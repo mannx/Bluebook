@@ -1,0 +1,199 @@
+table, th, td
+{
+	border: 1px solid black;
+	border-collapse: collapse;
+	text-align: center;
+}
+
+th.blank, td.blank
+{
+	border: none;
+}
+
+/* Used to highlight net sales total */
+td.Net
+{
+	background-color: yellow;
+}
+
+td.NetSalesUp
+{
+	background-color: {{ css.WeeklyColourUp }};
+}
+
+td.NetSalesDown
+{
+	background-color: {{ css.WeeklyColourDown }};
+}
+
+td.NetSalesSame
+{
+	background-color: {{ css.WeeklyColourSame }};
+}
+
+td.CustomerCount, td.ThirdPartyPerc
+{
+	background-color: yellow;
+}
+
+th.div, td.div
+{
+	background-color: black;
+}
+
+h1.title
+{
+	text-align: center;
+}
+
+div.comment
+{
+	font-size: 0.6em;
+}
+
+ul.tagList
+{
+	columns: 6;
+	list-style-type: none;
+}
+
+button.tag
+{
+	background-color: white;
+	color: black;
+	border: 2px solid lightblue;
+
+	margin-top: 2px;
+	margin-bottom: 2px;
+}
+
+button.tag:hover
+{
+	background-color: lightblue;
+	color: white;
+}
+
+ul.navControl
+{
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+	background-color: {{ css.NavMenuColour }};
+}
+
+li.navControl
+{
+	float: left;
+}
+
+li.navControl a.navLink
+{
+	display: block;
+	color: white;
+	text-align: center;
+	padding: 14px 16px;
+	text-decoration: none;
+}
+
+li.navControl a.navLink:hover
+{
+	background-color: cornflowerblue;
+}
+
+.dialog
+{
+	display: none;
+	position: fixed;
+	z-index: 1;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	overflow: auto;
+	background-color: rgb(0,0,0);
+	background-color: rgba(0,0,0,0.4);
+}
+
+.dialog-contents
+{
+	background-color: #fefefe;
+	margin: 15% auto;
+	padding: 20px;
+	border: 1px solid #888;
+	width: 80%;
+}
+
+.dialog-close
+{
+	color: #aaa;
+	float: right;
+	font-size: 28px;
+	font-weight: bold;
+}
+
+.dialog-close:hover
+.dialog-close:focus
+{
+	color: black;
+	text-decoration: none;
+	cursor: pointer;
+}
+
+button.smallButton
+{
+	font-size: 10px;
+	display: inline-block;
+	text-align: center;
+	text-decoration: none;
+}
+
+
+.tooltip
+{
+	position: relative;
+	display: inline-block;
+}
+
+.tooltip .tooltiptext
+{
+	visibility: hidden;
+	width: 120px;
+	background-color: black;
+	color: #fff;
+	text-align: center;
+	padding: 5px 0;
+	border-radius: 6px;
+	position: absolute;
+	z-index: 1;
+}
+
+.tooltip:hover .tooltiptext
+{
+	visibility: visible;
+}
+
+@media print
+{
+	.no-print, .no-print *
+	{
+		display: none !important;
+	}
+
+	body
+	{
+		-webkit-print-color-adjust: exact;
+	}
+	
+	{% if not css.WeeklySalesPrintColour %}
+	td.NetSalesUp
+	{
+		background-color: white;
+	}
+
+	td.NetSalesDown
+	{
+		background-color: white;
+	}
+	{% endif %}
+}

@@ -31,9 +31,16 @@ func lastDayHandler(c echo.Context) error {
 	return c.JSON(http.StatusOK, &dd)
 }
 
+// DayViewData is object type retruned by api
+type DayViewData struct {
+	DayData
+
+	GrossSales float64
+}
+
 // MonthlyView holds the monthly day data along with several other bits of info
 type MonthlyView struct {
-	Data []DayData
+	Data []DayViewData
 }
 
 //
@@ -79,6 +86,11 @@ func getMonthViewHandler(c echo.Context) error {
 		return res.Error
 	}
 
-	mv := MonthlyView{Data: data}
+	mvd := make([]DayViewData, 0)
+	for _, o := range data {
+		mvd = append(mvd, DayViewData{DayData: o, GrossSales: 1123})
+	}
+
+	mv := MonthlyView{Data: mvd}
 	return c.JSON(http.StatusOK, &mv)
 }
