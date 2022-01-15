@@ -31,16 +31,29 @@ func lastDayHandler(c echo.Context) error {
 	return c.JSON(http.StatusOK, &dd)
 }
 
-// DayViewData is object type retruned by api
+// EndOfWeek provides data totaling the previous week of sales
+type EndOfWeek struct {
+	NetSales      float64
+	CustomerCount int
+}
+
+// DayViewData is an expanded DayData object with additional properties
 type DayViewData struct {
 	DayData
 
-	GrossSales float64
+	ThirdPartyDollar  float64
+	ThirdPartyPercent float64
+	GrossSales        float64
+	DayOfMonth        int       // 1-31 for what day of the month it is
+	DayOfWeek         string    // user friendly name of what day it is
+	IsEndOfWeek       bool      // is this a tuesday?
+	EOW               EndOfWeek // end of week data if required
 }
 
 // MonthlyView holds the monthly day data along with several other bits of info
 type MonthlyView struct {
-	Data []DayViewData
+	Data      []DayViewData
+	MonthName string // month in a user friendly format
 }
 
 //
@@ -88,9 +101,43 @@ func getMonthViewHandler(c echo.Context) error {
 
 	mvd := make([]DayViewData, 0)
 	for _, o := range data {
-		mvd = append(mvd, DayViewData{DayData: o, GrossSales: 1123})
+		// compute the gross sales (net+hst+bot dep)
+		gs := o.NetSales + o.HST + o.BottleDeposit
+		d := time.Time(o.Date)
+
+		eow := EndOfWeek{} // initialize the end of week of it is required
+		if d.Weekday() == time.Tuesday {
+			// end of week, pull in the required data
+			pw := d.Add(-time.Hour * 24 * 7) // get previous 7 days
+			dat := make([]DayData, 7)
+			r := DB.Find(&dat, "Date >= ? AND Date <= ?", pw, d)
+			if r.Error != nil {
+				log.Error().Err(res.Error).Msg("Unable to retrieve data to compute end of week calculations")
+			} else {
+				net := 0.0
+				cc := 0
+				for _, n := range dat {
+					net += n.NetSales
+					cc += n.CustomerCount
+				}
+
+				eow.NetSales = net
+				eow.CustomerCount = cc
+			}
+		}
+
+		mvd = append(mvd,
+			DayViewData{
+				DayData:          o,
+				ThirdPartyDollar: o.DoorDash + o.SkipTheDishes,
+				GrossSales:       gs,
+				DayOfMonth:       d.Day(),
+				DayOfWeek:        d.Weekday().String(),
+				IsEndOfWeek:      d.Weekday() == time.Tuesday,
+				EOW:              eow,
+			})
 	}
 
-	mv := MonthlyView{Data: mvd}
+	mv := MonthlyView{Data: mvd, MonthName: time.Month(month).String()}
 	return c.JSON(http.StatusOK, &mv)
 }

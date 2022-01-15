@@ -55,27 +55,3 @@ func main() {
 		e.Logger.Fatal(err)
 	}
 }
-
-/*	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	db.AutoMigrate(&DayData{})
-
-	// retrieve the past 30 days
-	start := time.Date(2021, time.December, 1, 0, 0, 0, 0, time.UTC)
-	end := time.Date(2021, time.December, 31, 0, 0, 0, 0, time.UTC)
-
-	fmt.Printf("from: %v\n", start)
-	fmt.Printf("now: %v\n", end)
-
-	sql := "Date >= ? AND Date <= ?"
-	data := make([]DayData, 31)
-
-	db.Find(&data, sql, start, end)
-	for _, d := range data {
-		str, _ := d.Date.Value()
-		fmt.Printf("Date: %v\n", str)
-		fmt.Printf("Cash Deposit: %v\n", d.CashDeposit)
-	}*/

@@ -1,5 +1,6 @@
 import React from "react";
 import TableCell from "./TableCell.jsx";
+import TableEOW from "./TableEOW.jsx";
 import "./table.css";
 
 //
@@ -18,26 +19,31 @@ class TableView extends React.Component {
 
 				this.state.month = props.month;
 				this.state.year = props.year;
+
+				this.loadData = this.loadData.bind(this);
 		}
 
-		async componentDidMount() {
-			const url = "http://localhost:8080/api/month?month=" + this.state.month + "&year=" + this.state.year;
-			const resp = await fetch(url);
-			const data = await resp.json();
-
+		async loadData(month, year) {
+				const url = "http://localhost:8080/api/month?month=" + month + "&year=" + year;
+				const resp = await fetch(url);
+				const data = await resp.json();
+	
 				console.log(data);
-				//this.state.data = data;
-				this.setState({data: data, loading: false});
+				this.setState({data: data, loading: false, month: month, year:  year});
 		}
 
 		render() {
-			if(this.state.loading == true || this.state.data == null) {
+			if(this.state.loading === true || this.state.data == null) {
+					this.loadData(this.props.month, this.props.year);
 					return <h1>Loading data...</h1>;
+			}else if(this.state.month !== this.props.month || this.state.year !== this.props.year) {
+					this.loadData(this.props.month, this.props.year);
+					return <h1>Loading new data...</h1>;
 			}
 
 			return (
 					<table>
-							<caption><h1>Month {this.state.month} {this.state.year}</h1></caption>
+							<caption><h1>{this.state.data.MonthName} {this.state.year}</h1></caption>
 							<thead>
 								<tr>
 									<th></th>
@@ -74,6 +80,14 @@ class TableView extends React.Component {
 							</thead>
 							<tbody>
 							{this.state.data.Data.map(function (obj, i) {
+									if(obj.IsEndOfWeek) {
+											return (
+													<>
+														<TableCell data={obj} />
+														<TableEOW data={obj} />
+													</>
+											);
+									}
 									return <TableCell data={obj} />;
 							})}
 					</tbody>

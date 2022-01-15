@@ -1,7 +1,6 @@
 import React, {Component} from "react";
 import './App.css';
 
-import TableView from "./components/TableView/TableView.jsx";
 import Navigation from "./components/Navigation/Navigation.jsx";
 
 class App extends Component {
@@ -9,7 +8,7 @@ class App extends Component {
 	render(){
 		return (
 			<div className="App">
-				<Navigation />
+				<Navigation month="12" year="2021"  />
 			</div>
 		);
 	}

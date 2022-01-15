@@ -1,0 +1,36 @@
+
+th.blank, td.blank
+{
+	border: none;
+}
+
+/* Used to highlight net sales total */
+td.Net
+{
+	background-color: yellow;
+}
+
+/*td.NetSalesUp
+{
+	background-color: {{ css.WeeklyColourUp }};
+}
+
+td.NetSalesDown
+{
+	background-color: {{ css.WeeklyColourDown }};
+}
+
+td.NetSalesSame
+{
+	background-color: {{ css.WeeklyColourSame }};
+}*/
+
+td.CustomerCount, td.ThirdPartyPerc
+{
+	background-color: yellow;
+}
+
+th.div, td.div
+{
+	background-color: black;
+}

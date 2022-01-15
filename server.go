@@ -19,9 +19,7 @@ func initServer() *echo.Echo {
 	e.Use(middleware.Static("./static"))
 
 	// routes
-	//e.GET("/api/24hr", handle24hrView)
 	e.GET("/api/test", testHandler)
-	e.GET("/api/last", lastDayHandler)
 	e.GET("/api/month", getMonthViewHandler)
 
 	return e
