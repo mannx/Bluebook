@@ -165,7 +165,7 @@ func extractData(sheet *excelize.File, index int, date time.Time, ver int, db *g
 	return dd
 }
 
-func getDataOrNew(date time.Time, db *gorm.DB) models.DayData {
+/*func getDataOrNew(date time.Time, db *gorm.DB) models.DayData {
 	n := models.DayData{}
 
 	// TODO:
@@ -180,4 +180,4 @@ func getDataOrNew(date time.Time, db *gorm.DB) models.DayData {
 
 	log.Info().Msgf("n: %T", n)
 	return n
-}
+}*/

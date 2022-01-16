@@ -44,6 +44,7 @@ class Navigation extends React.Component {
 				this.NavigatePrev = this.NavigatePrev.bind(this);
 				this.NavigateNext = this.NavigateNext.bind(this);
 				this.Imports = this.Imports.bind(this);
+				this.funcToday = this.funcToday.bind(this);
 		}
 
 		render() {
@@ -68,7 +69,7 @@ class Navigation extends React.Component {
 		}
 
 		funcToday() {
-				alert("today!");
+				this.setState({page: PageMonth});
 		}
 
 		NavigatePrev() {

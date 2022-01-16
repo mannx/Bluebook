@@ -82,13 +82,13 @@ func getMonthViewHandler(c echo.Context) error {
 	endDay := time.Date(year, time.Month(xmonth+1), 0, 0, 0, 0, 0, time.UTC).Day()
 
 	// retrieve the objects in the given range
-	loc, e2 := time.LoadLocation("Canada/Atlantic")
-	if e2 != nil {
-		log.Fatal().Err(e2).Msg("Unable to load timezone")
-	}
+	/*	loc, e2 := time.LoadLocation("Canada/Atlantic")
+		if e2 != nil {
+			log.Fatal().Err(e2).Msg("Unable to load timezone")
+		}*/
 
-	start := time.Date(year, time.Month(month), 0, 0, 0, 0, 0, loc)
-	end := time.Date(year, time.Month(month), endDay, 0, 0, 0, 0, loc)
+	start := time.Date(year, time.Month(month), 1, 0, 0, 0, 0, time.UTC)
+	end := time.Date(year, time.Month(month), endDay, 0, 0, 0, 0, time.UTC)
 	data := make([]models.DayData, endDay)
 
 	log.Debug().Msgf("Start Time: [%v] End Time: [%v]", start, end)
@@ -109,7 +109,8 @@ func getMonthViewHandler(c echo.Context) error {
 		eow := EndOfWeek{} // initialize the end of week of it is required
 		if d.Weekday() == time.Tuesday {
 			// end of week, pull in the required data
-			pw := d.Add(-time.Hour * 24 * 7) // get previous 7 days
+			pw := d.Add(-time.Hour * 24 * 6) // get previous 7 days
+			log.Debug().Msgf("[EOW] start[%v] end=[%v]", pw.String(), d.String())
 			dat := make([]models.DayData, 7)
 			r := DB.Find(&dat, "Date >= ? AND Date <= ?", pw, d)
 			if r.Error != nil {

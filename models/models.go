@@ -51,3 +51,20 @@ type DayData struct {
 	// holds average of previous 4 weeks
 	WeeklyAverage float64 `gorm:"column:WeeklyAverage"`
 }
+
+//
+//	 Contains various bit of data for a given week
+type WeeklyInfo struct {
+	gorm.Model
+
+	Date       datatypes.Date `gorm:"column:Date"`
+	BreadCount int            `gorm:"column:BreadCount"`
+
+	FoodCostAmount  float64 `gorm:"column:FoodCostAmount"`
+	FoodCostPercent float64 `gorm:"column:FoodCostPercent"`
+
+	LabourCostAmount  float64 `gorm:"column:LabourCostAmount"`
+	LabourCostPercent float64 `gorm:"column:LabourCostPercent"`
+
+	PartySales float64 `gorm:"column:PartySales"`
+}

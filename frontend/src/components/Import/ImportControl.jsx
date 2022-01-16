@@ -1,12 +1,18 @@
 import React from "react";
 
-class Daily extends React.Component {
+//
+// This class is used to manage all imports
+// it requires a URL property for the GET/POST url
+//
+class ImportControl extends React.Component {
 		constructor(props) {
 				super(props);
 
 				this.state = {
 						data: null,		// data containing availble files to import
 						imports: null,	// list of all the files that will be imported
+						url: props.URL,	// url to use
+						page: props.page,
 				}
 
 				this.getControls = this.getControls.bind(this);
@@ -16,8 +22,7 @@ class Daily extends React.Component {
 
 		async componentDidMount() {
 				// load in the available import data from the server
-				const url = "http://localhost:8080/api/import/daily";
-				const resp = await fetch(url);
+				const resp = await fetch(this.state.url);
 				const data = await resp.json();
 				
 				// display and choose which files to import
@@ -25,9 +30,6 @@ class Daily extends React.Component {
 		}
 
 		getControls() {
-				console.log(this.state.data);
-				//return <span>getControls</span>;
-
 				this.state.data.map(function(obj, i) {
 						return <span>{obj}</span>;
 				});
@@ -35,13 +37,10 @@ class Daily extends React.Component {
 
 		addImp(e) {
 				if(this.state.imports == null ) {
-						//this.state.imports = [e.target.name];
 						this.setState({imports: [e.target.name]});
 				}else{
-						//this.state.imports=[...this.state.imports, e.target.name];
 						this.setState({imports: [...this.state.imports, e.target.name]});
 				}
-				console.log("add import " + this.state.imports);
 		}
 
 		render() {
@@ -50,7 +49,7 @@ class Daily extends React.Component {
 				}
 
 				return (
-						<div><h3>Daily Sheets Available for Import</h3>
+						<div><h3>Daily Sheets Available for Import (page {this.state.page})</h3>
 								<button onClick={this.performUpdate}>Update</button>
 								{this.state.data.map(function(obj, i) {
 										return (<>
@@ -65,18 +64,16 @@ class Daily extends React.Component {
 		// send the list of id's to be updated to the server
 		// TODO: find a way to get progress, another api waypoint with a timer?
 		performUpdate() {
-				const url = "http://localhost:8080/api/import/daily";
-				
 				const options = {
 						method: 'POST',
 						headers: {'Content-Type':'application/json'},
 						body: JSON.stringify(this.state.imports)
 				};
 
-				fetch(url, options)
+				fetch(this.state.url, options)
 					.then(res => res.json())
 					.then(data => console.log("update: " + data));
 		}
 }
 
-export default Daily;
+export default ImportControl;

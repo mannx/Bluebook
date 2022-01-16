@@ -40,6 +40,13 @@ func main() {
 
 	log.Debug().Msg("Auto migrating the database...")
 	DB.AutoMigrate(&models.DayData{})
+	DB.AutoMigrate(&models.WeeklyInfo{})
+
+	log.Debug().Msg("Converting old database to current...")
+	err = convertDB()
+	if err != nil {
+		log.Error().Err(err).Msgf("Unable to convert db")
+	}
 
 	log.Info().Msg("Initialiing server and middleware")
 
@@ -60,4 +67,35 @@ func main() {
 	if err := e.Shutdown(ctx); err != nil {
 		e.Logger.Fatal(err)
 	}
+}
+
+// this updates every record in the database with a new timestamp that includes
+// the time as well (since currently if using datatype.Date, it still contains a time component)
+// TODO: fix at some point, or not?
+func convertDB() error {
+	log.Debug().Msg("convertDB() begin")
+	var data []models.DayData
+	res := DB.Find(&data)
+	if res.Error != nil {
+		return res.Error
+	}
+
+	log.Debug().Msgf("Starting update of %v records....", res.RowsAffected)
+	for _, obj := range data {
+		DB.Save(&obj)
+	}
+
+	var wi []models.WeeklyInfo
+	res = DB.Find(&wi)
+	if res.Error != nil {
+		return res.Error
+	}
+
+	log.Debug().Msgf("starting update of %v records [weeklyinfo]....", res.RowsAffected)
+	for _, obj := range wi {
+		DB.Save(&obj)
+	}
+
+	log.Debug().Msg("Finished")
+	return nil
 }
