@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/labstack/echo/v4"
+	models "github.com/mannx/Bluebook/models"
 	"github.com/rs/zerolog/log"
 )
 
@@ -22,7 +23,7 @@ func lastDayHandler(c echo.Context) error {
 		log.Fatal().Msg("DB is null lastDayHandler")
 	}
 
-	var dd DayData
+	var dd models.DayData
 	res := DB.Last(&dd)
 	if res.Error != nil {
 		return res.Error
@@ -39,7 +40,7 @@ type EndOfWeek struct {
 
 // DayViewData is an expanded DayData object with additional properties
 type DayViewData struct {
-	DayData
+	models.DayData
 
 	ThirdPartyDollar  float64
 	ThirdPartyPercent float64
@@ -88,7 +89,7 @@ func getMonthViewHandler(c echo.Context) error {
 
 	start := time.Date(year, time.Month(month), 0, 0, 0, 0, 0, loc)
 	end := time.Date(year, time.Month(month), endDay, 0, 0, 0, 0, loc)
-	data := make([]DayData, endDay)
+	data := make([]models.DayData, endDay)
 
 	log.Debug().Msgf("Start Time: [%v] End Time: [%v]", start, end)
 
@@ -109,7 +110,7 @@ func getMonthViewHandler(c echo.Context) error {
 		if d.Weekday() == time.Tuesday {
 			// end of week, pull in the required data
 			pw := d.Add(-time.Hour * 24 * 7) // get previous 7 days
-			dat := make([]DayData, 7)
+			dat := make([]models.DayData, 7)
 			r := DB.Find(&dat, "Date >= ? AND Date <= ?", pw, d)
 			if r.Error != nil {
 				log.Error().Err(res.Error).Msg("Unable to retrieve data to compute end of week calculations")

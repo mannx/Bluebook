@@ -11,10 +11,12 @@ import (
 	"github.com/rs/zerolog/log"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+
+	models "github.com/mannx/Bluebook/models"
 )
 
 // Version of the current build/release
-const Version = 0.01
+const Version = 0.02
 
 // DB is the database connection for the entire run
 var DB *gorm.DB
@@ -33,7 +35,8 @@ func main() {
 
 	DB = dbo
 
-	DB.AutoMigrate(&DayData{})
+	log.Debug().Msg("Auto migrating the database...")
+	DB.AutoMigrate(&models.DayData{})
 
 	log.Info().Msg("Initialiing server and middleware")
 

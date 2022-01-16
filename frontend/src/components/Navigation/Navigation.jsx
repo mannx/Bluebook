@@ -1,5 +1,6 @@
 import React from "react";
 import TableView from "../../components/TableView/TableView.jsx";
+import Imports from "../Import/Import.jsx";
 import "./header.css";
 
 //
@@ -16,8 +17,18 @@ function func(props){}
 
 
 function Navigate(props) {
-		return <TableView month={props.month} year={props.year} />;
+		switch(props.page) {
+				case 1:
+					return <TableView month={props.month} year={props.year} />;
+				case 2:
+						return <Imports />;
+				default:
+						return <h2>Invalid page number {props.page}</h2>;
+		}
 }
+
+const PageMonth = 1;
+const PageImport = 2;
 
 class Navigation extends React.Component {
 		constructor(props) {
@@ -26,11 +37,13 @@ class Navigation extends React.Component {
 				this.state = {
 						// make sure month and year are both considered integers
 						month: parseInt(props.month), 
-						year: parseInt(props.year)
+						year: parseInt(props.year),
+						page: PageMonth,
 				};
 
 				this.NavigatePrev = this.NavigatePrev.bind(this);
 				this.NavigateNext = this.NavigateNext.bind(this);
+				this.Imports = this.Imports.bind(this);
 		}
 
 		render() {
@@ -47,6 +60,7 @@ class Navigation extends React.Component {
 							<li className={"navControl"}><NavButton name={"Wastage"} func={func} /></li>
 							<li className={"navControl"}><NavButton name={"Top 5"} func={func} /></li>
 							<li className={"navControl"}><NavButton name={"Settings"} func={func} /></li>
+							<li className={"navControl"}><NavButton name={"Import"} func={this.Imports} /></li>
 						</ul></div>
 						<Navigate month={this.state.month} year={this.state.year} page={this.state.page} />
 						</>
@@ -85,6 +99,11 @@ class Navigation extends React.Component {
 
 
 				this.setState({month: m, year: y});
+		}
+
+		// display the import pages
+		Imports() {
+				this.setState({page: PageImport});
 		}
 }
 
