@@ -21,6 +21,9 @@ const Version = 0.02
 // DB is the database connection for the entire run
 var DB *gorm.DB
 
+// name of the database we are using
+const dbName = "./data/db.db"
+
 func main() {
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 	zerolog.SetGlobalLevel(zerolog.DebugLevel)
@@ -28,7 +31,7 @@ func main() {
 	log.Info().Msgf("Bluebook Helper v%v.\n\n", Version)
 
 	log.Info().Msg("Initializing database...")
-	dbo, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+	dbo, err := gorm.Open(sqlite.Open(dbName), &gorm.Config{})
 	if err != nil {
 		log.Fatal().Err(err).Msg("Unable to open database...")
 	}

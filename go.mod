@@ -35,3 +35,8 @@ require (
 	gorm.io/driver/postgres v1.2.3 // indirect
 	gorm.io/driver/sqlserver v1.2.1 // indirect
 )
+
+replace (
+	github.com/mannx/Bluebook/import => ../import
+	github.com/mannx/Bluebook/models => ../models
+)

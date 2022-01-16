@@ -6,7 +6,12 @@
 
 FROM golang:alpine AS build
 
-WORKDIR /app
+# require gcc for some of the modules
+RUN apk add build-base
+
+ENV GOPATH /go/src
+
+WORKDIR /go/src/github.com/mannx/Bluebook
 
 COPY go.mod ./
 COPY go.sum ./
@@ -14,9 +19,10 @@ COPY go.sum ./
 RUN go mod download
 
 COPY *.go ./
+COPY ./models ./models
+COPY ./import ./import
 
 RUN go build -o /bluebook
-
 
 #
 # React Build Stage

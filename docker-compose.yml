@@ -1,0 +1,17 @@
+version: "3.8"
+
+services:
+  weather:
+    image: bluebook
+    container_name: bluebook
+    ports:
+      - 8080:8080
+    environment:
+      - TZ=Canada/Atlantic      
+      - BLUEBOOK_IMPORT_PATH=./testdata
+    volumes:
+      - ./data:/data
+      - /etc/localtime:/etc/localtime:ro
+    deploy:
+      restart_policy:
+        condition: on-failure
