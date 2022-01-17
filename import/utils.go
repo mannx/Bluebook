@@ -37,10 +37,6 @@ func PDFToText(fileName string) (string, error) {
 func getDataOrNew(date time.Time, db *gorm.DB) models.DayData {
 	n := models.DayData{}
 
-	// TODO:
-	//	check if we have an object already in the db
-
-	//res := db.Where("Date = ?", date.Format(dateFormat2)).First(&n)
 	log.Debug().Msgf("[getDataOrNew] Checking for object date: %v", date.String())
 	res := db.Find(&n, "Date = ?", date)
 	if res.Error != nil {

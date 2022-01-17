@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/mannx/Bluebook/api"
 )
 
 func initServer() *echo.Echo {
@@ -19,8 +20,7 @@ func initServer() *echo.Echo {
 	e.Use(middleware.Static("./static"))
 
 	// routes
-	e.GET("/api/test", testHandler)
-	e.GET("/api/month", getMonthViewHandler)
+	e.GET("/api/month", func(c echo.Context) error { return api.GetMonthViewHandler(c, DB) })
 
 	// import GET and POST handlers
 	e.GET("/api/import/daily", importDailyHandler)
@@ -32,5 +32,14 @@ func initServer() *echo.Echo {
 	e.GET("/api/import/wisr", importWISRHandler)
 	e.POST("/api/import/wisr", importPostWISR)
 
+	// comment editing
+	//e.POST("/api/update/comment", updateCommentHandler)
+	//e.POST("/api/update/comment", func(c echo.Context) error { return updateCommentHandler(c, DB) })
+	e.POST("/api/update/comment", uch)
+
 	return e
+}
+
+func uch(c echo.Context) error {
+	return api.UpdateCommentHandler(c, DB)
 }

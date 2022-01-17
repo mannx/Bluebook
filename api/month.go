@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"net/http"
@@ -7,30 +7,13 @@ import (
 	"github.com/labstack/echo/v4"
 	models "github.com/mannx/Bluebook/models"
 	"github.com/rs/zerolog/log"
+	"gorm.io/gorm"
 )
 
 /*
  * Contains all functions that handle incoming api requests
  *
  */
-
-func testHandler(c echo.Context) error {
-	return c.String(http.StatusOK, "TEST HANDLER")
-}
-
-func lastDayHandler(c echo.Context) error {
-	if DB == nil {
-		log.Fatal().Msg("DB is null lastDayHandler")
-	}
-
-	var dd models.DayData
-	res := DB.Last(&dd)
-	if res.Error != nil {
-		return res.Error
-	}
-
-	return c.JSON(http.StatusOK, &dd)
-}
 
 // EndOfWeek provides data totaling the previous week of sales
 type EndOfWeek struct {
@@ -50,6 +33,7 @@ type DayViewData struct {
 	IsEndOfWeek       bool      // is this a tuesday?
 	EOW               EndOfWeek // end of week data if required
 	Comment           string    // contains the comment if any
+	CommentID         int       // contains the ID of the comment entry in case we update
 }
 
 // MonthlyView holds the monthly day data along with several other bits of info
@@ -62,7 +46,7 @@ type MonthlyView struct {
 //	Returns data for a given month
 //	query url: /API_URL?month=MM&year=YYYY
 //
-func getMonthViewHandler(c echo.Context) error {
+func GetMonthViewHandler(c echo.Context, db *gorm.DB) error {
 	var month, year int
 
 	err := echo.QueryParamsBinder(c).
@@ -92,9 +76,9 @@ func getMonthViewHandler(c echo.Context) error {
 	end := time.Date(year, time.Month(month), endDay, 0, 0, 0, 0, time.UTC)
 	data := make([]models.DayData, endDay)
 
-	log.Debug().Msgf("Start Time: [%v] End Time: [%v]", start, end)
+	//log.Debug().Msgf("Start Time: [%v] End Time: [%v]", start, end)
 
-	res := DB.Order("Date").Find(&data, "Date >= ? AND Date <= ?", start, end)
+	res := db.Order("Date").Find(&data, "Date >= ? AND Date <= ?", start, end)
 
 	if res.Error != nil {
 		log.Error().Err(res.Error).Msg("Error retrieving data")
@@ -111,9 +95,9 @@ func getMonthViewHandler(c echo.Context) error {
 		if d.Weekday() == time.Tuesday {
 			// end of week, pull in the required data
 			pw := d.Add(-time.Hour * 24 * 6) // get previous 7 days
-			log.Debug().Msgf("[EOW] start[%v] end=[%v]", pw.String(), d.String())
+			//log.Debug().Msgf("[EOW] start[%v] end=[%v]", pw.String(), d.String())
 			dat := make([]models.DayData, 7)
-			r := DB.Find(&dat, "Date >= ? AND Date <= ?", pw, d)
+			r := db.Find(&dat, "Date >= ? AND Date <= ?", pw, d)
 			if r.Error != nil {
 				log.Error().Err(res.Error).Msg("Unable to retrieve data to compute end of week calculations")
 			} else {
@@ -131,12 +115,12 @@ func getMonthViewHandler(c echo.Context) error {
 
 		// check to see if we have any comment with this day
 		comm := models.Comments{}
-		r := DB.Find(&comm, "LinkedID = ?", o.ID)
-		if r.Error != nil {
+		_ = db.Find(&comm, "LinkedID = ?", o.ID)
+		/*if r.Error != nil {
 			log.Warn().Msgf("Unable to get comment for day %v", o.ID)
 		} else {
 			log.Debug().Msgf("[%v] Comment retrieved: %v (%T)", r.RowsAffected, comm.Comment, comm.Comment)
-		}
+		}*/
 
 		mvd = append(mvd,
 			DayViewData{
@@ -148,6 +132,7 @@ func getMonthViewHandler(c echo.Context) error {
 				IsEndOfWeek:      d.Weekday() == time.Tuesday,
 				EOW:              eow,
 				Comment:          comm.Comment,
+				CommentID:        comm.LinkedID,
 			})
 	}
 

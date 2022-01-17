@@ -39,7 +39,7 @@ func main() {
 	DB = dbo
 
 	log.Debug().Msg("Auto migrating the database...")
-	MigrateDB()
+	migrateDB()
 
 	log.Debug().Msg("Converting old database to current...")
 	//	_ = convertDB()
@@ -96,7 +96,7 @@ func convertDB() error {
 	return nil
 }
 
-func MigrateDB() {
+func migrateDB() {
 	DB.AutoMigrate(&models.DayData{})
 	DB.AutoMigrate(&models.WeeklyInfo{})
 	DB.AutoMigrate(&models.Comments{})

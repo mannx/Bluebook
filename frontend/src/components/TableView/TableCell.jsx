@@ -1,11 +1,42 @@
-import React from "react";
+import React  from "react";
 import NumberFormat from "react-number-format";
 import "./table.css";
+
+function CommentField(props) {
+		if(props.show === false) {
+				return <div className="comment"  >{props.Comment}</div>
+		}else{
+				return (
+						<form onSubmit={props.submit} >
+							<input type={"text"} name={"comment"} defaultValue={props.Comment} onChange={props.commentChange}/>
+							<input type={"hidden"} name="LinkedID" value={props.LinkedID} />
+							<input type={"submit"} value={"Update"} />
+						</form>
+				);
+		}
+}
 
 //
 //	This is used to draw a single row and fill in its data
 //	
 class TableCell extends React.Component {
+
+		commentURL = "http://localhost:8080/api/update/comment";
+
+		constructor(props) {
+				super(props);
+
+				this.state = {
+					editComment: false,
+					comment: props.data.Comment,
+					linkedID: props.data.CommentID,
+					data: props.data,
+					msg: ""			// sucess or error message after sending any server updates
+				}
+
+				this.editComment = this.editComment.bind(this);
+				this.submitComment = this.submitComment.bind(this);
+		}
 
 		NF(obj, prefix="", suffix="") {
 				return (
@@ -67,20 +98,46 @@ class TableCell extends React.Component {
 								<td>{this.Dol(this.props.data.ThirdPartyDollar)}</td>
 								<td className="div"></td>
 
-								<td>
-									<div className="comment">{this.props.data.Comment}</div>
-									<form onSubmit={this.submitComment} method={"post"} hidden>
-										<input type={"text"} name={"comment"} value={this.props.data.Comment} />
-										<input type={"hidden"} name="LinkedID" value={this.props.data.ID} />
-										<input type={"submit"} value={"Update"} />
-									</form>
+								<td onDoubleClick={this.editComment} >
+										<CommentField Comment={this.state.comment} LinkedID={this.props.data.CommentID} show={this.state.editComment} change={this.commentChange} submit={this.submitComment}/>
 								</td>
-								<td>TAGS</td>
+								<td>{this.props.data.CommentID}</td>
 						</tr>
 				);
 		}
 
-		submitComment() {}
+		submitComment(event) {
+				event.preventDefault();
+
+				// state.comment is the comment to save
+				// state.linkedid is the comment id if updating, 0 otherwise
+				/*const body = {
+						Comment: this.state.comment,
+						LinkedID: this.state.linkedID
+				}*/
+				const body = [this.state.comment, this.state.linkedID+""];
+
+				const options = {
+						method: 'POST',
+						headers: {'Content-Type':'application/json'},
+						body: JSON.stringify(body)
+				};
+
+				fetch(this.commentURL, options)
+						.then(r => this.setState({editComment: !this.state.editComment}))
+
+				//		.then(r => r.json())
+				//		.then(data => console.log(data));
+
+		}
+
+		editComment(){
+				this.setState({editComment: !this.state.editComment});
+		}
+
+		commentChange(e) {
+				this.setState({comment: e.target.value});
+		}
 }
 
 export default TableCell;

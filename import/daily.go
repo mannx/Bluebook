@@ -164,20 +164,3 @@ func extractData(sheet *excelize.File, index int, date time.Time, ver int, db *g
 
 	return dd
 }
-
-/*func getDataOrNew(date time.Time, db *gorm.DB) models.DayData {
-	n := models.DayData{}
-
-	// TODO:
-	//	check if we have an object already in the db
-
-	//res := db.Where("Date = ?", date.Format(dateFormat2)).First(&n)
-	res := db.Find(&n, "Date = ?", date)
-	if res.Error != nil {
-		log.Error().Err(res.Error).Msg("Unable to load data, using new data")
-		return n
-	}
-
-	log.Info().Msgf("n: %T", n)
-	return n
-}*/

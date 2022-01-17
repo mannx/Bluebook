@@ -23,6 +23,8 @@ class Imports extends React.Component {
 				this.dailyImport = this.dailyImport.bind(this);
 				this.controlImport= this.controlImport.bind(this);
 				this.wisrImport=this.wisrImport.bind(this);
+
+				console.log("dailyURL: " + this.dailyURL);
 		}
 
 		render() {

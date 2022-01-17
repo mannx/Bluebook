@@ -76,3 +76,15 @@ type Comments struct {
 	LinkedID int    `gorm:"column:LinkedID"`
 	Comment  string `gorm:"column:Comment"`
 }
+
+//
+//	Retrieves a comment block based on LinkedID,
+//	if not found, returns a fresh comment object
+func getCommentsOrNew(linkedID int, db *gorm.DB) Comments {
+	c := Comments{}
+
+	// ignore any errors since will return a default object
+	// on fail anyway
+	_ = db.Find(&c, "LinkedID = ?", linkedID)
+	return c
+}

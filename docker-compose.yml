@@ -9,6 +9,7 @@ services:
     environment:
       - TZ=Canada/Atlantic      
       - BLUEBOOK_IMPORT_PATH=./testdata
+      - BLUEBOOK_TEMP_PATH=./temp
     volumes:
       - ./data:/data
       - /etc/localtime:/etc/localtime:ro

@@ -21,6 +21,7 @@ RUN go mod download
 COPY *.go ./
 COPY ./models ./models
 COPY ./import ./import
+COPY ./api ./api
 
 RUN go build -o /bluebook
 
@@ -50,7 +51,7 @@ FROM alpine
 
 # make sure required packages are installed
 RUN apk update
-RUN apk add tzdata
+RUN apk add tzdata poppler-utils
 
 WORKDIR /
 
