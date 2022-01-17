@@ -77,6 +77,10 @@ type Comments struct {
 	Comment  string `gorm:"column:Comment"`
 }
 
+type WastageEntry struct {
+	gorm.Model
+}
+
 //
 //	Retrieves a comment block based on LinkedID,
 //	if not found, returns a fresh comment object
