@@ -39,14 +39,10 @@ func main() {
 	DB = dbo
 
 	log.Debug().Msg("Auto migrating the database...")
-	DB.AutoMigrate(&models.DayData{})
-	DB.AutoMigrate(&models.WeeklyInfo{})
+	MigrateDB()
 
 	log.Debug().Msg("Converting old database to current...")
-	err = convertDB()
-	if err != nil {
-		log.Error().Err(err).Msgf("Unable to convert db")
-	}
+	//	_ = convertDB()
 
 	log.Info().Msg("Initialiing server and middleware")
 
@@ -98,4 +94,10 @@ func convertDB() error {
 
 	log.Debug().Msg("Finished")
 	return nil
+}
+
+func MigrateDB() {
+	DB.AutoMigrate(&models.DayData{})
+	DB.AutoMigrate(&models.WeeklyInfo{})
+	DB.AutoMigrate(&models.Comments{})
 }

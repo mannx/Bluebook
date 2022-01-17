@@ -68,3 +68,11 @@ type WeeklyInfo struct {
 
 	PartySales float64 `gorm:"column:PartySales"`
 }
+
+// Contains day id, and the comment for that day
+type Comments struct {
+	gorm.Model
+
+	LinkedID int    `gorm:"column:LinkedID"`
+	Comment  string `gorm:"column:Comment"`
+}

@@ -49,6 +49,7 @@ type DayViewData struct {
 	DayOfWeek         string    // user friendly name of what day it is
 	IsEndOfWeek       bool      // is this a tuesday?
 	EOW               EndOfWeek // end of week data if required
+	Comment           string    // contains the comment if any
 }
 
 // MonthlyView holds the monthly day data along with several other bits of info
@@ -128,6 +129,15 @@ func getMonthViewHandler(c echo.Context) error {
 			}
 		}
 
+		// check to see if we have any comment with this day
+		comm := models.Comments{}
+		r := DB.Find(&comm, "LinkedID = ?", o.ID)
+		if r.Error != nil {
+			log.Warn().Msgf("Unable to get comment for day %v", o.ID)
+		} else {
+			log.Debug().Msgf("[%v] Comment retrieved: %v (%T)", r.RowsAffected, comm.Comment, comm.Comment)
+		}
+
 		mvd = append(mvd,
 			DayViewData{
 				DayData:          o,
@@ -137,6 +147,7 @@ func getMonthViewHandler(c echo.Context) error {
 				DayOfWeek:        d.Weekday().String(),
 				IsEndOfWeek:      d.Weekday() == time.Tuesday,
 				EOW:              eow,
+				Comment:          comm.Comment,
 			})
 	}
 

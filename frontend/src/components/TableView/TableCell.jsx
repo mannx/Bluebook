@@ -1,5 +1,6 @@
 import React from "react";
 import NumberFormat from "react-number-format";
+import "./table.css";
 
 //
 //	This is used to draw a single row and fill in its data
@@ -66,9 +67,20 @@ class TableCell extends React.Component {
 								<td>{this.Dol(this.props.data.ThirdPartyDollar)}</td>
 								<td className="div"></td>
 
+								<td>
+									<div className="comment">{this.props.data.Comment}</div>
+									<form onSubmit={this.submitComment} method={"post"} hidden>
+										<input type={"text"} name={"comment"} value={this.props.data.Comment} />
+										<input type={"hidden"} name="LinkedID" value={this.props.data.ID} />
+										<input type={"submit"} value={"Update"} />
+									</form>
+								</td>
+								<td>TAGS</td>
 						</tr>
 				);
 		}
+
+		submitComment() {}
 }
 
 export default TableCell;
