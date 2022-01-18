@@ -1,4 +1,5 @@
 import React from "react";
+import "./import.css";
 
 //
 // This class is used to manage all imports
@@ -51,11 +52,13 @@ class ImportControl extends React.Component {
 				return (
 						<div><h3>Daily Sheets Available for Import (page {this.state.page})</h3>
 								<button onClick={this.performUpdate}>Update</button>
+								<ul>
 								{this.state.data.map(function(obj, i) {
-										return (<>
+										return (<li>
 												<input type={"checkbox"} onChange={this.addImp} name={obj}/>
 												<span>{obj}</span>
-										</>);},this)}
+														</li>);},this)}
+								</ul>
 							</div>
 				);
 						
