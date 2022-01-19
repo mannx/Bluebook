@@ -28,7 +28,6 @@ class TableView extends React.Component {
 				const resp = await fetch(url);
 				const data = await resp.json();
 	
-				console.log(data);
 				this.setState({data: data, loading: false, month: month, year:  year});
 		}
 

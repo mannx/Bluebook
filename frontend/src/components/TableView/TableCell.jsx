@@ -17,11 +17,7 @@ class TableCell extends React.Component {
 					comment: props.data.Comment,
 					linkedID: props.data.CommentID,
 					data: props.data,
-					msg: ""			// sucess or error message after sending any server updates
 				}
-
-
-				console.log("comment: " + props.data.Comment)
 
 				this.editComment = this.editComment.bind(this);
 				this.submitComment = this.submitComment.bind(this);
@@ -117,11 +113,9 @@ class TableCell extends React.Component {
 				// state.linkedid is the comment id if updating, 0 otherwise
 				const body = {
 						Comment: this.state.comment,
-						LinkedID: this.state.linkedID
+						LinkedID: this.state.linkedID,
+						Date: ""
 				}
-				//const body = [this.state.comment, this.state.linkedID+""];
-				const json = JSON.stringify(body);
-				console.log(json);
 
 				const options = {
 						method: 'POST',
@@ -131,9 +125,7 @@ class TableCell extends React.Component {
 
 				fetch(this.commentURL, options)
 						.then(r => this.setState({editComment: !this.state.editComment}))
-
-				//		.then(r => r.json())
-				//		.then(data => console.log(data));
+						.then(r => console.log(r))
 
 		}
 
@@ -143,7 +135,6 @@ class TableCell extends React.Component {
 
 		commentChange(e) {
 				this.setState({comment: e.target.value});
-				console.log("comentChange() -> " + e.target.value);
 		}
 }
 

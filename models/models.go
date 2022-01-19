@@ -77,18 +77,44 @@ type Comments struct {
 	Comment  string `gorm:"column:Comment"`
 }
 
-type WastageEntry struct {
+//////////////////////
+//		Wastage		//
+//////////////////////
+
+// Various wastage constants
+const (
+	WasteUnitCount = 0 // item is counted as a unit
+	WastePounds    = 1 // item is counted in pounds (almost same as unit)
+	WasteKilo      = 2 // item is counted in kilos
+	WasteGram      = 3 // item is counted in grams
+
+	WasteLocationOther      = 0 // item is located inan unspecificed area
+	WasteLocationProtein    = 1 // item is a protein
+	WasteLocationVegetable  = 2
+	WasteLocationCookieChip = 3 // item is either cookies or chips
+	WasteLocationBread      = 4 // item is a type of bread
+)
+
+//
+//	Contains description of a single item and how it is counted
+//
+type WastageItem struct {
 	gorm.Model
+
+	Name             string  `gorm:"column:Name"`
+	UnitMeasure      int8    `gorm:"column:UnitMeasure"`       // how is this item measured (WasteUnitCount/Pounds/Kilo/etc)
+	Location         int8    `gorm:"column:Location"`          // where is the found
+	CustomConversion bool    `gorm:"column:CustomeConversion"` // do we havea custom conversion in use? if so, Weight*CustomConversion => UnitMeasure => Ouput value
+	CustomWeight     float64 `gorm:"column:CustomWeight"`      // what we multiple the items weight/count by if custom
 }
 
 //
-//	Retrieves a comment block based on LinkedID,
-//	if not found, returns a fresh comment object
-func getCommentsOrNew(linkedID int, db *gorm.DB) Comments {
-	c := Comments{}
+//	Contains 1 item that has been wasted
+//
+type WastageEntry struct {
+	gorm.Model
 
-	// ignore any errors since will return a default object
-	// on fail anyway
-	_ = db.Find(&c, "LinkedID = ?", linkedID)
-	return c
+	Item   uint           `gorm:"column:Item"` // item ID for an entry in the WastageItem table
+	Date   datatypes.Date `gorm:"column:Date"`
+	Amount float64        `gorm:"column:Amount"`
 }
