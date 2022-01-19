@@ -33,7 +33,7 @@ type DayViewData struct {
 	IsEndOfWeek       bool      // is this a tuesday?
 	EOW               EndOfWeek // end of week data if required
 	Comment           string    // contains the comment if any
-	CommentID         int       // contains the ID of the comment entry in case we update
+	CommentID         uint       // contains the ID of the comment entry in case we update
 }
 
 // MonthlyView holds the monthly day data along with several other bits of info
@@ -67,16 +67,9 @@ func GetMonthViewHandler(c echo.Context, db *gorm.DB) error {
 	endDay := time.Date(year, time.Month(xmonth+1), 0, 0, 0, 0, 0, time.UTC).Day()
 
 	// retrieve the objects in the given range
-	/*	loc, e2 := time.LoadLocation("Canada/Atlantic")
-		if e2 != nil {
-			log.Fatal().Err(e2).Msg("Unable to load timezone")
-		}*/
-
 	start := time.Date(year, time.Month(month), 1, 0, 0, 0, 0, time.UTC)
 	end := time.Date(year, time.Month(month), endDay, 0, 0, 0, 0, time.UTC)
 	data := make([]models.DayData, endDay)
-
-	//log.Debug().Msgf("Start Time: [%v] End Time: [%v]", start, end)
 
 	res := db.Order("Date").Find(&data, "Date >= ? AND Date <= ?", start, end)
 
@@ -95,7 +88,6 @@ func GetMonthViewHandler(c echo.Context, db *gorm.DB) error {
 		if d.Weekday() == time.Tuesday {
 			// end of week, pull in the required data
 			pw := d.Add(-time.Hour * 24 * 6) // get previous 7 days
-			//log.Debug().Msgf("[EOW] start[%v] end=[%v]", pw.String(), d.String())
 			dat := make([]models.DayData, 7)
 			r := db.Find(&dat, "Date >= ? AND Date <= ?", pw, d)
 			if r.Error != nil {
@@ -116,11 +108,6 @@ func GetMonthViewHandler(c echo.Context, db *gorm.DB) error {
 		// check to see if we have any comment with this day
 		comm := models.Comments{}
 		_ = db.Find(&comm, "LinkedID = ?", o.ID)
-		/*if r.Error != nil {
-			log.Warn().Msgf("Unable to get comment for day %v", o.ID)
-		} else {
-			log.Debug().Msgf("[%v] Comment retrieved: %v (%T)", r.RowsAffected, comm.Comment, comm.Comment)
-		}*/
 
 		mvd = append(mvd,
 			DayViewData{
@@ -132,7 +119,7 @@ func GetMonthViewHandler(c echo.Context, db *gorm.DB) error {
 				IsEndOfWeek:      d.Weekday() == time.Tuesday,
 				EOW:              eow,
 				Comment:          comm.Comment,
-				CommentID:        comm.LinkedID,
+				CommentID:        o.ID,
 			})
 	}
 

@@ -27,8 +27,5 @@ func UpdateCommentHandler(c echo.Context, db *gorm.DB) error {
 	log.Debug().Msg("updateCommentHandler")
 
 	log.Debug().Msgf("  comment updated: [%v] %v", arr.LinkedID, arr.Comment)
-	/*for i, n := range arr {
-		log.Debug().Msgf("  [%v] %v]", i, n)
-	}*/
 	return c.String(http.StatusOK, "Update Success")
 }
