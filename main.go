@@ -16,7 +16,7 @@ import (
 )
 
 // Version of the current build/release
-const Version = 0.02
+const Version = 0.03
 
 // DB is the database connection for the entire run
 var DB *gorm.DB

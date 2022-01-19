@@ -2,20 +2,6 @@ import React  from "react";
 import NumberFormat from "react-number-format";
 import "./table.css";
 
-function CommentField(props) {
-		if(props.show === false) {
-				return <div className="comment"  >{props.Comment}</div>
-		}else{
-				return (
-						<form onSubmit={props.submit} >
-							<input type={"text"} name={"comment"} defaultValue={props.Comment} onChange={props.commentChange}/>
-							<input type={"hidden"} name="LinkedID" value={props.LinkedID} />
-							<input type={"submit"} value={"Update"} />
-						</form>
-				);
-		}
-}
-
 //
 //	This is used to draw a single row and fill in its data
 //	
@@ -34,8 +20,13 @@ class TableCell extends React.Component {
 					msg: ""			// sucess or error message after sending any server updates
 				}
 
+
+				console.log("comment: " + props.data.Comment)
+
 				this.editComment = this.editComment.bind(this);
 				this.submitComment = this.submitComment.bind(this);
+				this.commentChange = this.commentChange.bind(this);
+				this.commentField = this.commentField.bind(this);
 		}
 
 		NF(obj, prefix="", suffix="") {
@@ -99,11 +90,24 @@ class TableCell extends React.Component {
 								<td className="div"></td>
 
 								<td onDoubleClick={this.editComment} >
-										<CommentField Comment={this.state.comment} LinkedID={this.props.data.CommentID} show={this.state.editComment} change={this.commentChange} submit={this.submitComment}/>
+										{this.commentField() }
 								</td>
 								<td>{this.props.data.CommentID}</td>
 						</tr>
 				);
+		}
+
+		commentField() {
+			if(this.state.editComment === false) {
+				return <div className="comment"  >{this.state.comment}</div>;
+			}else{
+				return (
+						<form onSubmit={this.submitComment} >
+							<input type={"text"} name={"comment"} defaultValue={this.state.Comment} onChange={this.commentChange}/>
+							<input type={"submit"} value={"Update"} />
+						</form>
+				);
+			}
 		}
 
 		submitComment(event) {
@@ -111,11 +115,13 @@ class TableCell extends React.Component {
 
 				// state.comment is the comment to save
 				// state.linkedid is the comment id if updating, 0 otherwise
-				/*const body = {
+				const body = {
 						Comment: this.state.comment,
 						LinkedID: this.state.linkedID
-				}*/
-				const body = [this.state.comment, this.state.linkedID+""];
+				}
+				//const body = [this.state.comment, this.state.linkedID+""];
+				const json = JSON.stringify(body);
+				console.log(json);
 
 				const options = {
 						method: 'POST',
@@ -137,6 +143,7 @@ class TableCell extends React.Component {
 
 		commentChange(e) {
 				this.setState({comment: e.target.value});
+				console.log("comentChange() -> " + e.target.value);
 		}
 }
 
