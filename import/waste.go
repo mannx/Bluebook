@@ -18,10 +18,17 @@ type wasteData struct {
 	amount float64
 }
 
+/*var cellNames []rune
+
+func init() {
+		cellNames = make([]rune,26)
+//		for i := 
+}*/
+
 // needs fixing
 func getCell(row int, col int) string {
-	c := rune(int('A') + col)
-	return fmt.Sprintf("%v%v", row, c)
+	c := int('A') + col
+	return fmt.Sprintf("%c%v", rune( c), row)
 }
 
 // Import a waste sheet given its filename
@@ -41,9 +48,11 @@ func ImportWaste(fileName string, db *gorm.DB) error {
 
 	var currDate time.Time // keeps track of the last date we saw
 
+	const wasteDateFormat = "02-Jan-2006"
+
 	for row := 2; ; row++ {
 		// retrieve the date if available
-		dat, err := f.GetCellValue("Sheet1", getCell(row, 1))
+		dat, err := f.GetCellValue("Waste Sheet", getCell(row, 0))
 		if err != nil {
 			log.Warn().Err(err).Msg("Unable to read cell")
 			continue
@@ -51,7 +60,7 @@ func ImportWaste(fileName string, db *gorm.DB) error {
 
 		if dat != "" {
 			// have a new date
-			currDate, err = time.Parse(dateFormat, dat)
+			currDate, err = time.Parse(wasteDateFormat, dat)
 			if err != nil {
 				log.Error().Err(err).Msg("Bad date format found!")
 				return err
@@ -59,7 +68,7 @@ func ImportWaste(fileName string, db *gorm.DB) error {
 		}
 
 		// get the item and quantity
-		item, err := f.GetCellValue("Sheet1", getCell(row, 2))
+		item, err := f.GetCellValue("Waste Sheet", getCell(row, 1))
 		if err != nil {
 			log.Warn().Err(err).Msg("Unable to read cell")
 			continue
@@ -70,7 +79,7 @@ func ImportWaste(fileName string, db *gorm.DB) error {
 			break
 		}
 
-		quant, err := f.GetCellValue("Sheet1", getCell(row, 3))
+		quant, err := f.GetCellValue("Waste Sheet", getCell(row, 2))
 		if err != nil {
 			log.Warn().Err(err).Msg("Unable to read cell")
 			continue
@@ -84,13 +93,16 @@ func ImportWaste(fileName string, db *gorm.DB) error {
 		res := db.Find(&obj, "Name = ?", item)
 		if res.Error == gorm.ErrRecordNotFound {
 			// unable to retrieve the item, create a new entry
+			log.Debug().Msgf("Unable to find item %v....creating new entry")
 			obj.Name = item
 			r := db.Save(&obj)
 			if r.Error != nil {
 				return err
 			}
+			log.Debug().Msgf("Item created...ID: %v", obj.ID)
 		} else if res.Error != nil {
 			// other error
+			log.Error().Err(res.Error).Msg("Error")
 			return res.Error
 		}
 

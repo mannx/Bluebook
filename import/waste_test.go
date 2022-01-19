@@ -6,8 +6,8 @@ import (
 
 func Test_getCell(t *testing.T) {
 	// test with value of B2
-	want := "C2"
-	got := getCell(2, 2)
+	want := "B2"
+	got := getCell(2, 1)
 
 	if want != got {
 		// fail

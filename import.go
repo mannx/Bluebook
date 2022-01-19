@@ -104,3 +104,11 @@ func importPostControl(c echo.Context) error {
 func importPostWISR(c echo.Context) error {
 	return importPostHandler(c, daily.ImportWISR)
 }
+
+func importWasteHandler(c echo.Context) error {
+		return importFileHandler(c, "*.xlsx")
+}
+
+func importPostWaste(c echo.Context) error {
+		return importPostHandler(c, daily.ImportWaste)
+}

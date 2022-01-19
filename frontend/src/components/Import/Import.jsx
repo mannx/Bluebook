@@ -8,21 +8,24 @@ class Imports extends React.Component {
 		dailyURL = "http://localhost:8080/api/import/daily";
 		controlURL = "http://localhost:8080/api/import/control";
 		wisrURL = "http://localhost:8080/api/import/wisr";
+		wasteURL = "http://localhost:8080/api/import/waste";
 
 		constructor(props) {
 				super(props)
 
 				this.state = {
-						page: 0,		// 0 blank, 1-> daily, 2-> control, 3-> wisr
+						page: 0,		// 0 blank, 1-> daily, 2-> control, 3-> wisr, 4-> waste
 				}
 
 				this.dailies = this.dailies.bind(this);
 				this.control = this.control.bind(this);
 				this.wisr = this.wisr.bind(this);
+				this.waste = this.waste.bind(this);
 
 				this.dailyImport = this.dailyImport.bind(this);
 				this.controlImport= this.controlImport.bind(this);
 				this.wisrImport=this.wisrImport.bind(this);
+				this.wasteImport = this.wasteImport.bind(this);
 
 				console.log("dailyURL: " + this.dailyURL);
 		}
@@ -33,6 +36,7 @@ class Imports extends React.Component {
 						case 1: return this.dailyImport();
 						case 2: return this.controlImport();
 						case 3: return this.wisrImport();
+						case 4: return this.wasteImport();
 						default: return (<>{this.blank()} <h1>Bad page #{this.state.page}</h1></>);
 				}
 		}
@@ -42,6 +46,7 @@ class Imports extends React.Component {
 						<button onClick={this.dailies}>Import Dailies</button>
 						<button onClick={this.control}>Import Control Sheet</button>
 						<button onClick={this.wisr}>Import WISR</button>
+						<button onClick={this.waste}>Import Waste</button>
 				</>);
 		}
 
@@ -58,9 +63,14 @@ class Imports extends React.Component {
 				return (<>{this.blank()}<ImportControl URL={this.wisrURL} page={this.state.page} /></>);
 		}
 
+		wasteImport() {
+				return (<>{this.blank()}<ImportControl URL={this.wasteURL} page={this.state.page} /></>);
+		}
+
 		dailies() {console.log("dailies()"); this.setState({page: 1});}
 		control() { console.log("control()"); this.setState({page: 2});}
 		wisr() { console.log("wisr()"); this.setState({page: 3});}
+		waste() { console.log("waste()"); this.setState({page: 4});}
 }
 
 export default Imports;

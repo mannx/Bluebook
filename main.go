@@ -100,4 +100,6 @@ func migrateDB() {
 	DB.AutoMigrate(&models.DayData{})
 	DB.AutoMigrate(&models.WeeklyInfo{})
 	DB.AutoMigrate(&models.Comments{})
+	DB.AutoMigrate(&models.WastageItem{})
+	DB.AutoMigrate(&models.WastageEntry{})
 }

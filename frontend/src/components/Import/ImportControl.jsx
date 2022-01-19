@@ -73,6 +73,7 @@ class ImportControl extends React.Component {
 						body: JSON.stringify(this.state.imports)
 				};
 
+				console.log("body: " + options.body);
 				fetch(this.state.url, options)
 					.then(res => res.json())
 					.then(data => console.log("update: " + data));

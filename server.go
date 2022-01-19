@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"github.com/mannx/Bluebook/api"
+	api "github.com/mannx/Bluebook/api"
 )
 
 func initServer() *echo.Echo {
@@ -32,14 +32,17 @@ func initServer() *echo.Echo {
 	e.GET("/api/import/wisr", importWISRHandler)
 	e.POST("/api/import/wisr", importPostWISR)
 
+	e.GET("/api/import/waste", importWasteHandler)
+	e.POST("/api/import/waste", importPostWaste)
+
 	// comment editing
 	//e.POST("/api/update/comment", updateCommentHandler)
-	//e.POST("/api/update/comment", func(c echo.Context) error { return updateCommentHandler(c, DB) })
-	e.POST("/api/update/comment", uch)
+	e.POST("/api/update/comment", func(c echo.Context) error { return api.UpdateCommentHandler(c, DB) })
+	//e.POST("/api/update/comment", uch)
 
 	return e
 }
 
-func uch(c echo.Context) error {
+/*func uch(c echo.Context) error {
 	return api.UpdateCommentHandler(c, DB)
-}
+}*/
