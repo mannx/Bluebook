@@ -33,7 +33,7 @@ type DayViewData struct {
 	IsEndOfWeek       bool      // is this a tuesday?
 	EOW               EndOfWeek // end of week data if required
 	Comment           string    // contains the comment if any
-	CommentID         uint       // contains the ID of the comment entry in case we update
+	CommentID         uint      // contains the ID of the comment entry in case we update
 }
 
 // MonthlyView holds the monthly day data along with several other bits of info
@@ -67,7 +67,7 @@ func GetMonthViewHandler(c echo.Context, db *gorm.DB) error {
 	endDay := time.Date(year, time.Month(xmonth+1), 0, 0, 0, 0, 0, time.UTC).Day()
 
 	// retrieve the objects in the given range
-	start := time.Date(year, time.Month(month), 1, 0, 0, 0, 0, time.UTC)
+	start := time.Date(year, time.Month(month), 0, 0, 0, 0, 0, time.UTC)
 	end := time.Date(year, time.Month(month), endDay, 0, 0, 0, 0, time.UTC)
 	data := make([]models.DayData, endDay)
 

@@ -3,6 +3,7 @@ package daily
 import (
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	models "github.com/mannx/Bluebook/models"
@@ -22,13 +23,13 @@ type wasteData struct {
 
 func init() {
 		cellNames = make([]rune,26)
-//		for i := 
+//		for i :=
 }*/
 
 // needs fixing
 func getCell(row int, col int) string {
 	c := int('A') + col
-	return fmt.Sprintf("%c%v", rune( c), row)
+	return fmt.Sprintf("%c%v", rune(c), row)
 }
 
 // Import a waste sheet given its filename
@@ -46,6 +47,10 @@ func ImportWaste(fileName string, db *gorm.DB) error {
 		}
 	}()
 
+	for i, n := range f.GetSheetMap() {
+		fmt.Printf("[%v] %v\n", i, n)
+	}
+
 	var currDate time.Time // keeps track of the last date we saw
 
 	const wasteDateFormat = "02-Jan-2006"
@@ -54,10 +59,11 @@ func ImportWaste(fileName string, db *gorm.DB) error {
 		// retrieve the date if available
 		dat, err := f.GetCellValue("Waste Sheet", getCell(row, 0))
 		if err != nil {
-			log.Warn().Err(err).Msg("Unable to read cell")
-			continue
+			log.Warn().Err(err).Msg("Unable to read cell (1)")
+			break
 		}
 
+		log.Debug().Msgf("   Date: %v", dat)
 		if dat != "" {
 			// have a new date
 			currDate, err = time.Parse(wasteDateFormat, dat)
@@ -70,36 +76,37 @@ func ImportWaste(fileName string, db *gorm.DB) error {
 		// get the item and quantity
 		item, err := f.GetCellValue("Waste Sheet", getCell(row, 1))
 		if err != nil {
-			log.Warn().Err(err).Msg("Unable to read cell")
-			continue
+			log.Warn().Err(err).Msg("Unable to read cell (2)")
+			break
 		}
 
+		log.Debug().Msgf("    Item: %v", item)
 		if item == "" {
 			// empty item means end of list
 			break
 		}
 
+		item = strings.ToLower(item) //force lowercase to minimize having to combine later
+
 		quant, err := f.GetCellValue("Waste Sheet", getCell(row, 2))
 		if err != nil {
-			log.Warn().Err(err).Msg("Unable to read cell")
-			continue
+			log.Warn().Err(err).Msg("Unable to read cell (3)")
+			break
 		}
 
 		// save it
 		// check if item exists in WastageEntry, otherwise
 		// create a new entry and use its ID
 
-		var obj models.WastageItem
+		obj := models.WastageItem{}
 		res := db.Find(&obj, "Name = ?", item)
-		if res.Error == gorm.ErrRecordNotFound {
+		if res.RowsAffected == 0 {
 			// unable to retrieve the item, create a new entry
-			log.Debug().Msgf("Unable to find item %v....creating new entry")
 			obj.Name = item
 			r := db.Save(&obj)
 			if r.Error != nil {
 				return err
 			}
-			log.Debug().Msgf("Item created...ID: %v", obj.ID)
 		} else if res.Error != nil {
 			// other error
 			log.Error().Err(res.Error).Msg("Error")
@@ -121,7 +128,6 @@ func ImportWaste(fileName string, db *gorm.DB) error {
 		if res.Error != nil {
 			return err
 		}
-
 	}
 
 	return nil

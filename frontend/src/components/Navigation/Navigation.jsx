@@ -1,6 +1,7 @@
 import React from "react";
 import TableView from "../../components/TableView/TableView.jsx";
 import Imports from "../Import/Import.jsx";
+import Wastage from "../Wastage/Wastage.jsx";
 import "./header.css";
 
 //
@@ -16,19 +17,22 @@ function NavButton(props) {
 function func(props){}
 
 
+const PageMonth = 1;
+const PageImport = 2;
+const PageWastage = 3;
+
 function Navigate(props) {
 		switch(props.page) {
-				case 1:
+				case PageMonth:
 					return <TableView month={props.month} year={props.year} />;
-				case 2:
+				case PageImport:
 						return <Imports />;
+				case PageWastage:
+						return <Wastage />;
 				default:
 						return <h2>Invalid page number {props.page}</h2>;
 		}
 }
-
-const PageMonth = 1;
-const PageImport = 2;
 
 class Navigation extends React.Component {
 		constructor(props) {
@@ -53,12 +57,12 @@ class Navigation extends React.Component {
 						<div><ul className={"navControl"}>
 							<li className={"navControl"}><NavButton name={"Prev"} func={this.NavigatePrev} /></li>
 							<li className={"navControl"}><NavButton name={"Next"} func={this.NavigateNext} /></li>
-							<li className={"navControl"}><NavButton name={"Prev Year"} func={func} /></li>
+							<li className={"navControl"}><NavButton name={"Prev Year"} func={this.NavigatePrevYear} /></li>
 							<li className={"navControl"}><NavButton name={"Today"} func={this.funcToday} /></li>
 							<li className={"navControl"}><NavButton name={"Search Tags"} func={func} /></li>
 							<li className={"navControl"}><NavButton name={"AUV"} func={func} /></li>
 							<li className={"navControl"}><NavButton name={"Weekly Info"} func={func} /></li>
-							<li className={"navControl"}><NavButton name={"Wastage"} func={func} /></li>
+							<li className={"navControl"}><NavButton name={"Wastage"} func={this.NavigateWastage} /></li>
 							<li className={"navControl"}><NavButton name={"Top 5"} func={func} /></li>
 							<li className={"navControl"}><NavButton name={"Settings"} func={func} /></li>
 							<li className={"navControl"}><NavButton name={"Import"} func={this.Imports} /></li>
@@ -70,6 +74,9 @@ class Navigation extends React.Component {
 
 		funcToday() {
 				this.setState({page: PageMonth});
+
+				let d = new Date();
+				this.setState({month: d.getMonth()+1, year: d.getFullYear()});
 		}
 
 		NavigatePrev() {
@@ -106,6 +113,13 @@ class Navigation extends React.Component {
 		Imports() {
 				this.setState({page: PageImport});
 		}
+
+		NavigatePrevYear = () => {
+				this.setState({year: this.state.year-1})
+		}
+
+		NavigateWastage = () => { this.setState({page: PageWastage});}
+
 }
 
 

@@ -3,13 +3,18 @@
 
 - TODO:
 	* be able to read/write from the existing db with little to no modifications to db structure
-	* Import functions/scripts for raw paperwork
+		+ columns need renamed
 	* (PARTIAL) Browse montly data or jump to a specific month/year
 	* Weekly paperwork calculations, file generation
+	* Wastage server and front end finishing
+		- Datepicker to pick week and error check for non-tuesday
+		- server: combine similar items for total weights, calculate weight conversions
+		- server: Wastage Import needs item combining implemented
+		- server: json file describing initial batch of common wastage items
+	* Tags: not yet started
+	* AUV and Weekly: not yet started
+	* CSS worked on
 
-
-- Immediate TODO:
-	* Import scripts/functions for dailys, control, and wisr sheets
 
 
 - Environment Variables:
