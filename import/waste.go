@@ -19,13 +19,6 @@ type wasteData struct {
 	amount float64
 }
 
-/*var cellNames []rune
-
-func init() {
-		cellNames = make([]rune,26)
-//		for i :=
-}*/
-
 // needs fixing
 func getCell(row int, col int) string {
 	c := int('A') + col
@@ -103,6 +96,7 @@ func ImportWaste(fileName string, db *gorm.DB) error {
 		if res.RowsAffected == 0 {
 			// unable to retrieve the item, create a new entry
 			obj.Name = item
+			log.Debug().Msgf("Adding wastem item: %v", obj.Name)
 			r := db.Save(&obj)
 			if r.Error != nil {
 				return err
@@ -130,5 +124,11 @@ func ImportWaste(fileName string, db *gorm.DB) error {
 		}
 	}
 
+	return nil
+}
+
+// ImportWasteDefinition imports waste entries give a simple JSON config
+func ImportWasteDefinition(fileName string) error {
+	log.Debug().Msg("ImportWasteDefinition()")
 	return nil
 }

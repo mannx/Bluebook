@@ -46,6 +46,8 @@ type MonthlyView struct {
 //	Returns data for a given month
 //	query url: /API_URL?month=MM&year=YYYY
 //
+
+// GetMonthViewHandler handles returning data for viewing a given month
 func GetMonthViewHandler(c echo.Context, db *gorm.DB) error {
 	var month, year int
 

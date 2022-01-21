@@ -5,19 +5,16 @@ class Wastage extends React.Component {
 				super(props);
 				let d = new Date();
 
-				let m = d.getMonth();
-				let da= d.getDay();
-				let y = d.getFullYear();
+				/*var m = d.getMonth();
+				var da= d.getDay();
+				var y = d.getFullYear();*/
 				this.state = {
-						month: d.m,
-						day: d.da,
-						year: d.y,
+						month: 1,
+						day: 18,
+						year: 2022,
+						data: null,
 						errorMsg: "",
-
 				}
-
-				console.log("state: " + this.state.year);
-				console.log(this.state);
 		}
 
 		async componentDidMount() {
@@ -25,14 +22,36 @@ class Wastage extends React.Component {
 				const resp = await fetch(url);
 				const data = await resp.json();
 
-				console.log(data);
+				//this.setState({data: JSON.parse(data)});
+				this.setState({data: data});
 		}
 
 
 		render() {
+				if(this.state.data == null){
+						return <h1>Loading...</h1>;
+				}
+
 				return (<>
 						{this.errorMessage()}
-						<div>Waste table here: {this.state.month}/{this.state.year}</div>
+						<table>
+								<caption>Waste for {this.state.month}/{this.state.day}/{this.state.year}</caption>
+								<thead>
+										<tr>
+											<th>Item</th>
+											<th>Weight</th>
+										</tr>
+								</thead>
+								<tbody>
+								{this.state.data.Data.map(function (obj, i) {
+										return (<tr>
+												<td>{obj.Name}</td>
+												<td>{obj.Amount}</td>
+												</tr>
+										);
+								}, this)}
+								</tbody>
+						</table>
 						</>);
 		}
 

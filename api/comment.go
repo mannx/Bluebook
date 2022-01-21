@@ -10,6 +10,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// CommentPost contains data when a new comment is created and needs to be saved
 type CommentPost struct {
 	Comment  string `json:"Comment" query:"Comment"`
 	LinkedID int    `json:"LinkedID" query:"LinkedID"` // id of the day we are adding the comment to, 0 if we dont have a linked day
@@ -21,6 +22,8 @@ const dateFormat = "02012006"
 // we are expecting 3 values in the post
 //   comment:	the comment we are updating/creating
 //	 linkedid:	the id of the day we are linked to
+
+// UpdateCommentHandler is used to handle comments
 func UpdateCommentHandler(c echo.Context, db *gorm.DB) error {
 	var cp CommentPost
 

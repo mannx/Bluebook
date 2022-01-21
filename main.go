@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"net/http"
 	"os"
 	"os/signal"
@@ -24,6 +25,12 @@ var DB *gorm.DB
 // name of the database we are using
 const dbName = "./data/db.db"
 
+var importFlag string // if true, -i was used to import a wast definition file
+
+func init() {
+	flag.StringVar(&importFlag, "i", "", "Import a wastage definition file")
+}
+
 func main() {
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 	zerolog.SetGlobalLevel(zerolog.DebugLevel)
@@ -43,6 +50,15 @@ func main() {
 
 	log.Debug().Msg("Converting old database to current...")
 	//	_ = convertDB()
+
+	if importFlag != "" {
+		// import waste definition
+		log.Info().Msgf("Importing waste defintions from file: %v", importFlag)
+		err := daily.ImportWasteDefinition(importFlag)
+		if err != nil {
+			log.Error().Err(err).Msg("Unable to load waste defintions")
+		}
+	}
 
 	log.Info().Msg("Initialiing server and middleware")
 
