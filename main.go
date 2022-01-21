@@ -14,6 +14,7 @@ import (
 	"gorm.io/gorm"
 
 	models "github.com/mannx/Bluebook/models"
+	daily "github.com/mannx/Bluebook/import"
 )
 
 // Version of the current build/release

@@ -28,6 +28,8 @@ class WI:
 objs = WastageItem.objects.all()
 out = WI()
 
+print('{"Data":[')
+
 for o in objs:
     w = Waste()
     w.Name=o.Name
@@ -35,4 +37,6 @@ for o in objs:
     w.Location=o.Location
     out.Objects.append(w)
     jstr = json.dumps(w.__dict__)
-    print(jstr)
+    print(jstr+",")
+
+print("]}")

@@ -5,6 +5,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"io/ioutil"
+	"encoding/json"
 
 	models "github.com/mannx/Bluebook/models"
 	"github.com/rs/zerolog/log"
@@ -130,5 +132,33 @@ func ImportWaste(fileName string, db *gorm.DB) error {
 // ImportWasteDefinition imports waste entries give a simple JSON config
 func ImportWasteDefinition(fileName string) error {
 	log.Debug().Msg("ImportWasteDefinition()")
+
+	f, err := ioutil.ReadFile(fileName)
+	if err != nil {
+			return err
+	}
+
+	type WasteData struct {
+		Name string 
+		UnitCount int
+		Location int
+}
+	type WasteInfo struct {
+			Data []WasteData
+	}
+
+	var obj WasteInfo
+
+	err = json.Unmarshal(f, &obj)
+	if err != nil {
+			return err
+	}
+
+	log.Debug().Msg("Import waste definition success")
+
+	for _,n := range obj.Data {
+			fmt.Printf("%v\n",n.Name)
+	}
+
 	return nil
 }

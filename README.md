@@ -1,6 +1,11 @@
 
 # Bluebook Helper Migration
 
+- Currently working on
+	* Importing waste defintion file
+		- JSON "generated" with scripts/waste.py
+		- Implement command line option to parse? or web ui/api methods
+
 - TODO:
 	* be able to read/write from the existing db with little to no modifications to db structure
 		+ columns need renamed
