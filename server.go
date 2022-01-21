@@ -36,13 +36,10 @@ func initServer() *echo.Echo {
 	e.POST("/api/import/waste", importPostWaste)
 
 	// comment editing
-	//e.POST("/api/update/comment", updateCommentHandler)
 	e.POST("/api/update/comment", func(c echo.Context) error { return api.UpdateCommentHandler(c, DB) })
-	//e.POST("/api/update/comment", uch)
+
+	// Waste handling
+	e.GET("/api/waste/view", func(c echo.Context) error { return api.GetWasteViewHandler(c, DB) })
 
 	return e
 }
-
-/*func uch(c echo.Context) error {
-	return api.UpdateCommentHandler(c, DB)
-}*/

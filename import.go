@@ -63,9 +63,6 @@ func importPostHandler(c echo.Context, handler func(string, *gorm.DB) error) err
 		return err
 	}
 
-	log.Debug().Msgf("data: %v (%T)", arr, arr)
-	log.Debug().Msgf("data length: %v", len(arr))
-
 	base := os.Getenv("BLUEBOOK_IMPORT_PATH")
 	for _, n := range arr {
 		fname := filepath.Join(base, n)
@@ -106,9 +103,9 @@ func importPostWISR(c echo.Context) error {
 }
 
 func importWasteHandler(c echo.Context) error {
-		return importFileHandler(c, "*.xlsx")
+	return importFileHandler(c, "*.xlsx")
 }
 
 func importPostWaste(c echo.Context) error {
-		return importPostHandler(c, daily.ImportWaste)
+	return importPostHandler(c, daily.ImportWaste)
 }

@@ -103,29 +103,3 @@ func migrateDB() {
 	DB.AutoMigrate(&models.WastageItem{})
 	DB.AutoMigrate(&models.WastageEntry{})
 }
-
-type TestJSONObj struct {
-	Name     string
-	Location int
-	Unit     string
-}
-
-/*type TestJSON struct {
-	Items []TestJSONObj
-}
-
-func jsonTest() {
-	// open the file to test the json
-	f, err := ioutil.ReadFile("waste_def.json")
-	if err != nil {
-		log.Fatal().Err(err).Msg("unable to open waste_def.json")
-	}
-
-	obj := TestJSON{}
-	err = json.Unmarshal(f, &obj)
-	if err != nil {
-		log.Fatal().Err(err).Msg("Unable to unmarsh")
-	}
-
-	log.Debug().Msgf("Items: %v", obj.Items)
-}*/
