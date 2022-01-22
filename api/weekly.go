@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
 	"time"
 
@@ -11,27 +10,27 @@ import (
 	"gorm.io/gorm"
 )
 
-type WeeklyInfo struct {
-	TargetAUV   int // from the auv tables
-	TargetHours int
-
-	FoodCostAmount   float64
-	LabourCostAmount float64
-	PartySales       float64
-
-	NetSales       float64
-	CustomerCount  int
-	GiftCardSold   float64
-	GiftCardRedeem float64
-	BreadOverShort float64
-
-	LastYearSales         float64
-	LastYearCustomerCount float64
-	UpcomingSales         float64
-}
-
 // GetWeekylViewHandler handles the weekly report generation params: /?month=MM&day=DD&year=YYYY
 func GetWeeklyViewHandler(c echo.Context, db *gorm.DB) error {
+	type WeeklyInfo struct {
+		TargetAUV   int // from the auv tables
+		TargetHours int
+
+		FoodCostAmount   float64
+		LabourCostAmount float64
+		PartySales       float64
+
+		NetSales       float64
+		CustomerCount  int
+		GiftCardSold   float64
+		GiftCardRedeem float64
+		BreadOverShort float64
+
+		LastYearSales         float64
+		LastYearCustomerCount int
+		UpcomingSales         float64
+	}
+
 	var month, day, year int
 
 	err := echo.QueryParamsBinder(c).
@@ -46,7 +45,7 @@ func GetWeeklyViewHandler(c echo.Context, db *gorm.DB) error {
 	log.Debug().Msgf("Weekly report for %v\\%v\\%v", month, day, year)
 
 	weekEnding := time.Date(year, time.Month(month), day, 0, 0, 0, 0, time.UTC)
-	weekStart := weekEnding.AddDate(0, 0, -7)
+	weekStart := weekEnding.AddDate(0, 0, -6)
 
 	// make sure a tuesday
 	if weekEnding.Weekday() != time.Tuesday {
@@ -54,8 +53,6 @@ func GetWeeklyViewHandler(c echo.Context, db *gorm.DB) error {
 		return c.JSON(http.StatusOK, "Can only view from a tuesday")
 	}
 
-	log.Debug().Msgf("Start: %v", weekStart)
-	log.Debug().Msgf("End: %v", weekEnding)
 	weekly := WeeklyInfo{}
 
 	// TODO: retrieve auv information here
@@ -72,16 +69,63 @@ func GetWeeklyViewHandler(c echo.Context, db *gorm.DB) error {
 	// calculate the data bits that we need
 	calculateWeekly(data, &weekly)
 
+	// retrieve hte information form the weekly table
+	//endDate := weekEnding.AddDate(0, 0, 1)
+	endDate := weekEnding
+	wi := models.WeeklyInfo{}
+	res = db.Find(&wi, "Date = ?", endDate) // we ignore any errors and we use a default strcut anyway
+	if res.Error != nil {
+		log.Debug().Err(res.Error).Msg("No weekly info, using defaults")
+	}
+
+	weekly.FoodCostAmount = wi.FoodCostAmount
+	weekly.LabourCostAmount = wi.LabourCostAmount
+	weekly.PartySales = wi.PartySales
+
+	// retrieve the last years data if available
+	lastYear := weekEnding.AddDate(-1, 0, 0)
+
+	// adjust if not a tuesday
+	if lastYear.Weekday() != time.Tuesday {
+		diff := weekEnding.Weekday() - lastYear.Weekday()
+		lastYear = lastYear.AddDate(0, 0, int(diff))
+	}
+
+	// compute last years sales data
+	lys := lastYear.AddDate(0, 0, -6)
+	res = db.Find(&data, "Date >= ? AND Date <= ?", lys, lastYear)
+	if res.Error != nil {
+		return res.Error
+	}
+
+	for _, n := range data {
+		weekly.LastYearSales += n.NetSales
+		weekly.LastYearCustomerCount += n.CustomerCount
+	}
+
+	// retrieve upcoming sales from last year
+	up := lastYear.AddDate(0, 0, 7)
+
+	res = db.Find(&data, "Date >= ? AND Date <= ?", lastYear.AddDate(0, 0, 1), up)
+	if res.Error != nil {
+		return res.Error
+	}
+
+	for _, n := range data {
+		weekly.UpcomingSales += n.NetSales
+	}
+
 	return c.JSON(http.StatusOK, &weekly)
 }
 
 func calculateWeekly(data []models.DayData, wi *WeeklyInfo) {
+	// retrieve information from daily table
 	for _, d := range data {
-		fmt.Printf("[%v] Net Sales: %v\n", time.Time(d.Date).String(), d.NetSales)
 		wi.NetSales += d.NetSales
 		wi.CustomerCount += d.CustomerCount
 		wi.GiftCardSold += d.GiftCardSold
 		wi.GiftCardRedeem += d.GiftCardRedeem
 		wi.BreadOverShort += d.BreadOverShort
+		log.Debug().Msgf("(%v) [%v] => [%v]", time.Time(d.Date).String(), d.BreadOverShort, wi.BreadOverShort)
 	}
 }

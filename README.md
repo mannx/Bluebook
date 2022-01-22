@@ -6,13 +6,13 @@
 		- JSON "generated" with scripts/waste.py
 		- Implement command line option to parse? or web ui/api methods
 	* Weekly Report
-		- Initial api mostly done, frontend started, table begun
+		- AUV/Hours to be implemented
 
 - TODO:
 	* be able to read/write from the existing db with little to no modifications to db structure
 		+ columns need renamed
 	* (PARTIAL) Browse montly data or jump to a specific month/year
-	* Weekly paperwork calculations, file generation
+	* (MOSTLY) Weekly paperwork calculations, (TODO) file generation
 	* Wastage server and front end finishing
 		- Datepicker to pick week and error check for non-tuesday
 		- server: combine similar items for total weights, calculate weight conversions

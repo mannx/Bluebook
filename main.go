@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"flag"
 	"net/http"
 	"os"
 	"os/signal"
@@ -13,24 +12,17 @@ import (
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 
-	daily "github.com/mannx/Bluebook/import"
 	models "github.com/mannx/Bluebook/models"
 )
 
 // Version of the current build/release
-const Version = 0.03
+const Version = 0.04
 
 // DB is the database connection for the entire run
 var DB *gorm.DB
 
 // name of the database we are using
 const dbName = "./data/db.db"
-
-var importFlag string // if true, -i was used to import a wast definition file
-
-func init() {
-	flag.StringVar(&importFlag, "i", "", "Import a wastage definition file")
-}
 
 func main() {
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
@@ -50,21 +42,7 @@ func main() {
 	migrateDB()
 
 	log.Debug().Msg("Converting old database to current...")
-	//	_ = convertDB()
-
-	/*if importFlag != "" {
-		// import waste definition
-		log.Info().Msgf("Importing waste defintions from file: %v", importFlag)
-		err := daily.ImportWasteDefinition(importFlag)
-		if err != nil {
-			log.Error().Err(err).Msg("Unable to load waste defintions")
-		}
-	}*/
-
-	err = daily.ImportWasteDefinition("waste_def.json", DB)
-	if err != nil {
-		log.Error().Err(err).Msg("Unable to import waste definitions")
-	}
+	//_ = convertDB()
 
 	log.Info().Msg("Initialiing server and middleware")
 
@@ -92,6 +70,7 @@ func main() {
 // TODO: fix at some point, or not?
 func convertDB() error {
 	log.Debug().Msg("convertDB() begin")
+
 	var data []models.DayData
 	res := DB.Find(&data)
 	if res.Error != nil {

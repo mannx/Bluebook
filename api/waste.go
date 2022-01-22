@@ -11,22 +11,6 @@ import (
 	models "github.com/mannx/Bluebook/models"
 )
 
-type wasteError struct {
-	Message string `json:"Message"`
-}
-
-// WasteViewItem is  a single item and its total waste amount
-type WasteViewItem struct {
-	Name   string  `json:"Name"`
-	Amount float64 `json:"Amount"`
-}
-
-// WasteView for returning to the client
-type WasteView struct {
-	WeekEnding time.Time `json:"WeekEnding"`
-	Data       []WasteViewItem
-}
-
 // return a combined waste report for week ending
 //		/api/../?month=MONTH&year=YEAR&day=DAY
 //		where month and year are 2 and 4 digits each
@@ -34,6 +18,22 @@ type WasteView struct {
 // GetWasteViewHandler handls the waste report generation
 func GetWasteViewHandler(c echo.Context, db *gorm.DB) error {
 	log.Debug().Msg("GetWasteViewHandler()")
+
+	type wasteError struct {
+		Message string `json:"Message"`
+	}
+
+	// WasteViewItem is  a single item and its total waste amount
+	type WasteViewItem struct {
+		Name   string  `json:"Name"`
+		Amount float64 `json:"Amount"`
+	}
+
+	// WasteView for returning to the client
+	type WasteView struct {
+		WeekEnding time.Time `json:"WeekEnding"`
+		Data       []WasteViewItem
+	}
 	var month, year, day int
 
 	err := echo.QueryParamsBinder(c).

@@ -10,13 +10,6 @@ import (
 	"gorm.io/gorm"
 )
 
-// CommentPost contains data when a new comment is created and needs to be saved
-type CommentPost struct {
-	Comment  string `json:"Comment" query:"Comment"`
-	LinkedID int    `json:"LinkedID" query:"LinkedID"` // id of the day we are adding the comment to, 0 if we dont have a linked day
-	Date     string `json:"Date" query:"Date"`         // if LinkedID is valid, this is nil, otherwise form of MMDDYYYY used when there is no daydata
-}
-
 const dateFormat = "02012006"
 
 // we are expecting 3 values in the post
@@ -25,6 +18,11 @@ const dateFormat = "02012006"
 
 // UpdateCommentHandler is used to handle comments
 func UpdateCommentHandler(c echo.Context, db *gorm.DB) error {
+	type CommentPost struct {
+		Comment  string `json:"Comment" query:"Comment"`
+		LinkedID int    `json:"LinkedID" query:"LinkedID"` // id of the day we are adding the comment to, 0 if we dont have a linked day
+		Date     string `json:"Date" query:"Date"`         // if LinkedID is valid, this is nil, otherwise form of MMDDYYYY used when there is no daydata
+	}
 	var cp CommentPost
 
 	if err := c.Bind(&cp); err != nil {
