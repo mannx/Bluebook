@@ -13,8 +13,8 @@ import (
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 
-	models "github.com/mannx/Bluebook/models"
 	daily "github.com/mannx/Bluebook/import"
+	models "github.com/mannx/Bluebook/models"
 )
 
 // Version of the current build/release
@@ -52,13 +52,18 @@ func main() {
 	log.Debug().Msg("Converting old database to current...")
 	//	_ = convertDB()
 
-	if importFlag != "" {
+	/*if importFlag != "" {
 		// import waste definition
 		log.Info().Msgf("Importing waste defintions from file: %v", importFlag)
 		err := daily.ImportWasteDefinition(importFlag)
 		if err != nil {
 			log.Error().Err(err).Msg("Unable to load waste defintions")
 		}
+	}*/
+
+	err = daily.ImportWasteDefinition("waste_def.json", DB)
+	if err != nil {
+		log.Error().Err(err).Msg("Unable to import waste definitions")
 	}
 
 	log.Info().Msg("Initialiing server and middleware")

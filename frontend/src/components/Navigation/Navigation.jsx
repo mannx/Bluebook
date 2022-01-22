@@ -2,6 +2,7 @@ import React from "react";
 import TableView from "../../components/TableView/TableView.jsx";
 import Imports from "../Import/Import.jsx";
 import Wastage from "../Wastage/Wastage.jsx";
+import Weekly from "../Weekly/Weekly.jsx";
 import "./header.css";
 
 //
@@ -20,6 +21,7 @@ function func(props){}
 const PageMonth = 1;
 const PageImport = 2;
 const PageWastage = 3;
+const PageWeekly = 4;
 
 function Navigate(props) {
 		switch(props.page) {
@@ -29,6 +31,8 @@ function Navigate(props) {
 						return <Imports />;
 				case PageWastage:
 						return <Wastage />;
+				case PageWeekly:
+						return <Weekly />;
 				default:
 						return <h2>Invalid page number {props.page}</h2>;
 		}
@@ -47,7 +51,6 @@ class Navigation extends React.Component {
 
 				this.NavigatePrev = this.NavigatePrev.bind(this);
 				this.NavigateNext = this.NavigateNext.bind(this);
-				this.Imports = this.Imports.bind(this);
 				this.funcToday = this.funcToday.bind(this);
 		}
 
@@ -61,7 +64,7 @@ class Navigation extends React.Component {
 							<li className={"navControl"}><NavButton name={"Today"} func={this.funcToday} /></li>
 							<li className={"navControl"}><NavButton name={"Search Tags"} func={func} /></li>
 							<li className={"navControl"}><NavButton name={"AUV"} func={func} /></li>
-							<li className={"navControl"}><NavButton name={"Weekly Info"} func={func} /></li>
+							<li className={"navControl"}><NavButton name={"Weekly Info"} func={this.NavigateWeekly} /></li>
 							<li className={"navControl"}><NavButton name={"Wastage"} func={this.NavigateWastage} /></li>
 							<li className={"navControl"}><NavButton name={"Top 5"} func={func} /></li>
 							<li className={"navControl"}><NavButton name={"Settings"} func={func} /></li>
@@ -109,17 +112,10 @@ class Navigation extends React.Component {
 				this.setState({month: m, year: y});
 		}
 
-		// display the import pages
-		Imports() {
-				this.setState({page: PageImport});
-		}
-
-		NavigatePrevYear = () => {
-				this.setState({year: this.state.year-1})
-		}
-
+		Imports = () => {this.setState({page: PageImport});}
+		NavigatePrevYear = () => {this.setState({year: this.state.year-1})}
 		NavigateWastage = () => { this.setState({page: PageWastage});}
-
+		NavigateWeekly = () => { this.setState({page: PageWeekly});}
 }
 
 

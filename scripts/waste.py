@@ -3,6 +3,7 @@
 #   This script is used to generate the waste_def.json file for waste item definitions from the original
 #   django version of the database
 #   make sure to run from the original Bluebook django version
+#   NOTE: the last ',' in the file needs to be removed, unless fixed first
 #
 
 import os

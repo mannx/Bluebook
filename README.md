@@ -5,6 +5,8 @@
 	* Importing waste defintion file
 		- JSON "generated" with scripts/waste.py
 		- Implement command line option to parse? or web ui/api methods
+	* Weekly Report
+		- Initial api mostly done, frontend started, table begun
 
 - TODO:
 	* be able to read/write from the existing db with little to no modifications to db structure

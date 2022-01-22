@@ -102,8 +102,8 @@ type WastageItem struct {
 	gorm.Model
 
 	Name             string  `gorm:"column:Name"`
-	UnitMeasure      int8    `gorm:"column:UnitMeasure"`       // how is this item measured (WasteUnitCount/Pounds/Kilo/etc)
-	Location         int8    `gorm:"column:Location"`          // where is the found
+	UnitMeasure      int     `gorm:"column:UnitMeasure"`       // how is this item measured (WasteUnitCount/Pounds/Kilo/etc)
+	Location         int     `gorm:"column:Location"`          // where is the found
 	CustomConversion bool    `gorm:"column:CustomeConversion"` // do we havea custom conversion in use? if so, Weight*CustomConversion => UnitMeasure => Ouput value
 	CustomWeight     float64 `gorm:"column:CustomWeight"`      // what we multiple the items weight/count by if custom
 }
