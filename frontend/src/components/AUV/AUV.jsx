@@ -52,9 +52,14 @@ class AUV extends React.Component {
 			console.log(this.state.auv[1]);
 	}
 	
+	auvChange = (e, i) => {
+			this.state.auv[i] = e.target.value;
+			console.log("auv["+i+"] = " + this.state.auv[i]);
+	}
+
 	inputField = (v, i) => {
 			return (
-					<input type={"number"} defaultValue={v} />
+					<input type={"number"} defaultValue={v} onChange={(e) => this.auvChange(e, i)}/>
 			);
 	}
 }
