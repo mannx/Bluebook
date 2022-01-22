@@ -18,11 +18,6 @@ class TableCell extends React.Component {
 					linkedID: props.data.CommentID,
 					data: props.data,
 				}
-
-				this.editComment = this.editComment.bind(this);
-				this.submitComment = this.submitComment.bind(this);
-				this.commentChange = this.commentChange.bind(this);
-				this.commentField = this.commentField.bind(this);
 		}
 
 		NF(obj, prefix="", suffix="") {
@@ -93,7 +88,7 @@ class TableCell extends React.Component {
 				);
 		}
 
-		commentField() {
+		commentField = () => {
 			if(this.state.editComment === false) {
 				return <div className="comment"  >{this.state.comment}</div>;
 			}else{
@@ -106,7 +101,7 @@ class TableCell extends React.Component {
 			}
 		}
 
-		submitComment(event) {
+		submitComment = (event) => {
 				event.preventDefault();
 
 				// state.comment is the comment to save
@@ -129,11 +124,11 @@ class TableCell extends React.Component {
 
 		}
 
-		editComment(){
+		editComment = () => {
 				this.setState({editComment: !this.state.editComment});
 		}
 
-		commentChange(e) {
+		commentChange = (e) =>  {
 				this.setState({comment: e.target.value});
 		}
 }

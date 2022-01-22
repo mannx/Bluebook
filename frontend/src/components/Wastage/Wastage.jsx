@@ -10,7 +10,7 @@ class Wastage extends React.Component {
 				var y = d.getFullYear();*/
 				this.state = {
 						month: 1,
-						day: 18,
+						day: 11,
 						year: 2022,
 						data: null,
 						errorMsg: "",
@@ -24,6 +24,7 @@ class Wastage extends React.Component {
 
 				//this.setState({data: JSON.parse(data)});
 				this.setState({data: data});
+				console.log(data);
 		}
 
 

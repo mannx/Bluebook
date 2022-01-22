@@ -43,5 +43,9 @@ func initServer() *echo.Echo {
 
 	// Weekly reports
 	e.GET("/api/weekly/view", func(c echo.Context) error { return api.GetWeeklyViewHandler(c, DB) })
+
+	// AUV
+	e.GET("/api/auv/view", func(c echo.Context) error { return api.GetAUVViewHandler(c, DB) })
+	e.POST("/api/auv/update", func(c echo.Context) error { return api.UpdateAUVPostHandler(c, DB) })
 	return e
 }

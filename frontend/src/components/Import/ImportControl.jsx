@@ -16,9 +16,9 @@ class ImportControl extends React.Component {
 						page: props.page,
 				}
 
-				this.getControls = this.getControls.bind(this);
+				/*this.getControls = this.getControls.bind(this);
 				this.addImp = this.addImp.bind(this);
-				this.performUpdate = this.performUpdate.bind(this);
+				this.performUpdate = this.performUpdate.bind(this);*/
 		}
 
 		async componentDidMount() {
@@ -30,13 +30,13 @@ class ImportControl extends React.Component {
 				this.setState({data: data});
 		}
 
-		getControls() {
+		getControls = () => {
 				this.state.data.map(function(obj, i) {
 						return <span>{obj}</span>;
 				});
 		}
 
-		addImp(e) {
+		addImp = (e) => {
 				if(this.state.imports == null ) {
 						this.setState({imports: [e.target.name]});
 				}else{
@@ -66,7 +66,7 @@ class ImportControl extends React.Component {
 
 		// send the list of id's to be updated to the server
 		// TODO: find a way to get progress, another api waypoint with a timer?
-		performUpdate() {
+		performUpdate = () => {
 				const options = {
 						method: 'POST',
 						headers: {'Content-Type':'application/json'},

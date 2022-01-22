@@ -19,11 +19,9 @@ class TableView extends React.Component {
 
 				this.state.month = props.month;
 				this.state.year = props.year;
-
-				this.loadData = this.loadData.bind(this);
 		}
 
-		async loadData(month, year) {
+		loadData = async (month, year) => {
 				const url = "http://localhost:8080/api/month?month=" + month + "&year=" + year;
 				const resp = await fetch(url);
 				const data = await resp.json();

@@ -10,27 +10,27 @@ import (
 	"gorm.io/gorm"
 )
 
+type weeklyInfo struct {
+	TargetAUV   int // from the auv tables
+	TargetHours int
+
+	FoodCostAmount   float64
+	LabourCostAmount float64
+	PartySales       float64
+
+	NetSales       float64
+	CustomerCount  int
+	GiftCardSold   float64
+	GiftCardRedeem float64
+	BreadOverShort float64
+
+	LastYearSales         float64
+	LastYearCustomerCount int
+	UpcomingSales         float64
+}
+
 // GetWeekylViewHandler handles the weekly report generation params: /?month=MM&day=DD&year=YYYY
 func GetWeeklyViewHandler(c echo.Context, db *gorm.DB) error {
-	type WeeklyInfo struct {
-		TargetAUV   int // from the auv tables
-		TargetHours int
-
-		FoodCostAmount   float64
-		LabourCostAmount float64
-		PartySales       float64
-
-		NetSales       float64
-		CustomerCount  int
-		GiftCardSold   float64
-		GiftCardRedeem float64
-		BreadOverShort float64
-
-		LastYearSales         float64
-		LastYearCustomerCount int
-		UpcomingSales         float64
-	}
-
 	var month, day, year int
 
 	err := echo.QueryParamsBinder(c).
@@ -53,7 +53,7 @@ func GetWeeklyViewHandler(c echo.Context, db *gorm.DB) error {
 		return c.JSON(http.StatusOK, "Can only view from a tuesday")
 	}
 
-	weekly := WeeklyInfo{}
+	weekly := weeklyInfo{}
 
 	// TODO: retrieve auv information here
 
@@ -118,7 +118,7 @@ func GetWeeklyViewHandler(c echo.Context, db *gorm.DB) error {
 	return c.JSON(http.StatusOK, &weekly)
 }
 
-func calculateWeekly(data []models.DayData, wi *WeeklyInfo) {
+func calculateWeekly(data []models.DayData, wi *weeklyInfo) {
 	// retrieve information from daily table
 	for _, d := range data {
 		wi.NetSales += d.NetSales
@@ -126,6 +126,5 @@ func calculateWeekly(data []models.DayData, wi *WeeklyInfo) {
 		wi.GiftCardSold += d.GiftCardSold
 		wi.GiftCardRedeem += d.GiftCardRedeem
 		wi.BreadOverShort += d.BreadOverShort
-		log.Debug().Msgf("(%v) [%v] => [%v]", time.Time(d.Date).String(), d.BreadOverShort, wi.BreadOverShort)
 	}
 }

@@ -93,6 +93,18 @@ func convertDB() error {
 		DB.Save(&obj)
 	}
 
+	var auv []models.AUVEntry
+	res = DB.Find(&auv)
+	if res.Error != nil {
+		log.Debug().Err(res.Error).Msg("no auv")
+		return res.Error
+	}
+
+	log.Debug().Msgf("updating %v [AUVEntry]", res.RowsAffected)
+	for _, obj := range auv {
+		DB.Save(&obj)
+	}
+
 	log.Debug().Msg("Finished")
 	return nil
 }
@@ -103,4 +115,5 @@ func migrateDB() {
 	DB.AutoMigrate(&models.Comments{})
 	DB.AutoMigrate(&models.WastageItem{})
 	DB.AutoMigrate(&models.WastageEntry{})
+	DB.AutoMigrate(&models.AUVEntry{})
 }
