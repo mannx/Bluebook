@@ -44,5 +44,20 @@ func GetAUVViewHandler(c echo.Context, db *gorm.DB) error {
 
 // UpdateAUVPostHandler updates auv data from user form
 func UpdateAUVPostHandler(c echo.Context, db *gorm.DB) error {
+	type auvData struct {
+		Week1Date string `json:"week1date"`
+		Week2Date string `json:"week2date"`
+		Week3Date string `json:"week3date"`
+		Week4Date string `json:"week4date"`
+		Week5Date string `json:"week5date"`
+	}
+
+	var auv auvData
+	if err := c.Bind(&auv); err != nil {
+		return err
+	}
+
+	log.Debug().Msgf("Week1 Date: %v", auv.Week1Date)
+
 	return nil
 }

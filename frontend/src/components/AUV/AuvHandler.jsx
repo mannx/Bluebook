@@ -47,16 +47,20 @@ class AuvHandler extends React.Component {
 	}
 
 	//async componentDidMount() {
-	loadData = async () => {
-			const month = this.props.date.getMonth() + 1;
-			const year = this.props.date.getFullYear();
+	loadData = async (date) => {
+			this.setState({loading: true});
+
+			/*const month = this.props.date.getMonth() + 1;
+			const year = this.props.date.getFullYear();*/
+			const month = date.getMonth()+1;
+			const year=date.getFullYear();
+
 
 			console.log("loading data for " + month + "/" + year);
 			const url ="http://localhost:8080/api/auv/view?month="+month+"&year="+year;
 			const resp = await fetch(url);
 			const data = await resp.json();
 
-			this.setState({loading: false});
 
 			const d1 = new Date(data.Week1Date.replace("T00:00:00Z",""));
 			const d2 = new Date(data.Week2Date.replace("T00:00:00Z",""));
@@ -83,35 +87,32 @@ class AuvHandler extends React.Component {
 			this.setState({week5auv: data.Week5AUV});
 
 			this.setState({date: this.props.date});
+			this.setState({loading: false});
 	}
 
-	async componentDidMount() {
-			await this.loadData();
+	componentDidMount() {
+			this.loadData(this.props.date);
 	}
 
 	render() {
 			if(this.state.loading) {
-					this.loadData();
+					this.loadData(this.props.date);
 
 					return <h1>AUV data loading...</h1>;
+			}else if(this.state.date != this.props.date) {
+					console.log("mismatched date");
 			}
 
-			/*if(this.state.date != this.props.date) {
-					console.log("mismatched dates, reload?");
-					console.log(this.props.date);
 
-					this.loadData();
-					return <h1>AUV  new data loading...</h1>;
-			}*/
-
-			const m=this.state.date.getMonth();
+			// force a rerender if dates change
+			/*const m=this.state.date.getMonth();
 			const y =this.state.date.getFullYear();
 			const m2=this.props.date.getMonth();
 			const y2=this.props.date.getFullYear();
 
 			if(m!=m2||y!=y2){
-					this.loadData();
-			}
+					//this.loadData();
+			}*/
 
 			return (
 					<>
@@ -163,6 +164,15 @@ class AuvHandler extends React.Component {
 		
 	updateAUV = () => {
 		console.log("w1 auv");
+
+		const options = {
+				method: 'POST',
+				headers: {'Content-Type':'application/json'},
+				body: JSON.stringify(this.state)
+		};
+
+		fetch("http://localhost:8080/api/auv/update", options)
+					.then(r=>console.log(r));
 	}
 }
 
