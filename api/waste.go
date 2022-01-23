@@ -2,6 +2,7 @@ package api
 
 import (
 	"net/http"
+	"sort"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -25,8 +26,9 @@ func GetWasteViewHandler(c echo.Context, db *gorm.DB) error {
 
 	// WasteViewItem is  a single item and its total waste amount
 	type WasteViewItem struct {
-		Name   string  `json:"Name"`
-		Amount float64 `json:"Amount"`
+		Name     string  `json:"Name"`
+		Amount   float64 `json:"Amount"`
+		Location int     `json:"Location"`
 	}
 
 	// WasteView for returning to the client
@@ -46,7 +48,7 @@ func GetWasteViewHandler(c echo.Context, db *gorm.DB) error {
 	}
 
 	weekEnding := time.Date(year, time.Month(month), day, 0, 0, 0, 0, time.UTC)
-	weekStart := weekEnding.AddDate(0, 0, -6)
+	weekStart := weekEnding.AddDate(0, 0, -7)
 
 	// make sure we have a tuesday, week ending day
 	if weekEnding.Weekday() != time.Tuesday {
@@ -62,6 +64,7 @@ func GetWasteViewHandler(c echo.Context, db *gorm.DB) error {
 		return res.Error
 	}
 
+	// total same units together
 	data := map[uint]float64{} // store the running total for each item
 	for _, n := range waste {
 		data[n.Item] = data[n.Item] + n.Amount
@@ -76,8 +79,28 @@ func GetWasteViewHandler(c echo.Context, db *gorm.DB) error {
 			return err.Error
 		}
 
-		output.Data = append(output.Data, WasteViewItem{Name: wi.Name, Amount: n})
+		// process the weight conversion if required
+		m := wi.Convert(n)
+		output.Data = append(output.Data, WasteViewItem{Name: wi.Name, Amount: m, Location: wi.Location})
 	}
 
-	return c.JSON(http.StatusOK, &output)
+	// sort output by location insert an empty entry between location switches
+	sort.Slice(output.Data, func(i, j int) bool {
+		return output.Data[i].Location > output.Data[j].Location
+	})
+
+	loc := 0
+	final := make([]WasteViewItem, 0)
+	for _, v := range output.Data {
+		if loc == 0 {
+			loc = v.Location
+		} else if loc != v.Location {
+			// insert blank entry
+			final = append(final, WasteViewItem{Name: "", Amount: 0, Location: 0})
+			loc = v.Location
+		}
+		final = append(final, v)
+	}
+
+	return c.JSON(http.StatusOK, &WasteView{WeekEnding: weekEnding, Data: final})
 }

@@ -31,7 +31,7 @@ func GetAUVViewHandler(c echo.Context, db *gorm.DB) error {
 	}
 
 	// get the starting date to look for
-	start := time.Date(year, time.Month(month), 1, 0, 0, 0, 0, time.UTC)
+	start := time.Date(year, time.Month(month), 0, 0, 0, 0, 0, time.UTC)
 	end := start.AddDate(0, 1, 0) // get the next month
 	res := db.Find(&auv, "week1_date >= ? AND week1_date < ?", start, end)
 	if res.Error != nil {
@@ -39,11 +39,10 @@ func GetAUVViewHandler(c echo.Context, db *gorm.DB) error {
 		return res.Error
 	}
 
-	log.Debug().Msgf("ID: %v [AUV: %v]", auv.ID, auv.Week1AUV)
-
 	return c.JSON(http.StatusOK, &auv)
 }
 
+// UpdateAUVPostHandler updates auv data from user form
 func UpdateAUVPostHandler(c echo.Context, db *gorm.DB) error {
 	return nil
 }

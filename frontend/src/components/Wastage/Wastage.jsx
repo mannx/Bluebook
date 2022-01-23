@@ -1,9 +1,10 @@
 import React from "react";
+import NumberFormat from "react-number-format";
 
 class Wastage extends React.Component {
 		constructor(props) {
 				super(props);
-				let d = new Date();
+				//let d = new Date();
 
 				/*var m = d.getMonth();
 				var da= d.getDay();
@@ -45,11 +46,15 @@ class Wastage extends React.Component {
 								</thead>
 								<tbody>
 								{this.state.data.Data.map(function (obj, i) {
-										return (<tr>
-												<td>{obj.Name}</td>
-												<td>{obj.Amount}</td>
-												</tr>
-										);
+										if(obj.Name !== ""){
+											return (<tr>
+													<td>{obj.Name}</td>
+													<td>{this.NF(obj.Amount)}</td>
+													</tr>
+											);
+										}else{
+											return (<tr><td>&nbsp;</td><td>&nbsp;</td></tr>);
+										}
 								}, this)}
 								</tbody>
 						</table>
@@ -63,6 +68,19 @@ class Wastage extends React.Component {
 						return <></>;
 				}
 		}
+
+		NF = (obj) => {
+				return (
+						<NumberFormat
+						value={obj}
+						displayType={"text"}
+						thousandSeparator={true}
+						decimalScale={2}
+						fixedDecimalScale={true}
+						/ >
+				);
+		}
+
 }
 
 

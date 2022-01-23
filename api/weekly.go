@@ -29,7 +29,7 @@ type weeklyInfo struct {
 	UpcomingSales         float64
 }
 
-// GetWeekylViewHandler handles the weekly report generation params: /?month=MM&day=DD&year=YYYY
+// GetWeeklyViewHandler handles the weekly report generation params: /?month=MM&day=DD&year=YYYY
 func GetWeeklyViewHandler(c echo.Context, db *gorm.DB) error {
 	var month, day, year int
 
@@ -70,7 +70,6 @@ func GetWeeklyViewHandler(c echo.Context, db *gorm.DB) error {
 	calculateWeekly(data, &weekly)
 
 	// retrieve hte information form the weekly table
-	//endDate := weekEnding.AddDate(0, 0, 1)
 	endDate := weekEnding
 	wi := models.WeeklyInfo{}
 	res = db.Find(&wi, "Date = ?", endDate) // we ignore any errors and we use a default strcut anyway
