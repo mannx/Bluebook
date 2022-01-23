@@ -57,5 +57,13 @@ func (wi *WastageItem) Convert(n float64) float64 {
 		return n * wi.UnitWeight
 	}
 
+	// convert to kilo/gram if required
+	switch wi.UnitMeasure {
+	case WasteKilo:
+		return n * 0.45359237
+	case WasteGram:
+		return n * 453.59237
+	}
+
 	return n
 }

@@ -36,6 +36,9 @@ for o in objs:
     w.Name=o.Name
     w.UnitCount=o.UnitCount
     w.Location=o.Location
+    w.CustomConversion=o.CustomConversion
+    w.UnitWeight = "{}".format(o.UnitWeight)
+
     out.Objects.append(w)
     jstr = json.dumps(w.__dict__)
     print(jstr+",")
