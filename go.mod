@@ -3,6 +3,7 @@ module github.com/mannx/Bluebook
 go 1.17
 
 require (
+	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/labstack/echo/v4 v4.6.3
 	github.com/rs/zerolog v1.15.0
 	github.com/xuri/excelize/v2 v2.5.0
@@ -38,6 +39,7 @@ require (
 
 replace (
 	github.com/mannx/Bluebook/api => ../api
+	github.com/mannx/Bluebook/environ => ../environ
 	github.com/mannx/Bluebook/import => ../import
 	github.com/mannx/Bluebook/models => ../models
 )

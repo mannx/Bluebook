@@ -12,6 +12,7 @@ import (
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 
+	env "github.com/mannx/Bluebook/environ"
 	models "github.com/mannx/Bluebook/models"
 )
 
@@ -43,6 +44,10 @@ func main() {
 
 	log.Debug().Msg("Converting old database to current...")
 	//_ = convertDB()
+
+	log.Debug().Msg("Initializing environment...")
+	env.Environment.Init()
+	log.Debug().Msgf("Import Path: %v", env.Environment.ImportPath)
 
 	log.Info().Msg("Initialiing server and middleware")
 

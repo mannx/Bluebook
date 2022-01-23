@@ -2,12 +2,13 @@ package daily
 
 import (
 	"fmt"
-	"os"
 	"os/exec"
 	"path/filepath"
 	"time"
 
+	env "github.com/mannx/Bluebook/environ"
 	models "github.com/mannx/Bluebook/models"
+
 	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
 )
@@ -21,7 +22,7 @@ import (
 func PDFToText(fileName string) (string, error) {
 	// execute: pdftotext fileName BLUEBOOK_TEMP_PATH/tempFileName
 	_, rawfname := filepath.Split(fileName) // extract just the file name
-	outFile := filepath.Join(os.Getenv("BLUEBOOK_TEMP_PATH"), fmt.Sprintf("%v.txt", rawfname))
+	outFile := filepath.Join(env.Environment.TempPath, fmt.Sprintf("%v.txt", rawfname))
 
 	log.Debug().Msgf("running pdftotext %v %v", fileName, outFile)
 	cmd := exec.Command("pdftotext", "-layout", fileName, outFile)

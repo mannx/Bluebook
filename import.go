@@ -3,10 +3,10 @@ package main
 import (
 	"io/ioutil"
 	"net/http"
-	"os"
 	"path/filepath"
 
 	"github.com/labstack/echo/v4"
+	env "github.com/mannx/Bluebook/environ"
 	daily "github.com/mannx/Bluebook/import"
 	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
@@ -22,14 +22,7 @@ import (
 func importFileHandler(c echo.Context, fileMask string) error {
 	log.Debug().Msg("importFileHandler")
 
-	path := os.Getenv("BLUEBOOK_IMPORT_PATH")
-	if path == "" {
-		// unable to import, return a warning
-		log.Error().Msg("BLUEBOOK_IMPORT_PATH is not configured, unable to import")
-		return c.String(http.StatusOK, "BLUEBOOK_IMPORT_PATH not configured. Unable to import")
-	}
-
-	files, err := ioutil.ReadDir(path)
+	files, err := ioutil.ReadDir(env.Environment.ImportPath)
 	if err != nil {
 		log.Error().Err(err).Msg("Unable to read directory provided by BLUEBOOK_IMPORT_PATH")
 		return c.String(http.StatusInternalServerError, "Unable to retrieve import directory")
@@ -63,9 +56,8 @@ func importPostHandler(c echo.Context, handler func(string, *gorm.DB) error) err
 		return err
 	}
 
-	base := os.Getenv("BLUEBOOK_IMPORT_PATH")
 	for _, n := range arr {
-		fname := filepath.Join(base, n)
+		fname := filepath.Join(env.Environment.ImportPath, n)
 		log.Info().Msgf("Preparing to parse file: %v", fname)
 
 		//go daily.ImportDaily(fname, DB)
