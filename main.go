@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"time"
 
 	"github.com/rs/zerolog"
@@ -23,13 +24,19 @@ const Version = 0.04
 var DB *gorm.DB
 
 // name of the database we are using
-const dbName = "./data/db.db"
+//const dbName = "./data/db.db"
+var dbName string
 
 func main() {
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 	zerolog.SetGlobalLevel(zerolog.DebugLevel)
 
 	log.Info().Msgf("Bluebook Helper v%v.\n\n", Version)
+
+	log.Debug().Msg("Initializing environment...")
+	env.Environment.Init()
+
+	dbName = filepath.Join(env.Environment.DataPath, "db.db")
 
 	log.Info().Msg("Initializing database...")
 	dbo, err := gorm.Open(sqlite.Open(dbName), &gorm.Config{})
@@ -45,8 +52,6 @@ func main() {
 	log.Debug().Msg("Converting old database to current...")
 	//_ = convertDB()
 
-	log.Debug().Msg("Initializing environment...")
-	env.Environment.Init()
 	log.Debug().Msgf("Import Path: %v", env.Environment.ImportPath)
 
 	log.Info().Msg("Initialiing server and middleware")
