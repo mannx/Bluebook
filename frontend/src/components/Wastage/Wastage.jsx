@@ -1,43 +1,56 @@
 import React from "react";
 import NumberFormat from "react-number-format";
+import DatePicker from "react-datepicker";
+
+import "react-datepicker/dist/react-datepicker.css";
 
 class Wastage extends React.Component {
 		constructor(props) {
 				super(props);
-				//let d = new Date();
-
-				/*var m = d.getMonth();
-				var da= d.getDay();
-				var y = d.getFullYear();*/
 				this.state = {
-						month: 1,
-						day: 11,
-						year: 2022,
+						date: null,
 						data: null,
 						errorMsg: "",
 				}
 		}
 
-		async componentDidMount() {
-				const url = "http://localhost:8080/api/waste/view?month="+this.state.month+"&year="+this.state.year+"&day="+this.state.day;
+		loadData = async () => {
+				if(this.state.date == null ) return;
+
+				const month = this.state.date.getMonth()+1;
+				const year = this.state.date.getFullYear();
+				const day = this.state.date.getDate();
+
+				const url = "http://localhost:8080/api/waste/view?month="+month+"&year="+year+"&day="+day;
 				const resp = await fetch(url);
 				const data = await resp.json();
 
-				//this.setState({data: JSON.parse(data)});
 				this.setState({data: data});
 				console.log(data);
 		}
 
+		header = () => {
+				return (
+						<div><span>Pick Week To View:</span>
+								<DatePicker selected={this.state.date} onChange={(d)=>this.setState({date:d})} />
+								<button onClick={this.loadData}>View</button>
+						</div>);
+		}
 
 		render() {
 				if(this.state.data == null){
-						return <h1>Loading...</h1>;
+						return (<>{this.header()}<h1>Loading</h1></>);
 				}
+
+				const month = this.state.date.getMonth()+1;
+				const year = this.state.date.getFullYear();
+				const day = this.state.date.getDate();
 
 				return (<>
 						{this.errorMessage()}
+						{this.header()}
 						<table>
-								<caption>Waste for {this.state.month}/{this.state.day}/{this.state.year}</caption>
+								<caption>Waste for {month}/{day}/{year}</caption>
 								<thead>
 										<tr>
 											<th>Item</th>

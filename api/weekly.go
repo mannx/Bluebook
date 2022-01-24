@@ -150,6 +150,18 @@ func getAuvData(weekEnding time.Time, wi *weeklyInfo, db *gorm.DB) error {
 	if auv.Week1Date == we {
 		wi.TargetHours = auv.Week1Hours
 		wi.TargetAUV = auv.Week1AUV
+	} else if auv.Week2Date == we {
+		wi.TargetHours = auv.Week2Hours
+		wi.TargetAUV = auv.Week2AUV
+	} else if auv.Week3Date == we {
+		wi.TargetHours = auv.Week3Hours
+		wi.TargetAUV = auv.Week3AUV
+	} else if auv.Week4Date == we {
+		wi.TargetHours = auv.Week4Hours
+		wi.TargetAUV = auv.Week4AUV
+	} else if auv.Week5Date == we {
+		wi.TargetHours = auv.Week5Hours
+		wi.TargetAUV = auv.Week5AUV
 	}
 
 	return nil

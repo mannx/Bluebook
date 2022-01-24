@@ -1,5 +1,20 @@
 import React from "react";
 import NumberFormat from "react-number-format";
+import DatePicker from "react-datepicker";
+
+import "react-datepicker/dist/react-datepicker.css";
+
+const formatUTC = (dateInt, addOffset = false) => {
+		let date=(!dateInt||dateInt.length<1)?new Date():new Date(dateInt);
+		if (typeof dateInt === "string"){
+				return date;
+		}else{
+				const offset=addOffset?date.getTimezoneOffset():-(date.getTimezoneOffset());
+				const offsetDate=new Date();
+				offsetDate.setTime(date.getTime()+offset*60000);
+				return offsetDate;
+		}
+}
 
 class Weekly extends React.Component {
 		constructor(props) {
@@ -8,27 +23,34 @@ class Weekly extends React.Component {
 				this.state = { 
 						data: null,
 						isLoading: true,
-						month: 1,
-						year: 2022,
-						day: 4,
+						date: new Date(2022, 0, 4, 0, 0, 0, 0),
 				}
 		}
 		
 
-		async componentDidMount() {
-				const month=this.state.month;
-				const day = this.state.day;
-				const year = this.state.year;
+		loadData = async () => {
+				if(this.state.date == null) {
+						return;
+				}
+
+				const month=this.state.date.getMonth()+1;
+				const day = this.state.date.getDate();
+				const year = this.state.date.getFullYear();
 
 				const url = "http://localhost:8080/api/weekly/view?month="+month+"&day="+day+"&year="+year;
 				const resp = await fetch(url);
 				const data = await resp.json();
 
 				console.log("Weekly");
+				console.log(this.state.date);
 				console.log(data);
 
 				this.setState({data: data, isLoading: false});
 		}	
+
+		componentDidMount() {
+				this.loadData();
+		}
 
 		NF(obj) {
 				return (
@@ -41,6 +63,27 @@ class Weekly extends React.Component {
 				);
 		}
 
+		D(obj) {
+				return (<span>
+						{obj.getMonth()+1} / {obj.getDate()} / {obj.getFullYear()}
+				</span>
+				);
+		}
+
+		header = () => {
+				return (<>
+						<span>Pick Week To View:</span>
+						<DatePicker selected={this.state.date} onChange={(e)=>this.setState({date:e})} />
+						<button onClick={this.updateView}>View</button>
+				</>
+				);
+		}
+
+		updateView = () => {
+				console.log(this.state.date);
+				this.loadData();
+		}
+
 		render() {
 				if(this.state.isLoading === true || this.state.data === null) {
 					return <h1>Weekly Report Loading...</h1>;
@@ -48,7 +91,10 @@ class Weekly extends React.Component {
 
 				const data = this.state.data;
 				return (
-						<><table><caption>Weekly Report</caption>
+						<>
+						<span>Week Ending: {this.D(this.state.date)}</span>
+						{this.header()}
+						<table><caption>Weekly Report</caption>
 								<thead><tr>
 										<th>Name</th><th>Value</th>
 								</tr></thead>

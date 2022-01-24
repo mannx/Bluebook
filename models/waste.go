@@ -50,8 +50,6 @@ type WastageEntry struct {
 
 // Convert the weight to custom weight type or conversion factor
 func (wi *WastageItem) Convert(n float64) float64 {
-	//log.Debug().Msgf("WastageItem::Convert => %v(%v)[%v]", wi.Name, n, wi.CustomConversion)
-
 	if wi.CustomConversion == true {
 		log.Debug().Msg("WastageItem::Convert() => custom conversion")
 		return n * wi.UnitWeight
