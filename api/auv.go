@@ -7,6 +7,7 @@ import (
 	"github.com/labstack/echo/v4"
 	models "github.com/mannx/Bluebook/models"
 	"github.com/rs/zerolog/log"
+	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
 
@@ -38,6 +39,12 @@ func GetAUVViewHandler(c echo.Context, db *gorm.DB) error {
 		log.Debug().Msg("Unable to find auv data")
 		return res.Error
 	}
+	log.Debug().Msgf("  => AUV rows affected: %v", res.RowsAffected)
+	if res.RowsAffected == 0 {
+		// no auv data found, make sure to set the default fields to the month/year
+		d := time.Date(year, time.Month(month), 1, 0, 0, 0, 0, time.UTC)
+		auv.Default(datatypes.Date(d))
+	}
 
 	return c.JSON(http.StatusOK, &auv)
 }
@@ -50,14 +57,68 @@ func UpdateAUVPostHandler(c echo.Context, db *gorm.DB) error {
 		Week3Date string `json:"week3date"`
 		Week4Date string `json:"week4date"`
 		Week5Date string `json:"week5date"`
+
+		Week1Hours int `json:"week1hours"`
+		Week2Hours int `json:"week2hours"`
+		Week3Hours int `json:"week3hours"`
+		Week4Hours int `json:"week4hours"`
+		Week5Hours int `json:"week5hours"`
+
+		Week1Auv int `json:"week1auv"`
+		Week2Auv int `json:"week2auv"`
+		Week3Auv int `json:"week3auv"`
+		Week4Auv int `json:"week4auv"`
+		Week5Auv int `json:"week5auv"`
+
+		Id int `json:"id"`
 	}
 
 	var auv auvData
 	if err := c.Bind(&auv); err != nil {
+		log.Error().Err(err).Msg("Unable to bind auv data")
 		return err
 	}
 
-	log.Debug().Msgf("Week1 Date: %v", auv.Week1Date)
+	w1d, _ := time.Parse(time.RFC3339, auv.Week1Date)
+	w2d, _ := time.Parse(time.RFC3339, auv.Week2Date)
+	w3d, _ := time.Parse(time.RFC3339, auv.Week3Date)
+	w4d, _ := time.Parse(time.RFC3339, auv.Week4Date)
+	w5d, _ := time.Parse(time.RFC3339, auv.Week5Date)
 
-	return nil
+	e := models.AUVEntry{}
+
+	// retrieve the entry if we already have one using the id if not 0
+	if auv.Id != 0 {
+		res := db.Find(&e, "ID = ?", auv.Id)
+		if res.Error != nil {
+			return res.Error
+		}
+	}
+
+	e.Week1Date = datatypes.Date(w1d)
+	e.Week2Date = datatypes.Date(w2d)
+	e.Week3Date = datatypes.Date(w3d)
+	e.Week4Date = datatypes.Date(w4d)
+	e.Week5Date = datatypes.Date(w5d)
+
+	e.Week1AUV = auv.Week1Auv
+	e.Week2AUV = auv.Week2Auv
+	e.Week3AUV = auv.Week3Auv
+	e.Week4AUV = auv.Week4Auv
+	e.Week5AUV = auv.Week5Auv
+
+	e.Week1Hours = auv.Week1Hours
+	e.Week2Hours = auv.Week2Hours
+	e.Week3Hours = auv.Week3Hours
+	e.Week4Hours = auv.Week4Hours
+	e.Week5Hours = auv.Week5Hours
+
+	log.Debug().Msgf("  => Week1Date: %v", time.Time(e.Week1Date).String())
+	log.Debug().Msgf("  => Week3Auv: %v", e.Week3AUV)
+	log.Debug().Msgf("  => ID: %v", auv.Id)
+
+	// save/update the entries
+	db.Save(&e)
+
+	return c.JSON(http.StatusOK, &models.ServerReturnMessage{Message: "AUV Record Updated"})
 }

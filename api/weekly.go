@@ -7,6 +7,7 @@ import (
 	"github.com/labstack/echo/v4"
 	models "github.com/mannx/Bluebook/models"
 	"github.com/rs/zerolog/log"
+	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
 
@@ -54,10 +55,10 @@ func GetWeeklyViewHandler(c echo.Context, db *gorm.DB) error {
 	}
 
 	weekly := weeklyInfo{}
-
-	// TODO: retrieve auv information here
-
-	// END todo
+	err = getAuvData(weekEnding, &weekly, db)
+	if err != nil {
+		return err
+	}
 
 	// retrieve the data for the week
 	data := make([]models.DayData, 9)
@@ -126,4 +127,30 @@ func calculateWeekly(data []models.DayData, wi *weeklyInfo) {
 		wi.GiftCardRedeem += d.GiftCardRedeem
 		wi.BreadOverShort += d.BreadOverShort
 	}
+}
+
+func getAuvData(weekEnding time.Time, wi *weeklyInfo, db *gorm.DB) error {
+	// get the auv data for the month
+	start := time.Date(weekEnding.Year(), weekEnding.Month(), 1, 0, 0, 0, 0, time.UTC)
+	end := start.AddDate(0, 1, 0) // get the next month
+	auv := models.AUVEntry{}
+
+	res := db.Find(&auv, "week1_date >= ? AND week1_date < ?", start, end)
+	if res.Error != nil {
+		return res.Error
+	}
+
+	if res.RowsAffected == 0 {
+		// no auv data available
+		return nil
+	}
+
+	we := datatypes.Date(weekEnding)
+	// determine which week ending date matches ours, if no match, return error
+	if auv.Week1Date == we {
+		wi.TargetHours = auv.Week1Hours
+		wi.TargetAUV = auv.Week1AUV
+	}
+
+	return nil
 }

@@ -30,3 +30,12 @@ type AUVEntry struct {
 	Week5Hours    int
 	Week5Required bool // true if this month has 5 weeks of data
 }
+
+// Default sets the date fields to the provided date
+func (auv *AUVEntry) Default(date datatypes.Date) {
+	auv.Week1Date = date
+	auv.Week2Date = date
+	auv.Week3Date = date
+	auv.Week4Date = date
+	auv.Week5Date = date
+}
