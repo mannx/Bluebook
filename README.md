@@ -30,3 +30,15 @@
 	* Environment variables are used only to override default locations. See Environ.go
 	* BLUEBOOK\_IMPORT\_PATH	-> directory where files to import are found
 	* BLUEBOOK\_TEMP\_PATH -> directory where temp files are stored
+
+
+- Migration Steps:
+	* Copy current database into /data (BLUEBOOK\_DATA\_PATH)
+	* Copy migrate.sh into the /data directory
+	* Run migrate.sh and everything *SHOULD* get migrated over correctly
+	* TODO:
+		- Provide a runtime option to update the time stamps on all entries
+			~ This adds the time (0:00UTC) to all entries to make searching currently work
+		- Dockerfile build todo
+			~ use a runtime script that initializes the server with the update flag on first run
+			~ but not for future runs

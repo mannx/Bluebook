@@ -19,9 +19,11 @@ COPY go.sum ./
 RUN go mod download
 
 COPY *.go ./
-COPY ./models ./models
-COPY ./import ./import
+
 COPY ./api ./api
+COPY ./environ ./environ
+COPY ./import ./import
+COPY ./models ./models
 
 RUN go build -o /bluebook
 
