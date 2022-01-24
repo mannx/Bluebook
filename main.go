@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"net/http"
 	"os"
 	"os/signal"
@@ -18,7 +19,7 @@ import (
 )
 
 // Version of the current build/release
-const Version = 0.04
+const Version = 0.05
 
 // DB is the database connection for the entire run
 var DB *gorm.DB
@@ -29,7 +30,7 @@ var dbName string
 
 func main() {
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
-	zerolog.SetGlobalLevel(zerolog.DebugLevel)
+	zerolog.SetGlobalLevel(zerolog.InfoLevel)
 
 	log.Info().Msgf("Bluebook Helper v%v.\n\n", Version)
 
@@ -49,8 +50,22 @@ func main() {
 	log.Debug().Msg("Auto migrating the database...")
 	migrateDB()
 
-	log.Debug().Msg("Converting old database to current...")
-	//_ = convertDB()
+	convertFlag := flag.Bool("convert", false, "convert date types in all database entries")
+	commentFlag := flag.Bool("comment", false, "combine comments into day data table before destroying")
+
+	flag.Parse()
+
+	if *convertFlag {
+		log.Debug().Msg("Converting old database to current...")
+		err = convertDB()
+		if err != nil {
+			log.Fatal().Err(err).Msg("Unable to convert dates to timestamps")
+		}
+	}
+
+	if *commentFlag {
+		importComments()
+	}
 
 	log.Debug().Msgf("Import Path: %v", env.Environment.ImportPath)
 
@@ -126,4 +141,33 @@ func migrateDB() {
 	DB.AutoMigrate(&models.WastageItem{})
 	DB.AutoMigrate(&models.WastageEntry{})
 	DB.AutoMigrate(&models.AUVEntry{})
+}
+
+// importComments combines the comment table into the day data table
+func importComments() {
+	log.Debug().Msg("Combining commnets into 1 table")
+
+	var cmt []models.Comments
+	res := DB.Find(&cmt)
+	if res.Error != nil {
+		log.Error().Err(res.Error).Msg("Unable to read in comments")
+		return
+	}
+
+	log.Debug().Msgf("Combining %v comment records...")
+	for _, n := range cmt {
+		dd := models.DayData{}
+		res = DB.Find(&dd, "ID = ?", n.LinkedID)
+		if res.Error != nil {
+			log.Error().Err(res.Error).Msgf("Unable to find day for comment %v", n.LinkedID)
+			continue
+		}
+		if res.RowsAffected == 0 {
+			log.Error().Msgf("No data for comment id %v", res.RowsAffected)
+			continue
+		}
+
+		dd.Comment = n.Comment
+		DB.Save(&dd)
+	}
 }

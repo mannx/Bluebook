@@ -32,8 +32,8 @@ type DayViewData struct {
 	DayOfWeek         string    // user friendly name of what day it is
 	IsEndOfWeek       bool      // is this a tuesday?
 	EOW               EndOfWeek // end of week data if required
-	Comment           string    // contains the comment if any
-	CommentID         uint      // contains the ID of the comment entry in case we update
+	//	Comment           string    // contains the comment if any
+	//	CommentID         uint      // contains the ID of the comment entry in case we update
 }
 
 // MonthlyView holds the monthly day data along with several other bits of info
@@ -108,8 +108,8 @@ func GetMonthViewHandler(c echo.Context, db *gorm.DB) error {
 		}
 
 		// check to see if we have any comment with this day
-		comm := models.Comments{}
-		_ = db.Find(&comm, "LinkedID = ?", o.ID)
+		//		comm := models.Comments{}
+		//		_ = db.Find(&comm, "LinkedID = ?", o.ID)
 
 		mvd = append(mvd,
 			DayViewData{
@@ -120,8 +120,8 @@ func GetMonthViewHandler(c echo.Context, db *gorm.DB) error {
 				DayOfWeek:        d.Weekday().String(),
 				IsEndOfWeek:      d.Weekday() == time.Tuesday,
 				EOW:              eow,
-				Comment:          comm.Comment,
-				CommentID:        o.ID,
+				//				Comment:          comm.Comment,
+				//				CommentID:        o.ID,
 			})
 	}
 

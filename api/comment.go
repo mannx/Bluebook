@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -21,7 +20,6 @@ func UpdateCommentHandler(c echo.Context, db *gorm.DB) error {
 	type CommentPost struct {
 		Comment  string `json:"Comment" query:"Comment"`
 		LinkedID int    `json:"LinkedID" query:"LinkedID"` // id of the day we are adding the comment to, 0 if we dont have a linked day
-		Date     string `json:"Date" query:"Date"`         // if LinkedID is valid, this is nil, otherwise form of MMDDYYYY used when there is no daydata
 	}
 	var cp CommentPost
 
@@ -34,12 +32,16 @@ func UpdateCommentHandler(c echo.Context, db *gorm.DB) error {
 	if cp.LinkedID != 0 {
 		log.Debug().Msgf("Adding comment to linked day: %v", cp.LinkedID)
 
-		cm := models.Comments{LinkedID: cp.LinkedID, Comment: cp.Comment}
-		res := db.Save(&cm)
+		dd := models.DayData{}
+		res := db.Find(&dd, "ID = ?", cp.LinkedID)
 		if res.Error != nil {
-			return c.String(http.StatusInternalServerError,
-				fmt.Sprintf("Unable to save comment: %v", res.Error))
+			return c.String(http.StatusInternalServerError, "Unable to find linked day")
 		}
+
+		dd.Comment = cp.Comment
+		db.Save(&dd)
+	} else {
+		log.Warn().Msg("UpdateCommentHandler() => Adding comment with no linked day not yet supported")
 	}
 
 	return c.String(http.StatusOK, "Update Success")

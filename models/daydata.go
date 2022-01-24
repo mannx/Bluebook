@@ -50,6 +50,8 @@ type DayData struct {
 
 	// holds average of previous 4 weeks
 	WeeklyAverage float64 `gorm:"column:WeeklyAverage"`
+
+	Comment string `gorm:"column:Comment"` // comment for the given day
 }
 
 // Comments contains day id and the comment linked to it

@@ -14,8 +14,6 @@ class TableCell extends React.Component {
 
 				this.state = {
 					editComment: false,
-					comment: props.data.Comment,
-					linkedID: props.data.CommentID,
 					data: props.data,
 				}
 		}
@@ -83,14 +81,14 @@ class TableCell extends React.Component {
 								<td onDoubleClick={this.editComment} >
 										{this.commentField() }
 								</td>
-								<td>{this.props.data.CommentID}</td>
+								<td></td>
 						</tr>
 				);
 		}
 
 		commentField = () => {
 			if(this.state.editComment === false) {
-				return <div className="comment"  >{this.state.comment}</div>;
+				return <div className="comment"  >{this.state.data.Comment}</div>;
 			}else{
 				return (
 						<form onSubmit={this.submitComment} >
@@ -108,8 +106,7 @@ class TableCell extends React.Component {
 				// state.linkedid is the comment id if updating, 0 otherwise
 				const body = {
 						Comment: this.state.comment,
-						LinkedID: this.state.linkedID,
-						Date: ""
+						LinkedID: this.state.data.ID,
 				}
 
 				const options = {
