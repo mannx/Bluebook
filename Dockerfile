@@ -60,7 +60,9 @@ WORKDIR /
 COPY --from=build /bluebook /bluebook
 COPY --from=react /app/build /static
 
+COPY ./run.sh ./
+
 EXPOSE 8080
 USER root:root
 
-ENTRYPOINT ["/bluebook"]
+ENTRYPOINT ["/run.sh"]
