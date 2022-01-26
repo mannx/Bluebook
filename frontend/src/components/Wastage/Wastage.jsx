@@ -8,14 +8,20 @@ class Wastage extends React.Component {
 		constructor(props) {
 				super(props);
 				this.state = {
-						date: null,
+						date: new Date(),
 						data: null,
 						errorMsg: "",
+						error: false,
+				}
+
+				// if not a tuesday, display an error 
+				if(this.state.date.getDay() !== 2) {
+						this.setState({error: true, errorMsg: "Require date to be a tuesday"});
 				}
 		}
 
 		loadData = async () => {
-				if(this.state.date == null ) return;
+				if(this.state.date == null || this.state.error === true) return;
 
 				const month = this.state.date.getMonth()+1;
 				const year = this.state.date.getFullYear();
@@ -33,8 +39,23 @@ class Wastage extends React.Component {
 				return (
 						<div><span>Pick Week To View:</span>
 								<DatePicker selected={this.state.date} onChange={(d)=>this.setState({date:d})} />
-								<button onClick={this.loadData}>View</button>
+								<button onClick={this.updateView}>View</button>
+								<div>{this.state.errorMsg}</div>
 						</div>);
+		}
+
+		updateView = () => {
+				console.log(this.state.date);
+				//
+				// if not a tuesday, display an error 
+				if(this.state.date.getDay() !== 2) {
+						this.setState({error: true, errorMsg: "Require date to be a tuesday"});
+				}else{
+						// make sure the error is cleared
+						this.setState({error: false, errorMsg: ""});
+				}
+
+				this.loadData();
 		}
 
 		render() {
@@ -47,7 +68,6 @@ class Wastage extends React.Component {
 				const day = this.state.date.getDate();
 
 				return (<>
-						{this.errorMessage()}
 						{this.header()}
 						<table>
 								<caption>Waste for {month}/{day}/{year}</caption>
@@ -72,14 +92,6 @@ class Wastage extends React.Component {
 								</tbody>
 						</table>
 						</>);
-		}
-
-		errorMessage = () => {
-				if(this.state.errorMsg !== ""){ 
-					return <span className="error">{this.state.errorMsg}</span>;
-				}else{
-						return <></>;
-				}
 		}
 
 		NF = (obj) => {

@@ -54,10 +54,29 @@ type DayData struct {
 	Comment string `gorm:"column:Comment"` // comment for the given day
 }
 
+// TODO:
+//	This structure can be removed along with any code relant on it
+//	once the need to convert a django version of the db has passed
+//
 // Comments contains day id and the comment linked to it
 type Comments struct {
 	gorm.Model
 
 	LinkedID int    `gorm:"column:LinkedID"`
 	Comment  string `gorm:"column:Comment"`
+}
+
+// TagInfo simply provides a name to the given tag
+type TagList struct {
+	gorm.Model
+
+	Tag string `gorm:"column:Tag"`
+}
+
+// TagData keeps track of which days have what tags
+type TagData struct {
+	gorm.Model
+
+	TagID uint `gorm:"column:TagID"` // ID of the TagInfo structure for this entry
+	DayID uint `gorm:"column:DayID"`
 }

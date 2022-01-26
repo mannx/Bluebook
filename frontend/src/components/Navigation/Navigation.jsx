@@ -24,11 +24,12 @@ const PageImport = 2;
 const PageWastage = 3;
 const PageWeekly = 4;
 const PageAUV = 5;
+const PageTags = 6;
 
 function Navigate(props) {
 		switch(props.page) {
 				case PageMonth:
-					return <TableView month={props.month} year={props.year} />;
+					return <TableView month={props.month} year={props.year} navTag={props.searchTags} />;
 				case PageImport:
 						return <Imports />;
 				case PageWastage:
@@ -37,6 +38,8 @@ function Navigate(props) {
 						return <Weekly />;
 				case PageAUV:
 						return <AUV />;
+				case PageTags:
+						return <h1>Tag Search TODO</h1>;
 				default:
 						return <h2>Invalid page number {props.page}</h2>;
 		}
@@ -59,14 +62,25 @@ class Navigation extends React.Component {
 		}
 
 		render() {
-				return (
-						<>
-						<div><ul className={"navControl"}>
+
+				let nav;
+				if(this.state.page === PageMonth) {
+						// show related navigation optioons
+						nav = (<>
 							<li className={"navControl"}><NavButton name={"Prev"} func={this.NavigatePrev} /></li>
 							<li className={"navControl"}><NavButton name={"Next"} func={this.NavigateNext} /></li>
 							<li className={"navControl"}><NavButton name={"Prev Year"} func={this.NavigatePrevYear} /></li>
+						</>);
+				}else{
+						nav = <></>;
+				}
+
+				return (
+						<>
+						<div><ul className={"navControl"}>
+							{nav}
 							<li className={"navControl"}><NavButton name={"Today"} func={this.funcToday} /></li>
-							<li className={"navControl"}><NavButton name={"Search Tags"} func={func} /></li>
+							<li className={"navControl"}><NavButton name={"Search Tags"} func={this.NavigateTags} /></li>
 							<li className={"navControl"}><NavButton name={"AUV"} func={this.NavigateAUV} /></li>
 							<li className={"navControl"}><NavButton name={"Weekly Info"} func={this.NavigateWeekly} /></li>
 							<li className={"navControl"}><NavButton name={"Wastage"} func={this.NavigateWastage} /></li>
@@ -74,7 +88,7 @@ class Navigation extends React.Component {
 							<li className={"navControl"}><NavButton name={"Settings"} func={func} /></li>
 							<li className={"navControl"}><NavButton name={"Import"} func={this.Imports} /></li>
 						</ul></div>
-						<Navigate month={this.state.month} year={this.state.year} page={this.state.page} />
+						<Navigate month={this.state.month} year={this.state.year} page={this.state.page} navTag={this.NavigateTags} />
 						</>
 				);
 		}
@@ -121,6 +135,7 @@ class Navigation extends React.Component {
 		NavigateWastage = () => { this.setState({page: PageWastage});}
 		NavigateWeekly = () => { this.setState({page: PageWeekly});}
 		NavigateAUV = () => { this.setState({page: PageAUV});}
+		NavigateTags = () => { this.setState({page: PageTags});}
 }
 
 

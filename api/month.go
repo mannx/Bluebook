@@ -15,33 +15,6 @@ import (
  *
  */
 
-// EndOfWeek provides data totaling the previous week of sales
-type EndOfWeek struct {
-	NetSales      float64
-	CustomerCount int
-}
-
-// DayViewData is an expanded DayData object with additional properties
-type DayViewData struct {
-	models.DayData
-
-	ThirdPartyDollar  float64
-	ThirdPartyPercent float64
-	GrossSales        float64
-	DayOfMonth        int       // 1-31 for what day of the month it is
-	DayOfWeek         string    // user friendly name of what day it is
-	IsEndOfWeek       bool      // is this a tuesday?
-	EOW               EndOfWeek // end of week data if required
-	//	Comment           string    // contains the comment if any
-	//	CommentID         uint      // contains the ID of the comment entry in case we update
-}
-
-// MonthlyView holds the monthly day data along with several other bits of info
-type MonthlyView struct {
-	Data      []DayViewData
-	MonthName string // month in a user friendly format
-}
-
 //
 //	Returns data for a given month
 //	query url: /API_URL?month=MM&year=YYYY
@@ -49,6 +22,33 @@ type MonthlyView struct {
 
 // GetMonthViewHandler handles returning data for viewing a given month
 func GetMonthViewHandler(c echo.Context, db *gorm.DB) error {
+
+	// endOfWeek provides data totaling the previous week of sales
+	type endOfWeek struct {
+		NetSales      float64
+		CustomerCount int
+	}
+
+	// dayViewData is an expanded DayData object with additional properties
+	type dayViewData struct {
+		models.DayData
+
+		ThirdPartyDollar  float64
+		ThirdPartyPercent float64
+		GrossSales        float64
+		DayOfMonth        int       // 1-31 for what day of the month it is
+		DayOfWeek         string    // user friendly name of what day it is
+		IsEndOfWeek       bool      // is this a tuesday?
+		EOW               endOfWeek // end of week data if required
+
+		Tags []string // list of tags on this day
+	}
+
+	// monthlyView holds the monthly day data along with several other bits of info
+	type monthlyView struct {
+		Data      []dayViewData
+		MonthName string // month in a user friendly format
+	}
 	var month, year int
 
 	err := echo.QueryParamsBinder(c).
@@ -80,13 +80,13 @@ func GetMonthViewHandler(c echo.Context, db *gorm.DB) error {
 		return res.Error
 	}
 
-	mvd := make([]DayViewData, 0)
+	mvd := make([]dayViewData, 0)
 	for _, o := range data {
 		// compute the gross sales (net+hst+bot dep)
 		gs := o.NetSales + o.HST + o.BottleDeposit
 		d := time.Time(o.Date)
 
-		eow := EndOfWeek{} // initialize the end of week of it is required
+		eow := endOfWeek{} // initialize the end of week of it is required
 		if d.Weekday() == time.Tuesday {
 			// end of week, pull in the required data
 			pw := d.Add(-time.Hour * 24 * 6) // get previous 7 days
@@ -107,12 +107,8 @@ func GetMonthViewHandler(c echo.Context, db *gorm.DB) error {
 			}
 		}
 
-		// check to see if we have any comment with this day
-		//		comm := models.Comments{}
-		//		_ = db.Find(&comm, "LinkedID = ?", o.ID)
-
 		mvd = append(mvd,
-			DayViewData{
+			dayViewData{
 				DayData:          o,
 				ThirdPartyDollar: o.DoorDash + o.SkipTheDishes,
 				GrossSales:       gs,
@@ -120,11 +116,34 @@ func GetMonthViewHandler(c echo.Context, db *gorm.DB) error {
 				DayOfWeek:        d.Weekday().String(),
 				IsEndOfWeek:      d.Weekday() == time.Tuesday,
 				EOW:              eow,
-				//				Comment:          comm.Comment,
-				//				CommentID:        o.ID,
+				Tags:             getTags(o.ID, db),
 			})
 	}
 
-	mv := MonthlyView{Data: mvd, MonthName: time.Month(month).String()}
+	mv := monthlyView{Data: mvd, MonthName: time.Month(month).String()}
 	return c.JSON(http.StatusOK, &mv)
+}
+
+func getTags(id uint, db *gorm.DB) []string {
+	// retrieve all tags for this day
+	tags := make([]models.TagData, 0)
+	res := db.Find(&tags, "DayID = ?", id)
+	if res.Error != nil {
+		log.Error().Err(res.Error).Msg("Unable to retrieve tag data")
+		return nil
+	}
+
+	var tstr []string
+	for _, obj := range tags {
+		var t models.TagList
+		e := db.Find(&t, "ID = ?", obj.TagID)
+		if e.Error != nil {
+			log.Error().Err(e.Error).Msg("Unable to retrieve tag data")
+			continue
+		}
+
+		tstr = append(tstr, t.Tag)
+	}
+
+	return tstr
 }

@@ -4,18 +4,6 @@ import DatePicker from "react-datepicker";
 
 import "react-datepicker/dist/react-datepicker.css";
 
-const formatUTC = (dateInt, addOffset = false) => {
-		let date=(!dateInt||dateInt.length<1)?new Date():new Date(dateInt);
-		if (typeof dateInt === "string"){
-				return date;
-		}else{
-				const offset=addOffset?date.getTimezoneOffset():-(date.getTimezoneOffset());
-				const offsetDate=new Date();
-				offsetDate.setTime(date.getTime()+offset*60000);
-				return offsetDate;
-		}
-}
-
 class Weekly extends React.Component {
 		constructor(props) {
 				super(props);
@@ -23,13 +11,20 @@ class Weekly extends React.Component {
 				this.state = { 
 						data: null,
 						isLoading: true,
-						date: new Date(2022, 0, 4, 0, 0, 0, 0),
+						date: new Date(),
+						errorMsg: "",
+						error: false,
+				}
+
+				// if not a tuesday, display an error 
+				if(this.state.date.getDay() !== 2) {
+						this.setState({error: true, errorMsg: "Require date to be a tuesday"});
 				}
 		}
 		
 
 		loadData = async () => {
-				if(this.state.date == null) {
+				if(this.state.date === null || this.state.error === true) {
 						return;
 				}
 
@@ -75,18 +70,28 @@ class Weekly extends React.Component {
 						<span>Pick Week To View:</span>
 						<DatePicker selected={this.state.date} onChange={(e)=>this.setState({date:e})} />
 						<button onClick={this.updateView}>View</button>
+						<span>{this.state.errorMsg}</span>
 				</>
 				);
 		}
 
 		updateView = () => {
 				console.log(this.state.date);
+				//
+				// if not a tuesday, display an error 
+				if(this.state.date.getDay() !== 2) {
+						this.setState({error: true, errorMsg: "Require date to be a tuesday"});
+				}else{
+						// make sure the error is cleared
+						this.setState({error: false, errorMsg: ""});
+				}
+
 				this.loadData();
 		}
 
 		render() {
 				if(this.state.isLoading === true || this.state.data === null) {
-					return <h1>Weekly Report Loading...</h1>;
+						return (<>{this.header()}<h1>Weekly Report Loading...</h1></>);
 				}
 
 				const data = this.state.data;

@@ -141,6 +141,9 @@ func migrateDB() {
 	DB.AutoMigrate(&models.WastageItem{})
 	DB.AutoMigrate(&models.WastageEntry{})
 	DB.AutoMigrate(&models.AUVEntry{})
+
+	DB.AutoMigrate(&models.TagList{})
+	DB.AutoMigrate(&models.TagData{})
 }
 
 // importComments combines the comment table into the day data table

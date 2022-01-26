@@ -5,3 +5,6 @@ ALTER TABLE bbhelper_comments RENAME TO comments;
 ALTER TABLE bbhelper_wastageentry RENAME TO wastage_entries;
 ALTER TABLE bbhelper_wastageitem RENAME TO wastage_items;
 ALTER TABLE bbhelper_weeklyinfo RENAME TO weekly_infos;
+
+ALTER TABLE bbhelper_tagdata RENAME TO tag_data;
+ALTER TABLE bbhelper_taglist RENAME TO tag_lists;

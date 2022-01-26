@@ -14,6 +14,7 @@ class TableCell extends React.Component {
 
 				this.state = {
 					editComment: false,
+					editTag: false,
 					data: props.data,
 				}
 		}
@@ -81,7 +82,7 @@ class TableCell extends React.Component {
 								<td onDoubleClick={this.editComment} >
 										{this.commentField() }
 								</td>
-								<td></td>
+								<td>{this.tagField()}</td>
 						</tr>
 				);
 		}
@@ -128,6 +129,19 @@ class TableCell extends React.Component {
 		commentChange = (e) =>  {
 				this.setState({comment: e.target.value});
 		}
+
+		tagField = () => {
+				if(this.state.editTag === false) {
+						if(this.state.data.Tags !== null) {
+							return (<div className='tag'>
+								{this.state.data.Tags.map(function (obj, i) {
+										return <button className="tagButton" >#{obj} </button>;
+								}, this)}
+							</div>);
+						}
+				}
+		}
+
 }
 
 export default TableCell;

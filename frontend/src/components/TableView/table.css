@@ -5,3 +5,14 @@ table, th, td
 	border-collapse: collapse;
 	text-align: center;
 }
+
+button.tagButton {
+		background-color: transparent;
+		border: none;
+		cursor: pointer;
+		text-decoration: underline;
+		display: inline;
+		margin: 0;
+		padding: 0;
+		color: blue;
+}

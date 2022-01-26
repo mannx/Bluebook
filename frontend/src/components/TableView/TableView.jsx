@@ -49,18 +49,18 @@ class TableView extends React.Component {
 									<th>HST</th>
 									<th>Bot Dep</th>
 									<th>Net Sales</th>
-									<th></th>
+									<th className="div"></th>
 
 										<th>Debit</th>
 										<th>Visa</th>
 										<th>MC</th>
 										<th>Amex</th>
 										<th>Credit Sales</th>
-										<th></th>
+										<th className="div"></th>
 
 										<th>GC Redeem</th>
 										<th>GC Sold</th>
-										<th></th>
+										<th className="div"></th>
 
 										<th>Hours</th>
 										<th>Prod</th>
@@ -69,7 +69,7 @@ class TableView extends React.Component {
 										<th>Cust Count</th>
 										<th>% 3rd Party</th>
 										<th>$ 3rd Party</th>
-										<th></th>
+										<th className="div"></th>
 
 										<th>Comments</th>
 										<th>Tags</th>
@@ -80,13 +80,13 @@ class TableView extends React.Component {
 									if(obj.IsEndOfWeek) {
 											return (
 													<>
-														<TableCell data={obj} />
+														<TableCell data={obj} searchTag={this.props.navTag}/>
 														<TableEOW data={obj} />
 													</>
 											);
 									}
 									return <TableCell data={obj} />;
-							})}
+							}, this)}
 					</tbody>
 					</table>
 			);
