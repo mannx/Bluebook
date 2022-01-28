@@ -16,7 +16,7 @@ import (
 	models "github.com/mannx/Bluebook/models"
 )
 
-const dateFormat = "02-Jan-06" // format used when parsing time from sheets
+const dateFormat = "02-Jan-06"      // format used when parsing time from sheets
 const altDateFormat = "02-Jan-2006" // possible other variation of the time format
 //const dateFormat2 = "2006-Jan-02"
 
@@ -59,6 +59,11 @@ func ImportDaily(fileName string, db *gorm.DB) error {
 			break
 		}
 
+		// check if its a formula
+		if n[0] == '=' {
+			log.Debug().Msgf("found formula [%v] on %v", n, i)
+		}
+
 		// validate proper days
 		// date format: DD-MMM-YYYY
 		//const form = "2-Jan-06"
@@ -67,9 +72,9 @@ func ImportDaily(fileName string, db *gorm.DB) error {
 			log.Debug().Err(de).Msgf("Unable to parse time: %v, attemping 2nd format", n)
 			d, de = time.Parse(altDateFormat, n)
 			if de != nil {
-					log.Debug().Err(de).Msgf("Unable to parse time (alt format): %v", n)
-					// bad dates should cause a stop
-					break
+				log.Debug().Err(de).Msgf("Unable to parse time (alt format): %v", n)
+				// bad dates should cause a stop
+				break
 			}
 		} else {
 			log.Debug().Msgf("date: %v (%T)", d, d)
@@ -96,8 +101,8 @@ func ImportDaily(fileName string, db *gorm.DB) error {
 			log.Error().Err(err).Msg("Unable to parse date (2)")
 			d, err = time.Parse(altDateFormat, date)
 			if err != nil {
-					log.Error().Err(err).Msg("Unable to parse alt date (2)")
-					continue
+				log.Error().Err(err).Msg("Unable to parse alt date (2)")
+				continue
 			}
 		}
 
