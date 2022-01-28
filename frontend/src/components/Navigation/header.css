@@ -4,7 +4,8 @@ ul.navControl {
 		margin: 0;
 		padding: 0;
 		overflow: hidden;
-		background-color: cadetblue;
+		/*background-color: cadetblue;*/
+		background-color: limegreen;
 }
 
 li.navControl {
@@ -20,5 +21,6 @@ li.navControl span.navLink {
 }
 
 li.navControl span.navLink:hover {
-		background-color: cornflowerblue;
+		/*background-color: cornflowerblue;*/
+		background-color: lime;
 }

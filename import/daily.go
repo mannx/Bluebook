@@ -18,7 +18,6 @@ import (
 
 const dateFormat = "02-Jan-06"      // format used when parsing time from sheets
 const altDateFormat = "02-Jan-2006" // possible other variation of the time format
-//const dateFormat2 = "2006-Jan-02"
 
 // ImportDaily is used to import a single sheet into the database
 func ImportDaily(fileName string, db *gorm.DB) error {
@@ -26,6 +25,7 @@ func ImportDaily(fileName string, db *gorm.DB) error {
 
 	f, err := excelize.OpenFile(fileName)
 	if err != nil {
+			log.Error().Err(err).Msgf("Unable to open file: %v", fileName)
 		return err
 	}
 
@@ -59,14 +59,8 @@ func ImportDaily(fileName string, db *gorm.DB) error {
 			break
 		}
 
-		// check if its a formula
-		if n[0] == '=' {
-			log.Debug().Msgf("found formula [%v] on %v", n, i)
-		}
-
 		// validate proper days
 		// date format: DD-MMM-YYYY
-		//const form = "2-Jan-06"
 		d, de := time.Parse(dateFormat, n)
 		if de != nil {
 			log.Debug().Err(de).Msgf("Unable to parse time: %v, attemping 2nd format", n)
@@ -129,9 +123,13 @@ func getFloat(file *excelize.File, sheet string, cell string) float64 {
 		return 0.0
 	}
 
+	if len(v) > 0 &&  v[0] == '=' {
+			log.Debug().Msgf("found formula cell %v", cell)
+	}
+
 	n, err := strconv.ParseFloat(v, 64)
 	if err != nil {
-		//log.Error().Err(err).Msgf("unable to get float from %v", cell)
+		log.Error().Err(err).Msgf("unable to get float from %v [%v]", cell, v)
 		return 0.0
 	}
 
@@ -146,6 +144,8 @@ func extractData(sheet *excelize.File, index int, date time.Time, ver int, db *g
 	dd := getDataOrNew(date, db)
 
 	// 2) fill in the data from the sheet
+	//	any entry that uses a formula will automatically get the correct value
+	//	instead of having to parse the formula ourselves
 	dd.Date = datatypes.Date(date)
 
 	dd.CashDeposit = getFloat(sheet, "Sheet1", CashDeposit[ver][index])
