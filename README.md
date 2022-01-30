@@ -11,15 +11,15 @@
 			~ (PARTIAL) rework sorting for viewing, show category? (after waste defintion file import done)	 
 
 - TODO:
-	* be able to read/write from the existing db with little to no modifications to db structure
-		+ columns need renamed
-		+ script started to auto adjust tables and column names as needed
 	* (MOSTLY) Weekly paperwork calculations, (TODO) file generation
 	* Wastage server and front end finishing
 		- server: calculate weight conversions
 		- server: json file describing initial batch of common wastage items
-	* Tags: need to implement tag searching
-	* CSS worked on
+	* CSS worked on -- themes? or other easier way of chaning colouring
+
+- Issues:
+	* Import: Unable to move between import options without viewing another page first
+	* Import: No feedback after pressing button. Should show progress or other status information
 
 - Notes:
 	* Import script for adjusting database from django project in progress
@@ -28,7 +28,7 @@
 - Environment Variables:
 	* Environment variables are used only to override default locations. See Environ.go
 	* BLUEBOOK\_IMPORT\_PATH	-> directory where files to import are found
-	* BLUEBOOK\_TEMP\_PATH -> directory where temp files are stored
+	* [DEPRECIATED] BLUEBOOK\_TEMP\_PATH -> directory where temp files are stored [temp path is no longer used, temp files are generated in same directory]
 	* BLUEBOOK\_DATA\_PATH -> directory where the database is stored
 
 

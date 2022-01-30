@@ -16,3 +16,7 @@ button.tagButton {
 		padding: 0;
 		color: blue;
 }
+
+button.tagButton:hover {
+		color: red;
+}

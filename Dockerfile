@@ -62,6 +62,9 @@ COPY --from=react /app/build /static
 
 COPY ./run.sh ./
 
+# uncomment to prevent the initial database conversion
+#RUN touch READY
+
 EXPOSE 8080
 USER root:root
 

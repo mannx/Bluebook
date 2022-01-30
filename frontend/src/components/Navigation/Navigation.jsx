@@ -4,6 +4,7 @@ import Imports from "../Import/Import.jsx";
 import Wastage from "../Wastage/Wastage.jsx";
 import Weekly from "../Weekly/Weekly.jsx";
 import AUV from "../AUV/AUV.jsx";
+import ViewTags from "../Tags/ViewTags.jsx";
 import "./header.css";
 
 //
@@ -29,7 +30,7 @@ const PageTags = 6;
 function Navigate(props) {
 		switch(props.page) {
 				case PageMonth:
-					return <TableView month={props.month} year={props.year} navTag={props.searchTags} />;
+					return <TableView month={props.month} year={props.year} navTag={props.navTag} />;
 				case PageImport:
 						return <Imports />;
 				case PageWastage:
@@ -39,7 +40,7 @@ function Navigate(props) {
 				case PageAUV:
 						return <AUV />;
 				case PageTags:
-						return <h1>Tag Search TODO</h1>;
+						return <ViewTags />;
 				default:
 						return <h2>Invalid page number {props.page}</h2>;
 		}
@@ -85,7 +86,6 @@ class Navigation extends React.Component {
 							<li className={"navControl"}><NavButton name={"Weekly Info"} func={this.NavigateWeekly} /></li>
 							<li className={"navControl"}><NavButton name={"Wastage"} func={this.NavigateWastage} /></li>
 							<li className={"navControl"}><NavButton name={"Top 5"} func={func} /></li>
-							<li className={"navControl"}><NavButton name={"Settings"} func={func} /></li>
 							<li className={"navControl"}><NavButton name={"Import"} func={this.Imports} /></li>
 						</ul></div>
 						<Navigate month={this.state.month} year={this.state.year} page={this.state.page} navTag={this.NavigateTags} />

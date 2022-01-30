@@ -1,6 +1,7 @@
 import React from "react";
 import TableCell from "./TableCell.jsx";
 import TableEOW from "./TableEOW.jsx";
+import UrlGet from "../URLs/URLs.jsx";
 import "./table.css";
 
 //
@@ -22,7 +23,8 @@ class TableView extends React.Component {
 		}
 
 		loadData = async (month, year) => {
-				const url = "http://localhost:8080/api/month?month=" + month + "&year=" + year;
+				//const url = "http://localhost:8080/api/month?month=" + month + "&year=" + year;
+				const url = UrlGet("Month") + "?month=" + month + "&year=" + year;
 				const resp = await fetch(url);
 				const data = await resp.json();
 	
@@ -85,7 +87,7 @@ class TableView extends React.Component {
 													</>
 											);
 									}
-									return <TableCell data={obj} />;
+									return <TableCell data={obj} searchTag={this.props.navTag} />;
 							}, this)}
 					</tbody>
 					</table>

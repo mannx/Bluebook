@@ -1,14 +1,19 @@
 import React from "react";
 import ImportControl from "./ImportControl.jsx";
+import UrlGet from "../URLs/URLs.jsx";
 
 // This contains everything to handle the import page
 
 class Imports extends React.Component {
 
-		dailyURL = "http://localhost:8080/api/import/daily";
+		/*dailyURL = "http://localhost:8080/api/import/daily";
 		controlURL = "http://localhost:8080/api/import/control";
 		wisrURL = "http://localhost:8080/api/import/wisr";
-		wasteURL = "http://localhost:8080/api/import/waste";
+		wasteURL = "http://localhost:8080/api/import/waste";*/
+		dailyURL = UrlGet("Daily");
+		controlURL = UrlGet("Control");
+		wisrURL = UrlGet("WISR");
+		wasteURL = UrlGet("Waste");
 
 		constructor(props) {
 				super(props)
@@ -38,8 +43,7 @@ class Imports extends React.Component {
 				</>);
 		}
 
-		dailyImport = () =>
-			{return (<>{this.blank()}<ImportControl URL={this.dailyURL} page={this.state.page} /></>);}
+		dailyImport = () => { return (<>{this.blank()}<ImportControl URL={this.dailyURL} page={this.state.page} /> </>);}
 
 		controlImport = () => {
 				return (<>{this.blank()}<ImportControl URL={this.controlURL} page={this.state.page}  /></>);

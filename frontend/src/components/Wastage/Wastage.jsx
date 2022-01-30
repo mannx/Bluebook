@@ -1,6 +1,7 @@
 import React from "react";
 import NumberFormat from "react-number-format";
 import DatePicker from "react-datepicker";
+import UrlGet from "../URLs/URLs.jsx";
 
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -27,7 +28,8 @@ class Wastage extends React.Component {
 				const year = this.state.date.getFullYear();
 				const day = this.state.date.getDate();
 
-				const url = "http://localhost:8080/api/waste/view?month="+month+"&year="+year+"&day="+day;
+				//const url = "http://localhost:8080/api/waste/view?month="+month+"&year="+year+"&day="+day;
+				const url = UrlGet("WasteView") + "?month="+month+"&year="+year+"&day="+day;
 				const resp = await fetch(url);
 				const data = await resp.json();
 

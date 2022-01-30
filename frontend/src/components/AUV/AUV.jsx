@@ -1,5 +1,6 @@
 import React from "react";
 import DatePicker from "react-datepicker";
+import UrlGet from "../URLs/URLs.jsx";
 import "react-datepicker/dist/react-datepicker.css";
 
 const formatUTC = (dateInt, addOffset = false) => {
@@ -54,7 +55,8 @@ class AUV extends React.Component {
 
 
 			console.log("loading data for " + month + "/" + year);
-			const url ="http://localhost:8080/api/auv/view?month="+month+"&year="+year;
+			//const url ="http://localhost:8080/api/auv/view?month="+month+"&year="+year;
+			const url =UrlGet("AUV") + "?month="+month+"&year="+year;
 			const resp = await fetch(url);
 			const data = await resp.json();
 

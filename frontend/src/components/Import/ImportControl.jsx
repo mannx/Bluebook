@@ -15,10 +15,6 @@ class ImportControl extends React.Component {
 						url: props.URL,	// url to use
 						page: props.page,
 				}
-
-				/*this.getControls = this.getControls.bind(this);
-				this.addImp = this.addImp.bind(this);
-				this.performUpdate = this.performUpdate.bind(this);*/
 		}
 
 		async componentDidMount() {

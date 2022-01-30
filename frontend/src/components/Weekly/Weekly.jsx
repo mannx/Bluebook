@@ -1,6 +1,7 @@
 import React from "react";
 import NumberFormat from "react-number-format";
 import DatePicker from "react-datepicker";
+import UrlGet from "../URLs/URLs.jsx";
 
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -32,7 +33,8 @@ class Weekly extends React.Component {
 				const day = this.state.date.getDate();
 				const year = this.state.date.getFullYear();
 
-				const url = "http://localhost:8080/api/weekly/view?month="+month+"&day="+day+"&year="+year;
+				//const url = "http://localhost:8080/api/weekly/view?month="+month+"&day="+day+"&year="+year;
+				const url = UrlGet("Weekly") + "?month="+month+"&day="+day+"&year="+year;
 				const resp = await fetch(url);
 				const data = await resp.json();
 

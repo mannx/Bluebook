@@ -25,8 +25,10 @@ func GetMonthViewHandler(c echo.Context, db *gorm.DB) error {
 
 	// endOfWeek provides data totaling the previous week of sales
 	type endOfWeek struct {
-		NetSales      float64
-		CustomerCount int
+		NetSales          float64
+		CustomerCount     int
+		ThirdPartyPercent float64
+		ThirdPartyTotal   float64
 	}
 
 	// dayViewData is an expanded DayData object with additional properties
@@ -41,7 +43,8 @@ func GetMonthViewHandler(c echo.Context, db *gorm.DB) error {
 		IsEndOfWeek       bool      // is this a tuesday?
 		EOW               endOfWeek // end of week data if required
 
-		Tags []string // list of tags on this day
+		Tags  []string // list of tags on this day
+		TagID []uint
 	}
 
 	// monthlyView holds the monthly day data along with several other bits of info
@@ -97,26 +100,50 @@ func GetMonthViewHandler(c echo.Context, db *gorm.DB) error {
 			} else {
 				net := 0.0
 				cc := 0
+				tps := 0.0 //3rd party sales
+				gsw := 0.0 //gross sales for hte week
+
 				for _, n := range dat {
 					net += n.NetSales
 					cc += n.CustomerCount
+					tps += n.DoorDash + n.SkipTheDishes
+					gsw += n.NetSales + n.BottleDeposit + n.HST
 				}
 
 				eow.NetSales = net
 				eow.CustomerCount = cc
+				eow.ThirdPartyTotal = tps
+
+				if gsw > 0 {
+					eow.ThirdPartyPercent = (tps / gsw) * 100.0
+				}
 			}
+		}
+
+		tags, ids := getTags(o.ID, db)
+
+		// caluclate the % of 3rd party sales
+		tp := o.DoorDash + o.SkipTheDishes
+		tpp := 0.0
+
+		if gs > 0.0 {
+			tpp = (tp / gs) * 100.0
 		}
 
 		mvd = append(mvd,
 			dayViewData{
-				DayData:          o,
-				ThirdPartyDollar: o.DoorDash + o.SkipTheDishes,
-				GrossSales:       gs,
-				DayOfMonth:       d.Day(),
-				DayOfWeek:        d.Weekday().String(),
-				IsEndOfWeek:      d.Weekday() == time.Tuesday,
-				EOW:              eow,
-				Tags:             getTags(o.ID, db),
+				DayData: o,
+				//ThirdPartyDollar:  o.DoorDash + o.SkipTheDishes,
+				//ThirdPartyPercent: ((o.DoorDash + o.SkipTheDishes) / (o.NetSales + o.HST + o.BottleDeposit)) * 100.0,
+				ThirdPartyDollar:  tp,
+				ThirdPartyPercent: tpp,
+				GrossSales:        gs,
+				DayOfMonth:        d.Day(),
+				DayOfWeek:         d.Weekday().String(),
+				IsEndOfWeek:       d.Weekday() == time.Tuesday,
+				EOW:               eow,
+				Tags:              tags,
+				TagID:             ids,
 			})
 	}
 
@@ -124,16 +151,19 @@ func GetMonthViewHandler(c echo.Context, db *gorm.DB) error {
 	return c.JSON(http.StatusOK, &mv)
 }
 
-func getTags(id uint, db *gorm.DB) []string {
+// returns a list of tags and their id's in seperate lists
+func getTags(id uint, db *gorm.DB) ([]string, []uint) {
 	// retrieve all tags for this day
 	tags := make([]models.TagData, 0)
 	res := db.Find(&tags, "DayID = ?", id)
 	if res.Error != nil {
 		log.Error().Err(res.Error).Msg("Unable to retrieve tag data")
-		return nil
+		return nil, nil
 	}
 
 	var tstr []string
+	var tids []uint
+
 	for _, obj := range tags {
 		var t models.TagList
 		e := db.Find(&t, "ID = ?", obj.TagID)
@@ -143,7 +173,8 @@ func getTags(id uint, db *gorm.DB) []string {
 		}
 
 		tstr = append(tstr, t.Tag)
+		tids = append(tids, t.ID) // also save the id of the tag for easier searching
 	}
 
-	return tstr
+	return tstr, tids
 }

@@ -1,5 +1,6 @@
 import React  from "react";
 import NumberFormat from "react-number-format";
+import UrlGet from "../URLs/URLs.jsx";
 import "./table.css";
 
 //
@@ -7,7 +8,8 @@ import "./table.css";
 //	
 class TableCell extends React.Component {
 
-		commentURL = "http://localhost:8080/api/update/comment";
+		//commentURL = "http://localhost:8080/api/update/comment";
+		commentURL = UrlGet("Comment");
 
 		constructor(props) {
 				super(props);
@@ -16,6 +18,7 @@ class TableCell extends React.Component {
 					editComment: false,
 					editTag: false,
 					data: props.data,
+					tagFunc: props.searchTag,
 				}
 		}
 
@@ -135,11 +138,19 @@ class TableCell extends React.Component {
 						if(this.state.data.Tags !== null) {
 							return (<div className='tag'>
 								{this.state.data.Tags.map(function (obj, i) {
-										return <button className="tagButton" >#{obj} </button>;
+										return <button className="tagButton" onClick={(e) => this.tagClick(e)} data-id={this.state.data.TagID[i]}>#{obj} </button>;
 								}, this)}
 							</div>);
 						}
 				}
+		}
+
+		tagClick = (e) => {
+				console.log(e.target.textContent);
+				
+				let n = parseInt(e.target.attributes["data-id"].nodeValue);
+				console.log(n);
+				this.props.searchTag(n);
 		}
 
 }

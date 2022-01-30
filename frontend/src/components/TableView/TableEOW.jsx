@@ -40,8 +40,7 @@ function TableEOW(props) {
 						<td className="blank"></td>
 						<td className="CustomerCount">{num(props.data.EOW.CustomerCount)}</td>
 						<td className="ThirdPartyPerc no-print">{num(props.data.EOW.ThirdPartyPercent)}</td>
-
-						<td className="blank"></td>
+						<td className="no-print">{num(props.data.EOW.ThirdPartyTotal)}</td>
 				</tr>
 		);
 		//return <tr><td>eow</td></tr>;

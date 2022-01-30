@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/rs/zerolog/log"
+	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
 
@@ -80,6 +81,7 @@ func ImportWISR(fileName string, db *gorm.DB) error {
 	log.Debug().Msgf("food:%v|%v", foodCost, foodPerc)
 
 	wi := getWeeklyInfoOrNew(endDate, db)
+	wi.Date = datatypes.Date(endDate) //make sure the date is correct
 	wi.FoodCostAmount = foodCost
 	wi.FoodCostPercent = foodPerc
 	wi.LabourCostAmount = labourCost

@@ -19,13 +19,12 @@ import (
 )
 
 // Version of the current build/release
-const Version = 0.05
+const Version = 0.06
 
 // DB is the database connection for the entire run
 var DB *gorm.DB
 
 // name of the database we are using
-//const dbName = "./data/db.db"
 var dbName string
 
 func main() {

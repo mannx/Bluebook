@@ -7,8 +7,8 @@
 #	the server launches normally
 
 if test -f "READY"; then
-		/Bluebook
+		/bluebook
 		touch READY
 else
-		/Bluebook -comment -convert
+		/bluebook -comment -convert
 fi

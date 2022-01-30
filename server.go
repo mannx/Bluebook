@@ -47,5 +47,9 @@ func initServer() *echo.Echo {
 	// AUV
 	e.GET("/api/auv/view", func(c echo.Context) error { return api.GetAUVViewHandler(c, DB) })
 	e.POST("/api/auv/update", func(c echo.Context) error { return api.UpdateAUVPostHandler(c, DB) })
+
+	// Tags
+	e.GET("/api/tags/view", func(c echo.Context) error { return api.TagListViewHandler(c, DB) })
+	e.GET("/api/tags/data", func(c echo.Context) error { return api.TagDataViewHandler(c, DB) })
 	return e
 }
