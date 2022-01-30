@@ -158,7 +158,7 @@ func ImportWasteDefinition(fileName string, db *gorm.DB) error {
 
 	for _, n := range obj.Data {
 		wi := models.WastageItem{
-			Name:        n.Name,
+			Name:        strings.ToLower(n.Name),
 			UnitMeasure: n.UnitCount,
 			Location:    n.Location,
 		}
