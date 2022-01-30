@@ -18,17 +18,17 @@
 	* CSS worked on -- themes? or other easier way of chaning colouring
 
 - Issues:
-	* Import: Unable to move between import options without viewing another page first
 	* Import: No feedback after pressing button. Should show progress or other status information
 
 - Notes:
 	* Import script for adjusting database from django project in progress
 	* Located in scripts directory along with SQL files with commands to update tables
+	* Redo several front end data fetching mechanisms (see https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#fetching-external-data-when-props-change)
 
 - Environment Variables:
 	* Environment variables are used only to override default locations. See Environ.go
 	* BLUEBOOK\_IMPORT\_PATH	-> directory where files to import are found
-	* [DEPRECIATED] BLUEBOOK\_TEMP\_PATH -> directory where temp files are stored [temp path is no longer used, temp files are generated in same directory]
+	* BLUEBOOK\_TEMP\_PATH -> directory where temp files are stored 
 	* BLUEBOOK\_DATA\_PATH -> directory where the database is stored
 
 
@@ -41,3 +41,4 @@
 		- Comment Table gets merged into the day data table
 		- a file named READY is created at the root directory
 			~ If this file is present the first two steps are ignored, and can be pre placed if required
+

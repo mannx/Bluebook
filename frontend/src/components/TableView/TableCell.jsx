@@ -8,7 +8,6 @@ import "./table.css";
 //	
 class TableCell extends React.Component {
 
-		//commentURL = "http://localhost:8080/api/update/comment";
 		commentURL = UrlGet("Comment");
 
 		constructor(props) {

@@ -55,7 +55,6 @@ class AUV extends React.Component {
 
 
 			console.log("loading data for " + month + "/" + year);
-			//const url ="http://localhost:8080/api/auv/view?month="+month+"&year="+year;
 			const url =UrlGet("AUV") + "?month="+month+"&year="+year;
 			const resp = await fetch(url);
 			const data = await resp.json();
@@ -165,7 +164,8 @@ class AUV extends React.Component {
 				body: JSON.stringify(this.state)
 		};
 
-		fetch("http://localhost:8080/api/auv/update", options)
+		//fetch("http://localhost:8080/api/auv/update", options)
+		fetch(UrlGet("AUVUpdate"), options)
 					.then(r=>console.log(r));
 	}
 }

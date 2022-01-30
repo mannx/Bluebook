@@ -12,18 +12,27 @@ class ImportControl extends React.Component {
 				this.state = {
 						data: null,		// data containing availble files to import
 						imports: null,	// list of all the files that will be imported
-						url: props.URL,	// url to use
 						page: props.page,
 				}
 		}
 
-		async componentDidMount() {
+		loadData = async () => {
 				// load in the available import data from the server
-				const resp = await fetch(this.state.url);
+				const resp = await fetch(this.props.URL);
 				const data = await resp.json();
 				
 				// display and choose which files to import
 				this.setState({data: data});
+		}
+
+		async componentDidMount() {
+				this.loadData();
+		}
+
+		componentDidUpdate(prev) {
+				if(prev.page !== this.props.page){
+						this.loadData();
+				}
 		}
 
 		getControls = () => {
@@ -46,7 +55,7 @@ class ImportControl extends React.Component {
 				}
 
 				return (
-						<div><h3>Daily Sheets Available for Import (page {this.state.page})</h3>
+						<div><h3>Daily Sheets Available for Import (page {this.props.page})</h3>
 								<button onClick={this.performUpdate}>Update</button>
 								<ul>
 								{this.state.data.map(function(obj, i) {
@@ -70,10 +79,19 @@ class ImportControl extends React.Component {
 				};
 
 				console.log("body: " + options.body);
-				fetch(this.state.url, options)
-					.then(res => res.json())
-					.then(data => console.log("update: " + data));
+				fetch(this.props.URL, options)
+					//.then(res => res.json())
+					//.then(data => console.log("update: " + data));
+					.then(r => r.text())
+					.then(r => this.updateResult(r));
 		}
+
+		updateResult = (msg) => {
+				if(msg !== null) {
+					this.props.result(msg);
+				}
+		}
+
 }
 
 export default ImportControl;

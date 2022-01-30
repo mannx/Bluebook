@@ -33,14 +33,9 @@ class Weekly extends React.Component {
 				const day = this.state.date.getDate();
 				const year = this.state.date.getFullYear();
 
-				//const url = "http://localhost:8080/api/weekly/view?month="+month+"&day="+day+"&year="+year;
 				const url = UrlGet("Weekly") + "?month="+month+"&day="+day+"&year="+year;
 				const resp = await fetch(url);
 				const data = await resp.json();
-
-				console.log("Weekly");
-				console.log(this.state.date);
-				console.log(data);
 
 				this.setState({data: data, isLoading: false});
 		}	
@@ -83,6 +78,7 @@ class Weekly extends React.Component {
 				// if not a tuesday, display an error 
 				if(this.state.date.getDay() !== 2) {
 						this.setState({error: true, errorMsg: "Require date to be a tuesday"});
+						return;
 				}else{
 						// make sure the error is cleared
 						this.setState({error: false, errorMsg: ""});

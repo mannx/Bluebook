@@ -28,7 +28,6 @@ class Wastage extends React.Component {
 				const year = this.state.date.getFullYear();
 				const day = this.state.date.getDate();
 
-				//const url = "http://localhost:8080/api/waste/view?month="+month+"&year="+year+"&day="+day;
 				const url = UrlGet("WasteView") + "?month="+month+"&year="+year+"&day="+day;
 				const resp = await fetch(url);
 				const data = await resp.json();
@@ -52,6 +51,7 @@ class Wastage extends React.Component {
 				// if not a tuesday, display an error 
 				if(this.state.date.getDay() !== 2) {
 						this.setState({error: true, errorMsg: "Require date to be a tuesday"});
+						return;
 				}else{
 						// make sure the error is cleared
 						this.setState({error: false, errorMsg: ""});

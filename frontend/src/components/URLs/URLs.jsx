@@ -5,6 +5,7 @@ const baseURL = "http://localhost:8080";
 
 const urls = {
 		"AUV": "/api/auv/view",
+		"AUVUpdate": "/api/auv/update",
 
 		"Daily": "/api/import/daily",
 		"Control": "/api/import/control",

@@ -29,10 +29,6 @@ class ViewTags extends React.Component {
 				this.loadData();
 		}
 
-		componentDidUpdate() {
-				console.log("update() => ViewTag");
-		}
-		
 		render() {
 				if(this.state.loading || this.state.tagList == null) {
 						return <h1>Loading tag data...</h1>;
@@ -58,11 +54,6 @@ class ViewTags extends React.Component {
 
 		viewTag = (n) => {
 				this.setState({currentTag: n});
-		}
-
-
-		outputTag = () => {
-				// output the currently selected tag, load the data if required
 		}
 }
 

@@ -4,38 +4,37 @@ import UrlGet from "../URLs/URLs.jsx";
 
 // This contains everything to handle the import page
 
+const dailyURL = UrlGet("Daily");
+const controlURL = UrlGet("Control");
+const wisrURL = UrlGet("WISR");
+const wasteURL = UrlGet("Waste");
+
 class Imports extends React.Component {
 
-		/*dailyURL = "http://localhost:8080/api/import/daily";
-		controlURL = "http://localhost:8080/api/import/control";
-		wisrURL = "http://localhost:8080/api/import/wisr";
-		wasteURL = "http://localhost:8080/api/import/waste";*/
-		dailyURL = UrlGet("Daily");
-		controlURL = UrlGet("Control");
-		wisrURL = UrlGet("WISR");
-		wasteURL = UrlGet("Waste");
 
 		constructor(props) {
 				super(props)
 
 				this.state = {
 						page: 0,		// 0 blank, 1-> daily, 2-> control, 3-> wisr, 4-> waste
+						result: null,
 				}
 		}
 
 		render() {
 				switch(this.state.page) {
 					case 0: return this.blank()
-						case 1: return this.dailyImport();
-						case 2: return this.controlImport();
-						case 3: return this.wisrImport();
-						case 4: return this.wasteImport();
+						case 1: return (<>{this.blank()}<ImportControl URL={dailyURL} page={this.state.page} result={this.result}/> </>);
+						case 2: return (<>{this.blank()}<ImportControl URL={controlURL} page={this.state.page}  /></>);
+						case 3: return (<>{this.blank()}<ImportControl URL={wisrURL} page={this.state.page} /></>);
+						case 4: return (<>{this.blank()}<ImportControl URL={wasteURL} page={this.state.page} /></>);
 						default: return (<>{this.blank()} <h1>Bad page #{this.state.page}</h1></>);
 				}
 		}
 
 		blank() {
 				return (<>
+						{this.showMsg()}
 						<button onClick={this.dailies}>Import Dailies</button>
 						<button onClick={this.control}>Import Control Sheet</button>
 						<button onClick={this.wisr}>Import WISR</button>
@@ -43,24 +42,21 @@ class Imports extends React.Component {
 				</>);
 		}
 
-		dailyImport = () => { return (<>{this.blank()}<ImportControl URL={this.dailyURL} page={this.state.page} /> </>);}
-
-		controlImport = () => {
-				return (<>{this.blank()}<ImportControl URL={this.controlURL} page={this.state.page}  /></>);
-		}
-
-		wisrImport = () => {
-				return (<>{this.blank()}<ImportControl URL={this.wisrURL} page={this.state.page} /></>);
-		}
-
-		wasteImport = () => {
-				return (<>{this.blank()}<ImportControl URL={this.wasteURL} page={this.state.page} /></>);
-		}
-
 		dailies = () => {console.log("dailies()"); this.setState({page: 1});}
 		control = () => { console.log("control()"); this.setState({page: 2});}
 		wisr = () => { console.log("wisr()"); this.setState({page: 3});}
 		waste = () => { console.log("waste()"); this.setState({page: 4});}
+
+		result = (msg) => {
+				this.setState({result: msg});
+		}
+
+		showMsg = () => {
+				if(this.state.result !== null ) {
+						return <span className="info">{this.state.result}</span>;
+				}
+				return null;
+		}
 }
 
 export default Imports;

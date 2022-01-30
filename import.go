@@ -60,12 +60,12 @@ func importPostHandler(c echo.Context, handler func(string, *gorm.DB) error) err
 		fname := filepath.Join(env.Environment.ImportPath, n)
 		log.Info().Msgf("Preparing to parse file: %v", fname)
 
-		//go daily.ImportDaily(fname, DB)
 		log.Debug().Msg("Running go function to handle import...")
 		go handler(fname, DB)
 	}
 
-	return c.JSON(http.StatusOK, arr)
+	//return c.JSON(http.StatusOK, arr)
+	return c.String(http.StatusOK, "Processing files...")
 }
 
 // returns a list of all files in the BB_IMPORT_?? enviromnet variable that are
