@@ -8,7 +8,7 @@
 
 if test -f "READY"; then
 		/bluebook
-		touch READY
+		touch /data/READY
 else
 		/bluebook -comment -convert
 fi

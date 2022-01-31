@@ -39,7 +39,7 @@
 	* On first start of a container:
 		- Dates get updated to the currnet date/time model
 		- Comment Table gets merged into the day data table
-		- a file named READY is created at the root directory
+		- a file named READY is created at in the data directory
 			~ If this file is present the first two steps are ignored, and can be pre placed if required
 	* Notes/Issues:
 		- Waste data is not preserved during the migration due to several changes
