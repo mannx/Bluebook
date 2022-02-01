@@ -1,7 +1,7 @@
-env.sh
 testdata/
-db.sh
 data/
 temp/
 testdata
 Bluebook
+backup/
+frontend.old/

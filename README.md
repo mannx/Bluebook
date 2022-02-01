@@ -19,7 +19,6 @@
 		- server: json file describing initial batch of common wastage items
 	* CSS worked on -- themes? or other easier way of chaning colouring
 	* Daily color highlight based on average sales +/-
-	* Update import page header name (all show daily as import type)
 
 - Issues:
 	* Import: No feedback after pressing button. Should show progress or other status information

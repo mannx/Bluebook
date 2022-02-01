@@ -24,10 +24,10 @@ class Imports extends React.Component {
 		render() {
 				switch(this.state.page) {
 					case 0: return this.blank()
-						case 1: return (<>{this.blank()}<ImportControl URL={dailyURL} page={this.state.page} result={this.result}/> </>);
-						case 2: return (<>{this.blank()}<ImportControl URL={controlURL} page={this.state.page}  /></>);
-						case 3: return (<>{this.blank()}<ImportControl URL={wisrURL} page={this.state.page} /></>);
-						case 4: return (<>{this.blank()}<ImportControl URL={wasteURL} page={this.state.page} /></>);
+						case 1: return (<>{this.blank()}<ImportControl URL={dailyURL} page={this.state.page} title="Daily Sheets" result={this.result}/> </>);
+						case 2: return (<>{this.blank()}<ImportControl URL={controlURL} page={this.state.page}  title="Control Sheets" /></>);
+						case 3: return (<>{this.blank()}<ImportControl URL={wisrURL} page={this.state.page} title="WISR"/></>);
+						case 4: return (<>{this.blank()}<ImportControl URL={wasteURL} page={this.state.page} title="Waste Sheets"/></>);
 						default: return (<>{this.blank()} <h1>Bad page #{this.state.page}</h1></>);
 				}
 		}

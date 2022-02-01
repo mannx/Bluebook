@@ -55,7 +55,7 @@ class ImportControl extends React.Component {
 				}
 
 				return (
-						<div><h3>Daily Sheets Available for Import (page {this.props.page})</h3>
+						<div><h3>{this.props.title} Available for Import (page {this.props.page})</h3>
 								<button onClick={this.performUpdate}>Update</button>
 								<ul>
 								{this.state.data.map(function(obj, i) {
