@@ -21,6 +21,7 @@ const urls = {
 		"WasteView": "/api/waste/view",
 		"Weekly": "/api/weekly/view",
 
+		"Top5": "/api/top5/view",
 }
 
 function UrlGet(name) {

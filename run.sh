@@ -6,7 +6,7 @@
 #	are first run and the file created.  If it does exist,
 #	the server launches normally
 
-if test -f "READY"; then
+if test -f "/data/READY"; then
 		/bluebook
 		touch /data/READY
 else

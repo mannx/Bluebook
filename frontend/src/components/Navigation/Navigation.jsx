@@ -5,6 +5,7 @@ import Wastage from "../Wastage/Wastage.jsx";
 import Weekly from "../Weekly/Weekly.jsx";
 import AUV from "../AUV/AUV.jsx";
 import ViewTags from "../Tags/ViewTags.jsx";
+import Top5 from "../Top5/Top5.jsx";
 import "./header.css";
 
 //
@@ -17,8 +18,6 @@ function NavButton(props) {
 				<span className={"navLink"} onClick={props.func}> {props.name}</span>
 		);
 }
-function func(props){}
-
 
 const PageMonth = 1;
 const PageImport = 2;
@@ -26,6 +25,7 @@ const PageWastage = 3;
 const PageWeekly = 4;
 const PageAUV = 5;
 const PageTags = 6;
+const PageTop5 = 7;
 
 function Navigate(props) {
 		switch(props.page) {
@@ -41,6 +41,8 @@ function Navigate(props) {
 						return <AUV />;
 				case PageTags:
 						return <ViewTags />;
+				case PageTop5:
+						return <Top5 />;
 				default:
 						return <h2>Invalid page number {props.page}</h2>;
 		}
@@ -85,7 +87,7 @@ class Navigation extends React.Component {
 							<li className={"navControl"}><NavButton name={"AUV"} func={this.NavigateAUV} /></li>
 							<li className={"navControl"}><NavButton name={"Weekly Info"} func={this.NavigateWeekly} /></li>
 							<li className={"navControl"}><NavButton name={"Wastage"} func={this.NavigateWastage} /></li>
-							<li className={"navControl"}><NavButton name={"Top 5"} func={func} /></li>
+							<li className={"navControl"}><NavButton name={"Top 5"} func={this.NavigateTop5} /></li>
 							<li className={"navControl"}><NavButton name={"Import"} func={this.Imports} /></li>
 						</ul></div>
 						<Navigate month={this.state.month} year={this.state.year} page={this.state.page} navTag={this.NavigateTags} />
@@ -136,6 +138,7 @@ class Navigation extends React.Component {
 		NavigateWeekly = () => { this.setState({page: PageWeekly});}
 		NavigateAUV = () => { this.setState({page: PageAUV});}
 		NavigateTags = () => { this.setState({page: PageTags});}
+		NavigateTop5 = () => { this.setState({page: PageTop5});}
 }
 
 

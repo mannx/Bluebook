@@ -51,5 +51,8 @@ func initServer() *echo.Echo {
 	// Tags
 	e.GET("/api/tags/view", func(c echo.Context) error { return api.TagListViewHandler(c, DB) })
 	e.GET("/api/tags/data", func(c echo.Context) error { return api.TagDataViewHandler(c, DB) })
+
+	// Top5
+	e.GET("/api/top5/view", func(c echo.Context) error { return api.GetTop5ViewHandler(c, DB) })
 	return e
 }
