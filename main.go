@@ -15,6 +15,7 @@ import (
 	"gorm.io/gorm"
 
 	env "github.com/mannx/Bluebook/environ"
+	imp "github.com/mannx/Bluebook/import"
 	models "github.com/mannx/Bluebook/models"
 )
 
@@ -51,6 +52,7 @@ func main() {
 
 	convertFlag := flag.Bool("convert", false, "convert date types in all database entries")
 	commentFlag := flag.Bool("comment", false, "combine comments into day data table before destroying")
+	wasteFlag := flag.Bool("waste", false, "import waste defintion file waste_def.json")
 
 	flag.Parse()
 
@@ -64,6 +66,10 @@ func main() {
 
 	if *commentFlag {
 		importComments()
+	}
+
+	if *wasteFlag {
+		importWasteDef()
 	}
 
 	log.Debug().Msgf("Import Path: %v", env.Environment.ImportPath)
@@ -172,4 +178,8 @@ func importComments() {
 		dd.Comment = n.Comment
 		DB.Save(&dd)
 	}
+}
+
+func importWasteDef() {
+	imp.ImportWasteDefinition("waste_def.json", DB)
 }

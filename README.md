@@ -10,7 +10,8 @@
 			~ (DONE | TESTING REQUIRED) Weight conversion todo, custom conversions working
 			~ (PARTIAL) rework sorting for viewing, show category? (after waste defintion file import done)	 
 	* Top5
-		- Frontend needs implemented, server currently barebones
+		- Basic backend down, front end in similar stage as django version
+		- Place data to view in a config file and load at startup?
 
 - TODO:
 	* (MOSTLY) Weekly paperwork calculations, (TODO) file generation

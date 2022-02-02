@@ -1,6 +1,8 @@
 package models
 
 import (
+	"time"
+
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
@@ -9,7 +11,8 @@ import (
 type DayData struct {
 	gorm.Model
 
-	Date datatypes.Date `gorm:"column:Date"`
+	Date       datatypes.Date `gorm:"column:Date"`
+	DateString string         `gorm:"-"` // User friendly version of the date, not stored in db
 
 	CashDeposit float64 `gorm:"column:CashDeposit"`
 	DebitCard   float64 `gorm:"column:DebitCard"`
@@ -52,6 +55,11 @@ type DayData struct {
 	WeeklyAverage float64 `gorm:"column:WeeklyAverage"`
 
 	Comment string `gorm:"column:Comment"` // comment for the given day
+}
+
+// Sets the user friendly version of the date string
+func (d *DayData) GetDate() string {
+	return time.Time(d.Date).Format("Jan 02, 2006")
 }
 
 // TODO:

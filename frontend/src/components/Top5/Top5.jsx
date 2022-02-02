@@ -1,6 +1,9 @@
 import React from "react";
 import UrlGet from "../URLs/URLs.jsx";
+import Top5Data from "./Top5Data.jsx";
+import NumberFormat from "react-number-format";
 
+const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 class Top5 extends React.Component {
 
@@ -10,6 +13,7 @@ class Top5 extends React.Component {
 				this.state = {
 						month: null,
 						year: null,
+						number: 5,		// default to how many top results we want
 						data: null,
 						loading: true,
 				}
@@ -21,18 +25,19 @@ class Top5 extends React.Component {
 				const year = this.state.year === null ? null : ("year="+this.state.year);
 
 				var url = "";
-				var b=false;
 				if(month !== null ){
-						url = "?"+month;
-						b=true;
+						url = "&"+month;
 				}
 
 				if(year !== null) {
-						url = (b ? "&" : "?") + year;
+						url = url + "&" + year;
 				}
 
-				console.log("loaddata:");
-				console.log(urlBase+url);
+				const url2 = urlBase + "?limit=" + this.state.number + url ;
+				const resp = await fetch(url2);
+				const data = await resp.json();
+
+				this.setState({data: data, loading: false});
 		}
 
 		componentDidMount() {
@@ -40,17 +45,51 @@ class Top5 extends React.Component {
 		}
 
 		render() {
-				return this.header();
+				if(this.state.data === null || this.state.loading === true ) {
+						return this.header();
+				}
+
+				return (<>
+						{this.header()}
+						{this.state.data.Data.map(function(obj, i) {
+								return <div><Top5Data data={obj} /></div>;
+						})}
+				</>);
 		}
 
 		header = () => {
 				return (<>
 						<div>
-								Year: <select><option value="Any">Any</option></select>
-								<button>View</button>
+								Year: <select onChange={this.yearChange}>{this.getYearValues()}</select><br/>
+								Month: <select onChange={this.monthChange}>
+										<option value="Any">Any</option>
+										{monthNames.map(function(obj, i) {
+												return <option value={i+1}>{obj}</option>;
+										})}
+								</select>
+								<NumberFormat displayType={"input"} defaultValue={5} allowNegative={false} decimalScale={0} onChange={this.numberChange}/>
+								<button onClick={this.viewClick}>View</button>
 						</div>
 				</>);
 		}
+
+		getYearValues = () => {
+				if(this.state.data === null) {
+						return <></>;
+				}
+
+				return (<>
+						<option value="0">Any</option>
+						{this.state.data.Years.map(function(obj, i) {
+								return <option value={obj}>{obj}</option>;
+						})}
+				</>);
+		}
+
+		monthChange = (e) => { this.setState({month: e.target.value}); }
+		yearChange = (e) => { this.setState({year: e.target.value}); }
+		numberChange = (e) => {this.setState({number: e.target.value}); }
+		viewClick = () => { this.loadData(); }
 }
 
 export default Top5;
