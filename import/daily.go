@@ -16,8 +16,8 @@ import (
 	models "github.com/mannx/Bluebook/models"
 )
 
-const dateFormat = "02-Jan-06"      // format used when parsing time from sheets
-const altDateFormat = "02-Jan-2006" // possible other variation of the time format
+const dateFormat = "_2-Jan-06"      // format used when parsing time from sheets
+const altDateFormat = "_2-Jan-2006" // possible other variation of the time format
 
 // ImportDaily is used to import a single sheet into the database
 func ImportDaily(fileName string, db *gorm.DB) error {
@@ -25,7 +25,7 @@ func ImportDaily(fileName string, db *gorm.DB) error {
 
 	f, err := excelize.OpenFile(fileName)
 	if err != nil {
-			log.Error().Err(err).Msgf("Unable to open file: %v", fileName)
+		log.Error().Err(err).Msgf("Unable to open file: %v", fileName)
 		return err
 	}
 
@@ -61,17 +61,14 @@ func ImportDaily(fileName string, db *gorm.DB) error {
 
 		// validate proper days
 		// date format: DD-MMM-YYYY
-		d, de := time.Parse(dateFormat, n)
+		_, de := time.Parse(dateFormat, n)
 		if de != nil {
-			log.Debug().Err(de).Msgf("Unable to parse time: %v, attemping 2nd format", n)
-			d, de = time.Parse(altDateFormat, n)
+			_, de = time.Parse(altDateFormat, n)
 			if de != nil {
 				log.Debug().Err(de).Msgf("Unable to parse time (alt format): %v", n)
 				// bad dates should cause a stop
 				break
 			}
-		} else {
-			log.Debug().Msgf("date: %v (%T)", d, d)
 		}
 
 		log.Debug().Msgf("another day. value: %v (%T)", n, n)
@@ -123,10 +120,6 @@ func getFloat(file *excelize.File, sheet string, cell string) float64 {
 		return 0.0
 	}
 
-	if len(v) > 0 &&  v[0] == '=' {
-			log.Debug().Msgf("found formula cell %v", cell)
-	}
-
 	n, err := strconv.ParseFloat(v, 64)
 	if err != nil {
 		log.Error().Err(err).Msgf("unable to get float from %v [%v]", cell, v)
@@ -175,8 +168,6 @@ func extractData(sheet *excelize.File, index int, date time.Time, ver int, db *g
 	dd.CreditSalesRedeemed2 = getFloat(sheet, "Sheet1", CreditBev[ver][index])
 	dd.CreditFood = getFloat(sheet, "Sheet1", CreditFood[ver][index])
 	dd.GiftCardSold = getFloat(sheet, "Sheet1", GiftCardSold[ver][index])
-
-	log.Debug().Msgf("cash deposit [%v] %v", date, dd.CashDeposit)
 
 	return dd
 }

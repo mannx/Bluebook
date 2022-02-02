@@ -1,7 +1,9 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"time"
 
@@ -21,19 +23,25 @@ type top5Data struct {
 var top5Table []top5Data
 
 func init() {
-	// move to a config file?
-	top5Table = []top5Data{
-		{
-			Title:  "Net Sales",
-			Column: "NetSales",
-			Field:  "NetSales",
-		},
-		{
-			Title:  "Skip The Dishes",
-			Column: "SkipTheDishes",
-			Field:  "SkipTheDishes",
-		},
+	f, err := ioutil.ReadFile("./data/data.json")
+	if err != nil {
+		log.Error().Err(err).Msg("Unable to read config file")
+		return
 	}
+
+	type jsonData struct {
+		Data []top5Data
+	}
+
+	var obj jsonData
+
+	err = json.Unmarshal(f, &obj)
+	if err != nil {
+		log.Error().Err(err).Msg("Unable to unmarshal config")
+		return
+	}
+
+	top5Table = obj.Data
 }
 
 // GetTop5ViewHandler expects params of none (top all time, year=YYYY for top of year, year=YYYY&month=MM for best of month
@@ -79,7 +87,7 @@ func GetTop5ViewHandler(c echo.Context, db *gorm.DB) error {
 	numYear := (time.Time(last.Date).Year() - time.Time(first.Date).Year())
 	var years []int
 
-	for i := 0; i < numYear; i++ {
+	for i := 0; i <= numYear; i++ {
 		years = append(years, time.Time(first.Date).Year()+i)
 	}
 
@@ -186,7 +194,6 @@ func top5Year(year int, limit int, db *gorm.DB) []top5Data {
 		log.Debug().Msgf("  [] start: %v", start.String())
 		log.Debug().Msgf("  [] end: %v", end.String())
 
-		//res := db.Order(n.Column+" desc").Limit(limit).Where("Date >= ? & Date <= ?", start, end).Find(&tbl.Data)
 		res := db.Where("Date >= ? AND Date <= ?", start, end).Order(n.Column + " desc").Limit(limit).Find(&tbl.Data)
 		if res.Error != nil {
 			log.Error().Err(res.Error).Msgf("Unable to retrieve data for column: %v", n.Column)

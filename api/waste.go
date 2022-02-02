@@ -80,6 +80,7 @@ func GetWasteViewHandler(c echo.Context, db *gorm.DB) error {
 		}
 
 		// process the weight conversion if required
+		log.Debug().Msgf("GetWasteViewHandler() => Converting %v to => %v", wi.Name, wi.UnitMeasure)
 		m := wi.Convert(n)
 		output.Data = append(output.Data, WasteViewItem{Name: wi.Name, Amount: m, Location: wi.Location})
 	}

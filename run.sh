@@ -8,7 +8,7 @@
 
 if test -f "/data/READY"; then
 		/bluebook
-		touch /data/READY
 else
-		/bluebook -comment -convert
+		touch /data/READY
+		/bluebook -comment -convert -waste
 fi

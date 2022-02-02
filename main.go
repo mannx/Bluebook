@@ -20,7 +20,7 @@ import (
 )
 
 // Version of the current build/release
-const Version = 0.07
+const Version = 0.08
 
 // DB is the database connection for the entire run
 var DB *gorm.DB
@@ -30,11 +30,11 @@ var dbName string
 
 func main() {
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
-	zerolog.SetGlobalLevel(zerolog.DebugLevel)
+	zerolog.SetGlobalLevel(zerolog.InfoLevel)
 
 	log.Info().Msgf("Bluebook Helper v%v.\n\n", Version)
 
-	log.Debug().Msg("Initializing environment...")
+	log.Info().Msg("Initializing environment...")
 	env.Environment.Init()
 
 	dbName = filepath.Join(env.Environment.DataPath, "db.db")
@@ -47,7 +47,7 @@ func main() {
 
 	DB = dbo
 
-	log.Debug().Msg("Auto migrating the database...")
+	log.Info().Msg("Auto migrating the database...")
 	migrateDB()
 
 	convertFlag := flag.Bool("convert", false, "convert date types in all database entries")
@@ -57,7 +57,7 @@ func main() {
 	flag.Parse()
 
 	if *convertFlag {
-		log.Debug().Msg("Converting old database to current...")
+		log.Info().Msg("Converting old database to current...")
 		err = convertDB()
 		if err != nil {
 			log.Fatal().Err(err).Msg("Unable to convert dates to timestamps")
@@ -71,8 +71,6 @@ func main() {
 	if *wasteFlag {
 		importWasteDef()
 	}
-
-	log.Debug().Msgf("Import Path: %v", env.Environment.ImportPath)
 
 	log.Info().Msg("Initialiing server and middleware")
 
@@ -162,7 +160,7 @@ func importComments() {
 		return
 	}
 
-	log.Debug().Msgf("Combining %v comment records...")
+	log.Debug().Msgf("Combining %v comment records...", res.RowsAffected)
 	for _, n := range cmt {
 		dd := models.DayData{}
 		res = DB.Find(&dd, "ID = ?", n.LinkedID)

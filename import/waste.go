@@ -48,7 +48,7 @@ func ImportWaste(fileName string, db *gorm.DB) error {
 
 	var currDate time.Time // keeps track of the last date we saw
 
-	const wasteDateFormat = "02-Jan-2006"
+	const wasteDateFormat = "_2-Jan-2006"
 
 	for row := 2; ; row++ {
 		// retrieve the date if available

@@ -8,17 +8,24 @@ import "react-datepicker/dist/react-datepicker.css";
 class Wastage extends React.Component {
 		constructor(props) {
 				super(props);
+
+				var d = new Date();
+
+				if(d.getDay() === 3) {
+						d.setDate(d.getDate()-1);
+				}
+
 				this.state = {
-						date: new Date(),
+						date: d,
 						data: null,
 						errorMsg: "",
 						error: false,
 				}
 
 				// if not a tuesday, display an error 
-				if(this.state.date.getDay() !== 2) {
+				/*if(this.state.date.getDay() !== 2) {
 						this.setState({error: true, errorMsg: "Require date to be a tuesday"});
-				}
+				}*/
 		}
 
 		loadData = async () => {
@@ -33,7 +40,6 @@ class Wastage extends React.Component {
 				const data = await resp.json();
 
 				this.setState({data: data});
-				console.log(data);
 		}
 
 		header = () => {
@@ -46,7 +52,6 @@ class Wastage extends React.Component {
 		}
 
 		updateView = () => {
-				console.log(this.state.date);
 				//
 				// if not a tuesday, display an error 
 				if(this.state.date.getDay() !== 2) {

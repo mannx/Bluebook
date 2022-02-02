@@ -2,32 +2,24 @@
 # Bluebook Helper Migration
 
 - Currently working on
-	* Importing waste defintion file
-		- JSON "generated" with scripts/waste.py
-		- Implement command line option to parse? or web ui/api methods
 	* Wastage
 		- Issues / Todo:
-			~ (DONE | TESTING REQUIRED) Weight conversion todo, custom conversions working
-			~ (PARTIAL) rework sorting for viewing, show category? (after waste defintion file import done)	 
-	* Top5
-		- Basic backend down, front end in similar stage as django version
-		- Place data to view in a config file and load at startup?
+			~ (PARTIAL) rework sorting for viewing, show category? 
 
 - TODO:
 	* (MOSTLY) Weekly paperwork calculations, (TODO) file generation
-	* Wastage server and front end finishing
-		- server: calculate weight conversions
-		- server: json file describing initial batch of common wastage items
 	* CSS worked on -- themes? or other easier way of chaning colouring
 	* Daily color highlight based on average sales +/-
 
 - Issues:
 	* Import: No feedback after pressing button. Should show progress or other status information
+	* [FIXED?] Docker: run.sh isn't creating the READY file to prevent database migrations after the first run
 
 - Notes:
 	* Import script for adjusting database from django project in progress
 	* Located in scripts directory along with SQL files with commands to update tables
 	* Redo several front end data fetching mechanisms (see https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#fetching-external-data-when-props-change)
+	* Top5 is generated for a config file found the the BLUEBOOK\_DATA\_PATH directory (see below)
 
 - Environment Variables:
 	* Environment variables are used only to override default locations. See Environ.go
@@ -47,3 +39,14 @@
 			~ If this file is present the first two steps are ignored, and can be pre placed if required
 	* Notes/Issues:
 		- Waste data is not preserved during the migration due to several changes
+		- Extra column in weekly_infos needs to be manually deleted or the model updated to include it (currently unused, unsure of original purpose)
+
+## Top5 Config Path
+
+	* Simple JSON file structure containg the tables title, the column name in the database, and the field it is stored in
+
+	{"Data": [
+		{"Title": "Title to show",
+		"Column": "Database column",
+		"Field: "Model field to get data"}
+	]}

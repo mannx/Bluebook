@@ -9,10 +9,15 @@ class Weekly extends React.Component {
 		constructor(props) {
 				super(props);
 
+				var d = new Date();
+				if(d.getDay() === 3){		// wed, push back to tuesday
+					d.setDate(d.getDate()-1);
+				}
+
 				this.state = { 
 						data: null,
 						isLoading: true,
-						date: new Date(),
+						date: d,
 						errorMsg: "",
 						error: false,
 				}

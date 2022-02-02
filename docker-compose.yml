@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   bluebook:
-    image: mannx/bluebook
+          image: mannx/bluebook:beta
     container_name: bluebook
     ports:
       - 8080:8080
@@ -10,8 +10,7 @@ services:
       - TZ=Canada/Atlantic      
     volumes:
       - ./data:/data
-      - ./testdata:/import
-      - ./temp:/tmp
+      - ./import_data:/import
       - /etc/localtime:/etc/localtime:ro
     deploy:
       restart_policy:
