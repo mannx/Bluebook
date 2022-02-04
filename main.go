@@ -30,7 +30,7 @@ var dbName string
 
 func main() {
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
-	zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	zerolog.SetGlobalLevel(zerolog.DebugLevel)
 
 	log.Info().Msgf("Bluebook Helper v%v.\n\n", Version)
 

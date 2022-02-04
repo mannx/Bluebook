@@ -54,6 +54,7 @@ class TableCell extends React.Component {
 
 		render() {
 				var cls = "";
+				//console.log(this.props.data);
 
 				switch(this.props.data.SalesLastWeek) {
 						case 1:	cls="NetSalesUp"; break;

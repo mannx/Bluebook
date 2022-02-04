@@ -3,17 +3,15 @@
 
 - Currently working on
 	* Net Sales highlight based on previous average
-		- Curently only able to use previously calculated values in db
-		- Perform calculations for average todo.
+		- [FALSE?] Curently only able to use previously calculated values in db
+		- Currently calculating average on load without saving (saving increases load time? find way to prevent?)
 
 - TODO:
 	* (MOSTLY) Weekly paperwork calculations, (TODO) file generation
 	* CSS worked on -- themes? or other easier way of chaning colouring
-	* Daily color highlight based on average sales +/-
 
 - Issues:
 	* Import: No feedback after pressing button. Should show progress or other status information
-	* [FIXED?] Docker: run.sh isn't creating the READY file to prevent database migrations after the first run
 
 - Notes:
 	* Import script for adjusting database from django project in progress
