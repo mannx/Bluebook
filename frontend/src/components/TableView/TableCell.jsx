@@ -2,6 +2,7 @@ import React  from "react";
 import NumberFormat from "react-number-format";
 import UrlGet from "../URLs/URLs.jsx";
 import "./table.css";
+import "./eow.css";
 
 //
 //	This is used to draw a single row and fill in its data
@@ -21,6 +22,7 @@ class TableCell extends React.Component {
 				}
 		}
 
+		// Output a NumberFormat
 		NF(obj, prefix="", suffix="") {
 				return (
 						<NumberFormat
@@ -51,6 +53,15 @@ class TableCell extends React.Component {
 		}
 
 		render() {
+				var cls = "";
+
+				switch(this.props.data.SalesLastWeek) {
+						case 1:	cls="NetSalesUp"; break;
+						case -1: cls="NetSalesDown"; break;
+						default: cls="NetSalesSame"; break;
+				}
+				
+
 				return (
 						<tr>
 								<td>{this.Zero(this.props.data.DayOfMonth)}</td>
@@ -58,7 +69,7 @@ class TableCell extends React.Component {
 								<td>{this.O(this.props.data.GrossSales)}</td>
 								<td>{this.O(this.props.data.HST)}</td>
 								<td>{this.O(this.props.data.BottleDeposit)}</td>
-								<td>{this.O(this.props.data.NetSales)}</td>
+								<td className={cls}>{this.O(this.props.data.NetSales)}</td>
 								<td className="div"></td>
 
 								<td>{this.O(this.props.data.DebitCard)}</td>

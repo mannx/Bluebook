@@ -2,9 +2,9 @@
 # Bluebook Helper Migration
 
 - Currently working on
-	* Wastage
-		- Issues / Todo:
-			~ (PARTIAL) rework sorting for viewing, show category? 
+	* Net Sales highlight based on previous average
+		- Curently only able to use previously calculated values in db
+		- Perform calculations for average todo.
 
 - TODO:
 	* (MOSTLY) Weekly paperwork calculations, (TODO) file generation

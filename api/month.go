@@ -42,9 +42,9 @@ func GetMonthViewHandler(c echo.Context, db *gorm.DB) error {
 		DayOfWeek         string    // user friendly name of what day it is
 		IsEndOfWeek       bool      // is this a tuesday?
 		EOW               endOfWeek // end of week data if required
-
-		Tags  []string // list of tags on this day
-		TagID []uint
+		Tags              []string  // list of tags on this day
+		TagID             []uint
+		SalesLastWeek     int // 0 if same, -1 if less, 1 if > than last weeks sales for this day
 	}
 
 	// monthlyView holds the monthly day data along with several other bits of info
@@ -94,6 +94,7 @@ func GetMonthViewHandler(c echo.Context, db *gorm.DB) error {
 			// end of week, pull in the required data
 			pw := d.Add(-time.Hour * 24 * 6) // get previous 7 days
 			dat := make([]models.DayData, 7)
+
 			r := db.Find(&dat, "Date >= ? AND Date <= ?", pw, d)
 			if r.Error != nil {
 				log.Error().Err(res.Error).Msg("Unable to retrieve data to compute end of week calculations")
@@ -117,7 +118,14 @@ func GetMonthViewHandler(c echo.Context, db *gorm.DB) error {
 				if gsw > 0 {
 					eow.ThirdPartyPercent = (tps / gsw) * 100.0
 				}
+
 			}
+		}
+
+		// calculate the weekly average of previous weeks if we havent already done so
+		if o.WeeklyAverage == 0 {
+			o.WeeklyAverage = calculateWeeklyAverage(d, 4, db)
+			db.Save(&o)
 		}
 
 		tags, ids := getTags(o.ID, db)
@@ -130,11 +138,16 @@ func GetMonthViewHandler(c echo.Context, db *gorm.DB) error {
 			tpp = (tp / gs) * 100.0
 		}
 
+		slw := 0
+		if o.NetSales > o.WeeklyAverage {
+			slw = 1
+		} else if o.NetSales < o.WeeklyAverage {
+			slw = -1
+		}
+
 		mvd = append(mvd,
 			dayViewData{
-				DayData: o,
-				//ThirdPartyDollar:  o.DoorDash + o.SkipTheDishes,
-				//ThirdPartyPercent: ((o.DoorDash + o.SkipTheDishes) / (o.NetSales + o.HST + o.BottleDeposit)) * 100.0,
+				DayData:           o,
 				ThirdPartyDollar:  tp,
 				ThirdPartyPercent: tpp,
 				GrossSales:        gs,
@@ -144,6 +157,7 @@ func GetMonthViewHandler(c echo.Context, db *gorm.DB) error {
 				EOW:               eow,
 				Tags:              tags,
 				TagID:             ids,
+				SalesLastWeek:     slw,
 			})
 	}
 
@@ -177,4 +191,27 @@ func getTags(id uint, db *gorm.DB) ([]string, []uint) {
 	}
 
 	return tstr, tids
+}
+
+// computes the average of a number of weeks starting at the given date
+func calculateWeeklyAverage(date time.Time, numWeeks int, db *gorm.DB) float64 {
+	var dates []time.Time
+
+	for i := 0; i < numWeeks; i++ {
+		dates = append(dates, date.AddDate(0, 0, -7))
+	}
+
+	var total float64
+	for _, d := range dates {
+		var obj models.DayData
+		res := db.Find(&obj, "Date = ?", d)
+		if res.Error != nil {
+			log.Error().Err(res.Error).Msgf("Unable to retrieve data for: %v", time.Time(d).String())
+			continue
+		}
+
+		total = total + obj.NetSales
+	}
+
+	return total / float64(numWeeks)
 }

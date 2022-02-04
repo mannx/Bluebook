@@ -10,20 +10,20 @@ td.Net
 	background-color: yellow;
 }
 
-/*td.NetSalesUp
+td.NetSalesUp
 {
-	background-color: {{ css.WeeklyColourUp }};
+	background-color: springgreen;
 }
 
 td.NetSalesDown
 {
-	background-color: {{ css.WeeklyColourDown }};
+	background-color: tomato;
 }
 
 td.NetSalesSame
 {
-	background-color: {{ css.WeeklyColourSame }};
-}*/
+	background-color: lightblue;
+}
 
 td.CustomerCount, td.ThirdPartyPerc
 {
