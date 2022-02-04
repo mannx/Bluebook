@@ -70,11 +70,25 @@ class Weekly extends React.Component {
 		header = () => {
 				return (<>
 						<span>Pick Week To View:</span>
-						<DatePicker selected={this.state.date} onChange={(e)=>this.setState({date:e})} />
+						<DatePicker selected={this.state.date} onChange={(e) => this.dateUpdate(e)} />
 						<button onClick={this.updateView}>View</button>
 						<span>{this.state.errorMsg}</span>
 				</>
 				);
+		}
+
+		dateUpdate = (e) => {
+				// if we are on a tuesday, load the data, otherwise display an error
+				this.setState({date: e});
+
+				const n = new Date(e);
+				if(n.getDay() === 2) {
+						//tuesday
+						this.setState({error: false, errorMsg: ""});
+						this.loadData();
+				}else{
+						this.setState({error: true, errorMsg: "Date must be a tuesday"});
+				}
 		}
 
 		updateView = () => {
@@ -100,7 +114,7 @@ class Weekly extends React.Component {
 				const data = this.state.data;
 				return (
 						<>
-						<span>Week Ending: {this.D(this.state.date)}</span>
+						<div>Week Ending: {this.D(this.state.date)}</div>
 						{this.header()}
 						<table><caption>Weekly Report</caption>
 								<thead><tr>
