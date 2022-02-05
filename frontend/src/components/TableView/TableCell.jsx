@@ -19,9 +19,17 @@ class TableCell extends React.Component {
 					editComment: false,
 					editTag: false,
 					tagFunc: props.searchTag,
-					comment: null,
-					tag: null,			// set !null once edited, if null, show data version, otherwise this
+					comment: this.props.data.Comment,
+					tag: null,
 				}
+
+				var tag = "";
+				if(this.props.data.Tags !== null) {
+						tag = this.props.data.Tags.join(" ");
+				}
+
+				this.setState({tag: tag});
+
 		}
 
 		// Output a NumberFormat
@@ -103,11 +111,11 @@ class TableCell extends React.Component {
 
 		commentField = () => {
 			if(this.state.editComment === false) {
-				return <div className="comment"  >{this.props.data.Comment}</div>;
+				return <div className="comment"  >{this.state.comment}</div>;
 			}else{
 				return (
 						<form onSubmit={this.submitComment} >
-							<input type={"text"} name={"comment"} defaultValue={this.state.Comment} onChange={this.commentChange}/>
+							<input type={"text"} name={"comment"} defaultValue={this.state.comment} onChange={this.commentChange}/>
 							<input type={"submit"} value={"Update"} />
 						</form>
 				);
@@ -175,14 +183,9 @@ class TableCell extends React.Component {
 							</div>);
 						}
 				}else{
-					var tags = "";
-					if(this.props.data.Tags !== null){
-						tags = this.props.data.Tags.join(" ");
-					}
-
 					return (
 						<form onSubmit={this.submitTag} >
-							<input type={"text"} name={"tag"} defaultValue={tags} onChange={this.tagChange}/>
+							<input type={"text"} name={"tag"} defaultValue={this.state.tag} onChange={this.tagChange}/>
 							<input type={"submit"} value={"Update"} />
 						</form>
 					);
