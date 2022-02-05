@@ -5,3 +5,4 @@
 
 sqlite3 db.db < ../scripts/tables.sql
 sqlite3 db.db < ../scripts/auv.sql
+sqlite3 db.db < ../scripts/cleanup.sql

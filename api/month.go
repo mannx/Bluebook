@@ -7,6 +7,7 @@ import (
 	"github.com/labstack/echo/v4"
 	models "github.com/mannx/Bluebook/models"
 	"github.com/rs/zerolog/log"
+	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
 
@@ -15,6 +16,31 @@ import (
  *
  */
 
+// endOfWeek provides data totaling the previous week of sales
+type endOfWeek struct {
+	NetSales          float64
+	CustomerCount     int
+	ThirdPartyPercent float64
+	ThirdPartyTotal   float64
+}
+
+// dayViewData is an expanded DayData object with additional properties
+type dayViewData struct {
+	models.DayData
+
+	ThirdPartyDollar  float64
+	ThirdPartyPercent float64
+	GrossSales        float64
+	DayOfMonth        int       // 1-31 for what day of the month it is
+	DayOfWeek         string    // user friendly name of what day it is
+	IsEndOfWeek       bool      // is this a tuesday?
+	EOW               endOfWeek // end of week data if required
+	Tags              []string  // list of tags on this day
+	TagID             []uint
+	SalesLastWeek     int  // 0 if same, -1 if less, 1 if > than last weeks sales for this day
+	Exists            bool // true if found in db, false if auto filled
+}
+
 //
 //	Returns data for a given month
 //	query url: /API_URL?month=MM&year=YYYY
@@ -22,30 +48,6 @@ import (
 
 // GetMonthViewHandler handles returning data for viewing a given month
 func GetMonthViewHandler(c echo.Context, db *gorm.DB) error {
-
-	// endOfWeek provides data totaling the previous week of sales
-	type endOfWeek struct {
-		NetSales          float64
-		CustomerCount     int
-		ThirdPartyPercent float64
-		ThirdPartyTotal   float64
-	}
-
-	// dayViewData is an expanded DayData object with additional properties
-	type dayViewData struct {
-		models.DayData
-
-		ThirdPartyDollar  float64
-		ThirdPartyPercent float64
-		GrossSales        float64
-		DayOfMonth        int       // 1-31 for what day of the month it is
-		DayOfWeek         string    // user friendly name of what day it is
-		IsEndOfWeek       bool      // is this a tuesday?
-		EOW               endOfWeek // end of week data if required
-		Tags              []string  // list of tags on this day
-		TagID             []uint
-		SalesLastWeek     int // 0 if same, -1 if less, 1 if > than last weeks sales for this day
-	}
 
 	// monthlyView holds the monthly day data along with several other bits of info
 	type monthlyView struct {
@@ -83,11 +85,27 @@ func GetMonthViewHandler(c echo.Context, db *gorm.DB) error {
 		return res.Error
 	}
 
-	mvd := make([]dayViewData, 0)
+	// ******************
+	//	Change in progress
+	// ******************
+	//
+	//	we no longer pre fill the database with empty rows, instead if a day is missing we generate a new empty node
+	//	and only save it to the db if required (a comment is added before any import data)
+	//
+
+	//mvd := make([]dayViewData, 0)
+	mvd := make([]dayViewData, endDay) // get a full month allocated
+
+	if len(data) == 0 {
+		// empty month, return a full set of empty dates
+		genEmptyMonth(&mvd, start, endDay)
+	}
+
 	for _, o := range data {
+		d := time.Time(o.Date)
+
 		// compute the gross sales (net+hst+bot dep)
 		gs := o.NetSales + o.HST + o.BottleDeposit
-		d := time.Time(o.Date)
 
 		eow := endOfWeek{} // initialize the end of week of it is required
 		if d.Weekday() == time.Tuesday {
@@ -125,7 +143,6 @@ func GetMonthViewHandler(c echo.Context, db *gorm.DB) error {
 		// calculate the weekly average of previous weeks if we havent already done so
 		if o.WeeklyAverage == 0 {
 			o.WeeklyAverage = calculateWeeklyAverage(d, 4, db)
-			//db.Save(&o)
 		}
 
 		tags, ids := getTags(o.ID, db)
@@ -145,20 +162,30 @@ func GetMonthViewHandler(c echo.Context, db *gorm.DB) error {
 			slw = -1
 		}
 
-		mvd = append(mvd,
-			dayViewData{
-				DayData:           o,
-				ThirdPartyDollar:  tp,
-				ThirdPartyPercent: tpp,
-				GrossSales:        gs,
-				DayOfMonth:        d.Day(),
-				DayOfWeek:         d.Weekday().String(),
-				IsEndOfWeek:       d.Weekday() == time.Tuesday,
-				EOW:               eow,
-				Tags:              tags,
-				TagID:             ids,
-				SalesLastWeek:     slw,
-			})
+		dvd := dayViewData{
+			DayData:           o,
+			ThirdPartyDollar:  tp,
+			ThirdPartyPercent: tpp,
+			GrossSales:        gs,
+			DayOfMonth:        d.Day(),
+			DayOfWeek:         d.Weekday().String(),
+			IsEndOfWeek:       d.Weekday() == time.Tuesday,
+			EOW:               eow,
+			Tags:              tags,
+			TagID:             ids,
+			SalesLastWeek:     slw,
+			Exists:            true,
+		}
+
+		mvd[d.Day()-1] = dvd
+	}
+
+	// any missing entries (Exists==false) generate a default node
+	for i, n := range mvd {
+		if n.Exists == false {
+			date := start.AddDate(0, 0, i)
+			mvd[i] = genEmptyDVD(date)
+		}
 	}
 
 	mv := monthlyView{Data: mvd, MonthName: time.Month(month).String()}
@@ -195,7 +222,6 @@ func getTags(id uint, db *gorm.DB) ([]string, []uint) {
 
 // computes the average of a number of weeks starting at the given date
 func calculateWeeklyAverage(date time.Time, numWeeks int, db *gorm.DB) float64 {
-	log.Debug().Msg("calculateWeeklyAverage() ==> ")
 	var dates []time.Time
 
 	for i := 0; i < numWeeks; i++ {
@@ -215,4 +241,30 @@ func calculateWeeklyAverage(date time.Time, numWeeks int, db *gorm.DB) float64 {
 	}
 
 	return total / float64(numWeeks)
+}
+
+func genEmptyMonth(data *[]dayViewData, start time.Time, numDays int) {
+	for i := 0; i < numDays; i++ {
+		d := start.AddDate(0, 0, i)
+		*data = append(*data, genEmptyDVD(d))
+	}
+}
+
+func genEmptyDVD(date time.Time) dayViewData {
+	eow := false
+
+	if date.Weekday() == 2 {
+		eow = true
+	}
+
+	dvd := dayViewData{
+		DayData: models.DayData{
+			Date: datatypes.Date(date),
+		},
+		DayOfWeek:   date.Weekday().String(),
+		DayOfMonth:  date.Day(),
+		IsEndOfWeek: eow,
+	}
+
+	return dvd
 }

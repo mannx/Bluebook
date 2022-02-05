@@ -10,6 +10,7 @@ import "./eow.css";
 class TableCell extends React.Component {
 
 		commentURL = UrlGet("Comment");
+		tagURL = UrlGet("TagEditPost");
 
 		constructor(props) {
 				super(props);
@@ -17,8 +18,9 @@ class TableCell extends React.Component {
 				this.state = {
 					editComment: false,
 					editTag: false,
-					data: props.data,
 					tagFunc: props.searchTag,
+					comment: null,
+					tag: null,			// set !null once edited, if null, show data version, otherwise this
 				}
 		}
 
@@ -54,15 +56,15 @@ class TableCell extends React.Component {
 
 		render() {
 				var cls = "";
-				//console.log(this.props.data);
+
 
 				switch(this.props.data.SalesLastWeek) {
 						case 1:	cls="NetSalesUp"; break;
 						case -1: cls="NetSalesDown"; break;
 						default: cls="NetSalesSame"; break;
 				}
-				
 
+				//<!-- <td className={cls}>{this.O(this.props.data.NetSales)}</td> -->
 				return (
 						<tr>
 								<td>{this.Zero(this.props.data.DayOfMonth)}</td>
@@ -70,7 +72,7 @@ class TableCell extends React.Component {
 								<td>{this.O(this.props.data.GrossSales)}</td>
 								<td>{this.O(this.props.data.HST)}</td>
 								<td>{this.O(this.props.data.BottleDeposit)}</td>
-								<td className={cls}>{this.O(this.props.data.NetSales)}</td>
+								<td className={cls}><div className="tooltip">{this.O(this.props.data.NetSales)}<span className="tooltiptext">{this.O(this.props.data.WeeklyAverage)}</span></div></td>
 								<td className="div"></td>
 
 								<td>{this.O(this.props.data.DebitCard)}</td>
@@ -93,17 +95,15 @@ class TableCell extends React.Component {
 								<td>{this.Dol(this.props.data.ThirdPartyDollar)}</td>
 								<td className="div"></td>
 
-								<td onDoubleClick={this.editComment} >
-										{this.commentField() }
-								</td>
-								<td>{this.tagField()}</td>
+								<td onDoubleClick={this.editComment} >{this.commentField()}</td>
+								<td onDoubleClick={this.editTag} >{this.tagField()}</td>
 						</tr>
 				);
 		}
 
 		commentField = () => {
 			if(this.state.editComment === false) {
-				return <div className="comment"  >{this.state.data.Comment}</div>;
+				return <div className="comment"  >{this.props.data.Comment}</div>;
 			}else{
 				return (
 						<form onSubmit={this.submitComment} >
@@ -121,7 +121,8 @@ class TableCell extends React.Component {
 				// state.linkedid is the comment id if updating, 0 otherwise
 				const body = {
 						Comment: this.state.comment,
-						LinkedID: this.state.data.ID,
+						LinkedID: this.props.data.ID,
+						Date: this.props.data.Date,
 				}
 
 				const options = {
@@ -136,6 +137,26 @@ class TableCell extends React.Component {
 
 		}
 
+		submitTag = (e) => {
+			e.preventDefault();
+
+			const body = {
+				Tag: this.state.tag,
+				LinkedID: this.props.data.ID,
+				Date: this.props.data.Date,
+			}
+
+			const options = {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify(body)
+			};
+
+			fetch(this.tagURL, options)
+				.then(r => this.setState({editTag: !this.state.editTag}))
+				.then(r => console.log(r));
+		}
+
 		editComment = () => {
 				this.setState({editComment: !this.state.editComment});
 		}
@@ -146,13 +167,25 @@ class TableCell extends React.Component {
 
 		tagField = () => {
 				if(this.state.editTag === false) {
-						if(this.state.data.Tags !== null) {
+						if(this.props.data.Tags !== null) {
 							return (<div className='tag'>
-								{this.state.data.Tags.map(function (obj, i) {
-										return <button className="tagButton" onClick={(e) => this.tagClick(e)} data-id={this.state.data.TagID[i]}>#{obj} </button>;
+								{this.props.data.Tags.map(function (obj, i) {
+										return <button className="tagButton" onClick={(e) => this.tagClick(e)} data-id={this.props.data.TagID[i]}>#{obj} </button>;
 								}, this)}
 							</div>);
 						}
+				}else{
+					var tags = "";
+					if(this.props.data.Tags !== null){
+						tags = this.props.data.Tags.join(" ");
+					}
+
+					return (
+						<form onSubmit={this.submitTag} >
+							<input type={"text"} name={"tag"} defaultValue={tags} onChange={this.tagChange}/>
+							<input type={"submit"} value={"Update"} />
+						</form>
+					);
 				}
 		}
 
@@ -160,10 +193,12 @@ class TableCell extends React.Component {
 				console.log(e.target.textContent);
 				
 				let n = parseInt(e.target.attributes["data-id"].nodeValue);
-				console.log(n);
 				this.props.searchTag(n);
 		}
 
+		editTag = () => {this.setState({editTag: !this.state.editTag});}
+
+		tagChange = (e) => {this.setState({tag: e.target.value});}
 }
 
 export default TableCell;

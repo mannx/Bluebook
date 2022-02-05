@@ -17,6 +17,8 @@ const urls = {
 
 		"Tags": "/api/tags/view",
 		"TagData": "/api/tags/data",		// get data about a single tag
+		"TagEditPost": "/api/tags/update",	// update the tags for a given day
+		"TagEdit": "/api/tags/edit",		// edit a tag name
 
 		"WasteView": "/api/waste/view",
 		"Weekly": "/api/weekly/view",
