@@ -1,5 +1,6 @@
 import React from "react";
 import DatePicker from "react-datepicker";
+import NumericInput from "react-numeric-input";
 import UrlGet from "../URLs/URLs.jsx";
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -106,6 +107,7 @@ class AUV extends React.Component {
 					return (<>{this.header()}<h1>AUV data loading...</h1></>);
 			}
 
+			//<td><input type={"number"} value={this.state.week1auv} onChange={(d)=>this.setState({week1auv: parseInt(d.target.value)})} /></td>
 			return (
 					<>{this.header()}
 					<table><caption>AUV for __</caption>
@@ -117,33 +119,33 @@ class AUV extends React.Component {
 							</tr></thead>
 							<tbody>
 									<tr>
-									<td><DatePicker selected={this.state.week1date} onChange={(d) => this.setState({week1date: d})} /></td>
-											<td><input type={"number"} defaultValue={this.state.week1auv} onChange={(d)=>this.setState({week1auv: parseInt(d.target.value)})} /></td>
-											<td><input type={"number"} defaultValue={this.state.week1hours} onChange={(d)=>this.setState({week1hours: d})} /></td>
+									<td><DatePicker selected={this.state.week1date} value={this.state.week1date} onChange={(d) => this.setState({week1date: d})} /></td>
+											<td><NumericInput value={this.state.week1auv} strict min={0} onChange={(n,s,i) => {this.setState({week1auv: n})}} /></td>
+										<td><input type={"number"} value={this.state.week1hours} onChange={(d)=>this.setState({week1hours: d})} /></td>
 									<td></td>
 									</tr>
 									<tr>
 									<td><DatePicker selected={this.state.week2date} onChange={(d) => this.setState({week2date: d})} /></td>
-											<td><input type={"number"} defaultValue={this.state.week2auv} onChange={(d)=>this.setState({week2auv: d})} /></td>
-											<td><input type={"number"} defaultValue={this.state.week2hours} onChange={(d)=>this.setState({week2hours: d})} /></td>
+											<td><input type={"number"} value={this.state.week2auv} onChange={(d)=>this.setState({week2auv: d})} /></td>
+											<td><input type={"number"} value={this.state.week2hours} onChange={(d)=>this.setState({week2hours: d})} /></td>
 									<td></td>
 									</tr>
 									<tr>
 									<td><DatePicker selected={this.state.week3date} onChange={(d) => this.setState({week3date: d})} /></td>
-											<td><input type={"number"} defaultValue={this.state.week3auv} onChange={(d)=>this.setState({week3auv: d})} /></td>
-											<td><input type={"number"} defaultValue={this.state.week3hours} onChange={(d)=>this.setState({week3hours: d})} /></td>
+											<td><input type={"number"} value={this.state.week3auv} onChange={(d)=>this.setState({week3auv: d})} /></td>
+											<td><input type={"number"} value={this.state.week3hours} onChange={(d)=>this.setState({week3hours: d})} /></td>
 									<td></td>
 									</tr>
 									<tr>
 									<td><DatePicker selected={this.state.week4date} onChange={(d) => this.setState({week4date: d})} /></td>
-											<td><input type={"number"} defaultValue={this.state.week4auv} onChange={(d)=>this.setState({week4auv: d})} /></td>
-											<td><input type={"number"} defaultValue={this.state.week4hours} onChange={(d)=>this.setState({week4hours: d})} /></td>
+											<td><input type={"number"} value={this.state.week4auv} onChange={(d)=>this.setState({week4auv: d})} /></td>
+											<td><input type={"number"} value={this.state.week4hours} onChange={(d)=>this.setState({week4hours: d})} /></td>
 									<td></td>
 									</tr>
 									<tr>
 									<td><DatePicker selected={this.state.week5date} onChange={(d) => this.setState({week5date: d})} /></td>
-											<td><input type={"number"} defaultValue={this.state.week5auv} onChange={(d)=>this.setState({week5auv: d})} /></td>
-											<td><input type={"number"} defaultValue={this.state.week5hours} onChange={(d)=>this.setState({week5hours: d})} /></td>
+											<td><input type={"number"} value={this.state.week5auv} onChange={(d)=>this.setState({week5auv: d})} /></td>
+											<td><input type={"number"} value={this.state.week5hours} onChange={(d)=>this.setState({week5hours: d})} /></td>
 									<td><input type="checkbox"/></td>
 									</tr>
 

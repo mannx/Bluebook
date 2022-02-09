@@ -2,7 +2,8 @@
 # Bluebook Helper Migration
 
 - Currently working on
-	* Tags & Comments when edited don't reflect new changes until refresh
+	* [PARTIAL?] Tags & Comments when edited don't reflect new changes until refresh
+	* AUV Number inputs / loading data after changing date
 
 - TODO:
 	* (MOSTLY) Weekly paperwork calculations, (TODO) file generation
@@ -12,6 +13,7 @@
 - Issues:
 	* Import: No feedback after pressing button. Should show progress or other status information
 	* AUV: Unable to save editing auv or create new auv entries
+	* AUV: Changing dates doesn't reload data to view another month
 
 - Notes:
 	* Import script for adjusting database from django project in progress
