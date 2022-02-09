@@ -11,6 +11,7 @@
 
 - Issues:
 	* Import: No feedback after pressing button. Should show progress or other status information
+	* AUV: Unable to save editing auv or create new auv entries
 
 - Notes:
 	* Import script for adjusting database from django project in progress
