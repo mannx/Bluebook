@@ -2,7 +2,8 @@
 # Bluebook Helper Migration
 
 - Currently working on
-	* Tags & Comments when edited don't reflect new changes until refresh
+	* Tags when edited don't reflect new changes until refresh
+	* Wastage report output. separate into categories or other divisions
 
 - TODO:
 	* (MOSTLY) Weekly paperwork calculations, (TODO) file generation
