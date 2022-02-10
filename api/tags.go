@@ -100,7 +100,7 @@ func TagUpdateViewHandler(c echo.Context, db *gorm.DB) error {
 
 	} else {
 		log.Warn().Msg("Adding Tags to empty days not yet supported")
-		return c.String(http.StatusOK, "Error")
+		return c.String(http.StatusInternalServerError, "Error")
 	}
 
 	return nil
@@ -123,8 +123,7 @@ func updateTags(id uint, tags string, db *gorm.DB) {
 	tstr := strings.Split(tags, "#")
 	for _, s := range tstr {
 		if len(s) == 0 {
-			log.Debug().Msgf("  => skipping %v", s)
-			continue
+			continue // skip empty tags
 		}
 
 		// 2) remove any excess whitespace and check if in table

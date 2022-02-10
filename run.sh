@@ -2,13 +2,34 @@
 
 #
 #	Script is the entry point to the docker container
-#	if a file called READY is not found, the migration functions
-#	are first run and the file created.  If it does exist,
-#	the server launches normally
+#	several files are check to exists and are used to set initial runtime flags
+#	for database migration and some imports
 
-if test -f "/data/READY"; then
-		/bluebook
+#Comment=
+#Convert=
+#Waste=
+
+Data=./data
+
+if test -f "$Data/COMMENT"; then
+	Comment=
 else
-		touch /data/READY
-		/bluebook -comment -convert -waste
+	Comment=-comment
+	touch $Data/COMMENT
 fi
+
+if test -f "$Data/CONVERT"; then
+	Convert=
+else
+	Convert=-convert
+	touch $Data/CONVERT
+fi
+
+if test -f "$Data/WASTE"; then
+	Waste=
+else
+	Waste=-waste
+	touch $Data/WASTE
+fi
+
+echo /bluebook $Comment $Convert $Waste

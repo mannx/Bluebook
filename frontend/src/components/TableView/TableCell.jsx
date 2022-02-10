@@ -161,8 +161,14 @@ class TableCell extends React.Component {
 			};
 
 			fetch(this.tagURL, options)
-				.then(r => this.setState({editTag: !this.state.editTag}))
-				.then(r => console.log(r));
+				.then(e => {
+					// attempting to display any returned error message
+					// have server return json object consistenitly?
+					const r = e.text();
+					console.log("error: " + r)
+				});
+
+			this.setState({editTag: !this.state.editTag});
 		}
 
 		editComment = () => {
@@ -174,22 +180,22 @@ class TableCell extends React.Component {
 		}
 
 		tagField = () => {
-				if(this.state.editTag === false) {
-						if(this.props.data.Tags !== null) {
-							return (<div className='tag'>
-								{this.props.data.Tags.map(function (obj, i) {
-										return <button className="tagButton" onClick={(e) => this.tagClick(e)} data-id={this.props.data.TagID[i]}>#{obj} </button>;
-								}, this)}
-							</div>);
-						}
-				}else{
-					return (
-						<form onSubmit={this.submitTag} >
-							<input type={"text"} name={"tag"} defaultValue={this.state.tag} onChange={this.tagChange}/>
-							<input type={"submit"} value={"Update"} />
-						</form>
-					);
+			if(this.state.editTag === false) {
+				if(this.props.data.Tags !== null) {
+					return (<div className='tag'>
+						{this.props.data.Tags.map(function (obj, i) {
+							return <button className="tagButton" onClick={(e) => this.tagClick(e)} data-id={this.props.data.TagID[i]}>#{obj} </button>;
+						}, this)}
+					</div>);
 				}
+			}else{
+				return (
+					<form onSubmit={this.submitTag} >
+						<input type={"text"} name={"tag"} defaultValue={this.state.tag} onChange={this.tagChange}/>
+						<input type={"submit"} value={"Update"} />
+					</form>
+				);
+			}
 		}
 
 		tagClick = (e) => {

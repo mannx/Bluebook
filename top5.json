@@ -1,0 +1,23 @@
+{ "Data": [
+	{
+		"Title": "Net Sales",
+		"Column": "NetSales",
+		"Field": "NetSales"
+	},
+	{
+		"Title": "Skip The Dishes",
+		"Column": "SkipTheDishes",
+		"Field": "SkipTheDishes"
+	},
+	{
+		"Title": "DoorDash",
+		"Column": "DoorDash",
+		"Field": "DoorDash"
+	},
+	{
+		"Title": "Tips",
+		"Column": "Tips",
+		"Field": "Tips"
+	}
+]
+}
