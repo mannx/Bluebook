@@ -66,6 +66,6 @@ COPY ./run.sh ./
 #RUN touch READY
 
 EXPOSE 8080
-USER root:root
+#USER root:root
 
 ENTRYPOINT ["/run.sh"]

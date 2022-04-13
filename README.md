@@ -25,6 +25,13 @@
 	* BLUEBOOK\_TEMP\_PATH -> directory where temp files are stored 
 	* BLUEBOOK\_DATA\_PATH -> directory where the database is stored
 
+- Volume Binds/Mounts:
+	* /data	->	Where the database and other configuration files are found
+	* /import -> Where files for import are located (daily sheets, control sheets, etc)
+
+- Ports:
+	* Port 8080 is used by default
+
 
 - Migration Steps:
 	* Copy current database into /data (BLUEBOOK\_DATA\_PATH)

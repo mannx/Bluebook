@@ -2,14 +2,17 @@ version: "3.8"
 
 services:
   bluebook:
-    image: mannx/bluebook:beta
+    #image: mannx/bluebook:beta
+    image: bluebook:latest
     container_name: bluebook
     ports:
       - 8080:8080
     environment:
       - TZ=Canada/Atlantic      
+      - PUID=1000
+      - PGID=1000
     volumes:
-      - ./data:/data
+      - ./data:/data:z
       - ./import_data:/import
       - /etc/localtime:/etc/localtime:ro
     deploy:

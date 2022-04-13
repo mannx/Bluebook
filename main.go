@@ -20,7 +20,13 @@ import (
 )
 
 // Version of the current build/release
-const Version = 0.08
+//const Version = 0.08
+
+// Better version strings set at compile time via script
+var (
+	BuildVersion string = ""
+	BuildTime    string = ""
+)
 
 // DB is the database connection for the entire run
 var DB *gorm.DB
@@ -32,7 +38,10 @@ func main() {
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 	zerolog.SetGlobalLevel(zerolog.DebugLevel)
 
-	log.Info().Msgf("Bluebook Helper v%v.\n\n", Version)
+	//log.Info().Msgf("Bluebook Helper v%v.\n\n", Version)
+	log.Info().Msgf("Bluebook Helper")
+	log.Info().Msgf("  => Version: %v", BuildVersion)
+	log.Info().Msgf("  => Build Time: %v", BuildTime)
 
 	log.Info().Msg("Initializing environment...")
 	env.Environment.Init()
@@ -40,6 +49,7 @@ func main() {
 	dbName = filepath.Join(env.Environment.DataPath, "db.db")
 
 	log.Info().Msg("Initializing database...")
+	log.Debug().Msgf("  => Database path: %v", dbName)
 	dbo, err := gorm.Open(sqlite.Open(dbName), &gorm.Config{})
 	if err != nil {
 		log.Fatal().Err(err).Msg("Unable to open database...")

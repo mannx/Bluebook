@@ -9,7 +9,7 @@
 #Convert=
 #Waste=
 
-Data=./data
+Data=/data
 
 if test -f "$Data/COMMENT"; then
 	Comment=
@@ -32,4 +32,4 @@ else
 	touch $Data/WASTE
 fi
 
-echo /bluebook $Comment $Convert $Waste
+/bluebook $Comment $Convert $Waste
