@@ -45,26 +45,36 @@ func GetWeeklyViewHandler(c echo.Context, db *gorm.DB) error {
 
 	log.Debug().Msgf("Weekly report for %v\\%v\\%v", month, day, year)
 
+	err, weekly := getWeeklyData(month, day, year, c, db)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusOK, &weekly)
+}
+
+func getWeeklyData(month int, day int, year int, c echo.Context, db *gorm.DB) (error, weeklyInfo) {
 	weekEnding := time.Date(year, time.Month(month), day, 0, 0, 0, 0, time.UTC)
 	weekStart := weekEnding.AddDate(0, 0, -6)
 
 	// make sure a tuesday
 	if weekEnding.Weekday() != time.Tuesday {
 		log.Debug().Msg("Request date is not a tuesday")
-		return c.JSON(http.StatusOK, "Can only view from a tuesday")
+		return c.JSON(http.StatusOK, "Can only view from a tuesday"), weeklyInfo{}
 	}
 
 	weekly := weeklyInfo{}
-	err = getAuvData(weekEnding, &weekly, db)
+	err := getAuvData(weekEnding, &weekly, db)
 	if err != nil {
-		return err
+		return err, weeklyInfo{}
 	}
 
 	// retrieve the data for the week
 	data := make([]models.DayData, 9)
 	res := db.Find(&data, "Date >= ? AND Date <= ?", weekStart, weekEnding)
 	if res.Error != nil {
-		return res.Error
+		return res.Error, weeklyInfo{}
+
 	}
 
 	// calculate the data bits that we need
@@ -95,7 +105,8 @@ func GetWeeklyViewHandler(c echo.Context, db *gorm.DB) error {
 	lys := lastYear.AddDate(0, 0, -6)
 	res = db.Find(&data, "Date >= ? AND Date <= ?", lys, lastYear)
 	if res.Error != nil {
-		return res.Error
+		return res.Error, weeklyInfo{}
+
 	}
 
 	for _, n := range data {
@@ -108,14 +119,16 @@ func GetWeeklyViewHandler(c echo.Context, db *gorm.DB) error {
 
 	res = db.Find(&data, "Date >= ? AND Date <= ?", lastYear.AddDate(0, 0, 1), up)
 	if res.Error != nil {
-		return res.Error
+		return res.Error, weeklyInfo{}
+
 	}
 
 	for _, n := range data {
 		weekly.UpcomingSales += n.NetSales
 	}
 
-	return c.JSON(http.StatusOK, &weekly)
+	return nil, weekly
+
 }
 
 func calculateWeekly(data []models.DayData, wi *weeklyInfo) {

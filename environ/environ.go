@@ -11,11 +11,11 @@ import (
 
 type EnvironmentDefinition struct {
 	ImportPath string `envconfig:"BLUEBOOK_IMPORT_PATH"`
+	OutputPath string `envconfig:"BLUEBOOK_OUTPUT_PATH"` // used when exporting weekly sheets
 	TempPath   string `envconfig:"BLUEBOOK_TEMP_PATH"`
 	DataPath   string `envconfig:"BLUEBOOK_DATA_PATH"`
 }
 
-//var Environment EnvironmentDefinition{}
 var Environment = EnvironmentDefinition{}
 
 func (e *EnvironmentDefinition) Init() {
@@ -30,6 +30,7 @@ func (e *EnvironmentDefinition) Init() {
 
 func (e *EnvironmentDefinition) Default() {
 	e.ImportPath = "/import" // default path, unless overriden
+	e.OutputPath = "/import" // defaults to the same as the import path
 	e.TempPath = "/tmp"
 	e.DataPath = "/data"
 }

@@ -23,6 +23,8 @@ const urls = {
 		"WasteView": "/api/waste/view",
 		"Weekly": "/api/weekly/view",
 
+		"Export": "/api/export/weekly",		// Export Weekly
+
 		"Top5": "/api/top5/view",
 }
 

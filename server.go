@@ -55,5 +55,8 @@ func initServer() *echo.Echo {
 
 	// Top5
 	e.GET("/api/top5/view", func(c echo.Context) error { return api.GetTop5ViewHandler(c, DB) })
+
+	// Export
+	e.GET("/api/export/weekly", func(c echo.Context) error { return api.ExportWeekly(c, DB) })
 	return e
 }

@@ -10,7 +10,6 @@ FROM golang:alpine AS build
 RUN apk add build-base
 
 ENV GOPATH /go/src
-
 WORKDIR /go/src/github.com/mannx/Bluebook
 
 COPY go.mod ./
@@ -66,6 +65,5 @@ COPY ./run.sh ./
 #RUN touch READY
 
 EXPOSE 8080
-#USER root:root
 
 ENTRYPOINT ["/run.sh"]
