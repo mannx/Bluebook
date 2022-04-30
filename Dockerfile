@@ -61,8 +61,8 @@ COPY --from=react /app/build /static
 
 COPY ./run.sh ./
 
-# uncomment to prevent the initial database conversion
-#RUN touch READY
+# copy in default config file for top5 api
+COPY ./api/data.json /
 
 EXPOSE 8080
 

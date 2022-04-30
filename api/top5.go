@@ -22,10 +22,31 @@ type top5Data struct {
 
 var top5Table []top5Data
 
-func init() {
+func readConfig() ([]byte, error) {
+	// try and read the user supplied config file
 	f, err := ioutil.ReadFile("./data/data.json")
+	if err == nil {
+		return f, nil // read success
+	}
+
+	// otherwise try and built in config found at /data.json
+	f, err = ioutil.ReadFile("/data.json")
+	if err == nil {
+		return f, nil
+	}
+
+	return nil, err
+}
+
+func init() {
+	/*f, err := ioutil.ReadFile("./data/data.json")
 	if err != nil {
 		log.Error().Err(err).Msg("Unable to read config file")
+		return
+	}*/
+	f, err := readConfig()
+	if err != nil {
+		log.Error().Msg("Unable to read user config or default config file for top5 api")
 		return
 	}
 

@@ -26,6 +26,8 @@ var labourCost = "D16"
 var customerCount = "D18"
 var customerPrev = "D19"
 var partySales = "D21"
+var hoursUsed = "D22"
+var managerHours = "D23"
 var targetHours = "D25"
 var gcSold = "D26"
 var gcRedeem = "D27"
@@ -34,17 +36,22 @@ var gcRedeem = "D27"
 // outputs in Environment.OutputDir
 func ExportWeekly(c echo.Context, db *gorm.DB) error {
 	var month, day, year int
+	var hours, manager float64 // hours used and manager hours
 
 	err := echo.QueryParamsBinder(c).
 		Int("month", &month).
 		Int("day", &day).
 		Int("year", &year).
+		Float64("hours", &hours).
+		Float64("manager", &manager).
 		BindError()
 	if err != nil {
 		return err
 	}
 
-	log.Debug().Msgf("Exporting weekly report %v\\%v\\%v", month, day, year)
+	log.Info().Msgf("Exporting weekly report %v\\%v\\%v", month, day, year)
+	log.Debug().Msgf("  => Hours: %v", hours)
+	log.Debug().Msgf("  => Manager: %v", manager)
 
 	// get the weekly data
 	err, weekly := getWeeklyData(month, day, year, c, db)
@@ -78,6 +85,9 @@ func ExportWeekly(c echo.Context, db *gorm.DB) error {
 	f.SetCellValue("Sheet1", lastYearSales, weekly.LastYearSales)
 	f.SetCellInt("Sheet1", customerPrev, weekly.LastYearCustomerCount)
 	f.SetCellValue("Sheet1", upcomingSales, weekly.UpcomingSales)
+
+	f.SetCellValue("Sheet1", hoursUsed, hours)
+	f.SetCellValue("Sheet1", managerHours, manager)
 
 	// set the correct date
 	weekEnding := time.Date(year, time.Month(month), day, 0, 0, 0, 0, time.UTC)

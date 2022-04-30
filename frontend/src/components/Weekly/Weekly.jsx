@@ -21,6 +21,9 @@ class Weekly extends React.Component {
 			errorMsg: "",
 			error: false,
 			message: "",
+
+			managerHours: 0,
+			hoursUsed: 0,
 		}
 
 		// if not a tuesday, display an error 
@@ -120,7 +123,10 @@ class Weekly extends React.Component {
 		const day = this.state.date.getDate();
 		const year = this.state.date.getFullYear();
 
-		const url = UrlGet("Export") + "?month="+month+"&day="+day+"&year="+year;
+		const hours = this.state.hoursUsed;
+		const manager = this.state.managerHours;
+
+		const url = UrlGet("Export") + "?month="+month+"&day="+day+"&year="+year+"&hours="+hours+"&manager="+manager;
 		const resp = await fetch(url);
 		const data = await resp.json();
 
@@ -163,9 +169,16 @@ class Weekly extends React.Component {
 					<tr><td>&nbsp;</td><td></td></tr>
 				</tbody>
 			</table>
+			<div>
+				Manager Hours: <input type="text" onChange={this.managerHoursChanged}/><br/>
+				Hours Used: <input type="text" onChange={this.hoursUsedChanged}/>
+			</div>
 			</>
 		);
 	}
+
+	managerHoursChanged = (e) => { this.setState({managerHours: e.target.value}); }
+	hoursUsedChanged = (e) => { this.setState({hoursUsed: e.target.value}); }
 }
 
 export default Weekly;
