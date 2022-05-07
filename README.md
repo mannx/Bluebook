@@ -6,7 +6,6 @@
 	* Wastage report output. separate into categories or other divisions
 
 - TODO:
-	* (MOSTLY) Weekly paperwork calculations, (TODO) file generation
 	* CSS worked on -- themes? or other easier way of chaning colouring
 	* Redo several front end data fetching mechanisms (see https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#fetching-external-data-when-props-change)
 
@@ -24,10 +23,11 @@
 	* BLUEBOOK\_IMPORT\_PATH	-> directory where files to import are found
 	* BLUEBOOK\_TEMP\_PATH -> directory where temp files are stored 
 	* BLUEBOOK\_DATA\_PATH -> directory where the database is stored
+	* BLUEBOOK\_OUTPUT\_PATH		-> Directory for export files to go
 
 - Volume Binds/Mounts:
 	* /data	->	Where the database and other configuration files are found
-	* /import -> Where files for import are located (daily sheets, control sheets, etc)
+	* /import -> Where files for import are located (daily sheets, control sheets, etc), also where generated output files are stored by default
 
 - Ports:
 	* Port 8080 is used by default
@@ -44,7 +44,6 @@
 			~ If this file is present the first two steps are ignored, and can be pre placed if required
 	* Notes/Issues:
 		- Waste data is not preserved during the migration due to several changes
-		- Extra column in weekly_infos needs to be manually deleted or the model updated to include it (currently unused, unsure of original purpose)
 
 ## Top5 Config Path
 
@@ -74,7 +73,7 @@ services:
       - TZ=Europe/London
     volumes:
       - <Data directory>:/data
-      - <Import Direcotyr>:/import
+      - <Import directory>:/import
       - /etc/localtime:/etc/localtime:ro
     deploy:
       restart_policy:

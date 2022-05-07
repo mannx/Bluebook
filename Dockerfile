@@ -24,7 +24,10 @@ COPY ./environ ./environ
 COPY ./import ./import
 COPY ./models ./models
 
-RUN go build -o /bluebook
+COPY go-build.sh .
+
+#RUN go build -o /bluebook
+RUN ./go-build.sh
 
 #
 # React Build Stage

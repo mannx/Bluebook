@@ -8,6 +8,7 @@ import (
 	"github.com/labstack/echo/v4"
 	models "github.com/mannx/Bluebook/models"
 	"github.com/rs/zerolog/log"
+	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
 
@@ -99,11 +100,32 @@ func TagUpdateViewHandler(c echo.Context, db *gorm.DB) error {
 		updateTags(tu.LinkedID, tu.Tag, db)
 
 	} else {
-		log.Warn().Msg("Adding Tags to empty days not yet supported")
-		return c.String(http.StatusInternalServerError, "Error")
+		// attempt to generate an empty day and then try and link again
+		id, err := genEmptyDay(db, tu.Date)
+		if err != nil {
+			log.Warn().Err(err).Msg("Unable to add tag to empty day")
+			return c.String(http.StatusInternalServerError, "Error")
+		}
+
+		log.Debug().Msg("Updating tags linked to new day")
+		updateTags(id, tu.Tag, db)
 	}
 
 	return nil
+}
+
+// generate the empty day, save it to the database and return its id
+func genEmptyDay(db *gorm.DB, date time.Time) (uint, error) {
+	dd := models.DayData{
+		Date: datatypes.Date(date),
+	}
+
+	res := db.Create(&dd)
+	if res.Error != nil {
+		return 0, res.Error
+	}
+
+	return dd.ID, nil
 }
 
 // parse and update the tags for a given day

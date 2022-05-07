@@ -14,3 +14,6 @@ ALTER TABLE bbhelper_taglist RENAME TO tag_lists;
 
 DROP TABLE bbhelper_wastageentry;
 DROP TABLE bbhelper_wastageitem;
+
+-- Remove the Extra field from the weekly_infos tables
+ALTER TABLE weekly_infos DROP COLUMN Extra;

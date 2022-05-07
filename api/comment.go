@@ -45,7 +45,6 @@ func UpdateCommentHandler(c echo.Context, db *gorm.DB) error {
 		dd.Comment = cp.Comment
 		db.Save(&dd)
 	} else {
-		//log.Warn().Msgf("UpdateCommentHandler() => Date: %v", cp.Date.String())
 		// use the provided date to generate a new database entry for this date
 		log.Debug().Msg("UpdateCommentHandler() => No DayData found, generating new entry...")
 		dd := models.DayData{

@@ -39,11 +39,6 @@ func readConfig() ([]byte, error) {
 }
 
 func init() {
-	/*f, err := ioutil.ReadFile("./data/data.json")
-	if err != nil {
-		log.Error().Err(err).Msg("Unable to read config file")
-		return
-	}*/
 	f, err := readConfig()
 	if err != nil {
 		log.Error().Msg("Unable to read user config or default config file for top5 api")
