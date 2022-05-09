@@ -98,6 +98,10 @@ func ImportControl(fileName string, db *gorm.DB) error {
 	if bos == nil {
 		return reFail("Bread over short")
 	}
+
+	// might panic with out of range?
+	log.Debug().Msg("breadOverShort := bos[1]")
+
 	breadOverShort := bos[1]
 	log.Debug().Msgf("over short: %v", breadOverShort)
 
