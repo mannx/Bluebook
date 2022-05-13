@@ -95,7 +95,7 @@ func ExportWeekly(c echo.Context, db *gorm.DB) error {
 
 	// generate our output file name and save
 	fname := fmt.Sprintf("%v.xlsx", weekEnding.Format("01-02-06"))
-	outPath := filepath.Join(env.Environment.DataPath, fname)
+	outPath := filepath.Join(env.Environment.OutputPath, fname)
 	f.SaveAs(outPath)
 
 	m := models.ServerReturnMessage{Message: "Ok"}
