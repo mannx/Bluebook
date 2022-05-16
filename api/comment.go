@@ -33,6 +33,26 @@ func UpdateCommentHandler(c echo.Context, db *gorm.DB) error {
 	}
 
 	// do we have a valid linkedID?
+	// check to see if we have an entry already
+	if cp.LinkedID == 0 {
+		log.Debug().Msgf("Linked id == 0, checking for existing day...[date: %v]", cp.Date)
+
+		dd := models.DayData{}
+		res := db.Where("Date = ?", cp.Date).Find(&dd)
+		if res.Error == nil && res.RowsAffected != 0 {
+			// save the comment to this day
+			log.Debug().Msgf("  => Day found, date [%v] id [%v]", dd.Date, dd.ID)
+			log.Debug().Msgf("  => Rows Affected: %v", res.RowsAffected)
+
+			dd.Comment = cp.Comment
+			db.Save(&dd)
+
+			return c.String(http.StatusOK, "Update Success")
+		}
+
+		// otherwise fall through
+	}
+
 	if cp.LinkedID != 0 {
 		log.Debug().Msgf("Adding comment to linked day: %v", cp.LinkedID)
 

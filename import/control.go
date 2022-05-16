@@ -23,7 +23,12 @@ var reCustomerCount = regexp.MustCompile(`CUSTOMER COUNT\s+(\d+)\s+(\d+)\s+(\d+)
 var reHoursWorked = regexp.MustCompile(`HOURS WORKED\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)`)
 
 var reBreadWaste = regexp.MustCompile(`- CREDITS\s+(-?\d+[.]\d+)\s+(-?\d+[.]\d+)\s+(-?\d+[.]\d+)\s+(-?\d+[.]\d+)\s+(-?\d+[.]\d+)\s+(-?\d+[.]\d+)\s+(-?\d+[.]\d+)\s+(-?\d+[.]\d+)\s+`)
+
 var reBreadOverShort = regexp.MustCompile(`= OVER\/SHORT\s+(-?\d+[.]\d+)\s+(-?\d+[.]\d+)\s+(-?\d+[.]\d+)\s+(-?\d+[.]\d+)\s+(-?\d+[.]\d+)\s+(-?\d+[.]\d+)\s+(-?\d+[.]\d+)\s+(-?\d+[.]\d+)`)
+
+// this allows us to parse values in the thousands, should only be required rarely, and doesnt seem to work well as the main regex
+// find way to fix instead?
+var reBreadOverShort2 = regexp.MustCompile(`/= OVER\/SHORT\s+(-?\d*,?\d+[.]\d+)\s+(-?\d*,?\d+[.]\d+)\s+(-?\d*,?\d+[.]\d+)\s+(-?\d*,?\d+[.]\d+)\s+(-?\d*,?\d+[.]\d+)\s+(-?\d*,?\d+[.]\d+)\s+(-?\d*,?\d+[.]\d+)\s+`)
 
 func ImportControl(fileName string, db *gorm.DB) error {
 	log.Info().Msgf("ImportControl(%v)", fileName)
@@ -96,13 +101,23 @@ func ImportControl(fileName string, db *gorm.DB) error {
 	// multiple possible results, we need the 2nd result
 	bos := reBreadOverShort.FindAllStringSubmatch(cstr, -1)
 	if bos == nil {
-		return reFail("Bread over short")
+		// try the 2nd regex before fail
+		// find way of not having to use 2 regex for this
+		bos = reBreadOverShort2.FindAllStringSubmatch(cstr, -1)
+		if bos == nil {
+			return reFail("Bread over short")
+		}
 	}
 
-	// might panic with out of range?
-	log.Debug().Msg("breadOverShort := bos[1]")
-
-	breadOverShort := bos[1]
+	// sometimes we only match with the over/short count we want
+	// in that case use it, otherwise it will be the 2nd match
+	var breadOverShort []string
+	if len(bos) == 1 {
+		breadOverShort = bos[0]
+	} else {
+		breadOverShort = bos[1]
+	}
+	//breadOverShort := bos[1]
 	log.Debug().Msgf("over short: %v", breadOverShort)
 
 	log.Debug().Msg("Preparing to update each day...")
@@ -136,5 +151,6 @@ func ImportControl(fileName string, db *gorm.DB) error {
 }
 
 func reFail(item string) error {
+	log.Error().Msgf("[control.go]{reFail} Unable to parse data for: %v", item)
 	return errors.New(fmt.Sprintf("Unable to parse data for: %v", item))
 }
