@@ -1,6 +1,9 @@
 Issues to fix
 =============
 
+* Net Sales not updating if not full week?
+	- w/e 5/17/22 not updated
+
 * Logs:
 	+ Notes
 		- Echo logger outputs to stdout
