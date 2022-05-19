@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"path/filepath"
 	"time"
 
@@ -98,6 +99,8 @@ func ExportWeekly(c echo.Context, db *gorm.DB) error {
 	outPath := filepath.Join(env.Environment.OutputPath, fname)
 	f.SaveAs(outPath)
 
+	// adjust ownership to PUID/PGID (container runs as root?)
+	os.Chown(outPath, env.Environment.GroupID, env.Environment.UserID)
 	m := models.ServerReturnMessage{Message: "Ok"}
 	return c.JSON(http.StatusOK, &m)
 }

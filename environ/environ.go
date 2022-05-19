@@ -14,6 +14,10 @@ type EnvironmentDefinition struct {
 	OutputPath string `envconfig:"BLUEBOOK_OUTPUT_PATH"` // used when exporting weekly sheets
 	TempPath   string `envconfig:"BLUEBOOK_TEMP_PATH"`
 	DataPath   string `envconfig:"BLUEBOOK_DATA_PATH"`
+
+	// UserID and GroupID are used to set the file permissions for all exported files
+	UserID  int `envconfig:"PUID"` // userid the container should be running under
+	GroupID int `envconfig:"PGID"` // groupid "								"
 }
 
 var Environment = EnvironmentDefinition{}
@@ -26,6 +30,9 @@ func (e *EnvironmentDefinition) Init() {
 		log.Error().Err(err).Msg("Unable to parse local environment")
 		return
 	}
+
+	log.Debug().Msgf("  => [EnvironmentDefinition] UserID: %v", e.UserID)
+	log.Debug().Msgf("  => [EnvironmentDefinition] GroupID: %v", e.GroupID)
 }
 
 func (e *EnvironmentDefinition) Default() {
