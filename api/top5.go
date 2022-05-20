@@ -108,6 +108,14 @@ func GetTop5ViewHandler(c echo.Context, db *gorm.DB) error {
 	}
 
 	data := getTop5Data(month, year, limit, db) // retrieve the data
+	if data == nil {
+		msg := models.ServerReturnMessage{
+			Message: "Unable to retrieve top 5 data",
+			Error:   true,
+		}
+
+		return c.JSON(http.StatusOK, &msg)
+	}
 
 	msg := message{
 		Message: fmt.Sprintf("Top 5 of month: %v, year: %v", month, year),
