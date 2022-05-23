@@ -1,6 +1,8 @@
 Issues to fix
 =============
 
+* Wastage not sorting or seperating into categories, just a single list
+
 * Logs:
 	+ Notes
 		- Echo logger outputs to stdout
