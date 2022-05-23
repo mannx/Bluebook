@@ -189,5 +189,7 @@ func importComments() {
 }
 
 func importWasteDef() {
-	imp.ImportWasteDefinition("waste_def.json", DB)
+	log.Debug().Msg("ImportWasteDef()")
+	fname := filepath.Join(env.Environment.DataPath, "waste_def.json")
+	imp.ImportWasteDefinition(fname, DB)
 }

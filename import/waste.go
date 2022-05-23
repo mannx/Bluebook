@@ -135,6 +135,7 @@ func ImportWasteDefinition(fileName string, db *gorm.DB) error {
 
 	f, err := ioutil.ReadFile(fileName)
 	if err != nil {
+		log.Error().Err(err).Msgf("Unable to read file: %v", fileName)
 		return err
 	}
 
@@ -151,6 +152,7 @@ func ImportWasteDefinition(fileName string, db *gorm.DB) error {
 
 	err = json.Unmarshal(f, &obj)
 	if err != nil {
+		log.Error().Err(err).Msg("Unable to parse waste data...")
 		return err
 	}
 

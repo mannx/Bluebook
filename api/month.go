@@ -136,7 +136,6 @@ func GetMonthViewHandler(c echo.Context, db *gorm.DB) error {
 				if gsw > 0 {
 					eow.ThirdPartyPercent = (tps / gsw) * 100.0
 				}
-
 			}
 		}
 

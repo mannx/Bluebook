@@ -12,6 +12,18 @@ import (
 	models "github.com/mannx/Bluebook/models"
 )
 
+func GetWasteSettingHandler(c echo.Context, db *gorm.DB) error {
+	// return all the wastage items
+	var data []models.WastageItem
+	res := db.Find(&data)
+	if res.Error != nil {
+		log.Error().Err(res.Error).Msg("Unable to retrieve wastage items")
+		return res.Error
+	}
+
+	return c.JSON(http.StatusOK, &data)
+}
+
 // return a combined waste report for week ending
 //		/api/../?month=MONTH&year=YEAR&day=DAY
 //		where month and year are 2 and 4 digits each
