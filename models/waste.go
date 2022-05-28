@@ -24,6 +24,21 @@ const (
 	WasteLocationBread      = 4 // item is a type of bread
 )
 
+var unitStringTable = map[int]string{
+	WasteUnitCount: "Count",
+	WastePounds:    "lbs",
+	WasteKilo:      "kilo",
+	WasteGram:      "gram",
+}
+
+var locationStringTable = map[int]string{
+	WasteLocationOther:      "Other",
+	WasteLocationProtein:    "Protein",
+	WasteLocationVegetable:  "Vegetable",
+	WasteLocationCookieChip: "Cookie/Chips",
+	WasteLocationBread:      "Bread",
+}
+
 //
 //	Contains description of a single item and how it is counted
 //
@@ -35,6 +50,26 @@ type WastageItem struct {
 	Location         int     `gorm:"column:Location"`         // where is the found
 	CustomConversion bool    `gorm:"column:CustomConversion"` // do we havea custom conversion in use? if so, Weight*CustomConversion => UnitMeasure => Ouput value
 	UnitWeight       float64 `gorm:"column:UnitWeight"`       // what we multiple the items weight/count by if custom
+
+	// the remaing fields are not stored in the db, and only provide data generated at runtime
+	UnitString     string `gorm:"-"` // string version of the unit measure
+	LocationString string `gorm:"-"` // string version of the location
+}
+
+// GenString generates the strings for the string version of unit, location, etc
+func (wi *WastageItem) GenString() {
+	(*wi).UnitString = unitStringTable[wi.UnitMeasure]
+	(*wi).LocationString = locationStringTable[wi.Location]
+
+	log.Debug().Msgf("[WastageItem::GenString]Unit String: %v", wi.UnitString)
+}
+
+func (wi *WastageItem) Locations() map[int]string {
+	return locationStringTable
+}
+
+func (wi *WastageItem) Units() map[int]string {
+	return unitStringTable
 }
 
 //

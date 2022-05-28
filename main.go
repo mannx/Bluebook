@@ -20,9 +20,6 @@ import (
 )
 
 // Version of the current build/release
-//const Version = 0.08
-
-// Better version strings set at compile time via script
 var (
 	BuildVersion string = ""
 	BuildTime    string = ""

@@ -11,6 +11,8 @@ export default class Settings extends React.Component {
 		this.state = {
 			data: null,
 			isLoading: true,
+			units: [],
+			locations: [],
 		}
 	}
 
@@ -19,15 +21,26 @@ export default class Settings extends React.Component {
 		const resp = await fetch(url);
 		const data = await resp.json();
 
-		this.setState({data: data, isLoading:false});
+		this.setState({
+			isLoading:false,
+			data: data.Data, 
+			units: data.Units,
+			locations: data.Locations,
+		});
 	}
 
+	// render the settings data for all current settings
 	render = () => {
 		if (this.state.isLoading === true) {
 			this.loadData();
 			return <h3>Loading...</h3>;
 		}
 
+		return this.renderWastage();
+	}
+
+	// render wastage table for display and editing
+	renderWastage = () => {
 		return (
 			<>
 			<div>
@@ -43,10 +56,10 @@ export default class Settings extends React.Component {
 						{this.state.data.map(function (obj, i) {
 							return (<tr>
 								<td>{obj.Name}</td>
-								<td>Unit</td>
+								<td>{obj.UnitString}</td>
 								<td>?</td>
 								<td>Conversion</td>
-								<td>Location</td>
+								<td>{obj.LocationString}</td>
 							</tr>);
 						})}
 					</tbody>
@@ -54,5 +67,13 @@ export default class Settings extends React.Component {
 			</div>
 			</>
 		);
+	}
+
+	renderUnitOptions = () => {
+		return (<select>
+			{this.state.units.map(function(obj, i) {
+				return <option value={i}>{obj}</option>;
+			})}
+		</select>);
 	}
 }

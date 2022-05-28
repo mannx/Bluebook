@@ -21,7 +21,30 @@ func GetWasteSettingHandler(c echo.Context, db *gorm.DB) error {
 		return res.Error
 	}
 
-	return c.JSON(http.StatusOK, &data)
+	type WastageSetting struct {
+		Data      []models.WastageItem // list of items
+		Locations map[int]string       // list of all locations
+		Units     map[int]string       // list of all unit types
+	}
+
+	wi := models.WastageItem{}
+	ws := WastageSetting{
+		//Locations: models.locationStringTable,
+		Locations: wi.Locations(),
+		Units:     wi.Units(),
+		Data:      make([]models.WastageItem, 0),
+	}
+
+	for _, n := range data {
+		n.GenString()
+		//data[i] = n
+		//log.Debug().Msgf("[GetWasteSetting]Count: %v", n.UnitMeasure)
+		//log.Debug().Msgf("[GetWasteSetting]String: %v", n.UnitString)
+
+		ws.Data = append(ws.Data, n)
+	}
+
+	return c.JSON(http.StatusOK, &ws)
 }
 
 // return a combined waste report for week ending
