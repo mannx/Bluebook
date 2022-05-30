@@ -71,7 +71,7 @@ class TableCell extends React.Component {
 
 		//<!-- <td className={cls}>{this.O(this.props.data.NetSales)}</td> -->
 		return (
-			<tr>
+			<tr key={this.props.data.ID}>
 				<td>{this.Zero(this.props.data.DayOfMonth)}</td>
 				<td>{this.props.data.DayOfWeek}</td>
 				<td>{this.O(this.props.data.GrossSales)}</td>

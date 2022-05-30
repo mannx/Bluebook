@@ -6,91 +6,89 @@ import "./import.css";
 // it requires a URL property for the GET/POST url
 //
 class ImportControl extends React.Component {
-		constructor(props) {
-				super(props);
+	constructor(props) {
+		super(props);
 
-				this.state = {
-						data: null,		// data containing availble files to import
-						imports: null,	// list of all the files that will be imported
-						page: props.page,
-				}
+		this.state = {
+			data: null,		// data containing availble files to import
+			imports: null,	// list of all the files that will be imported
+			page: props.page,
 		}
+	}
 
-		loadData = async () => {
-				// load in the available import data from the server
-				const resp = await fetch(this.props.URL);
-				const data = await resp.json();
-				
-				// display and choose which files to import
-				this.setState({data: data});
-		}
+	loadData = async () => {
+		// load in the available import data from the server
+		const resp = await fetch(this.props.URL);
+		const data = await resp.json();
+		
+		// display and choose which files to import
+		this.setState({data: data});
+	}
 
-		async componentDidMount() {
+	async componentDidMount() {
+		this.loadData();
+	}
+
+	componentDidUpdate(prev) {
+		if(prev.page !== this.props.page){
 				this.loadData();
 		}
+	}
 
-		componentDidUpdate(prev) {
-				if(prev.page !== this.props.page){
-						this.loadData();
-				}
+	getControls = () => {
+		this.state.data.map(function(obj, i) {
+			return <span>{obj}</span>;
+		});
+	}
+
+	addImp = (e) => {
+		if(this.state.imports == null ) {
+			this.setState({imports: [e.target.name]});
+		}else{
+			this.setState({imports: [...this.state.imports, e.target.name]});
+		}
+	}
+
+	render() {
+		if(this.state.data == null) {
+			return <h1>Loading Data...</h1>;
 		}
 
-		getControls = () => {
-				this.state.data.map(function(obj, i) {
-						return <span>{obj}</span>;
-				});
+		return (
+			<div><h3>{this.props.title} Available for Import (page {this.props.page})</h3>
+				<button onClick={this.performUpdate}>Update</button>
+				<ul>
+				{this.state.data.map(function(obj, i) {
+					return (<li>
+							<input type={"checkbox"} onChange={this.addImp} name={obj}/>
+							<span>{obj}</span>
+					</li>);
+				},this)}
+				</ul>
+			</div>
+		);
+					
+	}
+
+	// send the list of id's to be updated to the server
+	// TODO: find a way to get progress, another api waypoint with a timer?
+	performUpdate = () => {
+		const options = {
+			method: 'POST',
+			headers: {'Content-Type':'application/json'},
+			body: JSON.stringify(this.state.imports)
+		};
+
+		fetch(this.props.URL, options)
+			.then(r => r.text())
+			.then(r => this.updateResult(r));
+	}
+
+	updateResult = (msg) => {
+		if(msg !== null) {
+			this.props.result(msg);
 		}
-
-		addImp = (e) => {
-				if(this.state.imports == null ) {
-						this.setState({imports: [e.target.name]});
-				}else{
-						this.setState({imports: [...this.state.imports, e.target.name]});
-				}
-		}
-
-		render() {
-				if(this.state.data == null) {
-						return <h1>Loading Data...</h1>;
-				}
-
-				return (
-						<div><h3>{this.props.title} Available for Import (page {this.props.page})</h3>
-								<button onClick={this.performUpdate}>Update</button>
-								<ul>
-								{this.state.data.map(function(obj, i) {
-										return (<li>
-												<input type={"checkbox"} onChange={this.addImp} name={obj}/>
-												<span>{obj}</span>
-														</li>);},this)}
-								</ul>
-							</div>
-				);
-						
-		}
-
-		// send the list of id's to be updated to the server
-		// TODO: find a way to get progress, another api waypoint with a timer?
-		performUpdate = () => {
-				const options = {
-						method: 'POST',
-						headers: {'Content-Type':'application/json'},
-						body: JSON.stringify(this.state.imports)
-				};
-
-				console.log("body: " + options.body);
-				fetch(this.props.URL, options)
-					//.then(res => res.json())
-					//.then(data => console.log("update: " + data));
-					.then(r => r.text())
-					.then(r => this.updateResult(r));
-		}
-
-		updateResult = (msg) => {
-				if(msg !== null) {
-					this.props.result(msg);
-				}
-		}
+	}
 
 }
 

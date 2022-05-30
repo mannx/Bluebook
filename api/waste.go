@@ -23,13 +23,12 @@ func GetWasteSettingHandler(c echo.Context, db *gorm.DB) error {
 
 	type WastageSetting struct {
 		Data      []models.WastageItem // list of items
-		Locations map[int]string       // list of all locations
-		Units     map[int]string       // list of all unit types
+		Locations []string             // list of all location strings
+		Units     []string             // list of all unit types as strings
 	}
 
 	wi := models.WastageItem{}
 	ws := WastageSetting{
-		//Locations: models.locationStringTable,
 		Locations: wi.Locations(),
 		Units:     wi.Units(),
 		Data:      make([]models.WastageItem, 0),
@@ -37,14 +36,51 @@ func GetWasteSettingHandler(c echo.Context, db *gorm.DB) error {
 
 	for _, n := range data {
 		n.GenString()
-		//data[i] = n
-		//log.Debug().Msgf("[GetWasteSetting]Count: %v", n.UnitMeasure)
-		//log.Debug().Msgf("[GetWasteSetting]String: %v", n.UnitString)
-
 		ws.Data = append(ws.Data, n)
 	}
 
 	return c.JSON(http.StatusOK, &ws)
+}
+
+// UpdateWasteSettingHandler handles waste setting updates. Only items that have changed are POST'd in
+func UpdateWasteSettingHandler(c echo.Context, db *gorm.DB) error {
+	log.Debug().Msg("[UpdateWasteSettingHandler]")
+	data := make([]models.WastageItem, 0)
+
+	if err := c.Bind(&data); err != nil {
+		log.Error().Err(err).Msg("Failed to bind data for UpdateWasteSetting")
+		return err
+	}
+
+	// process changes
+	for _, n := range data {
+		// get the item from the db
+		//	can use the passed item as it should be a direct copy
+		//	from the db, but do this to prevent any issues from appearing
+		var obj models.WastageItem
+
+		res := db.First(&obj, n.ID)
+		if res.Error != nil {
+			log.Error().Err(res.Error).Msgf("Unable to retrieve item [ID: %v] [Name: %v]", n.ID, n.Name)
+			continue
+		} else if res.RowsAffected == 0 {
+			log.Debug().Msgf("Unable to find any objects id: %v", n.ID)
+			continue
+		}
+
+		obj.UnitMeasure = n.UnitMeasure
+		obj.Location = n.Location
+		obj.CustomConversion = n.CustomConversion
+		obj.UnitWeight = n.UnitWeight
+
+		// save the obj
+		db.Save(&obj)
+	}
+
+	return c.JSON(http.StatusOK, models.ServerReturnMessage{
+		Message: "Successfully updated",
+		Error:   false,
+	})
 }
 
 // return a combined waste report for week ending

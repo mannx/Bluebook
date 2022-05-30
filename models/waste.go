@@ -1,6 +1,8 @@
 package models
 
 import (
+	"sort"
+
 	"github.com/rs/zerolog/log"
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
@@ -60,16 +62,40 @@ type WastageItem struct {
 func (wi *WastageItem) GenString() {
 	(*wi).UnitString = unitStringTable[wi.UnitMeasure]
 	(*wi).LocationString = locationStringTable[wi.Location]
-
-	log.Debug().Msgf("[WastageItem::GenString]Unit String: %v", wi.UnitString)
 }
 
-func (wi *WastageItem) Locations() map[int]string {
-	return locationStringTable
+func (wi *WastageItem) Locations() []string {
+	d := make([]string, 0, len(locationStringTable))
+	keys := make([]int, 0, len(locationStringTable))
+
+	// extract the keys first, so we can sort then assemble the output array
+	for k := range locationStringTable {
+		keys = append(keys, k)
+	}
+	sort.Ints(keys)
+
+	for _, k := range keys {
+		d = append(d, locationStringTable[k])
+	}
+
+	return d
 }
 
-func (wi *WastageItem) Units() map[int]string {
-	return unitStringTable
+func (wi *WastageItem) Units() []string {
+	d := make([]string, 0, len(unitStringTable))
+	keys := make([]int, 0, len(unitStringTable))
+
+	// extract the keys first, so we can sort then assemble the output array
+	for k := range unitStringTable {
+		keys = append(keys, k)
+	}
+	sort.Ints(keys)
+
+	for _, k := range keys {
+		d = append(d, unitStringTable[k])
+	}
+
+	return d
 }
 
 //
