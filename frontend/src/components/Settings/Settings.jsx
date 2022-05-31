@@ -1,5 +1,6 @@
 import React from "react";
 import UrlGet from "../URLs/URLs.jsx";
+import CombinedDialog from "./CombinedDialog.jsx";
 
 /*
  * This page is currently only used to adjust wastage settings
@@ -13,6 +14,8 @@ export default class Settings extends React.Component {
 			isLoading: true,
 			units: [],
 			locations: [],
+			combined: [],			// which items are marked for combining
+			combinedDialog: false,	// display the combined confirmation dialog?
 		}
 	}
 
@@ -36,7 +39,11 @@ export default class Settings extends React.Component {
 			return <h3>Loading...</h3>;
 		}
 
-		return this.renderWastage();
+		//return this.renderWastage();
+		return (<>
+			{this.renderWastage()}
+			{this.state.combinedDialog ? <CombinedDialog items={this.state.combined}/> : null}
+		</>);
 	}
 
 	// render wastage table for display and editing
@@ -45,9 +52,20 @@ export default class Settings extends React.Component {
 			<>
 			<div>
 				<button onClick={this.updateWastage}>Update</button>
+				<button onClick={this.combineWastageItems}>Combine</button>
 
+				<div>
+					<h3>Items to combine</h3>
+					<ul>
+					{this.state.combined.map(function(obj) {
+						var name = this.state.data.find(n => n.ID === obj);
+						return <li>{name.Name}</li>;
+					}, this)}
+					</ul>
+				</div>
 				<table><caption><h3>Wastage Entries</h3></caption>
 					<thead><tr>
+						<th></th>
 						<th>Name</th>
 						<th>Unit</th>
 						<th>Location</th>
@@ -55,6 +73,7 @@ export default class Settings extends React.Component {
 					<tbody>
 						{this.state.data.map(function (obj, i) {
 							return (<tr>
+								<td><input type="checkbox" id={obj.ID} name={obj.Name} onClick={() => {this.onCombinedChecked(obj.ID)}}/></td>
 								<td>{obj.Name}</td>
 								<td>{this.renderUnitOptions(obj)}</td>
 								<td>{this.renderLocationOptions(obj)}</td>
@@ -126,5 +145,15 @@ export default class Settings extends React.Component {
 
 	conversionDataInput = (obj) => {
 		return <>ConversionData</>;
+	}
+
+	onCombinedChecked = (id) => {
+		this.setState({combined: [...this.state.combined, id]});
+	}
+
+	// Called when 'Combine' button is pressed to combine selected items
+	// first display popup to confirm and pick the item we want to use for all
+	combineWastageItems = () => {
+		this.setState({combinedDialog: true});
 	}
 }
