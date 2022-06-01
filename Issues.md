@@ -1,7 +1,8 @@
 Issues to fix
 =============
 
-* Wastage not sorting or seperating into categories, just a single list
+* Weekly export date in wrong field
+* No update message for WISR, Control sheet import
 
 * Logs:
 	+ Notes
