@@ -16,7 +16,7 @@ import (
 )
 
 // cell mappings for where values are stored
-var weekEndingCell = "D4"
+var weekEndingCell = "B4"
 var auvTarget = "D7"
 var lastYearSales = "D8"
 var netSales = "D9"

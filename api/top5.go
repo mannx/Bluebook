@@ -144,14 +144,16 @@ func getTop5Data(month int, year int, limit int, db *gorm.DB) []top5Data {
 	}
 
 	log.Debug().Msg("getTop5Data() => return nil.  Shouldnt get here")
+	log.Debug().Msgf("  [Year: %v] [Month: %v] [Limit: %v]", month, year, limit)
 	return nil
 }
 
 func top5All(limit int, db *gorm.DB) []top5Data {
-	log.Debug().Msg("top5All() ::")
+	log.Debug().Msgf("top5All() :: Table Size: %v", len(top5Table))
 	var out []top5Data
 
 	for _, n := range top5Table {
+		log.Debug().Msgf("  => [Title: %v] [Field: %v]", n.Title, n.Field)
 		tbl := top5Data{
 			Title:  n.Title,
 			Column: n.Column,

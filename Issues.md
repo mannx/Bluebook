@@ -1,8 +1,8 @@
 Issues to fix
 =============
 
-* Weekly export date in wrong field
 * No update message for WISR, Control sheet import
+* Top5 frontend not sending correct month/year values when viewing month data
 
 * Logs:
 	+ Notes
