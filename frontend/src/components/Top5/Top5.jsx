@@ -48,6 +48,13 @@ export default class Top5 extends React.Component {
 			return this.header();
 		}
 
+		if(this.state.data.Data === null) {
+			return (<>
+				{this.header()}
+				<p className="error">Unable to load data, check input parameters</p>
+			</>);
+		}
+
 		return (<>
 			{this.header()}
 			{this.state.data.Data.map(function(obj, i) {
@@ -71,6 +78,14 @@ export default class Top5 extends React.Component {
 				<button onClick={this.viewClick}>View</button>
 			</div>
 		</>);
+	}
+
+	showError = () => {
+		return (
+			<div>
+				<p class="error">{this.state.data.Message}</p>
+			</div>
+		);
 	}
 
 	getYearValues = () => {

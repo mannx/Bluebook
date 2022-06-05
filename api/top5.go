@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"path/filepath"
 	"time"
 
 	"github.com/labstack/echo/v4"
+	env "github.com/mannx/Bluebook/environ"
 	models "github.com/mannx/Bluebook/models"
 	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
@@ -24,13 +26,14 @@ var top5Table []top5Data
 
 func readConfig() ([]byte, error) {
 	// try and read the user supplied config file
-	f, err := ioutil.ReadFile("./data/data.json")
+	fname := filepath.Join(env.Environment.DataPath, "top5.json")
+	f, err := ioutil.ReadFile(fname)
 	if err == nil {
 		return f, nil // read success
 	}
 
 	// otherwise try and built in config found at /data.json
-	f, err = ioutil.ReadFile("/data.json")
+	f, err = ioutil.ReadFile("/top5.json")
 	if err == nil {
 		return f, nil
 	}
@@ -38,7 +41,8 @@ func readConfig() ([]byte, error) {
 	return nil, err
 }
 
-func init() {
+//func init() {
+func InitTop5() {
 	f, err := readConfig()
 	if err != nil {
 		log.Error().Msg("Unable to read user config or default config file for top5 api")
@@ -79,6 +83,9 @@ func GetTop5ViewHandler(c echo.Context, db *gorm.DB) error {
 		limit = 5
 	}
 
+	log.Debug().Msg("[GetTop5ViewHandler]")
+	log.Debug().Msgf("[Month: %v][Year: %v][Limit: %v]", month, year, limit)
+
 	type message struct {
 		Message string
 		Years   []int // list of the years we have data for
@@ -107,16 +114,7 @@ func GetTop5ViewHandler(c echo.Context, db *gorm.DB) error {
 		years = append(years, time.Time(first.Date).Year()+i)
 	}
 
-	data := getTop5Data(month, year, limit, db) // retrieve the data
-	if data == nil {
-		msg := models.ServerReturnMessage{
-			Message: "Unable to retrieve top 5 data",
-			Error:   true,
-		}
-
-		return c.JSON(http.StatusOK, &msg)
-	}
-
+	data := getTop5Data(month, year, limit, db) // retrieve the data, if none, handled in frontend
 	msg := message{
 		Message: fmt.Sprintf("Top 5 of month: %v, year: %v", month, year),
 		Years:   years,
@@ -134,7 +132,7 @@ func getTop5Data(month int, year int, limit int, db *gorm.DB) []top5Data {
 	}
 
 	if year != 0 && month != 0 {
-		// top for a month
+		// top for a month of a given year
 		return top5Month(month, year, limit, db)
 	}
 

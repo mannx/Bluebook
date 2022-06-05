@@ -15,9 +15,9 @@ import "./header.css";
 //
 
 function NavButton(props) {
-		return (
-				<span className={"navLink"} onClick={props.func}> {props.name}</span>
-		);
+	return (
+		<span className={"navLink"} onClick={props.func}> {props.name}</span>
+	);
 }
 
 const PageMonth = 1;
@@ -52,7 +52,7 @@ function Navigate(props) {
 	}
 }
 
-class Navigation extends React.Component {
+export default class Navigation extends React.Component {
 	constructor(props) {
 		super(props);
 
@@ -143,6 +143,3 @@ class Navigation extends React.Component {
 	NavigateTop5 = () => { this.setState({page: PageTop5});}
 	Settings = () => { this.setState({page: PageSettings});}
 }
-
-
-export default Navigation

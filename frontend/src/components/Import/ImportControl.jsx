@@ -5,7 +5,7 @@ import "./import.css";
 // This class is used to manage all imports
 // it requires a URL property for the GET/POST url
 //
-class ImportControl extends React.Component {
+export default class ImportControl extends React.Component {
 	constructor(props) {
 		super(props);
 
@@ -31,7 +31,7 @@ class ImportControl extends React.Component {
 
 	componentDidUpdate(prev) {
 		if(prev.page !== this.props.page){
-				this.loadData();
+			this.loadData();
 		}
 	}
 
@@ -91,5 +91,3 @@ class ImportControl extends React.Component {
 	}
 
 }
-
-export default ImportControl;

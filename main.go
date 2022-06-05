@@ -14,6 +14,7 @@ import (
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 
+	api "github.com/mannx/Bluebook/api"
 	env "github.com/mannx/Bluebook/environ"
 	imp "github.com/mannx/Bluebook/import"
 	models "github.com/mannx/Bluebook/models"
@@ -42,6 +43,9 @@ func main() {
 
 	log.Info().Msg("Initializing environment...")
 	env.Environment.Init()
+
+	log.Info().Msg("Initializing top5 list...")
+	api.InitTop5()
 
 	dbName = filepath.Join(env.Environment.DataPath, "db.db")
 
