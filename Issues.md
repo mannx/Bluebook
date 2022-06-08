@@ -1,8 +1,8 @@
 Issues to fix
 =============
 
-* No update message for WISR, Control sheet import
-* Top5 frontend not sending correct month/year values when viewing month data
+* Wastage output not converting
+	- Example: Roast beef still shows input value instead of gram/kilo conversion
 
 * Logs:
 	+ Notes
