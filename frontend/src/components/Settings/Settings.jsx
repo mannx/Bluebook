@@ -1,6 +1,7 @@
 import React from "react";
 import UrlGet from "../URLs/URLs.jsx";
 import CombinedDialog from "./CombinedDialog.jsx";
+import DeleteDialog from "./DeleteDialog.jsx";
 
 /*
  * This page is currently only used to adjust wastage settings
@@ -16,6 +17,7 @@ export default class Settings extends React.Component {
 			locations: [],
 			combined: [],			// which items are marked for combining
 			combinedDialog: false,	// display the combined confirmation dialog?
+			deleteDialog: false,
 		}
 	}
 
@@ -43,6 +45,7 @@ export default class Settings extends React.Component {
 		return (<>
 			{this.renderWastage()}
 			{this.state.combinedDialog ? <CombinedDialog items={this.state.combined}/> : null}
+			{this.state.deleteDialog ? <DeleteDialog items={this.state.combined}/> : null}
 		</>);
 	}
 
@@ -53,6 +56,7 @@ export default class Settings extends React.Component {
 			<div>
 				<button onClick={this.updateWastage}>Update</button>
 				<button onClick={this.combineWastageItems}>Combine</button>
+				<button onClick={this.deleteWasteItem}>Delete</button>
 
 				<div>
 					<h3>Items to combine</h3>
@@ -155,5 +159,9 @@ export default class Settings extends React.Component {
 	// first display popup to confirm and pick the item we want to use for all
 	combineWastageItems = () => {
 		this.setState({combinedDialog: true});
+	}
+
+	deleteWasteItems = () => {
+		this.setState({deleteDialog: true});
 	}
 }

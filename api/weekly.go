@@ -91,6 +91,7 @@ func getWeeklyData(month int, day int, year int, c echo.Context, db *gorm.DB) (e
 	weekly.FoodCostAmount = wi.FoodCostAmount
 	weekly.LabourCostAmount = wi.LabourCostAmount
 	weekly.PartySales = wi.PartySales
+	log.Debug().Msgf("[GetWeeklyData] [Party Sales: %v | %v", weekly.PartySales, wi.PartySales)
 
 	// retrieve the last years data if available
 	lastYear := weekEnding.AddDate(-1, 0, 0)

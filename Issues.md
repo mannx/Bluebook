@@ -3,6 +3,8 @@ Issues to fix
 
 * Wastage output not converting
 	- Example: Roast beef still shows input value instead of gram/kilo conversion
+* Implement wastage editing, ability to combine and remove duplicate entries
+	- Dialog boxes need implemented to confirm
 
 * Logs:
 	+ Notes
