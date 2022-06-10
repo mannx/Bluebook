@@ -1,7 +1,9 @@
 import React from "react";
 import UrlGet from "../URLs/URLs.jsx";
-import CombinedDialog from "./CombinedDialog.jsx";
+//import CombinedDialog from "./CombinedDialog.jsx";
 import DeleteDialog from "./DeleteDialog.jsx";
+
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 /*
  * This page is currently only used to adjust wastage settings
@@ -44,8 +46,7 @@ export default class Settings extends React.Component {
 		//return this.renderWastage();
 		return (<>
 			{this.renderWastage()}
-			{this.state.combinedDialog ? <CombinedDialog items={this.state.combined}/> : null}
-			{this.state.deleteDialog ? <DeleteDialog items={this.state.combined}/> : null}
+			{this.state.deleteDialog ? <DeleteDialog onClose={this.deleteConfirm} visible={true}/> : null}
 		</>);
 	}
 
