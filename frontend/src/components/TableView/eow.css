@@ -8,16 +8,19 @@ th.blank, td.blank
 td.Net
 {
 	background-color: yellow;
+	color: black;
 }
 
 td.NetSalesUp
 {
 	background-color: springgreen;
+	color: black;
 }
 
 td.NetSalesDown
 {
 	background-color: tomato;
+	color: black;
 }
 
 td.NetSalesSame

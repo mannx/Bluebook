@@ -1,8 +1,9 @@
 import React from "react";
 import UrlGet from "../URLs/URLs.jsx";
 //import CombinedDialog from "./CombinedDialog.jsx";
-import DeleteDialog from "./DeleteDialog.jsx";
-
+//import DeleteDialog from "./DeleteDialog.jsx";
+import Modal from "react-bootstrap/Modal";
+import Button from "react-bootstrap/Button";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 /*
@@ -46,7 +47,12 @@ export default class Settings extends React.Component {
 		//return this.renderWastage();
 		return (<>
 			{this.renderWastage()}
-			{this.state.deleteDialog ? <DeleteDialog onClose={this.deleteConfirm} visible={true}/> : null}
+			<Modal show={this.state.deleteDialog} onHide={this.hideDeleteDlg}>
+				<Modal.Body>Text Goes Here</Modal.Body>
+				<Modal.Footer>
+					<Button variant="primary" onClick={this.closeDeleteDlg}>Close</Button>
+				</Modal.Footer>
+			</Modal>
 		</>);
 	}
 

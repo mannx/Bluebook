@@ -40,40 +40,40 @@ class TableView extends React.Component {
 		}
 
 		return (
-			<table>
+			<table className="MyStyle">
 				<caption><h1>{this.state.data.MonthName} {this.state.year}</h1></caption>
 				<thead>
-					<tr>
-						<th></th>
-						<th>Day</th>
-						<th>Gross Sales</th>
-						<th>HST</th>
-						<th>Bot Dep</th>
-						<th>Net Sales</th>
+					<tr className="MyStyle">
+						<th className="MyStyle"></th>
+						<th className="MyStyle">Day</th>
+						<th className="MyStyle">Gross Sales</th>
+						<th className="MyStyle">HST</th>
+						<th className="MyStyle">Bot Dep</th>
+						<th className="MyStyle">Net Sales</th>
 						<th className="div"></th>
 
-							<th>Debit</th>
-							<th>Visa</th>
-							<th>MC</th>
-							<th>Amex</th>
-							<th>Credit Sales</th>
+						<th className="MyStyle">Debit</th>
+						<th className="MyStyle">Visa</th>
+						<th className="MyStyle">MC</th>
+						<th className="MyStyle">Amex</th>
+						<th className="MyStyle">Credit Sales</th>
+						<th className="div"></th>
+
+						<th className="MyStyle">GC Redeem</th>
+						<th className="MyStyle">GC Sold</th>
+						<th className="div"></th>
+
+						<th className="MyStyle">Hours</th>
+						<th className="MyStyle">Prod</th>
+						<th className="MyStyle">Factor</th>
+						<th className="MyStyle">Adj Sales</th>
+						<th className="MyStyle">Cust Count</th>
+						<th className="MyStyle">% 3rd Party</th>
+						<th className="MyStyle">$ 3rd Party</th>
 							<th className="div"></th>
 
-							<th>GC Redeem</th>
-							<th>GC Sold</th>
-							<th className="div"></th>
-
-							<th>Hours</th>
-							<th>Prod</th>
-							<th>Factor</th>
-							<th>Adj Sales</th>
-							<th>Cust Count</th>
-							<th>% 3rd Party</th>
-							<th>$ 3rd Party</th>
-							<th className="div"></th>
-
-							<th>Comments</th>
-							<th>Tags</th>
+							<th className="MyStyle">Comments</th>
+							<th className="MyStyle">Tags</th>
 					</tr>
 				</thead>
 				<tbody>
