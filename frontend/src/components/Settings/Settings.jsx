@@ -17,6 +17,7 @@ export default class Settings extends React.Component {
 			units: [],
 			locations: [],
 			combined: [],			// which items are marked for combining
+			combineCheck: [],
 			combinedDialog: false,	// display the combined confirmation dialog?
 			deleteDialog: false,
 		}
@@ -32,6 +33,9 @@ export default class Settings extends React.Component {
 			data: data.Data, 
 			units: data.Units,
 			locations: data.Locations,
+
+			// initialize all checkboxes as cleared, ID to map to array
+			combineCheck: Array(data.Data.length).fill(false),
 		});
 	}
 
@@ -62,24 +66,15 @@ export default class Settings extends React.Component {
 			console.log(" > " + obj.Name);
 			return 0;
 		});
+
+		this.clearSelection();
 	}
 
 	// Clear out the selected items after processing a dialog box
 	clearSelection = () => {
-		combined = [];
+		this.setState({combined: []});
 	}
 
-	/*
-	<div>
-		<h3>Items to combine</h3>
-		<ul>
-		{this.state.combined.map(function(obj) {
-			var name = this.state.data.find(n => n.ID === obj);
-			return <li>{name.Name}</li>;
-		}, this)}
-		</ul>
-	</div>
-	 * */
 	// render wastage table for display and editing
 	renderWastage = () => {
 		return (
@@ -99,7 +94,7 @@ export default class Settings extends React.Component {
 					<tbody>
 						{this.state.data.map(function (obj, i) {
 							return (<tr>
-								<td><input type="checkbox" id={obj.ID} name={obj.Name} onClick={() => {this.onCombinedChecked(obj.ID)}}/></td>
+								<td><input type="checkbox" id={obj.ID} name={obj.Name} onClick={() => {this.onCombinedChecked(obj.ID, i)}} checked={this.state.combineCheck[i]}/></td>
 								<td>{obj.Name}</td>
 								<td>{this.renderUnitOptions(obj)}</td>
 								<td>{this.renderLocationOptions(obj)}</td>
@@ -173,14 +168,20 @@ export default class Settings extends React.Component {
 		return <>ConversionData</>;
 	}
 
-	onCombinedChecked = (id) => {
+	onCombinedChecked = (id, idx) => {
 		//this.setState({combined: [...this.state.combined, id]});
 		var item = {
 			Id: id,
 			Name: this.state.data.find(n => n.ID === id).Name,
 		};
 
-		this.setState({combined: [...this.state.combined, item]});
+		var n = this.state.combineCheck;
+		n[idx] = !n[idx];
+
+		this.setState({
+			combined: [...this.state.combined, item],
+			combineCheck: n
+		});
 	}
 
 	// Called when 'Combine' button is pressed to combine selected items
@@ -191,5 +192,17 @@ export default class Settings extends React.Component {
 
 	deleteWasteItem = () => {
 		this.setState({deleteDialog: true});
+	}
+
+	clearSelection = () => {
+		var arr = this.state.combineCheck;
+		for(var i = 0; i < arr.length; i++) {
+			arr[i] = false;
+		}
+
+		this.setState({
+			combineCheck: arr,
+			combined: [],
+		});
 	}
 }
