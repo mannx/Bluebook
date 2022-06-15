@@ -1,37 +1,31 @@
 import React from "react";
-import Modal from "react-bootstrap/Modal";
-import Button from "react-bootstrap/Button";
-import 'bootstrap/dist/css/bootstrap.min.css';
+import "./dialog.css";
 
 export default class DeleteDialog extends React.Component {
-	constructor(props) {
-		super(props);
-
-		this.state = {
-			visible: this.props.visible,
-		}
-	}
-
-	setVisible = (val) => {this.setState({visible:val});}
-	show = () => {this.setVisible(true);}
-	hide = () => {this.setVisible(false);}
-
 	render = () => {
+		var visString = this.props.visible === true ? "block" : "none";
+
 		return (<>
-			<Modal show={this.state.visible} onHide={this.hide}>
-				<Modal.Body>Modal Body Text Here</Modal.Body>
-				<Modal.Footer>
-					<Button variant="primary" onClick={this.handleClose}>Close</Button>
-				</Modal.Footer>
-			</Modal>
+			<div className="Dialog" style={{display: visString}}>
+				<div className="DialogContents">
+					<p>Confirm Deletion of the following items: </p>
+					<ul>
+						{this.props.Items.map(function(obj) {
+							return <li>{obj.Name}</li>;
+						})}
+					</ul>
+					<button onClick={this.handleOk}>Confirm</button>
+					<button onClick={this.close}>Close</button>
+				</div>
+			</div>
 		</>);
 	}
 
 	close = () => {
+		this.props.onClose();
 	}
 
-	handleClose = () => {
-		this.setState({visible: false});
-		this.props.onClose();
+	handleOk = () => {
+		this.props.onConfirm();
 	}
 }

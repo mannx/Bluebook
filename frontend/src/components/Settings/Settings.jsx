@@ -1,10 +1,8 @@
 import React from "react";
 import UrlGet from "../URLs/URLs.jsx";
-//import CombinedDialog from "./CombinedDialog.jsx";
-//import DeleteDialog from "./DeleteDialog.jsx";
-import Modal from "react-bootstrap/Modal";
-import Button from "react-bootstrap/Button";
-import 'bootstrap/dist/css/bootstrap.min.css';
+import DeleteDialog from "./DeleteDialog.jsx";
+
+import "./dialog.css";
 
 /*
  * This page is currently only used to adjust wastage settings
@@ -44,18 +42,44 @@ export default class Settings extends React.Component {
 			return <h3>Loading...</h3>;
 		}
 
-		//return this.renderWastage();
 		return (<>
 			{this.renderWastage()}
-			<Modal show={this.state.deleteDialog} onHide={this.hideDeleteDlg}>
-				<Modal.Body>Text Goes Here</Modal.Body>
-				<Modal.Footer>
-					<Button variant="primary" onClick={this.closeDeleteDlg}>Close</Button>
-				</Modal.Footer>
-			</Modal>
+			<DeleteDialog 
+				visible={this.state.deleteDialog}
+				Items={this.state.combined}
+				onClose={this.deleteClose}
+				onConfirm={this.confirmDelete}
+			/>
 		</>);
 	}
 
+	deleteClose = () => {this.setState({deleteDialog: false});}
+	confirmDelete = () => {
+		this.setState({deleteDialog: false});
+
+		console.log("Deleting the following items:");
+		this.state.combined.map(function(obj) {
+			console.log(" > " + obj.Name);
+			return 0;
+		});
+	}
+
+	// Clear out the selected items after processing a dialog box
+	clearSelection = () => {
+		combined = [];
+	}
+
+	/*
+	<div>
+		<h3>Items to combine</h3>
+		<ul>
+		{this.state.combined.map(function(obj) {
+			var name = this.state.data.find(n => n.ID === obj);
+			return <li>{name.Name}</li>;
+		}, this)}
+		</ul>
+	</div>
+	 * */
 	// render wastage table for display and editing
 	renderWastage = () => {
 		return (
@@ -65,15 +89,6 @@ export default class Settings extends React.Component {
 				<button onClick={this.combineWastageItems}>Combine</button>
 				<button onClick={this.deleteWasteItem}>Delete</button>
 
-				<div>
-					<h3>Items to combine</h3>
-					<ul>
-					{this.state.combined.map(function(obj) {
-						var name = this.state.data.find(n => n.ID === obj);
-						return <li>{name.Name}</li>;
-					}, this)}
-					</ul>
-				</div>
 				<table><caption><h3>Wastage Entries</h3></caption>
 					<thead><tr>
 						<th></th>
@@ -159,7 +174,13 @@ export default class Settings extends React.Component {
 	}
 
 	onCombinedChecked = (id) => {
-		this.setState({combined: [...this.state.combined, id]});
+		//this.setState({combined: [...this.state.combined, id]});
+		var item = {
+			Id: id,
+			Name: this.state.data.find(n => n.ID === id).Name,
+		};
+
+		this.setState({combined: [...this.state.combined, item]});
 	}
 
 	// Called when 'Combine' button is pressed to combine selected items
@@ -168,7 +189,7 @@ export default class Settings extends React.Component {
 		this.setState({combinedDialog: true});
 	}
 
-	deleteWasteItems = () => {
+	deleteWasteItem = () => {
 		this.setState({deleteDialog: true});
 	}
 }

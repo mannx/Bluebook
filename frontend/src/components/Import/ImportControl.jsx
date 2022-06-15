@@ -57,7 +57,7 @@ export default class ImportControl extends React.Component {
 		return (
 			<div><h3>{this.props.title} Available for Import (page {this.props.page})</h3>
 				<button onClick={this.performUpdate}>Update</button>
-				<ul>
+				<ul className="Import">
 				{this.state.data.map(function(obj, i) {
 					return (<li>
 							<input type={"checkbox"} onChange={this.addImp} name={obj}/>
