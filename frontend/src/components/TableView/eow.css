@@ -9,6 +9,9 @@ td.Net
 {
 	background-color: yellow;
 	color: black;
+	border: 1px solid black;
+	border-collapse: colllapse;
+	text-align: center;
 }
 
 td.NetSalesUp
@@ -31,6 +34,9 @@ td.NetSalesSame
 td.CustomerCount, td.ThirdPartyPerc
 {
 	background-color: yellow;
+	border: 1px solid black;
+	border-collapse: colllapse;
+	text-align: center;
 }
 
 th.div, td.div

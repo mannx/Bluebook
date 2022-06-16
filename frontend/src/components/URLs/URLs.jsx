@@ -23,8 +23,9 @@ const urls = {
 	"WasteView": "/api/waste/view",
 	"WasteSettings": "/api/waste/settings",
 	"WasteUpdate":"/api/waste/update",	// update waste settings
-	"Weekly": "/api/weekly/view",
+	"DeleteWasteItem": "/api/waste/delete", 	// delete a wastage item
 
+	"Weekly": "/api/weekly/view",
 	"Export": "/api/export/weekly",		// Export Weekly
 
 	"Top5": "/api/top5/view",

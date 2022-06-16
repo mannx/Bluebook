@@ -176,3 +176,24 @@ func GetWasteViewHandler(c echo.Context, db *gorm.DB) error {
 
 	return c.JSON(http.StatusOK, &WasteView{WeekEnding: weekEnding, Data: final})
 }
+
+func DeleteWasteItemHandler(c echo.Context, db *gorm.DB) error {
+	var items []int
+
+	if err := c.Bind(&items); err != nil {
+		log.Error().Err(err).Msg("Unable to bind parameters for [DeleteWasteItemHandler]")
+		return err
+	}
+
+	/*for _, i := range items {
+		log.Debug().Msgf("Preparing to delete item id: %v", i)
+	}*/
+
+	// delete the items from the db
+	db.Delete(&models.WastageItem{}, items)
+
+	return c.JSON(http.StatusOK, models.ServerReturnMessage{
+		Message: "Items To Be Deleted NYI",
+		Error:   true,
+	})
+}

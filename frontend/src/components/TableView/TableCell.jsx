@@ -7,7 +7,7 @@ import "./eow.css";
 //
 //	This is used to draw a single row and fill in its data
 //	
-class TableCell extends React.Component {
+export default class TableCell extends React.Component {
 
 	commentURL = UrlGet("Comment");
 	tagURL = UrlGet("TagEditPost");
@@ -97,8 +97,8 @@ class TableCell extends React.Component {
 				<td className="MyStyle">{this.O(this.props.data.Factor)}</td>
 				<td className="MyStyle">{this.O(this.props.data.AdjustedSales)}</td>
 				<td className="MyStyle">{this.O(this.props.data.CustomerCount)}</td>
-				<td className="MyStyle">{this.P(this.props.data.ThirdPartyPercent)}</td>
 				<td className="MyStyle">{this.Dol(this.props.data.ThirdPartyDollar)}</td>
+				<td className="MyStyle">{this.P(this.props.data.ThirdPartyPercent)}</td>
 				<td className="div"></td>
 
 				<td className="MyStyle" onDoubleClick={this.editComment} >{this.commentField()}</td>
@@ -206,5 +206,3 @@ class TableCell extends React.Component {
 
 	tagChange = (e) => {this.setState({tag: e.target.value});}
 }
-
-export default TableCell;

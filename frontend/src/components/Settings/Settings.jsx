@@ -61,18 +61,30 @@ export default class Settings extends React.Component {
 	confirmDelete = () => {
 		this.setState({deleteDialog: false});
 
-		console.log("Deleting the following items:");
-		this.state.combined.map(function(obj) {
-			console.log(" > " + obj.Name);
-			return 0;
-		});
+		var items = Array(this.state.combined.length);
+		for(var i = 0; i < this.state.combined.length; i++) {
+			items[i] = this.state.combined[i].Id;
+		}
+
+		// POST it to the server
+		const options = {
+			method: 'POST',
+			headers: {'Content-Type':'application/json'},
+			body: JSON.stringify(items)
+		};
+
+		const url = UrlGet("DeleteWasteItem");
+
+		fetch(url, options)
+			.then(r => r.text())
+			.then(r => this.setState({msg: r}));
 
 		this.clearSelection();
-	}
-
-	// Clear out the selected items after processing a dialog box
-	clearSelection = () => {
-		this.setState({combined: []});
+		
+		// attempt to force a reload on all the items
+		// TODO: doesn't work as expected, only works aftera refresh
+		this.loadData();
+		this.forceUpdate();
 	}
 
 	// render wastage table for display and editing
@@ -83,6 +95,7 @@ export default class Settings extends React.Component {
 				<button onClick={this.updateWastage}>Update</button>
 				<button onClick={this.combineWastageItems}>Combine</button>
 				<button onClick={this.deleteWasteItem}>Delete</button>
+				<button onClick={this.clearSelection}>Clear Selection</button>
 
 				<table><caption><h3>Wastage Entries</h3></caption>
 					<thead><tr>
@@ -94,7 +107,7 @@ export default class Settings extends React.Component {
 					<tbody>
 						{this.state.data.map(function (obj, i) {
 							return (<tr>
-								<td><input type="checkbox" id={obj.ID} name={obj.Name} onClick={() => {this.onCombinedChecked(obj.ID, i)}} checked={this.state.combineCheck[i]}/></td>
+								<td><input type="checkbox" id={obj.ID} name={obj.Name} onChange={() => {this.onCombinedChecked(obj.ID, i)}} checked={this.state.combineCheck[i]}/></td>
 								<td>{obj.Name}</td>
 								<td>{this.renderUnitOptions(obj)}</td>
 								<td>{this.renderLocationOptions(obj)}</td>
@@ -145,6 +158,7 @@ export default class Settings extends React.Component {
 				console.log(obj.Name + ": " + obj.UnitMeasure);
 				updates.push(obj);
 			}
+			return null;	// removes a warning about no return value
 		});
 
 		const options = {
@@ -169,7 +183,6 @@ export default class Settings extends React.Component {
 	}
 
 	onCombinedChecked = (id, idx) => {
-		//this.setState({combined: [...this.state.combined, id]});
 		var item = {
 			Id: id,
 			Name: this.state.data.find(n => n.ID === id).Name,
