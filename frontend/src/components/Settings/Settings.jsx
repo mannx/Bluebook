@@ -1,6 +1,8 @@
 import React from "react";
 import UrlGet from "../URLs/URLs.jsx";
 import DeleteDialog from "./DeleteDialog.jsx";
+import CombinedDialog from "./CombinedDialog.jsx"
+import AddDialog from "./AddDialog.jsx"
 
 import "./dialog.css";
 
@@ -16,10 +18,14 @@ export default class Settings extends React.Component {
 			isLoading: true,
 			units: [],
 			locations: [],
+
 			combined: [],			// which items are marked for combining
 			combineCheck: [],
 			combinedDialog: false,	// display the combined confirmation dialog?
+
 			deleteDialog: false,
+
+			addDialog: false,
 		}
 	}
 
@@ -54,8 +60,22 @@ export default class Settings extends React.Component {
 				onClose={this.deleteClose}
 				onConfirm={this.confirmDelete}
 			/>
+			<CombinedDialog
+				visible={this.state.combinedDialog}
+				Items={this.state.combined}
+				onClose={this.combineDlgToggle}
+				onConfirm={this.confirmCombine}
+			/>
+			<AddDialog
+				visible={this.state.addDialog}
+				onClose={this.addDlgToggle}
+				onConfirm={this.confirmAddDialog}
+			/>
 		</>);
 	}
+
+	addDlgToggle = () => {this.setState({addDialog: !this.state.addDialog});}
+	confirmAddDialog = () => {this.addDlgToggle();}
 
 	deleteClose = () => {this.setState({deleteDialog: false});}
 	confirmDelete = () => {
@@ -87,13 +107,44 @@ export default class Settings extends React.Component {
 		this.forceUpdate();
 	}
 
+	combineDlgToggle = () => {this.setState({combinedDialog: !this.state.combinedDialog});}
+	confirmCombine = () => {
+		this.combineDlgToggle();
+
+		var items = Array(this.state.combined.length);
+		for(var i = 0; i < this.state.combined.length; i++) {
+			items[i] = this.state.combined[i].Id;
+		}
+
+		// POST it to the server
+		const options = {
+			method: 'POST',
+			headers: {'Content-Type':'application/json'},
+			body: JSON.stringify(items)
+		};
+
+		const url = UrlGet("CombineWasteItems");
+
+		fetch(url, options)
+			.then(r => r.text())
+			.then(r => this.setState({msg: r}));
+
+		this.clearSelection();
+		
+		// attempt to force a reload on all the items
+		// TODO: doesn't work as expected, only works aftera refresh
+		this.loadData();
+		this.forceUpdate();
+	}
+
 	// render wastage table for display and editing
 	renderWastage = () => {
 		return (
 			<>
 			<div>
+				<button onClick={this.addDlgToggle}>Add</button>
 				<button onClick={this.updateWastage}>Update</button>
-				<button onClick={this.combineWastageItems}>Combine</button>
+				<button onClick={this.combineDlgToggle}>Combine</button>
 				<button onClick={this.deleteWasteItem}>Delete</button>
 				<button onClick={this.clearSelection}>Clear Selection</button>
 
