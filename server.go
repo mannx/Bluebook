@@ -44,6 +44,7 @@ func initServer() *echo.Echo {
 	e.POST("/api/waste/update", func(c echo.Context) error { return api.UpdateWasteSettingHandler(c, DB) })
 	e.POST("/api/waste/delete", func(c echo.Context) error { return api.DeleteWasteItemHandler(c, DB) })
 	e.POST("/api/waste/new", func(c echo.Context) error { return api.AddNewWasteItemHandler(c, DB) })
+	e.POST("/api/waste/combine", func(c echo.Context) error { return api.CombineWasteHandler(c, DB) })
 
 	// Weekly reports
 	e.GET("/api/weekly/view", func(c echo.Context) error { return api.GetWeeklyViewHandler(c, DB) })

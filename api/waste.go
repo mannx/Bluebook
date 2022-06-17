@@ -159,7 +159,6 @@ func GetWasteViewHandler(c echo.Context, db *gorm.DB) error {
 		}
 
 		// process the weight conversion if required
-		log.Debug().Msgf("GetWasteViewHandler() => Converting %v to => %v", wi.Name, wi.UnitMeasure)
 		m := wi.Convert(n)
 		output.Data = append(output.Data, WasteViewItem{Name: wi.Name, Amount: m, Location: wi.Location})
 	}
@@ -228,6 +227,49 @@ func AddNewWasteItemHandler(c echo.Context, db *gorm.DB) error {
 
 	return c.JSON(http.StatusOK, models.ServerReturnMessage{
 		Message: "Item Added Sucessfully",
+		Error:   false,
+	})
+}
+
+func CombineWasteHandler(c echo.Context, db *gorm.DB) error {
+	type combineData struct {
+		Items  []uint // list of id's to combine to
+		Target uint   // target id to combine all ids together to
+	}
+
+	var data combineData
+	if err := c.Bind(&data); err != nil {
+		log.Error().Err(err).Msg("Unable to bind parameters [CombineWasteHandler]")
+		return err
+	}
+
+	// make sure the target item is not in the list of items to retrieve
+	items := make([]uint, 0)
+	for _, i := range data.Items {
+		if i != data.Target {
+			items = append(items, i)
+		}
+	}
+
+	for _, i := range items {
+		var wi []models.WastageEntry
+
+		res := db.Where("Item = ?", i).Find(&wi)
+		if res.Error != nil {
+			log.Error().Err(res.Error).Msg("Unable to retrieve wastage entries to combine")
+			return c.JSON(http.StatusOK, models.ServerReturnMessage{
+				Message: "Unable to retrieve entries to combine",
+				Error:   true,
+			})
+		}
+
+		for _, obj := range wi {
+			obj.Item = data.Target
+			db.Save(&obj)
+		}
+	}
+	return c.JSON(http.StatusOK, models.ServerReturnMessage{
+		Message: "Items Combined Successfully",
 		Error:   false,
 	})
 }

@@ -108,7 +108,9 @@ export default class Settings extends React.Component {
 	}
 
 	combineDlgToggle = () => {this.setState({combinedDialog: !this.state.combinedDialog});}
-	confirmCombine = () => {
+
+	// combine selected items to the target id provided from the dialog box
+	confirmCombine = (target) => {
 		this.combineDlgToggle();
 
 		var items = Array(this.state.combined.length);
@@ -116,14 +118,19 @@ export default class Settings extends React.Component {
 			items[i] = this.state.combined[i].Id;
 		}
 
+		const data = {
+			Items: items,
+			Target: target,
+		}
+
 		// POST it to the server
 		const options = {
 			method: 'POST',
 			headers: {'Content-Type':'application/json'},
-			body: JSON.stringify(items)
+			body: JSON.stringify(data)
 		};
 
-		const url = UrlGet("CombineWasteItems");
+		const url = UrlGet("CombineWasteItem");
 
 		fetch(url, options)
 			.then(r => r.text())
@@ -266,6 +273,7 @@ export default class Settings extends React.Component {
 		var item = {
 			Id: id,
 			Name: this.state.data.find(n => n.ID === id).Name,
+			Count: this.state.counts[idx],
 		};
 
 		var n = this.state.combineCheck;

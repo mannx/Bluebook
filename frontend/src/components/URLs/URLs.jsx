@@ -25,6 +25,7 @@ const urls = {
 	"WasteUpdate":"/api/waste/update",			// update waste settings
 	"DeleteWasteItem": "/api/waste/delete", 	// delete a wastage item
 	"AddNewWasteItem": "/api/waste/new",		// add a new waste item
+	"CombineWasteItem": "/api/waste/combine",	// combine wastage items
 
 	"Weekly": "/api/weekly/view",
 	"Export": "/api/export/weekly",				// Export Weekly
