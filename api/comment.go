@@ -41,9 +41,6 @@ func UpdateCommentHandler(c echo.Context, db *gorm.DB) error {
 		res := db.Where("Date = ?", cp.Date).Find(&dd)
 		if res.Error == nil && res.RowsAffected != 0 {
 			// save the comment to this day
-			log.Debug().Msgf("  => Day found, date [%v] id [%v]", dd.Date, dd.ID)
-			log.Debug().Msgf("  => Rows Affected: %v", res.RowsAffected)
-
 			dd.Comment = cp.Comment
 			db.Save(&dd)
 

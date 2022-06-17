@@ -15,7 +15,7 @@ import (
 func GetWasteSettingHandler(c echo.Context, db *gorm.DB) error {
 	// return all the wastage items
 	var data []models.WastageItem
-	res := db.Find(&data)
+	res := db.Order("Name").Find(&data)
 	if res.Error != nil {
 		log.Error().Err(res.Error).Msg("Unable to retrieve wastage items")
 		return res.Error
@@ -25,6 +25,7 @@ func GetWasteSettingHandler(c echo.Context, db *gorm.DB) error {
 		Data      []models.WastageItem // list of items
 		Locations []string             // list of all location strings
 		Units     []string             // list of all unit types as strings
+		Counts    []int64              // count of entries linked by index to this.Data
 	}
 
 	wi := models.WastageItem{}
@@ -32,11 +33,18 @@ func GetWasteSettingHandler(c echo.Context, db *gorm.DB) error {
 		Locations: wi.Locations(),
 		Units:     wi.Units(),
 		Data:      make([]models.WastageItem, 0),
+		Counts:    make([]int64, 0),
 	}
 
 	for _, n := range data {
 		n.GenString()
 		ws.Data = append(ws.Data, n)
+
+		// retrieve count of all wastage entries for this item
+		var data []models.WastageEntry
+		res := db.Where("Item = ?", n.ID).Find(&data)
+
+		ws.Counts = append(ws.Counts, res.RowsAffected)
 	}
 
 	return c.JSON(http.StatusOK, &ws)
@@ -185,15 +193,41 @@ func DeleteWasteItemHandler(c echo.Context, db *gorm.DB) error {
 		return err
 	}
 
-	/*for _, i := range items {
-		log.Debug().Msgf("Preparing to delete item id: %v", i)
-	}*/
-
 	// delete the items from the db
 	db.Delete(&models.WastageItem{}, items)
 
 	return c.JSON(http.StatusOK, models.ServerReturnMessage{
 		Message: "Items To Be Deleted NYI",
 		Error:   true,
+	})
+}
+
+func AddNewWasteItemHandler(c echo.Context, db *gorm.DB) error {
+	type itemInfo struct {
+		Name     string `json:"name"`
+		Unit     int    `json:"unit"`
+		Location int    `json:"location"`
+	}
+
+	var info itemInfo
+	if err := c.Bind(&info); err != nil {
+		log.Error().Err(err).Msg("Unable to bind paramters. [AddNewWasteItemHandler]")
+		return c.JSON(http.StatusOK, models.ServerReturnMessage{
+			Message: "Unable to bind parameters",
+			Error:   true,
+		})
+	}
+
+	wi := models.WastageItem{
+		Name:        info.Name,
+		UnitMeasure: info.Unit,
+		Location:    info.Location,
+	}
+
+	db.Save(&wi)
+
+	return c.JSON(http.StatusOK, models.ServerReturnMessage{
+		Message: "Item Added Sucessfully",
+		Error:   false,
 	})
 }

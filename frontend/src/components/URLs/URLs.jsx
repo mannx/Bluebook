@@ -16,17 +16,18 @@ const urls = {
 	"Comment": "/api/update/comment",
 
 	"Tags": "/api/tags/view",
-	"TagData": "/api/tags/data",		// get data about a single tag
-	"TagEditPost": "/api/tags/update",	// update the tags for a given day
-	"TagEdit": "/api/tags/edit",		// edit a tag name
+	"TagData": "/api/tags/data",				// get data about a single tag
+	"TagEditPost": "/api/tags/update",			// update the tags for a given day
+	"TagEdit": "/api/tags/edit",				// edit a tag name
 
 	"WasteView": "/api/waste/view",
 	"WasteSettings": "/api/waste/settings",
-	"WasteUpdate":"/api/waste/update",	// update waste settings
+	"WasteUpdate":"/api/waste/update",			// update waste settings
 	"DeleteWasteItem": "/api/waste/delete", 	// delete a wastage item
+	"AddNewWasteItem": "/api/waste/new",		// add a new waste item
 
 	"Weekly": "/api/weekly/view",
-	"Export": "/api/export/weekly",		// Export Weekly
+	"Export": "/api/export/weekly",				// Export Weekly
 
 	"Top5": "/api/top5/view",
 }

@@ -4,8 +4,7 @@ import DeleteDialog from "./DeleteDialog.jsx";
 import CombinedDialog from "./CombinedDialog.jsx"
 import AddDialog from "./AddDialog.jsx"
 
-import "./dialog.css";
-
+import "../TableView/table.css";
 /*
  * This page is currently only used to adjust wastage settings
  * */
@@ -15,16 +14,16 @@ export default class Settings extends React.Component {
 
 		this.state = {
 			data: null,
+			counts: null,
 			isLoading: true,
 			units: [],
 			locations: [],
 
 			combined: [],			// which items are marked for combining
 			combineCheck: [],
+
 			combinedDialog: false,	// display the combined confirmation dialog?
-
 			deleteDialog: false,
-
 			addDialog: false,
 		}
 	}
@@ -37,6 +36,7 @@ export default class Settings extends React.Component {
 		this.setState({
 			isLoading:false,
 			data: data.Data, 
+			counts: data.Counts,
 			units: data.Units,
 			locations: data.Locations,
 
@@ -70,12 +70,12 @@ export default class Settings extends React.Component {
 				visible={this.state.addDialog}
 				onClose={this.addDlgToggle}
 				onConfirm={this.confirmAddDialog}
+				units={this.state.units}
+				locations={this.state.locations}
 			/>
 		</>);
 	}
 
-	addDlgToggle = () => {this.setState({addDialog: !this.state.addDialog});}
-	confirmAddDialog = () => {this.addDlgToggle();}
 
 	deleteClose = () => {this.setState({deleteDialog: false});}
 	confirmDelete = () => {
@@ -137,8 +137,34 @@ export default class Settings extends React.Component {
 		this.forceUpdate();
 	}
 
+	addDlgToggle = () => {this.setState({addDialog: !this.state.addDialog});}
+
+	confirmAddDialog = (data) => {
+		this.addDlgToggle();
+		
+		// POST it to the server
+		const options = {
+			method: 'POST',
+			headers: {'Content-Type':'application/json'},
+			body: JSON.stringify(data)
+		};
+
+		const url = UrlGet("AddNewWasteItem");
+
+		fetch(url, options)
+			.then(r => r.text())
+			.then(r => this.setState({msg: r}));
+
+		// attempt to force a reload on all the items
+		// TODO: doesn't work as expected, only works aftera refresh
+		this.loadData();
+		this.forceUpdate();
+	}
+
 	// render wastage table for display and editing
 	renderWastage = () => {
+		// TODO:
+		//	Adjust error/sucess message
 		return (
 			<>
 			<div>
@@ -148,9 +174,11 @@ export default class Settings extends React.Component {
 				<button onClick={this.deleteWasteItem}>Delete</button>
 				<button onClick={this.clearSelection}>Clear Selection</button>
 
+				<div>{this.state.msg}</div>
 				<table><caption><h3>Wastage Entries</h3></caption>
 					<thead><tr>
 						<th></th>
+						<th>Count</th>
 						<th>Name</th>
 						<th>Unit</th>
 						<th>Location</th>
@@ -159,6 +187,7 @@ export default class Settings extends React.Component {
 						{this.state.data.map(function (obj, i) {
 							return (<tr>
 								<td><input type="checkbox" id={obj.ID} name={obj.Name} onChange={() => {this.onCombinedChecked(obj.ID, i)}} checked={this.state.combineCheck[i]}/></td>
+								<td>{this.state.counts[i]}</td>
 								<td>{obj.Name}</td>
 								<td>{this.renderUnitOptions(obj)}</td>
 								<td>{this.renderLocationOptions(obj)}</td>

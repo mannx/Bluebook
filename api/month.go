@@ -93,7 +93,6 @@ func GetMonthViewHandler(c echo.Context, db *gorm.DB) error {
 	//	and only save it to the db if required (a comment is added before any import data)
 	//
 
-	//mvd := make([]dayViewData, 0)
 	mvd := make([]dayViewData, endDay) // get a full month allocated
 
 	if len(data) == 0 {

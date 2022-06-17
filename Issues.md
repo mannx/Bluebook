@@ -8,6 +8,8 @@ Issues to fix
 		+ calls both loadData() and forceUpdate() but wont update
 
 * Logs:
+	+ Add ability to set log level either via build option or runtime flag instead of hard code
+		- ie. Change from DEBUG to INFO
 	+ Notes
 		- Echo logger outputs to stdout
 		- zerolog outputs to stderr

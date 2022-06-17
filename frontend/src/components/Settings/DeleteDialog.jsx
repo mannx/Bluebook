@@ -1,31 +1,27 @@
 import React from "react";
-import "./dialog.css";
+import DialogBox from "../Dialog/DialogBox.jsx";
+import "../Dialog/dialog.css";
 
 export default class DeleteDialog extends React.Component {
 	render = () => {
-		var visString = this.props.visible === true ? "block" : "none";
+		return (
+			<DialogBox
+				visible={this.props.visible}
+				onClose={this.props.onClose}
+				onConfirm={this.props.onConfirm}
+				contents={this.contents}
+			/>
+		);
+	}
 
+	contents = () => {
 		return (<>
-			<div className="Dialog" style={{display: visString}}>
-				<div className="DialogContents">
-					<p>Confirm Deletion of the following items: </p>
-					<ul>
-						{this.props.Items.map(function(obj) {
-							return <li>{obj.Name}</li>;
-						})}
-					</ul>
-					<button onClick={this.handleOk}>Confirm</button>
-					<button onClick={this.close}>Close</button>
-				</div>
-			</div>
+			<p>Confirm Deletion of the following items: </p>
+			<ul>
+				{this.props.Items.map(function(obj) {
+					return <li>{obj.Name}</li>;
+				})}
+			</ul>
 		</>);
-	}
-
-	close = () => {
-		this.props.onClose();
-	}
-
-	handleOk = () => {
-		this.props.onConfirm();
 	}
 }

@@ -169,11 +169,11 @@ export default class TableCell extends React.Component {
 	}
 
 	editComment = () => {
-			this.setState({editComment: !this.state.editComment});
+		this.setState({editComment: !this.state.editComment});
 	}
 
 	commentChange = (e) =>  {
-			this.setState({comment: e.target.value});
+		this.setState({comment: e.target.value});
 	}
 
 	tagField = () => {
