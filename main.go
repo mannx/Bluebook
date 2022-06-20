@@ -36,7 +36,6 @@ func main() {
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 	zerolog.SetGlobalLevel(zerolog.DebugLevel)
 
-	//log.Info().Msgf("Bluebook Helper v%v.\n\n", Version)
 	log.Info().Msgf("Bluebook Helper")
 	log.Info().Msgf("  => Version: %v", BuildVersion)
 	log.Info().Msgf("  => Build Time: %v", BuildTime)

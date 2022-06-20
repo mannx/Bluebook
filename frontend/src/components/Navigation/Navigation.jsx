@@ -7,6 +7,7 @@ import AUV from "../AUV/AUV.jsx";
 import ViewTags from "../Tags/ViewTags.jsx";
 import Top5 from "../Top5/Top5.jsx";
 import Settings from "../Settings/Settings.jsx";
+import WasteInput from "../Wastage/WasteInput.jsx";
 import "./header.css";
 
 //
@@ -28,6 +29,7 @@ const PageAUV = 5;
 const PageTags = 6;
 const PageTop5 = 7;
 const PageSettings = 10;
+const PageWasteInput = 11;
 
 function Navigate(props) {
 	switch(props.page) {
@@ -47,6 +49,8 @@ function Navigate(props) {
 			return <Top5 />;
 		case PageSettings:
 			return <Settings/>;
+		case PageWasteInput:
+			return <WasteInput/>;
 		default:
 			return <h2>Invalid page number {props.page}</h2>;
 	}
@@ -81,6 +85,7 @@ export default class Navigation extends React.Component {
 			nav = <></>;
 		}
 
+		//<li className={"navControl"}><NavButton name={"Settings"} func={this.Settings} /></li>
 		return (
 			<>
 			<div><ul className={"navControl"}>
@@ -92,7 +97,8 @@ export default class Navigation extends React.Component {
 				<li className={"navControl"}><NavButton name={"Wastage"} func={this.NavigateWastage} /></li>
 				<li className={"navControl"}><NavButton name={"Top 5"} func={this.NavigateTop5} /></li>
 				<li className={"navControl"}><NavButton name={"Import"} func={this.Imports} /></li>
-				<li className={"navControl"}><NavButton name={"Settings"} func={this.Settings} /></li>
+				<li className={"navControl"}><NavButton name={"Waste Settings"} func={this.Settings} /></li>
+				<li className={"navControl"}><NavButton name={"Waste Input"} func={this.WasteInput} /></li>
 			</ul></div>
 			<Navigate month={this.state.month} year={this.state.year} page={this.state.page} navTag={this.NavigateTags} />
 			</>
@@ -142,4 +148,5 @@ export default class Navigation extends React.Component {
 	NavigateTags = () => { this.setState({page: PageTags});}
 	NavigateTop5 = () => { this.setState({page: PageTop5});}
 	Settings = () => { this.setState({page: PageSettings});}
+	WasteInput = () => {this.setState({page: PageWasteInput});}
 }
