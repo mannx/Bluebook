@@ -105,9 +105,10 @@ func GetWasteViewHandler(c echo.Context, db *gorm.DB) error {
 
 	// WasteViewItem is  a single item and its total waste amount
 	type WasteViewItem struct {
-		Name     string  `json:"Name"`
-		Amount   float64 `json:"Amount"`
-		Location int     `json:"Location"`
+		Name           string  `json:"Name"`
+		Amount         float64 `json:"Amount"`
+		Location       int     `json:"Location"`
+		LocationString string  `json:"LocationString"`
 	}
 
 	// WasteView for returning to the client
@@ -160,7 +161,10 @@ func GetWasteViewHandler(c echo.Context, db *gorm.DB) error {
 
 		// process the weight conversion if required
 		m := wi.Convert(n)
-		output.Data = append(output.Data, WasteViewItem{Name: wi.Name, Amount: m, Location: wi.Location})
+		//output.Data = append(output.Data, WasteViewItem{Name: wi.Name, Amount: m, Location: wi.Location})
+		wi.GenString()
+		output.Data = append(output.Data, WasteViewItem{Name: wi.Name, Amount: m, Location: wi.Location,
+			LocationString: wi.LocationString})
 	}
 
 	// sort output by location insert an empty entry between location switches

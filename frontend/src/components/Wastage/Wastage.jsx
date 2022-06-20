@@ -5,7 +5,7 @@ import UrlGet from "../URLs/URLs.jsx";
 
 import "react-datepicker/dist/react-datepicker.css";
 
-class Wastage extends React.Component {
+export default class Wastage extends React.Component {
 	constructor(props) {
 		super(props);
 
@@ -83,16 +83,16 @@ class Wastage extends React.Component {
 				<tbody>
 				{this.state.data.Data.map(function (obj, i) {
 					if(obj.Name !== ""){
-					return (<tr>
-							<td>{obj.Name}</td>
-							<td>{this.NF(obj.Amount)}</td>
-							<td>{this.NF(obj.Location)}</td>
-							</tr>
-					);
+						return (<tr>
+								<td>{obj.Name}</td>
+								<td>{this.NF(obj.Amount)}</td>
+								<td>{obj.LocationString}</td>
+								</tr>
+						);
 					}else{
 						return (<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>);
 					}
-			}, this)}
+				}, this)}
 				</tbody>
 			</table>
 			</>);
@@ -111,6 +111,3 @@ class Wastage extends React.Component {
 	}
 
 }
-
-
-export default Wastage;
