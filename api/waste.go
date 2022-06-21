@@ -277,3 +277,22 @@ func CombineWasteHandler(c echo.Context, db *gorm.DB) error {
 		Error:   false,
 	})
 }
+
+func GetWasteNamesHandler(c echo.Context, db *gorm.DB) error {
+	var items []models.WastageItem
+	res := db.Find(&items)
+	if res.Error != nil {
+		log.Error().Err(res.Error).Msg("Unable to retrieve wastage items for [GetWasteNamesHandler]")
+		return c.JSON(http.StatusOK, models.ServerReturnMessage{
+			Message: "Unable to retrieve names",
+			Error:   true,
+		})
+	}
+
+	names := make([]string, 0)
+	for _, i := range items {
+		names = append(names, i.Name)
+	}
+
+	return c.JSON(http.StatusOK, names)
+}

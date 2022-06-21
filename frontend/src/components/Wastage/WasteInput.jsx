@@ -1,4 +1,5 @@
 import React from "react";
+import UrlGet from "../URLs/URLs.jsx";
 
 export default class WasteInput extends React.Component {
 	constructor(props) {
@@ -7,21 +8,23 @@ export default class WasteInput extends React.Component {
 		this.state = {
 			items: [{Item: "item here", Quantity: 123}],
 
-			names: [
-				'cookies',
-				'bread',
-			],
+			names: [],
 		}
 	}
 
+	loadData = async () => {
+		const url = UrlGet("WasteNames");
+		const resp = await fetch(url);
+		const data = await resp.json();
+
+		this.setState({names: data});
+	}
+
+	componentDidMount = () => {
+		this.loadData();
+	}
+
 	render = () => {
-		// see 
-		// 	https://www.w3schools.com/howto/howto_js_autocomplete.asp
-		// for examples of autocomplete
-		//
-		// Ideally want to offer a text box to allow manual entry but provide suggestions
-		// for waste items that have already been set up
-		//
 		// Link tab/enter to move between fields and create new entries
 		return (
 			<div>
@@ -37,7 +40,13 @@ export default class WasteInput extends React.Component {
 					<tbody>
 					{this.state.items.map(function(obj) {
 						return (<tr>
-							<td><input type="text"/>
+							<td>
+								<input list="types" name={obj.Name} />
+								<datalist id="types">
+									{this.state.names.map(function(obj){
+										return <option value={obj}/>;
+									})}
+								</datalist>
 							</td>
 							<td><input type="text" defaultValue={obj.Quantity}/></td>
 							<td><button onClick={this.NewItem}>Add</button></td>
