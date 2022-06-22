@@ -77,7 +77,7 @@ type WastageEntryHolding struct {
 	gorm.Model
 
 	Item   uint           `gorm:"column:Item"`
-	Date   datatypes.Data `gorm:"column:Date"`
+	Date   datatypes.Date `gorm:"column:Date"`
 	Amount float64        `gorm:"column:Amount"`
 }
 

@@ -298,7 +298,7 @@ func GetWasteNamesHandler(c echo.Context, db *gorm.DB) error {
 }
 
 func GetWasteHoldingHandler(c echo.Context, db *gorm.DB) error {
-	var items []models.WasteEntryHolding
+	var items []models.WastageEntryHolding
 
 	res := db.Find(&items)
 	if res.Error != nil {
