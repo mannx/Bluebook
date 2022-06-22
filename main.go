@@ -153,6 +153,7 @@ func migrateDB() {
 	DB.AutoMigrate(&models.Comments{})
 	DB.AutoMigrate(&models.WastageItem{})
 	DB.AutoMigrate(&models.WastageEntry{})
+	DB.AutoMigrate(&models.WastageEntryHolding{})
 	DB.AutoMigrate(&models.AUVEntry{})
 
 	DB.AutoMigrate(&models.TagList{})

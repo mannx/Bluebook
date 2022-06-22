@@ -58,6 +58,37 @@ type WastageItem struct {
 	LocationString string `gorm:"-"` // string version of the location
 }
 
+//
+//	Contains 1 item that has been wasted
+//
+type WastageEntry struct {
+	gorm.Model
+
+	Item   uint           `gorm:"column:Item"` // item ID for an entry in the WastageItem table
+	Date   datatypes.Date `gorm:"column:Date"`
+	Amount float64        `gorm:"column:Amount"`
+}
+
+//
+//	Contains a WastageEntry entry while editing.  Once all entries have been added,
+//	will get moved into WastageEntry table and these entries cleared out.
+//	This lets us start entering data, but dont have to submit until ready to the main tables
+type WastageEntryHolding struct {
+	gorm.Model
+
+	Item   uint           `gorm:"column:Item"`
+	Date   datatypes.Data `gorm:"column:Date"`
+	Amount float64        `gorm:"column:Amount"`
+}
+
+//
+//	MEMBER FUNCTIONS
+//
+
+//
+// WastageItem
+//
+
 // GenString generates the strings for the string version of unit, location, etc
 func (wi *WastageItem) GenString() {
 	(*wi).UnitString = unitStringTable[wi.UnitMeasure]
@@ -96,17 +127,6 @@ func (wi *WastageItem) Units() []string {
 	}
 
 	return d
-}
-
-//
-//	Contains 1 item that has been wasted
-//
-type WastageEntry struct {
-	gorm.Model
-
-	Item   uint           `gorm:"column:Item"` // item ID for an entry in the WastageItem table
-	Date   datatypes.Date `gorm:"column:Date"`
-	Amount float64        `gorm:"column:Amount"`
 }
 
 // Convert the weight to custom weight type or conversion factor

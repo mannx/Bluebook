@@ -296,3 +296,18 @@ func GetWasteNamesHandler(c echo.Context, db *gorm.DB) error {
 
 	return c.JSON(http.StatusOK, names)
 }
+
+func GetWasteHoldingHandler(c echo.Context, db *gorm.DB) error {
+	var items []models.WasteEntryHolding
+
+	res := db.Find(&items)
+	if res.Error != nil {
+		log.Error().Err(res.Error).Msg("Unable to retrieve wastage items for [GetWasteHoldingHandler]")
+		return c.JSON(http.StatusOK, models.ServerReturnMessage{
+			Message: "Unable to retrieve names",
+			Error:   true,
+		})
+	}
+
+	return c.JSON(http.StatusOK, items)
+}
