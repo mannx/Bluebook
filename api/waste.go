@@ -7,6 +7,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/rs/zerolog/log"
+	"gorm.io/datatypes"
 	"gorm.io/gorm"
 
 	models "github.com/mannx/Bluebook/models"
@@ -85,10 +86,7 @@ func UpdateWasteSettingHandler(c echo.Context, db *gorm.DB) error {
 		db.Save(&obj)
 	}
 
-	return c.JSON(http.StatusOK, models.ServerReturnMessage{
-		Message: "Successfully updated",
-		Error:   false,
-	})
+	return ReturnServerMessage(c, "Successfully updated", false)
 }
 
 // return a combined waste report for week ending
@@ -161,7 +159,6 @@ func GetWasteViewHandler(c echo.Context, db *gorm.DB) error {
 
 		// process the weight conversion if required
 		m := wi.Convert(n)
-		//output.Data = append(output.Data, WasteViewItem{Name: wi.Name, Amount: m, Location: wi.Location})
 		wi.GenString()
 		output.Data = append(output.Data, WasteViewItem{Name: wi.Name, Amount: m, Location: wi.Location,
 			LocationString: wi.LocationString})
@@ -215,10 +212,7 @@ func AddNewWasteItemHandler(c echo.Context, db *gorm.DB) error {
 	var info itemInfo
 	if err := c.Bind(&info); err != nil {
 		log.Error().Err(err).Msg("Unable to bind paramters. [AddNewWasteItemHandler]")
-		return c.JSON(http.StatusOK, models.ServerReturnMessage{
-			Message: "Unable to bind parameters",
-			Error:   true,
-		})
+		return ReturnServerMessage(c, "Unable to bind paramters", true)
 	}
 
 	wi := models.WastageItem{
@@ -229,10 +223,7 @@ func AddNewWasteItemHandler(c echo.Context, db *gorm.DB) error {
 
 	db.Save(&wi)
 
-	return c.JSON(http.StatusOK, models.ServerReturnMessage{
-		Message: "Item Added Sucessfully",
-		Error:   false,
-	})
+	return ReturnServerMessage(c, "Item Addedd Successfully", false)
 }
 
 func CombineWasteHandler(c echo.Context, db *gorm.DB) error {
@@ -261,10 +252,11 @@ func CombineWasteHandler(c echo.Context, db *gorm.DB) error {
 		res := db.Where("Item = ?", i).Find(&wi)
 		if res.Error != nil {
 			log.Error().Err(res.Error).Msg("Unable to retrieve wastage entries to combine")
-			return c.JSON(http.StatusOK, models.ServerReturnMessage{
+			/*return c.JSON(http.StatusOK, models.ServerReturnMessage{
 				Message: "Unable to retrieve entries to combine",
 				Error:   true,
-			})
+			})*/
+			return ReturnServerMessage(c, "Unable to retrieve entries to combine", true)
 		}
 
 		for _, obj := range wi {
@@ -272,10 +264,8 @@ func CombineWasteHandler(c echo.Context, db *gorm.DB) error {
 			db.Save(&obj)
 		}
 	}
-	return c.JSON(http.StatusOK, models.ServerReturnMessage{
-		Message: "Items Combined Successfully",
-		Error:   false,
-	})
+
+	return ReturnServerMessage(c, "Items Combined Successfully", false)
 }
 
 func GetWasteNamesHandler(c echo.Context, db *gorm.DB) error {
@@ -303,11 +293,40 @@ func GetWasteHoldingHandler(c echo.Context, db *gorm.DB) error {
 	res := db.Find(&items)
 	if res.Error != nil {
 		log.Error().Err(res.Error).Msg("Unable to retrieve wastage items for [GetWasteHoldingHandler]")
-		return c.JSON(http.StatusOK, models.ServerReturnMessage{
-			Message: "Unable to retrieve names",
-			Error:   true,
-		})
+		return ReturnServerMessage(c, "Unable to retrieve names", true)
 	}
 
 	return c.JSON(http.StatusOK, items)
+}
+
+func AddWasteHoldingHandler(c echo.Context, db *gorm.DB) error {
+	type addWasteHolding struct {
+		Item   string
+		Amount float64
+		Date   datatypes.Date
+	}
+
+	var data addWasteHolding
+	if err := c.Bind(&data); err != nil {
+		log.Error().Err(err).Msg("Unable to bind parameters [AddWasteHoldingHandler]")
+		return ReturnServerMessage(c, "Unable to bind paramters", true)
+	}
+
+	// get the item we are adding to the hold
+	// if we dont have it, add it to the db and returns its id
+	item := getWastageIdByName(data.Item)
+	entry := models.WastageEntryHolding{
+		Item:   item,
+		Date:   data.Date,
+		Amount: data.Amount,
+	}
+
+	log.Debug().Msgf("Saving wastage entry: %v (%v) [Amount: %v]", data.Item, item, data.Amount)
+	db.Save(&entry)
+
+	return ReturnServerMessage(c, "Holding entry added sucessfully", false)
+}
+
+func getWastageIdByName(name string) uint {
+	return 0
 }
