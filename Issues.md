@@ -1,10 +1,6 @@
 Issues to fix
 =============
 
-* Add tag to day with only comment, creates a new day data entry
-	- Shouldn't occur, should be able to add/remove tags without creating an new entry if an entry
-	  containing just a comment is found
-
 * Wastage output not converting
 	- Example: Roast beef still shows input value instead of gram/kilo conversion
 * Implement wastage editing, ability to combine and remove duplicate entries

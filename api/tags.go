@@ -2,6 +2,7 @@ package api
 
 import (
 	"net/http"
+	"sort"
 	"strings"
 	"time"
 
@@ -74,6 +75,13 @@ func TagDataViewHandler(c echo.Context, db *gorm.DB) error {
 		data = append(data, tl)
 	}
 
+	// sort data by Day.Date
+	sort.Slice(data, func(i, j int) bool {
+		d1 := time.Time(data[i].Day.Date)
+		d2 := time.Time(data[j].Day.Date)
+		return d1.Before(d2)
+	})
+
 	return c.JSON(http.StatusOK, &data)
 
 }
@@ -115,12 +123,25 @@ func TagUpdateViewHandler(c echo.Context, db *gorm.DB) error {
 }
 
 // generate the empty day, save it to the database and return its id
+//	check to see if a day already exists and return its id instead of creating a new entry
+//	if only a comment is present, no linked id will be sent and we end up here
 func genEmptyDay(db *gorm.DB, date time.Time) (uint, error) {
+	var data models.DayData
+	res := db.Find(&data, "Date = ?", date)
+	if res.Error != nil {
+		return 0, res.Error
+	}
+
+	if res.RowsAffected != 0 {
+		// found an entry, return its id
+		return data.ID, nil
+	}
+
 	dd := models.DayData{
 		Date: datatypes.Date(date),
 	}
 
-	res := db.Create(&dd)
+	res = db.Create(&dd)
 	if res.Error != nil {
 		return 0, res.Error
 	}

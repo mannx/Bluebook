@@ -330,3 +330,8 @@ func AddWasteHoldingHandler(c echo.Context, db *gorm.DB) error {
 func getWastageIdByName(name string) uint {
 	return 0
 }
+
+// remove all wastage items with no associated entries
+func RemoveUnusedWasteItems(c echo.Context, db *gorm.DB) error {
+	return ReturnServerMessage(c, "Removed unused waste items", false)
+}

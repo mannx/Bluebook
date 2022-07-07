@@ -180,6 +180,7 @@ export default class Settings extends React.Component {
 				<button onClick={this.combineDlgToggle}>Combine</button>
 				<button onClick={this.deleteWasteItem}>Delete</button>
 				<button onClick={this.clearSelection}>Clear Selection</button>
+				<button onClick={this.removeUnused}>Remove Unused Items</button>
 
 				<div>{this.state.msg}</div>
 				<table><caption><h3>Wastage Entries</h3></caption>
@@ -305,5 +306,12 @@ export default class Settings extends React.Component {
 			combineCheck: arr,
 			combined: [],
 		});
+	}
+
+	removeUnused = await () => {
+		const url = UrlGet("WasteUnusedRemove");
+		
+		// currentl dont care about return data
+		await fetch(url);
 	}
 }
