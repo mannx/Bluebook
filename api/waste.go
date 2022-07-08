@@ -333,5 +333,38 @@ func getWastageIdByName(name string) uint {
 
 // remove all wastage items with no associated entries
 func RemoveUnusedWasteItems(c echo.Context, db *gorm.DB) error {
+	// 1) retrieve all items
+	// 2) for each item, retrieve all entries for it
+	// 3) if 0 found, add item id to remove list
+	var items []models.WastageItem
+
+	res := db.Find(&items)
+	if res.Error != nil {
+		log.Error().Err(res.Error).Msg("Unable to retrieve wastage items")
+		return ReturnServerMessage(c, "Unable to retrieve wastage items", true)
+	}
+
+	remove := make([]uint, 0)
+
+	for _, i := range items {
+		// 2) retrieve all the entries and check the total count
+		var entr []models.WastageEntry
+
+		res = db.Find(&entr, "Item = ?", i.ID)
+		if res.Error != nil {
+			log.Error().Err(res.Error).Msgf("Unable to retrieve wastage entries for item: %v [%v]", i.ID, i.Name)
+			continue
+		}
+
+		if res.RowsAffected == 0 {
+			// add to remove list
+			log.Debug().Msgf("Removing item [%v] from wastage", i.Name)
+			remove = append(remove, i.ID)
+		}
+	}
+
+	// remove all the empty entries
+	db.Delete(&models.WastageItem{}, remove)
+
 	return ReturnServerMessage(c, "Removed unused waste items", false)
 }

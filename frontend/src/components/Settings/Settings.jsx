@@ -308,7 +308,7 @@ export default class Settings extends React.Component {
 		});
 	}
 
-	removeUnused = await () => {
+	removeUnused = async () => {
 		const url = UrlGet("WasteUnusedRemove");
 		
 		// currentl dont care about return data
