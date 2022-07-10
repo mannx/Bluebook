@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"path/filepath"
+	"sort"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -113,6 +114,9 @@ func GetTop5ViewHandler(c echo.Context, db *gorm.DB) error {
 	for i := 0; i <= numYear; i++ {
 		years = append(years, time.Time(first.Date).Year()+i)
 	}
+
+	// make sure years is sorted current to earliest
+	sort.Sort(sort.Reverse(sort.IntSlice(years)))
 
 	data := getTop5Data(month, year, limit, db) // retrieve the data, if none, handled in frontend
 	msg := message{

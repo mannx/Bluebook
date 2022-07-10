@@ -47,8 +47,8 @@ export default class WasteInput extends React.Component {
 					</tr>
 					</thead>
 					<tbody>
-						{this.state.items.map(function(obj) {
-							return this.entryFields(obj);
+						{this.state.items.map(function(obj, i) {
+							return this.entryFields(obj, i);
 						}, this)}
 					</tbody>
 				</table>
@@ -56,7 +56,9 @@ export default class WasteInput extends React.Component {
 		);
 	}
 
-	entryFields = (obj) => {
+	entryFields = (obj, idx) => {
+		const size = this.state.items.length - 1;
+
 		return (<tr>
 			<td>
 				<input list="types" name={obj.Name} />
@@ -67,9 +69,13 @@ export default class WasteInput extends React.Component {
 				</datalist>
 			</td>
 			<td><input type="text" defaultValue={obj.Quantity}/></td>
-			<td><button onClick={this.NewItem}>Add</button></td>
+			<td>{idx === size ? this.addBtn() : this.updateBtn(idx)}</td>
 		</tr>);
 	}
+
+	addBtn = () => { return <button onClick={this.NewItem}>Add</button>; }
+	updateBtn = (idx) => {return <button onClick={()=>this.UpdateItem(idx)}>Update</button>; }
+
 
 	NewItem = () => {
 		this.setState({items: [...this.state.items, {Item: "",Quantity:0}]});
