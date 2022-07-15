@@ -5,7 +5,7 @@ import UrlGet from "../URLs/URLs.jsx";
 
 import "react-datepicker/dist/react-datepicker.css";
 
-class Weekly extends React.Component {
+export default class Weekly extends React.Component {
 	constructor(props) {
 		super(props);
 
@@ -170,8 +170,8 @@ class Weekly extends React.Component {
 				</tbody>
 			</table>
 			<div>
-				Manager Hours: <input type="text" onChange={this.managerHoursChanged}/><br/>
 				Hours Used: <input type="text" onChange={this.hoursUsedChanged}/>
+				Manager Hours: <input type="text" onChange={this.managerHoursChanged}/><br/>
 			</div>
 			</>
 		);
@@ -180,5 +180,3 @@ class Weekly extends React.Component {
 	managerHoursChanged = (e) => { this.setState({managerHours: e.target.value}); }
 	hoursUsedChanged = (e) => { this.setState({hoursUsed: e.target.value}); }
 }
-
-export default Weekly;
