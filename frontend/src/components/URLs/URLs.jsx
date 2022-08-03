@@ -27,7 +27,10 @@ const urls = {
 	"AddNewWasteItem": "/api/waste/new",		// add a new waste item
 	"CombineWasteItem": "/api/waste/combine",	// combine wastage items
 	"WasteNames": "/api/waste/names",			// get the list of all wastage items in the db
-	"WasteUnusedRemove":"/api/waste/unused",
+	"WasteUnusedRemove":"/api/waste/unused",	// remove unused wastage items
+
+	"WasteInputGet": "/api/waste/holding",		// get list of wastage input currently saved
+	"WasteInputAdd": "/api/waste/holding/add",	// add an entry to the wastage input holding table
 
 	"Weekly": "/api/weekly/view",
 	"Export": "/api/export/weekly",				// Export Weekly

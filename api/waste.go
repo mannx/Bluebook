@@ -3,11 +3,11 @@ package api
 import (
 	"net/http"
 	"sort"
+	"strconv"
 	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/rs/zerolog/log"
-	"gorm.io/datatypes"
 	"gorm.io/gorm"
 
 	models "github.com/mannx/Bluebook/models"
@@ -296,14 +296,38 @@ func GetWasteHoldingHandler(c echo.Context, db *gorm.DB) error {
 		return ReturnServerMessage(c, "Unable to retrieve names", true)
 	}
 
-	return c.JSON(http.StatusOK, items)
+	type wasteHoldingJSON struct {
+		Name     string  // name of the item
+		Quantity float64 // amount
+	}
+
+	var out []wasteHoldingJSON
+	for _, i := range items {
+		// get the item name from the id
+		var waste models.WastageItem
+		name := "INVALID ID"
+
+		res = db.First(&waste, i.Item)
+		if res.Error != nil {
+			log.Error().Msgf("Unable to find item id...")
+		} else {
+			name = waste.Name
+		}
+
+		out = append(out,
+			wasteHoldingJSON{
+				Name:     name,
+				Quantity: i.Amount,
+			})
+	}
+
+	return c.JSON(http.StatusOK, out)
 }
 
 func AddWasteHoldingHandler(c echo.Context, db *gorm.DB) error {
 	type addWasteHolding struct {
-		Item   string
-		Amount float64
-		Date   datatypes.Date
+		Name     string
+		Quantity string
 	}
 
 	var data addWasteHolding
@@ -314,21 +338,39 @@ func AddWasteHoldingHandler(c echo.Context, db *gorm.DB) error {
 
 	// get the item we are adding to the hold
 	// if we dont have it, add it to the db and returns its id
-	item := getWastageIdByName(data.Item)
-	entry := models.WastageEntryHolding{
-		Item:   item,
-		Date:   data.Date,
-		Amount: data.Amount,
+	item := getWastageIdByName(db, data.Name)
+
+	// convert the quantity into a float64, return error if unable
+	amount, err := strconv.ParseFloat(data.Quantity, 64)
+	if err != nil {
+		log.Error().Err(err).Msgf("[AddWasteHoldingHandler] Unable to convert string to float [%v]", data.Quantity)
+		return ReturnServerMessage(c, "Unable to convert quanity to float", true)
 	}
 
-	log.Debug().Msgf("Saving wastage entry: %v (%v) [Amount: %v]", data.Item, item, data.Amount)
+	entry := models.WastageEntryHolding{
+		Item:   item,
+		Amount: amount,
+	}
+
+	log.Debug().Msgf("Saving wastage entry: %v (%v) [Amount: %v] %v", data.Name, item, data.Quantity, entry)
 	db.Save(&entry)
 
+	log.Debug().Msg("Adding holding waste...")
 	return ReturnServerMessage(c, "Holding entry added sucessfully", false)
 }
 
-func getWastageIdByName(name string) uint {
-	return 0
+// return the id of a wastage item given its name, returns 0 if item is not found
+func getWastageIdByName(db *gorm.DB, name string) uint {
+	// retruns the first id that matches
+	var entry models.WastageItem
+
+	res := db.Where("Name = ?", name).First(&entry)
+	if res.Error != nil {
+		log.Error().Err(res.Error).Msgf("Unable to retrieve id for wastage item [%v]", name)
+		return 0
+	}
+
+	return entry.ID
 }
 
 // remove all wastage items with no associated entries
