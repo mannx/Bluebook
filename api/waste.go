@@ -54,7 +54,6 @@ func GetWasteSettingHandler(c echo.Context, db *gorm.DB) error {
 
 // UpdateWasteSettingHandler handles waste setting updates. Only items that have changed are POST'd in
 func UpdateWasteSettingHandler(c echo.Context, db *gorm.DB) error {
-	log.Debug().Msg("[UpdateWasteSettingHandler]")
 	data := make([]models.WastageItem, 0)
 
 	if err := c.Bind(&data); err != nil {
@@ -96,8 +95,6 @@ func UpdateWasteSettingHandler(c echo.Context, db *gorm.DB) error {
 
 // GetWasteViewHandler handls the waste report generation
 func GetWasteViewHandler(c echo.Context, db *gorm.DB) error {
-	log.Debug().Msg("GetWasteViewHandler()")
-
 	type wasteError struct {
 		Message string `json:"Message"`
 	}
@@ -131,7 +128,6 @@ func GetWasteViewHandler(c echo.Context, db *gorm.DB) error {
 
 	// make sure we have a tuesday, week ending day
 	if weekEnding.Weekday() != time.Tuesday {
-		log.Debug().Msg("Request date is not a tuesday")
 		return c.JSON(http.StatusOK, "Can only view from a tuesday")
 	}
 
@@ -349,7 +345,6 @@ func AddWasteHoldingHandler(c echo.Context, db *gorm.DB) error {
 		Amount: amount,
 	}
 
-	log.Debug().Msgf("Saving wastage entry: %v (%v) [Amount: %v] %v", data.Name, item, data.Quantity, entry)
 	db.Save(&entry)
 
 	return ReturnServerMessage(c, "Holding entry added sucessfully", false)
@@ -404,15 +399,26 @@ func WasteHoldingConfirmHandler(c echo.Context, db *gorm.DB) error {
 	return ReturnServerMessage(c, "Merge Success", false)
 }
 
-// return the id of a wastage item given its name, returns 0 if item is not found
+// return the id of a wastage item given its name,
+//	if the item is not found, add it to the db with default values and return its id
 func getWastageIdByName(db *gorm.DB, name string) uint {
 	// retruns the first id that matches
 	var entry models.WastageItem
 
 	res := db.Where("Name = ?", name).First(&entry)
 	if res.Error != nil {
-		log.Error().Err(res.Error).Msgf("Unable to retrieve id for wastage item [%v]", name)
-		return 0
+		//log.Error().Err(res.Error).Msgf("Unable to retrieve id for wastage item [%v]", name)
+
+		// attempt to create the entry
+		entry = models.WastageItem{
+			Name: name,
+		}
+
+		log.Debug().Msgf("Creating new waste item: %v", name)
+		db.Save(&entry)
+
+		log.Debug().Msgf("New ID: %v", entry.ID)
+		return entry.ID
 	}
 
 	return entry.ID
@@ -445,7 +451,6 @@ func RemoveUnusedWasteItems(c echo.Context, db *gorm.DB) error {
 
 		if res.RowsAffected == 0 {
 			// add to remove list
-			log.Debug().Msgf("Removing item [%v] from wastage", i.Name)
 			remove = append(remove, i.ID)
 		}
 	}

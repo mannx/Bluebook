@@ -18,6 +18,7 @@ const (
 	WastePounds    = 1 // item is counted in pounds (almost same as unit)
 	WasteKilo      = 2 // item is counted in kilos
 	WasteGram      = 3 // item is counted in grams
+	WasteOunce     = 4 // item is counted in ounces
 
 	WasteLocationOther      = 0 // item is located inan unspecificed area
 	WasteLocationProtein    = 1 // item is a protein
@@ -31,6 +32,7 @@ var unitStringTable = map[int]string{
 	WastePounds:    "lbs",
 	WasteKilo:      "kilo",
 	WasteGram:      "gram",
+	WasteOunce:     "ounce",
 }
 
 var locationStringTable = map[int]string{
@@ -143,6 +145,9 @@ func (wi *WastageItem) Convert(n float64) float64 {
 	case WasteGram:
 		log.Debug().Msgf("WastageItem::Convert() %v => Grams", wi.Name)
 		return n * 453.59237
+	case WasteOunce:
+		// convert from ounce to pounds
+		return n / 16
 	}
 
 	return n

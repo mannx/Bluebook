@@ -1,13 +1,6 @@
 Issues to fix
 =============
 
-* Waste Input:
-	- Items in DB work fine,
-	- New items do not get added
-		+ allow creating new item with defaults when inputting waste
-		+ allow user to adjust item settings after waste inputted
-
----- BELOW DONE? NEED TO CHECK ---
 * Wastage output not converting
 	- Example: Roast beef still shows input value instead of gram/kilo conversion
 * Implement wastage editing, ability to combine and remove duplicate entries

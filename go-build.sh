@@ -1,6 +1,6 @@
 #!/bin/sh
 
-version=0.0.15
+version=0.0.16
 time=$(date)
 
 # if we have a -t flag, simply output the version for use as a tag in the main build.sh script

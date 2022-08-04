@@ -20,8 +20,6 @@ import (
 // This function returns the list of files that can be imported
 // uses fileMask to only return files types that match
 func importFileHandler(c echo.Context, fileMask string) error {
-	log.Debug().Msg("importFileHandler")
-
 	files, err := ioutil.ReadDir(env.Environment.ImportPath)
 	if err != nil {
 		log.Error().Err(err).Msg("Unable to read directory provided by BLUEBOOK_IMPORT_PATH")
@@ -47,8 +45,6 @@ func importFileHandler(c echo.Context, fileMask string) error {
 }
 
 func importPostHandler(c echo.Context, handler func(string, *gorm.DB) error) error {
-	log.Debug().Msg("import post handler start")
-
 	arr := make([]string, 0)
 
 	if err := c.Bind(&arr); err != nil {
@@ -60,11 +56,9 @@ func importPostHandler(c echo.Context, handler func(string, *gorm.DB) error) err
 		fname := filepath.Join(env.Environment.ImportPath, n)
 		log.Info().Msgf("Preparing to parse file: %v", fname)
 
-		log.Debug().Msg("Running go function to handle import...")
 		go handler(fname, DB)
 	}
 
-	//return c.JSON(http.StatusOK, arr)
 	return c.String(http.StatusOK, "Processing files...")
 }
 
