@@ -50,8 +50,7 @@ func initServer() *echo.Echo {
 
 	e.GET("/api/waste/holding", func(c echo.Context) error { return api.GetWasteHoldingHandler(c, DB) })
 	e.POST("/api/waste/holding/add", func(c echo.Context) error { return api.AddWasteHoldingHandler(c, DB) })
-	/*e.GET("/api/waste/input/get", func(c echo.Context) error { return api.GetWasteInputHandler(c, DB) })
-	e.GET("/api/waste/input/add", func(c echo.Context) error { return api.AddWasteInputHandler(c, DB) })*/
+	e.POST("/api/waste/holding/confirm", func(c echo.Context) error { return api.WasteHoldingConfirmHandler(c, DB) })
 
 	// Weekly reports
 	e.GET("/api/weekly/view", func(c echo.Context) error { return api.GetWeeklyViewHandler(c, DB) })

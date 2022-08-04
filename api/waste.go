@@ -8,6 +8,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/rs/zerolog/log"
+	"gorm.io/datatypes"
 	"gorm.io/gorm"
 
 	models "github.com/mannx/Bluebook/models"
@@ -252,10 +253,6 @@ func CombineWasteHandler(c echo.Context, db *gorm.DB) error {
 		res := db.Where("Item = ?", i).Find(&wi)
 		if res.Error != nil {
 			log.Error().Err(res.Error).Msg("Unable to retrieve wastage entries to combine")
-			/*return c.JSON(http.StatusOK, models.ServerReturnMessage{
-				Message: "Unable to retrieve entries to combine",
-				Error:   true,
-			})*/
 			return ReturnServerMessage(c, "Unable to retrieve entries to combine", true)
 		}
 
@@ -355,8 +352,56 @@ func AddWasteHoldingHandler(c echo.Context, db *gorm.DB) error {
 	log.Debug().Msgf("Saving wastage entry: %v (%v) [Amount: %v] %v", data.Name, item, data.Quantity, entry)
 	db.Save(&entry)
 
-	log.Debug().Msg("Adding holding waste...")
 	return ReturnServerMessage(c, "Holding entry added sucessfully", false)
+}
+
+// WasteHoldingConfirmHandler confirms the holding table and merges it into the waste table.
+//	expects a week ending date POST'd to the Date field
+func WasteHoldingConfirmHandler(c echo.Context, db *gorm.DB) error {
+	type wasteConfirm struct {
+		Month int
+		Day   int
+		Year  int
+	}
+
+	var data wasteConfirm
+
+	if err := c.Bind(&data); err != nil {
+		log.Error().Err(err).Msg("[WasteHoldingConfirm] Unable to bind week ending date")
+		return ReturnServerMessage(c, "Unable to bind week ending date", true)
+	}
+
+	// build the date object for each item
+	date := time.Date(data.Year, time.Month(data.Month), data.Day, 0, 0, 0, 0, time.UTC)
+
+	// get all the holding entries
+	var holding []models.WastageEntryHolding
+	res := db.Find(&holding)
+	if res.Error != nil {
+		log.Error().Err(res.Error).Msg("[WastageHoldingConfirm] Unable to retrieve wastage holding data")
+		return ReturnServerMessage(c, "DB Error", true)
+	}
+
+	// convert to wastage entries
+	var waste []models.WastageEntry
+
+	for _, i := range holding {
+		waste = append(waste,
+			models.WastageEntry{
+				Item:   i.Item,
+				Date:   datatypes.Date(date),
+				Amount: i.Amount,
+			})
+	}
+
+	// save the wastage
+	db.Save(&waste)
+
+	// clear the holding table
+	//	need Where() to force the delete of the table
+	db.Where("1 = 1").Delete(&models.WastageEntryHolding{})
+
+	return ReturnServerMessage(c, "Merge Success", false)
 }
 
 // return the id of a wastage item given its name, returns 0 if item is not found

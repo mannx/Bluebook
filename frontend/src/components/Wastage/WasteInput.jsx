@@ -1,22 +1,50 @@
 import React from "react";
 import UrlGet from "../URLs/URLs.jsx";
+import DatePicker from "react-datepicker";
+import DialogBox from "../Dialog/DialogBox.jsx";
+
+import "../Dialog/dialog.css";
+import "react-datepicker/dist/react-datepicker.css";
+
+class ConfirmSubmitDialog extends  React.Component {
+	render = () => {
+		return (
+			<DialogBox
+				visible={this.props.visible}
+				onClose={this.props.onClose}
+				onConfirm={this.props.onConfirm}
+				contents={this.contents}
+			/>
+		);
+	}
+
+	contents = () => {
+		return (<>
+			<p>Confirm submittion of wastage for week ending: {this.props.date.toDateString()}?</p>
+		</>);
+	}
+}
 
 export default class WasteInput extends React.Component {
-	/*
-	 * 
-	 *	{
-	 *		ID: int		// determined by server
-	 *		Item: string	// user input
-	 *		Quantity: float	// user input
-	 * 		Update: bool	// has this entry been changed client side?
-	 *
-	 * */
 	constructor(props) {
 		super(props);
+
+		// get the current date, if a wednesday, auto move back to tuesday
+		// for week ending date
+		var d = new Date();
+		if(d.getDay() === 3) {
+			d.setDate(d.getDate() - 1);
+		}
 
 		this.state = {
 			items: [],
 			names: [],
+			date: d,			// week ending date for this wastage
+
+			confirmDlg: false,
+
+			message: null,
+			error: false,
 		}
 	}
 
@@ -33,11 +61,18 @@ export default class WasteInput extends React.Component {
 		const resp=await fetch(url);
 		const data=await resp.json();
 
+		if(data === null) {
+			this.NewItem();
+			return;
+		}
+
 		if(data.length !== 0) {
 			this.setState({items: data});
 		}else{
-			this.NewItem();
+			//this.NewItem();
 		}
+
+		this.NewItem();
 	}
 
 
@@ -49,8 +84,20 @@ export default class WasteInput extends React.Component {
 	render = () => {
 		// Link tab/enter to move between fields and create new entries
 		return (<>
+			<ConfirmSubmitDialog
+				visible={this.state.confirmDlg}
+				date={this.state.date}
+				onClose={this.submitClose}
+				onConfirm={this.submitConfirm}
+			/>
 			<div>
 				<h3>Waste Input</h3>
+				<div>
+					<span>Week Ending:</span>
+					<DatePicker selected={this.state.date} onChange={(d)=>this.setState({date: d})} />
+					<button onClick={this.submit}>Submit</button>
+				</div>
+				{this.showErrors()}
 				<table>
 					<thead>
 					<tr>
@@ -67,6 +114,16 @@ export default class WasteInput extends React.Component {
 				</table>
 			</div>
 		</>);
+	}
+
+	showErrors = () => {
+		if(this.state.Error === true) {
+			return (<div>
+				<span className="error">{this.state.Message}</span>
+			</div>);
+		}else{
+			return (<></>);
+		}
 	}
 
 	// render an input field if edit ==true, else just display the contents
@@ -130,8 +187,6 @@ export default class WasteInput extends React.Component {
 	// refresh data afterwards
 	// takes index to the item in the state we are adding
 	AddItem = (idx) => {
-		const item = this.state.items[idx];
-
 		const options = {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
@@ -140,9 +195,41 @@ export default class WasteInput extends React.Component {
 
 		// post the data
 		fetch(UrlGet("WasteInputAdd"), options)
-			.then(r => console.log(r));
+			.then(r => console.log(r))
+			.then(r => this.loadItems());
+	}
 
-		// reload
-		this.loadItems();
+	// submit button pressed, display confirmation dialog
+	submit = () => {
+		this.setState({confirmDlg: true});
+	}
+
+	// submit has been closed (cancel submit, keep data)
+	submitClose = () => {
+		this.setState({confirmDlg: false});
+	}
+
+	// submit has been confirmed, let the server know
+	submitConfirm = async () => {
+		this.setState({confirmDlg: false});
+
+		const month = this.state.date.getMonth()+1;
+		const year = this.state.date.getFullYear();
+		const day = this.state.date.getDate();
+
+		const options = {
+			method: 'POST',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify({
+				Month: month,
+				Year: year,
+				Day: day,
+			})
+		}
+
+		console.log("body: " + options.body);
+
+		fetch(UrlGet("WasteInputConfirm"), options)
+			.then(r => this.loadItems())
 	}
 }

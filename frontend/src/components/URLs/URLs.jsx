@@ -16,24 +16,25 @@ const urls = {
 	"Comment": "/api/update/comment",
 
 	"Tags": "/api/tags/view",
-	"TagData": "/api/tags/data",				// get data about a single tag
-	"TagEditPost": "/api/tags/update",			// update the tags for a given day
-	"TagEdit": "/api/tags/edit",				// edit a tag name
+	"TagData": "/api/tags/data",							// get data about a single tag
+	"TagEditPost": "/api/tags/update",						// update the tags for a given day
+	"TagEdit": "/api/tags/edit",							// edit a tag name
 
 	"WasteView": "/api/waste/view",
 	"WasteSettings": "/api/waste/settings",
-	"WasteUpdate":"/api/waste/update",			// update waste settings
-	"DeleteWasteItem": "/api/waste/delete", 	// delete a wastage item
-	"AddNewWasteItem": "/api/waste/new",		// add a new waste item
-	"CombineWasteItem": "/api/waste/combine",	// combine wastage items
-	"WasteNames": "/api/waste/names",			// get the list of all wastage items in the db
-	"WasteUnusedRemove":"/api/waste/unused",	// remove unused wastage items
+	"WasteUpdate":"/api/waste/update",						// update waste settings
+	"DeleteWasteItem": "/api/waste/delete", 				// delete a wastage item
+	"AddNewWasteItem": "/api/waste/new",					// add a new waste item
+	"CombineWasteItem": "/api/waste/combine",				// combine wastage items
+	"WasteNames": "/api/waste/names",						// get the list of all wastage items in the db
+	"WasteUnusedRemove":"/api/waste/unused",				// remove unused wastage items
 
-	"WasteInputGet": "/api/waste/holding",		// get list of wastage input currently saved
-	"WasteInputAdd": "/api/waste/holding/add",	// add an entry to the wastage input holding table
+	"WasteInputGet": "/api/waste/holding",					// get list of wastage input currently saved
+	"WasteInputAdd": "/api/waste/holding/add",				// add an entry to the wastage input holding table
+	"WasteInputConfirm": "/api/waste/holding/confirm",		// merge holding table to main waste table
 
 	"Weekly": "/api/weekly/view",
-	"Export": "/api/export/weekly",				// Export Weekly
+	"Export": "/api/export/weekly",							// Export Weekly
 
 	"Top5": "/api/top5/view",
 }
