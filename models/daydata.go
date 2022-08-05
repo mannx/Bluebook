@@ -62,18 +62,6 @@ func (d *DayData) GetDate() string {
 	return time.Time(d.Date).Format("Jan 02, 2006")
 }
 
-// TODO:
-//	This structure can be removed along with any code relant on it
-//	once the need to convert a django version of the db has passed
-//
-// Comments contains day id and the comment linked to it
-type Comments struct {
-	gorm.Model
-
-	LinkedID int    `gorm:"column:LinkedID"`
-	Comment  string `gorm:"column:Comment"`
-}
-
 // TagInfo simply provides a name to the given tag
 type TagList struct {
 	gorm.Model

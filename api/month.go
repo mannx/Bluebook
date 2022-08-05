@@ -85,13 +85,8 @@ func GetMonthViewHandler(c echo.Context, db *gorm.DB) error {
 		return res.Error
 	}
 
-	// ******************
-	//	Change in progress
-	// ******************
-	//
 	//	we no longer pre fill the database with empty rows, instead if a day is missing we generate a new empty node
 	//	and only save it to the db if required (a comment is added before any import data)
-	//
 
 	mvd := make([]dayViewData, endDay) // get a full month allocated
 
