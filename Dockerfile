@@ -63,8 +63,6 @@ WORKDIR /
 COPY --from=build /bluebook /bluebook
 COPY --from=react /app/build /static
 
-COPY ./run.sh ./
-
 # copy in default config file for top5 api
 COPY ./api/data.json /top5.json
 
