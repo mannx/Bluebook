@@ -68,8 +68,6 @@ export default class WasteInput extends React.Component {
 
 		if(data.length !== 0) {
 			this.setState({items: data});
-		}else{
-			//this.NewItem();
 		}
 
 		this.NewItem();
@@ -130,7 +128,7 @@ export default class WasteInput extends React.Component {
 	itemField = (obj, idx, edit) => {
 		if(edit===true){
 			return (<>
-				<input list="types" defaultValue={obj.Name} onChange={
+				<input autoFocus list="types" defaultValue={obj.Name} onChange={
 					(e)=>{
 						var items=this.state.items;
 						items[idx].Name=e.target.value;
@@ -195,7 +193,6 @@ export default class WasteInput extends React.Component {
 
 		// post the data
 		fetch(UrlGet("WasteInputAdd"), options)
-			.then(r => console.log(r))
 			.then(r => this.loadItems());
 	}
 
@@ -226,8 +223,6 @@ export default class WasteInput extends React.Component {
 				Day: day,
 			})
 		}
-
-		console.log("body: " + options.body);
 
 		fetch(UrlGet("WasteInputConfirm"), options)
 			.then(r => this.loadItems())

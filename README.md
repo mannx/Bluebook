@@ -3,7 +3,6 @@
 
 - Currently working on
 	* Tags when edited don't reflect new changes until refresh
-	* Wastage report output. separate into categories or other divisions
 
 - TODO:
 	* CSS worked on -- themes? or other easier way of chaning colouring
@@ -13,8 +12,6 @@
 	* Import: No feedback after pressing button. Should show progress or other status information
 
 - Notes:
-	* Import script for adjusting database from django project in progress
-	* Located in scripts directory along with SQL files with commands to update tables
 	* Top5 is generated for a config file found the the BLUEBOOK\_DATA\_PATH directory (see below)
 	* 4 week daily average is calculated each time page loads and is not stored in the db.  no performance hit seen so far?
 
@@ -31,19 +28,6 @@
 
 - Ports:
 	* Port 8080 is used by default
-
-
-- Migration Steps:
-	* Copy current database into /data (BLUEBOOK\_DATA\_PATH)
-	* Copy migrate.sh into the /data directory
-	* Run migrate.sh and everything *SHOULD* get migrated over correctly
-	* On first start of a container:
-		- Dates get updated to the currnet date/time model
-		- Comment Table gets merged into the day data table
-		- a file named READY is created at in the data directory
-			~ If this file is present the first two steps are ignored, and can be pre placed if required
-	* Notes/Issues:
-		- Waste data is not preserved during the migration due to several changes
 
 ## Top5 Config Path
 
