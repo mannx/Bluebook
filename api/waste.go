@@ -280,18 +280,19 @@ func GetWasteNamesHandler(c echo.Context, db *gorm.DB) error {
 	return c.JSON(http.StatusOK, names)
 }
 
-func GetWasteHoldingHandler(c echo.Context, db *gorm.DB) error {
+type wasteHoldingJSON struct {
+	Name     string  // name of the item
+	Quantity float64 // amount
+	ID       uint    // id of the entry
+}
+
+func getWasteHoldingEntries(db *gorm.DB) []wasteHoldingJSON {
 	var items []models.WastageEntryHolding
 
 	res := db.Find(&items)
 	if res.Error != nil {
 		log.Error().Err(res.Error).Msg("Unable to retrieve wastage items for [GetWasteHoldingHandler]")
 		return ReturnServerMessage(c, "Unable to retrieve names", true)
-	}
-
-	type wasteHoldingJSON struct {
-		Name     string  // name of the item
-		Quantity float64 // amount
 	}
 
 	var out []wasteHoldingJSON
@@ -311,10 +312,51 @@ func GetWasteHoldingHandler(c echo.Context, db *gorm.DB) error {
 			wasteHoldingJSON{
 				Name:     name,
 				Quantity: i.Amount,
+				ID:       i.ID,
 			})
 	}
 
-	return c.JSON(http.StatusOK, out)
+	return out
+}
+
+func GetWasteHoldingHandler(c echo.Context, db *gorm.DB) error {
+	/*var items []models.WastageEntryHolding
+
+	res := db.Find(&items)
+	if res.Error != nil {
+		log.Error().Err(res.Error).Msg("Unable to retrieve wastage items for [GetWasteHoldingHandler]")
+		return ReturnServerMessage(c, "Unable to retrieve names", true)
+	}
+
+	type wasteHoldingJSON struct {
+		Name     string  // name of the item
+		Quantity float64 // amount
+		ID       uint    // id of the entry
+	}
+
+	var out []wasteHoldingJSON
+	for _, i := range items {
+		// get the item name from the id
+		var waste models.WastageItem
+		name := "INVALID ID"
+
+		res = db.First(&waste, i.Item)
+		if res.Error != nil {
+			log.Error().Msgf("Unable to find item id...")
+		} else {
+			name = waste.Name
+		}
+
+		out = append(out,
+			wasteHoldingJSON{
+				Name:     name,
+				Quantity: i.Amount,
+				ID:       i.ID,
+			})
+	}
+
+	return c.JSON(http.StatusOK, out)*/
+	return c.JSON(http.StatusOK, getWasteHoldingEntries(db))
 }
 
 func AddWasteHoldingHandler(c echo.Context, db *gorm.DB) error {
@@ -348,6 +390,48 @@ func AddWasteHoldingHandler(c echo.Context, db *gorm.DB) error {
 	db.Save(&entry)
 
 	return ReturnServerMessage(c, "Holding entry added sucessfully", false)
+}
+
+func WasteHoldingDeleteHandler(c echo.Context, db *gorm.DB) error {
+	type holdingInput struct {
+		ID int
+	}
+
+	var input holdingInput
+	if err := c.Bind(&input); err != nil {
+		log.Error().Err(err).Msg("[WasteHoldingDeleteHandler] Unable to bind paramters")
+		return ReturnServerMessage(c, "Unable to bind parameters", true)
+	}
+
+	var entry models.WastageEntryHolding
+	res := db.Find(&entry, input.ID)
+	if res.Error != nil {
+		log.Error().Err(res.Error).Msg("Unable to retrieve holding entry for [WasteHoldingDeleteHandler]")
+		return ReturnServerMessage(c, "Unable to retrieve item from id", true)
+	}
+
+	db.Delete(&entry)
+
+	type returnData struct {
+		Error   bool
+		Message string
+		Items   []models.WastageEntryHolding
+	}
+
+	ret := returnData{
+		Error:   false,
+		Message: "",
+	}
+
+	// return a blank error message (allows front end to process result same either way)
+	// along with the current holding table
+	res = db.Find(&ret.Items)
+	if res.Error != nil {
+		log.Error().Err(res.Error).Msg("Unable to retrieve holding table (2) for [WasteHoldingDeleteHandler]")
+		return ReturnServerMessage(c, "Unable to retrieve holding table", true)
+	}
+
+	return c.JSON(http.StatusOK, &ret)
 }
 
 // WasteHoldingConfirmHandler confirms the holding table and merges it into the waste table.

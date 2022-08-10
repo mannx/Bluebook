@@ -32,6 +32,7 @@ const urls = {
 	"WasteInputGet": "/api/waste/holding",					// get list of wastage input currently saved
 	"WasteInputAdd": "/api/waste/holding/add",				// add an entry to the wastage input holding table
 	"WasteInputConfirm": "/api/waste/holding/confirm",		// merge holding table to main waste table
+	"WasteInputDelete": "/api/waste/holding/delete",		// delete holding entry
 
 	"Weekly": "/api/weekly/view",
 	"Export": "/api/export/weekly",							// Export Weekly

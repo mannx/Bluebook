@@ -73,6 +73,16 @@ export default class WasteInput extends React.Component {
 		this.NewItem();
 	}
 
+	loadItems2 = (data) => {
+		if(data.Error === false) {
+			// have valid item data
+			const items = data.Items;
+			this.setState({items: data.Items,Error:false});
+		}else{
+			this.setState({Error:true,Message:data.Message});
+		}
+	}
+
 
 	componentDidMount = () => {
 		this.loadData();		// load waste names
@@ -174,7 +184,7 @@ export default class WasteInput extends React.Component {
 	}
 
 	addBtn = (idx) => { return <button onClick={()=>{this.AddItem(idx)}}>Add</button>; }
-	updateBtn = (idx) => {return <button onClick={()=>this.UpdateItem(idx)}>Update</button>; }
+	updateBtn = (idx) => {return <button onClick={()=>this.DeleteItem(idx)}>Delete</button>; }
 
 
 	NewItem = () => {
@@ -194,6 +204,24 @@ export default class WasteInput extends React.Component {
 		// post the data
 		fetch(UrlGet("WasteInputAdd"), options)
 			.then(r => this.loadItems());
+	}
+
+	// Delete an item from the holding list given its index
+	DeleteItem = (idx) => {
+		var item = this.state.items[idx];
+
+		console.log("Deleting item: " + item.Name);
+		console.log("  ID: "+ item.ID);
+
+		const options = {
+			method: 'POST',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify({ID: item.ID}),
+		}
+
+		fetch(UrlGet("WasteInputDelete"), options)
+			.then(r => r.json())
+			.then(r => this.loadItems2(r));
 	}
 
 	// submit button pressed, display confirmation dialog

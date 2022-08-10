@@ -170,7 +170,7 @@ export default class Weekly extends React.Component {
 				</tbody>
 			</table>
 			<div>
-				Hours Used: <input type="text" onChange={this.hoursUsedChanged}/>
+				Hours Used: <input type="text" autoFocus onChange={this.hoursUsedChanged}/><br/>
 				Manager Hours: <input type="text" onChange={this.managerHoursChanged}/><br/>
 			</div>
 			</>
