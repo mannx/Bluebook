@@ -5,7 +5,6 @@
 	* Tags when edited don't reflect new changes until refresh
 
 - TODO:
-	* CSS worked on -- themes? or other easier way of chaning colouring
 	* Redo several front end data fetching mechanisms (see https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#fetching-external-data-when-props-change)
 
 - Issues:

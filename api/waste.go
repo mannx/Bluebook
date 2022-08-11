@@ -128,7 +128,8 @@ func GetWasteViewHandler(c echo.Context, db *gorm.DB) error {
 
 	// make sure we have a tuesday, week ending day
 	if weekEnding.Weekday() != time.Tuesday {
-		return c.JSON(http.StatusOK, "Can only view from a tuesday")
+		//return c.JSON(http.StatusOK, "Can only view from a tuesday")
+		return ReturnServerMessage(c, "Can only view from a tuesday", true)
 	}
 
 	// retrieve the data
@@ -193,10 +194,11 @@ func DeleteWasteItemHandler(c echo.Context, db *gorm.DB) error {
 	// delete the items from the db
 	db.Delete(&models.WastageItem{}, items)
 
-	return c.JSON(http.StatusOK, models.ServerReturnMessage{
+	/*return c.JSON(http.StatusOK, models.ServerReturnMessage{
 		Message: "Items To Be Deleted NYI",
 		Error:   true,
-	})
+	})*/
+	return ReturnServerMessage(c, "Items deleted successfully", false)
 }
 
 func AddNewWasteItemHandler(c echo.Context, db *gorm.DB) error {
@@ -266,10 +268,7 @@ func GetWasteNamesHandler(c echo.Context, db *gorm.DB) error {
 	res := db.Find(&items)
 	if res.Error != nil {
 		log.Error().Err(res.Error).Msg("Unable to retrieve wastage items for [GetWasteNamesHandler]")
-		return c.JSON(http.StatusOK, models.ServerReturnMessage{
-			Message: "Unable to retrieve names",
-			Error:   true,
-		})
+		return ReturnServerMessage(c, "Unable to retrieve names", true)
 	}
 
 	names := make([]string, 0)
@@ -292,7 +291,7 @@ func getWasteHoldingEntries(db *gorm.DB) []wasteHoldingJSON {
 	res := db.Find(&items)
 	if res.Error != nil {
 		log.Error().Err(res.Error).Msg("Unable to retrieve wastage items for [GetWasteHoldingHandler]")
-		return ReturnServerMessage(c, "Unable to retrieve names", true)
+		return nil
 	}
 
 	var out []wasteHoldingJSON

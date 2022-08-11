@@ -56,7 +56,8 @@ func UpdateCommentHandler(c echo.Context, db *gorm.DB) error {
 		dd := models.DayData{}
 		res := db.Find(&dd, "ID = ?", cp.LinkedID)
 		if res.Error != nil {
-			return c.String(http.StatusInternalServerError, "Unable to find linked day")
+			//return c.String(http.StatusInternalServerError, "Unable to find linked day")
+			return ReturnServerMessage(c, "Unable to find linked day", true)
 		}
 
 		dd.Comment = cp.Comment
@@ -72,5 +73,6 @@ func UpdateCommentHandler(c echo.Context, db *gorm.DB) error {
 		db.Save(&dd)
 	}
 
-	return c.String(http.StatusOK, "Update Success")
+	//return c.String(http.StatusOK, "Update Success")
+	return ReturnServerMessage(c, "Update Success", false)
 }
