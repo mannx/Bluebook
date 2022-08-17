@@ -85,7 +85,6 @@ export default class Navigation extends React.Component {
 			nav = <></>;
 		}
 
-		//<li className={"navControl"}><NavButton name={"Settings"} func={this.Settings} /></li>
 		return (
 			<>
 			<div><ul className={"navControl"}>

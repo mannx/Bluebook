@@ -63,7 +63,6 @@ func ExportWeekly(c echo.Context, db *gorm.DB) error {
 	f, err := excelize.OpenFile(path)
 	if err != nil {
 		log.Error().Err(err).Msgf("Unable to open weekly template: %v", path)
-		//return c.JSON(http.StatusOK, models.ServerReturnMessage{Error: true, Message: "Unable to open weekly template"})
 		return ReturnServerMessage(c, "Unable to open weekly template", true)
 	}
 
@@ -100,7 +99,5 @@ func ExportWeekly(c echo.Context, db *gorm.DB) error {
 
 	// adjust ownership to PUID/PGID (container runs as root?)
 	os.Chown(outPath, env.Environment.GroupID, env.Environment.UserID)
-	//m := models.ServerReturnMessage{Message: "Ok"}
-	//return c.JSON(http.StatusOK, &m)
 	return ReturnServerMessage(c, "OK", false)
 }

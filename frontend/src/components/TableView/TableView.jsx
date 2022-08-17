@@ -81,7 +81,7 @@ export default class TableView extends React.Component {
 					if(obj.IsEndOfWeek) {
 						return (
 							<>
-								<TableCell data={obj} searchTag={this.props.navTag}/>
+								<TableCell data={obj} searchTag={this.props.navTag} />
 								<TableEOW data={obj} />
 							</>
 						);

@@ -86,7 +86,6 @@ func ImportWISR(fileName string, db *gorm.DB) error {
 	wi.FoodCostPercent = foodPerc
 	wi.LabourCostAmount = labourCost
 	wi.LabourCostPercent = labourPerc
-	//wi.PartySales, err = strconv.ParseFloat(strings.ReplaceAll(catering[1], ",", ""), 64)
 	wi.PartySales, err = strconv.ParseFloat(strings.ReplaceAll(strings.TrimSpace(catering[1]), ",", ""), 64)
 	log.Debug().Msgf("[ImportWisr] [Party Sales: %v]", wi.PartySales)
 	log.Debug().Msgf("  [Catering[1]: %v]", catering[1])

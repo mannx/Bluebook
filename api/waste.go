@@ -127,10 +127,9 @@ func GetWasteViewHandler(c echo.Context, db *gorm.DB) error {
 	weekStart := weekEnding.AddDate(0, 0, -6)
 
 	log.Debug().Msgf("Retrieving waste from %v/%v - %v/%v",
-		weekStart.Day(),weekStart.Month(),weekEnding.Day(),weekEnding.Month())
+		weekStart.Day(), weekStart.Month(), weekEnding.Day(), weekEnding.Month())
 	// make sure we have a tuesday, week ending day
 	if weekEnding.Weekday() != time.Tuesday {
-		//return c.JSON(http.StatusOK, "Can only view from a tuesday")
 		return ReturnServerMessage(c, "Can only view from a tuesday", true)
 	}
 
@@ -394,11 +393,13 @@ func WasteHoldingDeleteHandler(c echo.Context, db *gorm.DB) error {
 
 	return c.JSON(http.StatusOK, &ret)
 }
+
 //
 //
 //
 
 // WasteHoldingConfirmHandler confirms the holding table and merges it into the waste table.
+//
 //	expects a week ending date POST'd to the Date field
 func WasteHoldingConfirmHandler(c echo.Context, db *gorm.DB) error {
 	type wasteConfirm struct {
@@ -434,9 +435,9 @@ func WasteHoldingConfirmHandler(c echo.Context, db *gorm.DB) error {
 				Item:   i.Item,
 				Date:   datatypes.Date(date),
 				Amount: i.Amount,
-//
-//
-//
+				//
+				//
+				//
 			})
 	}
 
@@ -447,12 +448,14 @@ func WasteHoldingConfirmHandler(c echo.Context, db *gorm.DB) error {
 	//	need Where() to force the delete of the table
 	db.Where("1 = 1").Delete(&models.WastageEntryHolding{})
 
-//
+	//
 	return ReturnServerMessage(c, "Merge Success", false)
 }
+
 //
 
 // return the id of a wastage item given its name,
+//
 //	if the item is not found, add it to the db with default values and return its id
 func getWastageIdByName(db *gorm.DB, name string) uint {
 	// retruns the first id that matches
@@ -484,7 +487,7 @@ func RemoveUnusedWasteItems(c echo.Context, db *gorm.DB) error {
 
 	res := db.Find(&items)
 	if res.Error != nil {
-//
+		//
 		log.Error().Err(res.Error).Msg("Unable to retrieve wastage items")
 		return ReturnServerMessage(c, "Unable to retrieve wastage items", true)
 	}
