@@ -77,6 +77,7 @@ export default class Wastage extends React.Component {
 				<tr>
 					<th>Item</th>
 					<th>Weight</th>
+					<th>Unit</th>
 					<th>Location</th>
 				</tr>
 				</thead>
@@ -86,6 +87,7 @@ export default class Wastage extends React.Component {
 						return (<tr>
 								<td>{obj.Name}</td>
 								<td>{this.NF(obj.Amount)}</td>
+								<td>{obj.UnitOfMeasure}</td>
 								<td>{obj.LocationString}</td>
 								</tr>
 						);

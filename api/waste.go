@@ -105,6 +105,7 @@ func GetWasteViewHandler(c echo.Context, db *gorm.DB) error {
 		Amount         float64 `json:"Amount"`
 		Location       int     `json:"Location"`
 		LocationString string  `json:"LocationString"`
+		UnitOfMeasure  string  `json:"UnitOfMeasure"` // unit of measure in string form
 	}
 
 	// WasteView for returning to the client
@@ -159,8 +160,13 @@ func GetWasteViewHandler(c echo.Context, db *gorm.DB) error {
 		// process the weight conversion if required
 		m := wi.Convert(n)
 		wi.GenString()
-		output.Data = append(output.Data, WasteViewItem{Name: wi.Name, Amount: m, Location: wi.Location,
-			LocationString: wi.LocationString})
+		output.Data = append(output.Data, WasteViewItem{
+			Name:           wi.Name,
+			Amount:         m,
+			Location:       wi.Location,
+			LocationString: wi.LocationString,
+			UnitOfMeasure:  wi.UnitString,
+		})
 	}
 
 	// sort output by location insert an empty entry between location switches
