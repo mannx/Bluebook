@@ -81,6 +81,7 @@ func main() {
 
 func migrateDB() {
 	DB.AutoMigrate(&models.DayData{})
+	//DB.AutoMigrate(&models.DayDataBackup{})
 	DB.AutoMigrate(&models.WeeklyInfo{})
 	DB.AutoMigrate(&models.WastageItem{})
 	DB.AutoMigrate(&models.WastageEntry{})

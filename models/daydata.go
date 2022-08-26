@@ -57,6 +57,12 @@ type DayData struct {
 	Comment string `gorm:"column:Comment"` // comment for the given day
 }
 
+type DayDataBackup struct {
+	DayData
+
+	BackupID uint `gorm:"column:BackupID"`
+}
+
 // Sets the user friendly version of the date string
 func (d *DayData) GetDate() string {
 	return time.Time(d.Date).Format("Jan 02, 2006")
