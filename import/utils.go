@@ -35,18 +35,42 @@ func PDFToText(fileName string) (string, error) {
 	return outFile, nil
 }
 
-func getDataOrNew(date time.Time, db *gorm.DB) models.DayData {
+// getDataOrNew returns either a blank DayData or an already filled in one, if blank, returns true, otherwise false
+func getDataOrNew(date time.Time, db *gorm.DB) (models.DayData, bool) {
 	n := models.DayData{}
 
 	log.Debug().Msgf("[getDataOrNew] Checking for object date: %v", date.String())
 	res := db.Find(&n, "Date = ?", date)
 	if res.Error != nil {
 		log.Error().Err(res.Error).Msg("Unable to load data, using new data")
-		return n
+		return n, true
+	}
+
+	if res.RowsAffected == 0 {
+		log.Debug().Msg("No data available, creating blank entry")
+		return n, true
 	}
 
 	log.Info().Msgf("date: %v [id: %v]", n.Date, n.ID)
-	return n
+
+	// non empty entry, create a backup if not present already
+	backup := models.DayDataBackup{}
+	res = db.Find(&backup, "BackupID = ?", n.ID)
+	if res.Error != nil {
+		log.Warn().Err(res.Error).Msg(" => Unable to check for day backup entry, continuing without...")
+		return n, false
+	}
+
+	if res.RowsAffected != 0 {
+		// found an entry, we don't update
+		return n, false
+	}
+
+	// no entry found, create the entry
+	backup.DayData = n
+	db.Save(&backup)
+
+	return n, false
 }
 
 func getWeeklyInfoOrNew(date time.Time, db *gorm.DB) models.WeeklyInfo {

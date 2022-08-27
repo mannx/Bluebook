@@ -130,7 +130,7 @@ func ImportControl(fileName string, db *gorm.DB) error {
 		currentDay := startDate.Add(dur)
 		log.Debug().Msgf("checking if we have data... day(%v)", currentDay)
 
-		dd := getDataOrNew(currentDay, db)
+		dd, _ := getDataOrNew(currentDay, db)
 
 		dd.Date = datatypes.Date(currentDay)                   // make sure the date is correct (only required if new)
 		dd.Productivity, _ = strconv.ParseFloat(prod[i+1], 64) // +1 since entry 0 is the full capture

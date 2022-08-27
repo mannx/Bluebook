@@ -6,8 +6,10 @@ import Weekly from "../Weekly/Weekly.jsx";
 import AUV from "../AUV/AUV.jsx";
 import ViewTags from "../Tags/ViewTags.jsx";
 import Top5 from "../Top5/Top5.jsx";
-import Settings from "../Settings/Settings.jsx";
+import WasteSettings from "../Wastage/Settings.jsx";
 import WasteInput from "../Wastage/WasteInput.jsx";
+
+import DBSettings from "../Settings/DBSettings.jsx";
 import "./header.css";
 
 //
@@ -28,8 +30,9 @@ const PageWeekly = 4;
 const PageAUV = 5;
 const PageTags = 6;
 const PageTop5 = 7;
-const PageSettings = 10;
+const PageWasteSettings = 10;
 const PageWasteInput = 11;
+const PageDBSettings = 12;
 
 function Navigate(props) {
 	switch(props.page) {
@@ -47,10 +50,12 @@ function Navigate(props) {
 			return <ViewTags />;
 		case PageTop5:
 			return <Top5 />;
-		case PageSettings:
-			return <Settings/>;
+		case PageWasteSettings:
+			return <WasteSettings/>;
 		case PageWasteInput:
 			return <WasteInput/>;
+		case PageDBSettings:
+			return <DBSettings/>;
 		default:
 			return <h2>Invalid page number {props.page}</h2>;
 	}
@@ -65,6 +70,9 @@ export default class Navigation extends React.Component {
 			month: parseInt(props.month), 
 			year: parseInt(props.year),
 			page: PageMonth,
+
+			ExtraShow: false,
+			ExtraCSS: "none",
 		};
 
 		this.NavigatePrev = this.NavigatePrev.bind(this);
@@ -85,6 +93,7 @@ export default class Navigation extends React.Component {
 			nav = <></>;
 		}
 
+		//<li className={"navControl navExtra"}><NavButton name={"..."} func={this.ExtraSettings} /></li>
 		return (
 			<>
 			<div><ul className={"navControl"}>
@@ -96,8 +105,16 @@ export default class Navigation extends React.Component {
 				<li className={"navControl"}><NavButton name={"Wastage"} func={this.NavigateWastage} /></li>
 				<li className={"navControl"}><NavButton name={"Top 5"} func={this.NavigateTop5} /></li>
 				<li className={"navControl"}><NavButton name={"Import"} func={this.Imports} /></li>
-				<li className={"navControl"}><NavButton name={"Waste Settings"} func={this.Settings} /></li>
+				<li className={"navControl"}><NavButton name={"Waste Settings"} func={this.WasteSettings} /></li>
 				<li className={"navControl"}><NavButton name={"Waste Input"} func={this.WasteInput} /></li>
+				<li className={"navControl navExtra"}>
+					<NavButton name={"..."} func={this.ExtraSettings} />
+					<div className={"dropdown-content"} style={{display: this.state.ExtraCSS}}>
+						<ul className={"navControl"}>
+							<li className={"navControl"}><NavButton name={"Database"} func={this.NavDBSettings} /></li>
+						</ul>
+					</div>
+				</li>
 			</ul></div>
 			<Navigate month={this.state.month} year={this.state.year} page={this.state.page} navTag={this.NavigateTags} />
 			</>
@@ -146,6 +163,24 @@ export default class Navigation extends React.Component {
 	NavigateAUV = () => { this.setState({page: PageAUV});}
 	NavigateTags = () => { this.setState({page: PageTags});}
 	NavigateTop5 = () => { this.setState({page: PageTop5});}
-	Settings = () => { this.setState({page: PageSettings});}
+	WasteSettings = () => { this.setState({page: PageWasteSettings});}
 	WasteInput = () => {this.setState({page: PageWasteInput});}
+
+	NavDBSettings = () => {
+		this.setState({page: PageDBSettings});
+		this.ExtraSettings();
+	}
+	
+	ExtraSettings = () => {
+		const show=this.state.ExtraShow;
+		var val = "none";
+
+		if(show===true){
+			val = "block";
+		}else{
+			val = "none";
+		}
+
+		this.setState({ExtraShow: !show, ExtraCSS: val});
+	}
 }

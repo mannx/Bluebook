@@ -8,7 +8,7 @@ import "../TableView/table.css";
 /*
  * This page is currently only used to adjust wastage settings
  * */
-export default class Settings extends React.Component {
+export default class WasteSettings extends React.Component {
 	constructor(props) {
 		super(props);
 

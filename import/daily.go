@@ -97,10 +97,21 @@ func ImportDaily(fileName string, db *gorm.DB) error {
 			}
 		}
 
-		dd := extractData(f, i, d, version, db)
+		dd, blank := extractData(f, i, d, version, db)
 
 		// save to database
 		db.Save(&dd)
+
+		log.Debug().Msgf("Creating import list entry: %v", blank)
+		if blank == true {
+			// save the id that was just added to the db
+			log.Debug().Msgf("Creating import list entry ID: %v", dd.ID)
+
+			ent := models.DayDataImportList{
+				EntryID: dd.ID,
+			}
+			db.Save(&ent)
+		}
 	}
 
 	return nil
@@ -129,12 +140,13 @@ func getFloat(file *excelize.File, sheet string, cell string) float64 {
 	return n
 }
 
-func extractData(sheet *excelize.File, index int, date time.Time, ver int, db *gorm.DB) models.DayData {
+// extractData builds the DayData data from the sheet, returns true if was a new entry, or false if it was updated
+func extractData(sheet *excelize.File, index int, date time.Time, ver int, db *gorm.DB) (models.DayData, bool) {
 	log.Debug().Msgf("extractData(%v, %v, %v)", index, date, ver)
 
 	// 1) check if we already have an entry, if so, we will update it
 	//   otherwise use a fresh copy
-	dd := getDataOrNew(date, db)
+	dd, blank := getDataOrNew(date, db)
 
 	// 2) fill in the data from the sheet
 	//	any entry that uses a formula will automatically get the correct value
@@ -169,5 +181,5 @@ func extractData(sheet *excelize.File, index int, date time.Time, ver int, db *g
 	dd.CreditFood = getFloat(sheet, "Sheet1", CreditFood[ver][index])
 	dd.GiftCardSold = getFloat(sheet, "Sheet1", GiftCardSold[ver][index])
 
-	return dd
+	return dd, blank
 }
