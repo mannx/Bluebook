@@ -38,6 +38,8 @@ const urls = {
 	"Export": "/api/export/weekly",							// Export Weekly
 
 	"Top5": "/api/top5/view",
+
+	"ImportBackupDev": "/api/import/backup",
 }
 
 function UrlGet(name) {
