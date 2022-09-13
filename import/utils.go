@@ -55,7 +55,7 @@ func getDataOrNew(date time.Time, db *gorm.DB) (models.DayData, bool) {
 
 	// non empty entry, create a backup if not present already
 	backup := models.DayDataBackup{}
-	res = db.Find(&backup, "BackupID = ?", n.ID)
+	/*res = db.Find(&backup, "BackupID = ?", n.ID)
 	if res.Error != nil {
 		log.Warn().Err(res.Error).Msg(" => Unable to check for day backup entry, continuing without...")
 		return n, false
@@ -67,6 +67,10 @@ func getDataOrNew(date time.Time, db *gorm.DB) (models.DayData, bool) {
 	}
 
 	// no entry found, create the entry
+	backup.DayData = n
+	db.Save(&backup)*/
+
+	// create a copy of the data and save it
 	backup.DayData = n
 	db.Save(&backup)
 

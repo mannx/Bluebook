@@ -9,6 +9,7 @@ export default class DBSettings extends React.Component {
 
 		this.state = {
 			data: null,
+			backupRevertList:[],
 		}
 	}
 
@@ -42,12 +43,18 @@ export default class DBSettings extends React.Component {
 		</>);
 	}
 
+	revertButton = (func) => {
+		return <button onClick={func}>Revert</button>;
+	}
 	ShowBackupTable = () => {
+		const btn=this.state.backupRevertList.length !== 0 ? this.revertButton(this.DoRevertBackup) : "";
+
 		return (<>
 			<table className="MyStyle">
-				<caption><h3>Backup Day Data</h3></caption>
+				<caption><h3>Backup Day Data {btn}</h3></caption>
 				<thead>
 					<tr className="MyStyle">
+						<th className="MyStyle"></th>
 						<th className="MyStyle">ID</th>
 						<th className="MyStyle">Date</th>
 					</tr>
@@ -56,11 +63,12 @@ export default class DBSettings extends React.Component {
 					{this.state.data.Backup.map(function(obj,i){
 						return (<>
 							<tr>
+								<td><input type="checkbox" onChange={this.backupChecked} value={obj.ID}/></td>
 								<td>{obj.ID}</td>
-								<td>{obj.Date}</td>
+								<td>{obj.DateString}</td>
 							</tr>
 						</>);
-					})}
+					},this)}
 				</tbody>
 			</table>
 		</>);
@@ -88,5 +96,17 @@ export default class DBSettings extends React.Component {
 				</tbody>
 			</table>
 		</>);
+	}
+
+	backupChecked=(e)=>{
+		// add the id to the list
+		if(this.state.backupRevertList === null){
+			this.setState({backupRevertList: [e.target.value]});
+		}else{
+			this.setState({backupRevertList: [...this.state.backupRevertList, e.target.value]});
+		}
+	}
+
+	DoRevertBackup = () => {
 	}
 }

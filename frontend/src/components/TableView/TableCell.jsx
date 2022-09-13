@@ -69,8 +69,6 @@ export default class TableCell extends React.Component {
 			default: cls="NetSalesSame"; break;
 		}
 
-		//<!-- <td className={cls}>{this.O(this.props.data.NetSales)}</td> -->
-		// <td className={cls}><div className="tooltip">{this.O(this.props.data.NetSales)}<span className="tooltiptext">{this.O(this.props.data.WeeklyAverage)}</span></div></td>
 		return (
 			<tr key={this.props.data.ID}>
 				<td className="MyStyle">{this.Zero(this.props.data.DayOfMonth)}</td>

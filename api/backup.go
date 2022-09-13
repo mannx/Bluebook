@@ -2,6 +2,7 @@ package api
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/rs/zerolog/log"
@@ -52,9 +53,16 @@ func BackupHandler(c echo.Context, db *gorm.DB) error {
 		})
 	}
 
+	bkp := make([]models.DayDataBackup, len(backup))
+
+	// update the date string for each backup data item
+	for i, obj := range backup {
+		obj.DateString = time.Time(obj.Date).Format("Jan 02, 2006")
+		bkp[i] = obj
+	}
 	log.Debug().Msg("Returning backup data to client...")
 	return c.JSON(http.StatusOK, &data{
-		Backup: backup,
+		Backup: bkp,
 		List:   lst,
 	})
 }
