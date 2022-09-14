@@ -37,6 +37,7 @@ func initServer() *echo.Echo {
 
 	// test api for viewing/editing backup data after import
 	e.GET("/api/import/backup", func(c echo.Context) error { return api.BackupHandler(c, DB) })
+	e.POST("/api/import/backup/revert", func(c echo.Context) error { return api.BackupRevertHandler(c, DB) })
 
 	// comment editing
 	e.POST("/api/update/comment", func(c echo.Context) error { return api.UpdateCommentHandler(c, DB) })

@@ -1,5 +1,27 @@
 import React from "react";
-import UrlGet from "../URLs/URLs.jsx";
+import {UrlGet, GetPostOptions} from "../URLs/URLs.jsx";
+import DialogBox from "../Dialog/DialogBox.jsx";
+
+function RevertConfirmDialog(props) {
+	var contents = (<>
+		<h3>Revert Daily Entry's?</h3>
+			<div>
+			{props.ids.map(function(obj){
+				//if(obj !== null) {
+					for(var i = 0;i < props.data.Backup.length; i++) {
+						if(props.data.Backup[i].ID === obj) {
+							return <li>{props.data.Backup[i].DateString}</li>;
+						}
+					}
+				//}
+			})}
+		</div>
+	</>);
+
+	return (
+		<DialogBox visible={props.visible} onClose={props.onClose} onConfirm={props.onConfirm} contents={()=>{return contents;}}/>
+	);
+}
 
 // DBSettings is used to provide admin help functions for cleaning
 // up database entries, undo'ing imports, etc
@@ -10,6 +32,10 @@ export default class DBSettings extends React.Component {
 		this.state = {
 			data: null,
 			backupRevertList:[],
+			revertConfirm: false,
+
+			error: false,
+			errorMsg: null,
 		}
 	}
 
@@ -34,13 +60,18 @@ export default class DBSettings extends React.Component {
 			list = this.ShowImportTable();
 		}
 
+		const error = this.state.errorMsg !== null ? <span class="ErrorMsg">{this.state.errorMsg}</span> : <span></span>;
+
 		return (<>
 			<h3>Undo</h3>
+			{error}
 			{this.ControlTable()}
 			<div>
 				{backup}
 				{list}
 			</div>
+
+			<RevertConfirmDialog visible={this.state.revertConfirm} onClose={()=>this.setState({revertConfirm: false})} onConfirm={this.ConfirmRevert} data={this.state.data} ids={this.state.backupRevertList}/>
 		</>);
 	}
 
@@ -71,9 +102,14 @@ export default class DBSettings extends React.Component {
 				</thead>
 				<tbody>
 					{this.state.data.Backup.map(function(obj,i){
+						// only check the box if we something there
+						const undef = this.state.backupRevertList[i] !== undefined;
+						const nil = this.state.backupRevertList[i] !== null;
+						const checked = undef && nil;
+
 						return (<>
 							<tr>
-								<td><input type="checkbox" onChange={this.backupChecked} value={obj.ID} data-index={i}/></td>
+								<td><input type="checkbox" onChange={this.backupChecked} value={obj.ID} data-index={i} checked={checked}/></td>
 								<td>{obj.ID}</td>
 								<td>{obj.DateString}</td>
 							</tr>
@@ -126,5 +162,26 @@ export default class DBSettings extends React.Component {
 	}
 
 	DoRevertBackup = () => {
+		// display a confirmation dialog that we do indeed want to revert the selected days
+		// this should only be shown (and the button to click) if we have already selected an item
+		this.setState({revertConfirm: true});
+		console.log("confirm revert dialog");
+	}
+
+	ConfirmRevert = () => {
+		// get the list of id's to revert, remove all null entries
+		const idList = this.state.backupRevertList.filter(n => n !== null);
+		console.log("Reverting ids: " + idList);
+
+		// post the ids to the server and display result
+		const options = GetPostOptions(JSON.stringify(idList));
+		const url = UrlGet("ImportBackupRevert");
+
+		fetch(url, options)
+			.then(r=>r.json())
+			.then(r => this.setState({errorMsg: r.Message,error: r.Error}));
+
+		// send request and clear the selected data
+		this.setState({backupRevertList: [], revertConfirm: false});
 	}
 }

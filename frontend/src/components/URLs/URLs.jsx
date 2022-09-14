@@ -40,14 +40,31 @@ const urls = {
 	"Top5": "/api/top5/view",
 
 	"ImportBackupDev": "/api/import/backup",
+	"ImportBackupRevert" : "/api/import/backup/revert",		// Revert entries to previous state
 }
 
-function UrlGet(name) {
+export function UrlGet(name) {
 	var base = "";
 	if(production === false) {
 		base = baseURL;
 	}
 	return base+urls[name];
+}
+
+
+// headers sent when doing a POST operation
+const headers = {
+	'Content-Type': 'application/json',
+}
+
+// returns the default options used when sending a post request
+// NOTE: body is sent as is, make sure JSONify if required first
+export function GetPostOptions(body) {
+	return {
+		method: 'POST',
+		headers: headers,
+		body: body,
+	};
 }
 
 export default UrlGet;
