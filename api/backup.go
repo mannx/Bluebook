@@ -78,17 +78,22 @@ func BackupRevertHandler(c echo.Context, db *gorm.DB) error {
 	for _, id := range idList {
 		var dd models.DayDataBackup
 
-		res := db.Find(&dd, "ID = ?", id)
+		res := db.Find(&dd, "id = ?", id)
 		if res.Error != nil {
 			return LogAndReturnError(c, "Unable to retrieve ID from db for pBackupRevertHandler]", res.Error)
 		}
 
 		if res.RowsAffected == 0 {
-			log.Warn().Msgf("Unable to find record to revert for [BackupRevertHandler] ID = ", id)
+			log.Warn().Msgf("Unable to find record to revert for [BackupRevertHandler] ID = %v", id)
 			continue
 		}
 
-		log.Debug().Msgf("Reverting id={} for day {}", id, dd.DayData.GetDate())
+		log.Debug().Msgf("Reverting id=%v for day %v", id, dd.DayData.GetDate())
+
+		// get the original data
+		data := dd.DayData
+
+		db.Save(&data) // update it
 	}
 
 	return ReturnServerMessage(c, "Success", false)

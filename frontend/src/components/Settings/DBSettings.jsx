@@ -9,7 +9,7 @@ function RevertConfirmDialog(props) {
 			{props.ids.map(function(obj){
 				//if(obj !== null) {
 					for(var i = 0;i < props.data.Backup.length; i++) {
-						if(props.data.Backup[i].ID === obj) {
+						if(props.data.Backup[i].ID == obj) {
 							return <li>{props.data.Backup[i].DateString}</li>;
 						}
 					}
@@ -165,13 +165,19 @@ export default class DBSettings extends React.Component {
 		// display a confirmation dialog that we do indeed want to revert the selected days
 		// this should only be shown (and the button to click) if we have already selected an item
 		this.setState({revertConfirm: true});
-		console.log("confirm revert dialog");
 	}
 
 	ConfirmRevert = () => {
 		// get the list of id's to revert, remove all null entries
-		const idList = this.state.backupRevertList.filter(n => n !== null);
-		console.log("Reverting ids: " + idList);
+		const ids = this.state.backupRevertList.filter(n => n !== null);
+		var idList = [];
+
+		for(var i = 0; i < ids.length; i++) {
+			if( i !== null ) {
+				const n = parseInt(ids[i],10);
+				idList.push(n);
+			}
+		}
 
 		// post the ids to the server and display result
 		const options = GetPostOptions(JSON.stringify(idList));
