@@ -7,13 +7,30 @@ function RevertConfirmDialog(props) {
 		<h3>Revert Daily Entry's?</h3>
 			<div>
 			{props.ids.map(function(obj){
-				//if(obj !== null) {
-					for(var i = 0;i < props.data.Backup.length; i++) {
-						if(props.data.Backup[i].ID == obj) {
-							return <li>{props.data.Backup[i].DateString}</li>;
-						}
+				for(var i = 0;i < props.data.Backup.length; i++) {
+					if(props.data.Backup[i].ID == obj) {
+						return <li>{props.data.Backup[i].DateString}</li>;
 					}
-				//}
+				}
+			})}
+		</div>
+	</>);
+
+	return (
+		<DialogBox visible={props.visible} onClose={props.onClose} onConfirm={props.onConfirm} contents={()=>{return contents;}}/>
+	);
+}
+
+function UndoConfirmDialog(props) {
+	var contents = (<>
+		<h3>Revert Daily Entry's?</h3>
+			<div>
+			{props.ids.map(function(obj){
+				for(var i = 0;i < props.data.List.length; i++) {
+					if(props.data.List[i].EntryID == obj) {
+						return <li>{props.data.List[i].Item.DateString}</li>;
+					}
+				}
 			})}
 		</div>
 	</>);
@@ -31,9 +48,14 @@ export default class DBSettings extends React.Component {
 
 		this.state = {
 			data: null,
-			backupRevertList:[],
-			revertConfirm: false,
 
+			backupRevertList:[],		// list of items to revert changes to
+			revertConfirm: false,		// display confirmation dialog?
+
+			undoList: [],				// list of items to undo (no entry to revert changes)
+			undoConfirm: false,			// display confirm dialog?
+
+			emptyConfirm: false,		// display empty table dialog?
 			error: false,
 			errorMsg: null,
 		}
@@ -72,6 +94,8 @@ export default class DBSettings extends React.Component {
 			</div>
 
 			<RevertConfirmDialog visible={this.state.revertConfirm} onClose={()=>this.setState({revertConfirm: false})} onConfirm={this.ConfirmRevert} data={this.state.data} ids={this.state.backupRevertList}/>
+			<UndoConfirmDialog visible={this.state.undoConfirm} onClose={()=>this.setState({undoConfirm: false})} onConfirm={this.ConfirmUndo} data={this.state.data} ids={this.state.undoList}/>
+			<DialogBox visible={this.state.emptyConfirm} onClose={()=>this.setState({emptyConfirm: false})} onConfirm={this.ConfirmEmpty} contents={this.emptyContents}/>
 		</>);
 	}
 
@@ -82,13 +106,13 @@ export default class DBSettings extends React.Component {
 	ControlTable = () => {
 		return (<>
 			<div>
-				<button>Empty Tables</button>
+				<button onClick={this.emptyTables}>Empty Tables</button>
 			</div>
 		</>);
 	}
 
 	ShowBackupTable = () => {
-		const btn=this.state.backupRevertList.length !== 0 ? this.revertButton(this.DoRevertBackup) : "";
+		const btn = this.state.backupRevertList.length !== 0 ? this.revertButton(this.DoRevertBackup) : "";
 
 		return (<>
 			<table className="MyStyle">
@@ -121,30 +145,38 @@ export default class DBSettings extends React.Component {
 	}
 
 	ShowImportTable = () => {
+		const btn = this.state.undoList.length !== 0 ? this.revertButton(this.DoUndo) : "";
+
 		return (<>
 			<table className="MyStyle">
-				<caption><h3>New Import List</h3></caption>
+				<caption><h3>New Imports <br/>{btn}</h3></caption>
 				<thead>
 					<tr className="MyStyle">
+						<th className="MyStyle"></th>
 						<th className="MyStyle">ID</th>
 						<th className="MyStyle">Date</th>
 					</tr>
 				</thead>
 				<tbody>
-					{this.state.data.List.map(function(obj){
+					{this.state.data.List.map(function(obj, i){
+						const undef = this.state.undoList[i] !== undefined;
+						const nil = this.state.undoList[i] !== null;
+						const checked = undef && nil;
+
 						return (<>
 							<tr>
+								<td><input type="checkbox" onChange={this.undoChecked} value={obj.EntryID} data-index={i} checked={checked}/></td>
 								<td>{obj.EntryID}</td>
-								<td>{obj.Item.Date}</td>
+								<td>{obj.Item.DateString}</td>
 							</tr>
 						</>);
-					})}
+					},this)}
 				</tbody>
 			</table>
 		</>);
 	}
 
-	backupChecked=(e)=>{
+	backupChecked = (e) => {
 		// add the id to the list
 		var data=this.state.backupRevertList;
 		const id = e.target.dataset.index;
@@ -158,7 +190,6 @@ export default class DBSettings extends React.Component {
 		}
 
 		this.setState({backupRevertList: data});
-		console.log(data);
 	}
 
 	DoRevertBackup = () => {
@@ -167,9 +198,39 @@ export default class DBSettings extends React.Component {
 		this.setState({revertConfirm: true});
 	}
 
+	undoChecked = (e) => {
+		var data = this.state.undoList;
+		const id = e.target.dataset.index;
+
+		if(data[id] === undefined || data[id] === null) {
+			//add item to list
+			data[id] = e.target.value;
+		}else{
+			// remove the item
+			data[id] = null;
+		}
+
+		this.setState({undoList: data});
+	}
+
+	DoUndo = () => {
+		this.setState({undoConfirm: true});
+	}
+
 	ConfirmRevert = () => {
 		// get the list of id's to revert, remove all null entries
-		const ids = this.state.backupRevertList.filter(n => n !== null);
+		this.sendToServer(this.state.backupRevertList.filter(n => n !== null), UrlGet("ImportBackupList"));
+
+		// send request and clear the selected data
+		this.setState({backupRevertList: [], revertConfirm: false});
+	}
+
+	ConfirmUndo = () => {
+		this.sendToServer(this.state.undoList.filter(n => n !== null), UrlGet("ImportBackupUndo"));
+		this.setState({undoList: [], undoConfirm: false});
+	}
+
+	sendToServer = (ids, url) => {
 		var idList = [];
 
 		for(var i = 0; i < ids.length; i++) {
@@ -181,13 +242,27 @@ export default class DBSettings extends React.Component {
 
 		// post the ids to the server and display result
 		const options = GetPostOptions(JSON.stringify(idList));
-		const url = UrlGet("ImportBackupRevert");
-
 		fetch(url, options)
-			.then(r=>r.json())
+			.then(r => r.json())
 			.then(r => this.setState({errorMsg: r.Message,error: r.Error}));
+	}
 
-		// send request and clear the selected data
-		this.setState({backupRevertList: [], revertConfirm: false});
+	emptyTables = () => {
+		this.setState({emptyConfirm: true});
+	}
+
+	ConfirmEmpty = () => {
+		const url = UrlGet("ImportBackupEmpty");
+		const options = GetPostOptions(null);
+
+		fetch(url,options)
+			.then(r => r.json())
+			.then(r => this.setState({errorMsg: r.Message, error: r.Error}));
+
+		this.setState({emptyConfirm: false});
+	}
+
+	emptyContents = () => {
+		return <div>Confirm empty backup/undo tables?</div>;
 	}
 }

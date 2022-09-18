@@ -41,6 +41,8 @@ const urls = {
 
 	"ImportBackupDev": "/api/import/backup",
 	"ImportBackupRevert" : "/api/import/backup/revert",		// Revert entries to previous state
+	"ImportBackupUndo" : "/api/import/backup/undo",			// undo imports that didnt update any records
+	"ImportBackupEmpty" : "/api/import/backup/empty",		// empty backup tables
 }
 
 export function UrlGet(name) {

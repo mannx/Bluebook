@@ -47,6 +47,8 @@ func BackupHandler(c echo.Context, db *gorm.DB) error {
 			continue
 		}
 
+		dd.DateString = dd.GetDate()
+
 		lst = append(lst, importList{
 			EntryID: i.EntryID,
 			Item:    dd,
@@ -95,6 +97,32 @@ func BackupRevertHandler(c echo.Context, db *gorm.DB) error {
 
 		db.Save(&data) // update it
 	}
+
+	return ReturnServerMessage(c, "Success", false)
+}
+
+func BackupUndoHandler(c echo.Context, db *gorm.DB) error {
+	var idList []uint // list of id's to copy back
+
+	if err := c.Bind(&idList); err != nil {
+		log.Error().Err(err).Msg("Unable to retrieve id list for [BackupUndoHandler]")
+		return ReturnServerMessage(c, "Unable to retrieve id list for [BackupUndoHandler]", true)
+	}
+
+	// list of id's points to DayData objects
+	res := db.Delete(&models.DayData{}, idList)
+	if res.Error != nil {
+		return LogAndReturnError(c, "Unable to delete records for [BackupUndoHandler]", res.Error)
+	}
+
+	return ReturnServerMessage(c, "Success", false)
+}
+
+// BackupEmptyTables is used to clear out both undo tables
+func BackupEmptyHandler(c echo.Context, db *gorm.DB) error {
+	// 1 = 1 is used since a condition is required
+	db.Where("1 = 1").Delete(&models.DayDataBackup{})
+	db.Where("1 = 1").Delete(&models.DayDataImportList{})
 
 	return ReturnServerMessage(c, "Success", false)
 }
