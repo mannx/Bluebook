@@ -1,9 +1,9 @@
 Issues to fix
 =============
 
-* Implement deletion of item from waste holding
+* Implement deletion of item from waste holding (DONE?)
 
-* Implement wastage editing, ability to combine and remove duplicate entries
+* Wastage editing
 	- Can delete items, but doesn't refresh after doing so
 		+ calls both loadData() and forceUpdate() but wont update
 

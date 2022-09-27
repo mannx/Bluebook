@@ -43,6 +43,9 @@ export default class WasteInput extends React.Component {
 
 			confirmDlg: false,
 
+			deleteCheck: false,		// display checkbox to select items to remove
+			deleteItems: [],		// list of items to delete from the holding table
+
 			message: null,
 			error: false,
 		}
@@ -76,8 +79,8 @@ export default class WasteInput extends React.Component {
 	loadItems2 = (data) => {
 		if(data.Error === false) {
 			// have valid item data
-			const items = data.Items;
-			this.setState({items: data.Items,Error:false});
+			const items = data.Items === null ? this.NewItem() : data.Items;
+			this.setState({items: items,Error:false});
 		}else{
 			this.setState({Error:true,Message:data.Message});
 		}
