@@ -23,7 +23,29 @@ func TagListViewHandler(c echo.Context, db *gorm.DB) error {
 		return res.Error
 	}
 
-	return c.JSON(http.StatusOK, &tl)
+	type tagData struct {
+		models.TagList
+
+		TagCount int
+	}
+
+	var td []tagData
+	for _, i := range tl {
+		// get the number of entries using this tag
+		var data []models.TagData
+
+		res = db.Where("TagID = ?", i.ID).Find(&data)
+		if res.Error != nil {
+			return LogAndReturnError(c, "Unable to retrieve tag counts", res.Error)
+		}
+
+		td = append(td, tagData{
+			TagList:  i,
+			TagCount: len(data),
+		})
+	}
+
+	return c.JSON(http.StatusOK, &td)
 }
 
 // TagDataViewHandler returns all the days that use the given tag. Provided by parameter ID
@@ -123,6 +145,7 @@ func TagUpdateViewHandler(c echo.Context, db *gorm.DB) error {
 }
 
 // generate the empty day, save it to the database and return its id
+//
 //	check to see if a day already exists and return its id instead of creating a new entry
 //	if only a comment is present, no linked id will be sent and we end up here
 func genEmptyDay(db *gorm.DB, date time.Time) (uint, error) {

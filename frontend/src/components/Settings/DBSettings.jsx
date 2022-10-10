@@ -55,6 +55,8 @@ export default class DBSettings extends React.Component {
 			undoList: [],				// list of items to undo (no entry to revert changes)
 			undoConfirm: false,			// display confirm dialog?
 
+			confirmTags: false,
+
 			emptyConfirm: false,		// display empty table dialog?
 			error: false,
 			errorMsg: null,
@@ -85,7 +87,8 @@ export default class DBSettings extends React.Component {
 		const error = this.state.errorMsg !== null ? <span class="ErrorMsg">{this.state.errorMsg}</span> : <span></span>;
 
 		return (<>
-			<h3>Undo</h3>
+			<fieldset><legend>
+				<h3>Undo</h3></legend>
 			{error}
 			{this.ControlTable()}
 			<div>
@@ -96,6 +99,13 @@ export default class DBSettings extends React.Component {
 			<RevertConfirmDialog visible={this.state.revertConfirm} onClose={()=>this.setState({revertConfirm: false})} onConfirm={this.ConfirmRevert} data={this.state.data} ids={this.state.backupRevertList}/>
 			<UndoConfirmDialog visible={this.state.undoConfirm} onClose={()=>this.setState({undoConfirm: false})} onConfirm={this.ConfirmUndo} data={this.state.data} ids={this.state.undoList}/>
 			<DialogBox visible={this.state.emptyConfirm} onClose={()=>this.setState({emptyConfirm: false})} onConfirm={this.ConfirmEmpty} contents={this.emptyContents}/>
+			</fieldset>
+
+			<fieldset>
+				<legend><h3>Tag</h3></legend>
+				<button onClick={this.emptyTags}>Clear Empty Tags</button>
+				<DialogBox visible={this.state.confirmTags} onClose={()=>this.setState({confirmTags: false})} onConfirm={this.ConfirmTags} contents={this.tagsContents}/>
+			</fieldset>
 		</>);
 	}
 
@@ -264,5 +274,17 @@ export default class DBSettings extends React.Component {
 
 	emptyContents = () => {
 		return <div>Confirm empty backup/undo tables?</div>;
+	}
+
+	tagsContents = () => {
+		return <div>Remove Unused Tags?</div>;
+	}
+
+	emptyTags = () => {
+		this.setState({confirmTags:true});
+	}
+
+	ConfirmTags = () => {
+		// remove unused tags from server
 	}
 }

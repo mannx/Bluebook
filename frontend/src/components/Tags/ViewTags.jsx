@@ -45,7 +45,7 @@ export default class ViewTags extends React.Component {
 			<fieldset><legend>All Tags</legend>
 				<div><ul className={"tagList"}>
 				{this.state.tagList.map(function(obj, i) {
-					return <li><button  className='tag' onClick={() => this.viewTag(obj.ID) }>{obj.Tag}</button></li>;
+					return <li><button  className='tag' onClick={() => this.viewTag(obj.ID) }>{obj.Tag} ({obj.TagCount})</button></li>;
 				}, this)}
 				</ul></div>
 			</fieldset>
