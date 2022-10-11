@@ -70,6 +70,7 @@ func initServer() *echo.Echo {
 	e.GET("/api/tags/view", func(c echo.Context) error { return api.TagListViewHandler(c, DB) })
 	e.GET("/api/tags/data", func(c echo.Context) error { return api.TagDataViewHandler(c, DB) })
 	e.POST("/api/tags/update", func(c echo.Context) error { return api.TagUpdateViewHandler(c, DB) })
+	e.GET("/api/tags/clean", func(c echo.Context) error { return api.TagCleanHandler(c, DB) })
 
 	// Top5
 	e.GET("/api/top5/view", func(c echo.Context) error { return api.GetTop5ViewHandler(c, DB) })

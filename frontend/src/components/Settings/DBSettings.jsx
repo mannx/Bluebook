@@ -281,10 +281,14 @@ export default class DBSettings extends React.Component {
 	}
 
 	emptyTags = () => {
-		this.setState({confirmTags:true});
+		this.setState({confirmTags: true});
 	}
 
 	ConfirmTags = () => {
 		// remove unused tags from server
+		const url = UrlGet("TagClean");
+		fetch(url);	
+
+		this.setState({confirmTags: false});
 	}
 }

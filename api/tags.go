@@ -13,20 +13,50 @@ import (
 	"gorm.io/gorm"
 )
 
-// TagListViewHandler returns a list of all tags paired with their id
-func TagListViewHandler(c echo.Context, db *gorm.DB) error {
+type tagData struct {
+	models.TagList
+
+	TagCount int
+}
+
+func getTagDataWithCount(db *gorm.DB) ([]tagData, error) {
 	var tl []models.TagList
 
 	res := db.Order("Tag").Find(&tl)
 	if res.Error != nil {
 		log.Error().Err(res.Error).Msg("Unable to retrieve tag list")
-		return res.Error
+		//return res.Error
+		return nil, res.Error
 	}
 
-	type tagData struct {
-		models.TagList
+	var td []tagData
+	for _, i := range tl {
+		// get the number of entries using this tag
+		var data []models.TagData
 
-		TagCount int
+		res = db.Where("TagID = ?", i.ID).Find(&data)
+		if res.Error != nil {
+			//return LogAndReturnError(c, "Unable to retrieve tag counts", res.Error)
+			return nil, res.Error
+		}
+
+		td = append(td, tagData{
+			TagList:  i,
+			TagCount: len(data),
+		})
+	}
+
+	return td, nil
+}
+
+// TagListViewHandler returns a list of all tags paired with their id
+func TagListViewHandler(c echo.Context, db *gorm.DB) error {
+	/*var tl []models.TagList
+
+	res := db.Order("Tag").Find(&tl)
+	if res.Error != nil {
+		log.Error().Err(res.Error).Msg("Unable to retrieve tag list")
+		return res.Error
 	}
 
 	var td []tagData
@@ -43,6 +73,11 @@ func TagListViewHandler(c echo.Context, db *gorm.DB) error {
 			TagList:  i,
 			TagCount: len(data),
 		})
+	}*/
+
+	td, err := getTagDataWithCount(db)
+	if err != nil {
+		return LogAndReturnError(c, "Unable to retrieve tag counts", err)
 	}
 
 	return c.JSON(http.StatusOK, &td)
@@ -220,4 +255,27 @@ func updateTags(id uint, tags string, db *gorm.DB) {
 			db.Save(&td)
 		}()
 	}
+}
+
+// TagCleanHandler removes all unused tags
+func TagCleanHandler(c echo.Context, db *gorm.DB) error {
+	// get list of all tags and their counts
+	td, err := getTagDataWithCount(db)
+	if err != nil {
+		return LogAndReturnError(c, "Unable to retrieve tag data", err)
+	}
+
+	ids := make([]uint, 0)
+	for _, i := range td {
+		if i.TagCount == 0 {
+			// add id to list
+			ids = append(ids, i.ID)
+		}
+	}
+
+	// remove all ids from the db
+	log.Debug().Msg("Removing all unused tags")
+	db.Delete(&models.TagList{}, ids)
+
+	return ReturnServerMessage(c, "Success", false)
 }
