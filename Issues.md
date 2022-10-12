@@ -20,3 +20,11 @@ Issues to fix
 	+ Find way of saving output to file.  Docker seems to sometimes only store echo logs, and
 	  not logs from main logging system.
 	+ Switch echo components to use main logging system instead of its own if possible
+
+
+TO DO
+====
+
+* Parse WISR into database table with item name, over/short, price per item, (category?)
+* Generate list of items +/- to include on waste sheet (show N, user selects 5)
+* Generate wastage report based on user selected items
