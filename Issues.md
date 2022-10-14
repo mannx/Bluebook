@@ -3,6 +3,12 @@ Issues to fix
 
 * Implement deletion of item from waste holding (DONE?)
 
+* Include date with items on wastage entry
+	- Skip over when tabbing (DONE)
+	- set date based on previously set date (update first entry, use same date for all new entries until date is chnaged for those)
+	- make sure date is stored in db and returned to frontend
+	- allow generation of wastage sheet based off input dates/items/amounts (reverse wastage import)
+
 * Wastage editing
 	- Can delete items, but doesn't refresh after doing so
 		+ calls both loadData() and forceUpdate() but wont update

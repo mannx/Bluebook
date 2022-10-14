@@ -36,6 +36,10 @@ export default class WasteInput extends React.Component {
 			d.setDate(d.getDate() - 1);
 		}
 
+		// get the date for the start of the week
+		var start = new Date();
+		// TODO: adjust date to the previous wednesday
+		
 		this.state = {
 			items: [],
 			names: [],
@@ -112,6 +116,7 @@ export default class WasteInput extends React.Component {
 				<table>
 					<thead>
 					<tr>
+						<th>Date</th>
 						<th>Item</th>
 						<th>Quantity</th>
 						<th></th>
@@ -180,6 +185,7 @@ export default class WasteInput extends React.Component {
 		const edit = idx === size;
 
 		return (<tr>
+			<td><DatePicker tabIndex={-1}/></td>
 			<td>{this.itemField(obj,idx,edit)}</td>
 			<td>{this.quantityField(obj, idx, edit)}</td>
 			<td>{idx === size ? this.addBtn(idx) : this.updateBtn(idx)}</td>
