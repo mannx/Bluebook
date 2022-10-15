@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 	"sort"
 	"strconv"
@@ -283,6 +284,7 @@ func GetWasteNamesHandler(c echo.Context, db *gorm.DB) error {
 }
 
 type wasteHoldingJSON struct {
+	Date     string
 	Name     string  // name of the item
 	Quantity float64 // amount
 	ID       uint    // id of the entry
@@ -310,11 +312,16 @@ func getWasteHoldingEntries(db *gorm.DB) []wasteHoldingJSON {
 			name = waste.Name
 		}
 
+		// format the date to the expected type
+		dateStr := time.Time(i.Date)
+		log.Debug().Msgf("dateStr: [%v]", dateStr)
+
 		out = append(out,
 			wasteHoldingJSON{
 				Name:     name,
 				Quantity: i.Amount,
 				ID:       i.ID,
+				Date:     dateStr.Format(time.RFC3339),
 			})
 	}
 
@@ -326,7 +333,10 @@ func GetWasteHoldingHandler(c echo.Context, db *gorm.DB) error {
 }
 
 func AddWasteHoldingHandler(c echo.Context, db *gorm.DB) error {
+	log.Debug().Msg("[AddWasteHoldingHandler]")
+
 	type addWasteHolding struct {
+		Date     string
 		Name     string
 		Quantity string
 	}
@@ -336,6 +346,13 @@ func AddWasteHoldingHandler(c echo.Context, db *gorm.DB) error {
 		log.Error().Err(err).Msg("Unable to bind parameters [AddWasteHoldingHandler]")
 		return ReturnServerMessage(c, "Unable to bind paramters", true)
 	}
+
+	date, err := time.Parse(time.RFC3339, data.Date)
+	if err != nil {
+		return LogAndReturnError(c, fmt.Sprintf("Unable to parse input time [%v]", data.Date), err)
+	}
+
+	log.Debug().Msgf("Date: [%v]", date)
 
 	// get the item we are adding to the hold
 	// if we dont have it, add it to the db and returns its id
@@ -351,6 +368,7 @@ func AddWasteHoldingHandler(c echo.Context, db *gorm.DB) error {
 	entry := models.WastageEntryHolding{
 		Item:   item,
 		Amount: amount,
+		Date:   datatypes.Date(date),
 	}
 
 	db.Save(&entry)

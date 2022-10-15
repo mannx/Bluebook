@@ -1,7 +1,8 @@
 import React from "react";
-import UrlGet from "../URLs/URLs.jsx";
+import {UrlGet, GetPostOptions} from "../URLs/URLs.jsx";
 import DatePicker from "react-datepicker";
 import DialogBox from "../Dialog/DialogBox.jsx";
+import FormatUTC from "../Utils/Utils.jsx";
 
 import "../Dialog/dialog.css";
 import "react-datepicker/dist/react-datepicker.css";
@@ -44,6 +45,8 @@ export default class WasteInput extends React.Component {
 			items: [],
 			names: [],
 			date: d,			// week ending date for this wastage
+
+			currDate: start,		// current date we are using for all new entries
 
 			confirmDlg: false,
 
@@ -180,12 +183,27 @@ export default class WasteInput extends React.Component {
 		}
 	}
 
+	dateField = (obj, idx, edit) => {
+		// const date = new Date(obj.Date);
+		const date =  FormatUTC(obj.Date, true);
+
+		return (<>
+			<DatePicker selected={date} tabIndex={-1} onChange={
+				(e) => {
+					var items = this.state.items;
+					items[idx].Date = e;
+					this.setState({items: items});
+				}}
+			/>
+		</>);
+	}
+
 	entryFields = (obj, idx) => {
 		const size = this.state.items.length - 1;
 		const edit = idx === size;
 
 		return (<tr>
-			<td><DatePicker tabIndex={-1}/></td>
+			<td>{this.dateField(obj, idx, edit)}</td>
 			<td>{this.itemField(obj,idx,edit)}</td>
 			<td>{this.quantityField(obj, idx, edit)}</td>
 			<td>{idx === size ? this.addBtn(idx) : this.updateBtn(idx)}</td>
@@ -197,18 +215,14 @@ export default class WasteInput extends React.Component {
 
 
 	NewItem = () => {
-		this.setState({items: [...this.state.items, {Name: "",Quantity:0}]});
+		this.setState({items: [...this.state.items, {Date: this.state.currDate, Name: "",Quantity:0}]});
 	}
 
 	// take the current item and send to the server to add to the holding table
 	// refresh data afterwards
 	// takes index to the item in the state we are adding
 	AddItem = (idx) => {
-		const options = {
-			method: 'POST',
-			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify(this.state.items[idx])
-		}
+		const options = GetPostOptions(JSON.stringify(this.state.items[idx]));
 
 		// post the data
 		fetch(UrlGet("WasteInputAdd"), options)

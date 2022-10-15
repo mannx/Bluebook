@@ -4,9 +4,7 @@ Issues to fix
 * Implement deletion of item from waste holding (DONE?)
 
 * Include date with items on wastage entry
-	- Skip over when tabbing (DONE)
-	- set date based on previously set date (update first entry, use same date for all new entries until date is chnaged for those)
-	- make sure date is stored in db and returned to frontend
+	- date for each item is stored in db, but shown as 1 day prior to user (timezone issue? manually fix time server side?)
 	- allow generation of wastage sheet based off input dates/items/amounts (reverse wastage import)
 
 * Wastage editing

@@ -43,9 +43,7 @@ var locationStringTable = map[int]string{
 	WasteLocationBread:      "Bread",
 }
 
-//
-//	Contains description of a single item and how it is counted
-//
+// Contains description of a single item and how it is counted
 type WastageItem struct {
 	gorm.Model
 
@@ -60,9 +58,7 @@ type WastageItem struct {
 	LocationString string `gorm:"-"` // string version of the location
 }
 
-//
-//	Contains 1 item that has been wasted
-//
+// Contains 1 item that has been wasted
 type WastageEntry struct {
 	gorm.Model
 
@@ -71,15 +67,15 @@ type WastageEntry struct {
 	Amount float64        `gorm:"column:Amount"`
 }
 
-//
-//	Contains a WastageEntry entry while editing.  Once all entries have been added,
-//	will get moved into WastageEntry table and these entries cleared out.
-//	This lets us start entering data, but dont have to submit until ready to the main tables
+// Contains a WastageEntry entry while editing.  Once all entries have been added,
+// will get moved into WastageEntry table and these entries cleared out.
+// This lets us start entering data, but dont have to submit until ready to the main tables
 type WastageEntryHolding struct {
 	gorm.Model
 
-	Item   uint    `gorm:"column:Item"`
-	Amount float64 `gorm:"column:Amount"`
+	Date   datatypes.Date `gorm:"column:Date"`
+	Item   uint           `gorm:"column:Item"`
+	Amount float64        `gorm:"column:Amount"`
 }
 
 //
