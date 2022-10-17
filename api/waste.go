@@ -20,8 +20,7 @@ func GetWasteSettingHandler(c echo.Context, db *gorm.DB) error {
 	var data []models.WastageItem
 	res := db.Order("Name").Find(&data)
 	if res.Error != nil {
-		log.Error().Err(res.Error).Msg("Unable to retrieve wastage items")
-		return res.Error
+		return LogAndReturnError(c, "Unable to retrieve wastage items", res.Error)
 	}
 
 	type WastageSetting struct {
@@ -58,8 +57,7 @@ func UpdateWasteSettingHandler(c echo.Context, db *gorm.DB) error {
 	data := make([]models.WastageItem, 0)
 
 	if err := c.Bind(&data); err != nil {
-		log.Error().Err(err).Msg("Failed to bind data for UpdateWasteSetting")
-		return err
+		return LogAndReturnError(c, "Failed to bind data for UpdateWasteSettign", err)
 	}
 
 	// process changes
@@ -136,11 +134,10 @@ func GetWasteViewHandler(c echo.Context, db *gorm.DB) error {
 	}
 
 	// retrieve the data
-	waste := make([]models.WastageEntry, 10) // 10 init size can be tweaked
+	waste := make([]models.WastageEntry, 0)
 	res := db.Order("Date").Find(&waste, "Date >= ? AND Date <= ?", weekStart, weekEnding)
 	if res.Error != nil {
-		log.Error().Err(res.Error).Msg("Unable to retrieve wastage data")
-		return res.Error
+		return LogAndReturnError(c, "Unable to retrieve wastage data", res.Error)
 	}
 
 	// total same units together
@@ -195,8 +192,7 @@ func DeleteWasteItemHandler(c echo.Context, db *gorm.DB) error {
 	var items []int
 
 	if err := c.Bind(&items); err != nil {
-		log.Error().Err(err).Msg("Unable to bind parameters for [DeleteWasteItemHandler]")
-		return err
+		return LogAndReturnError(c, "Unable to bind parameters for [DeleteWasteItemHandler]", err)
 	}
 
 	// delete the items from the db
@@ -214,8 +210,7 @@ func AddNewWasteItemHandler(c echo.Context, db *gorm.DB) error {
 
 	var info itemInfo
 	if err := c.Bind(&info); err != nil {
-		log.Error().Err(err).Msg("Unable to bind paramters. [AddNewWasteItemHandler]")
-		return ReturnServerMessage(c, "Unable to bind paramters", true)
+		return LogAndReturnError(c, "Unable to bind parameters", err)
 	}
 
 	wi := models.WastageItem{
@@ -237,8 +232,7 @@ func CombineWasteHandler(c echo.Context, db *gorm.DB) error {
 
 	var data combineData
 	if err := c.Bind(&data); err != nil {
-		log.Error().Err(err).Msg("Unable to bind parameters [CombineWasteHandler]")
-		return err
+		return LogAndReturnError(c, "Unable to bind parameters [CombineWasteHandler]", err)
 	}
 
 	// make sure the target item is not in the list of items to retrieve
@@ -254,8 +248,7 @@ func CombineWasteHandler(c echo.Context, db *gorm.DB) error {
 
 		res := db.Where("Item = ?", i).Find(&wi)
 		if res.Error != nil {
-			log.Error().Err(res.Error).Msg("Unable to retrieve wastage entries to combine")
-			return ReturnServerMessage(c, "Unable to retrieve entries to combine", true)
+			return LogAndReturnError(c, "Unable to retrieve entries to combine", res.Error)
 		}
 
 		for _, obj := range wi {
@@ -271,8 +264,7 @@ func GetWasteNamesHandler(c echo.Context, db *gorm.DB) error {
 	var items []models.WastageItem
 	res := db.Find(&items)
 	if res.Error != nil {
-		log.Error().Err(res.Error).Msg("Unable to retrieve wastage items for [GetWasteNamesHandler]")
-		return ReturnServerMessage(c, "Unable to retrieve names", true)
+		return LogAndReturnError(c, "Unable to retrieve names", res.Error)
 	}
 
 	names := make([]string, 0)
@@ -284,10 +276,13 @@ func GetWasteNamesHandler(c echo.Context, db *gorm.DB) error {
 }
 
 type wasteHoldingJSON struct {
-	Date     string
+	// Date     string
 	Name     string  // name of the item
 	Quantity float64 // amount
 	ID       uint    // id of the entry
+	Year     int
+	Month    int
+	Day      int
 }
 
 func getWasteHoldingEntries(db *gorm.DB) []wasteHoldingJSON {
@@ -314,6 +309,7 @@ func getWasteHoldingEntries(db *gorm.DB) []wasteHoldingJSON {
 
 		// format the date to the expected type
 		dateStr := time.Time(i.Date)
+		date := time.Time(i.Date)
 		log.Debug().Msgf("dateStr: [%v]", dateStr)
 
 		out = append(out,
@@ -321,7 +317,9 @@ func getWasteHoldingEntries(db *gorm.DB) []wasteHoldingJSON {
 				Name:     name,
 				Quantity: i.Amount,
 				ID:       i.ID,
-				Date:     dateStr.Format(time.RFC3339),
+				Year:     date.Year(),
+				Month:    int(date.Month()) - 1,
+				Day:      date.Day(),
 			})
 	}
 
@@ -343,8 +341,7 @@ func AddWasteHoldingHandler(c echo.Context, db *gorm.DB) error {
 
 	var data addWasteHolding
 	if err := c.Bind(&data); err != nil {
-		log.Error().Err(err).Msg("Unable to bind parameters [AddWasteHoldingHandler]")
-		return ReturnServerMessage(c, "Unable to bind paramters", true)
+		return LogAndReturnError(c, "Unable to bind paramters", err)
 	}
 
 	date, err := time.Parse(time.RFC3339, data.Date)
@@ -383,15 +380,13 @@ func WasteHoldingDeleteHandler(c echo.Context, db *gorm.DB) error {
 
 	var input holdingInput
 	if err := c.Bind(&input); err != nil {
-		log.Error().Err(err).Msg("[WasteHoldingDeleteHandler] Unable to bind paramters")
-		return ReturnServerMessage(c, "Unable to bind parameters", true)
+		return LogAndReturnError(c, "Unable to bind parameters", err)
 	}
 
 	var entry models.WastageEntryHolding
 	res := db.Find(&entry, input.ID)
 	if res.Error != nil {
-		log.Error().Err(res.Error).Msg("Unable to retrieve holding entry for [WasteHoldingDeleteHandler]")
-		return ReturnServerMessage(c, "Unable to retrieve item from id", true)
+		return LogAndReturnError(c, "Unable to retrieve item from id", res.Error)
 	}
 
 	db.Delete(&entry)
@@ -411,16 +406,11 @@ func WasteHoldingDeleteHandler(c echo.Context, db *gorm.DB) error {
 	// along with the current holding table
 	res = db.Find(&ret.Items)
 	if res.Error != nil {
-		log.Error().Err(res.Error).Msg("Unable to retrieve holding table (2) for [WasteHoldingDeleteHandler]")
-		return ReturnServerMessage(c, "Unable to retrieve holding table", true)
+		return LogAndReturnError(c, "Unable to retrieve holding table (2) for [WasteHoldingDeleteHandler]", res.Error)
 	}
 
 	return c.JSON(http.StatusOK, &ret)
 }
-
-//
-//
-//
 
 // WasteHoldingConfirmHandler confirms the holding table and merges it into the waste table.
 //
@@ -435,8 +425,7 @@ func WasteHoldingConfirmHandler(c echo.Context, db *gorm.DB) error {
 	var data wasteConfirm
 
 	if err := c.Bind(&data); err != nil {
-		log.Error().Err(err).Msg("[WasteHoldingConfirm] Unable to bind week ending date")
-		return ReturnServerMessage(c, "Unable to bind week ending date", true)
+		return LogAndReturnError(c, "[WasteHoldingConfirm] Unable to bind week ending date", err)
 	}
 
 	// build the date object for each item
@@ -446,8 +435,7 @@ func WasteHoldingConfirmHandler(c echo.Context, db *gorm.DB) error {
 	var holding []models.WastageEntryHolding
 	res := db.Find(&holding)
 	if res.Error != nil {
-		log.Error().Err(res.Error).Msg("[WastageHoldingConfirm] Unable to retrieve wastage holding data")
-		return ReturnServerMessage(c, "DB Error", true)
+		return LogAndReturnError(c, "[WastageHoldingConfirm] Unable to retrieve wastage holding data", res.Error)
 	}
 
 	// convert to wastage entries
@@ -459,9 +447,6 @@ func WasteHoldingConfirmHandler(c echo.Context, db *gorm.DB) error {
 				Item:   i.Item,
 				Date:   datatypes.Date(date),
 				Amount: i.Amount,
-				//
-				//
-				//
 			})
 	}
 
@@ -472,11 +457,8 @@ func WasteHoldingConfirmHandler(c echo.Context, db *gorm.DB) error {
 	//	need Where() to force the delete of the table
 	db.Where("1 = 1").Delete(&models.WastageEntryHolding{})
 
-	//
 	return ReturnServerMessage(c, "Merge Success", false)
 }
-
-//
 
 // return the id of a wastage item given its name,
 //
@@ -511,9 +493,9 @@ func RemoveUnusedWasteItems(c echo.Context, db *gorm.DB) error {
 
 	res := db.Find(&items)
 	if res.Error != nil {
-		//
-		log.Error().Err(res.Error).Msg("Unable to retrieve wastage items")
-		return ReturnServerMessage(c, "Unable to retrieve wastage items", true)
+		// log.Error().Err(res.Error).Msg("Unable to retrieve wastage items")
+		// return ReturnServerMessage(c, "Unable to retrieve wastage items", true)
+		return LogAndReturnError(c, "Unable to retrieve wastage items", res.Error)
 	}
 
 	remove := make([]uint, 0)
@@ -538,4 +520,41 @@ func RemoveUnusedWasteItems(c echo.Context, db *gorm.DB) error {
 	db.Delete(&models.WastageItem{}, remove)
 
 	return ReturnServerMessage(c, "Removed unused waste items", false)
+}
+
+// export waste report for given end of week date POST'd to us
+func WasteExport(c echo.Context, db *gorm.DB) error {
+	type inputDate struct {
+		Year  int
+		Month int
+		Day   int
+	}
+
+	var input inputDate
+
+	if err := c.Bind(&input); err != nil {
+		return LogAndReturnError(c, "[WasteExport] Unable to bind parameters", err)
+	}
+
+	// build the end date, and determine the start of the week
+	endDate := time.Date(input.Year, time.Month(input.Month), input.Day, 0, 0, 0, 0, time.UTC)
+	startDate := endDate.AddDate(0, 0, -6)
+
+	log.Debug().Msgf("[WasteExport] Start: [%v]", startDate)
+	log.Debug().Msgf("              End: [%v]", endDate)
+
+	// retrieve the data
+	waste := make([]models.WastageEntry, 0)
+	res := db.Order("Date").Find(&waste, "Date >= ? AND Date <= ?", startDate, endDate)
+	if res.Error != nil {
+		return LogAndReturnError(c, "[WasteExport] Unable to retrieve wastage data", res.Error)
+	}
+
+	// perform the actual export of the data
+	err := exportWaste(waste)
+	if err != nil {
+		return LogAndReturnError(c, "[WasteExport] Unable to export data", err)
+	}
+
+	return ReturnServerMessage(c, "Success", false)
 }

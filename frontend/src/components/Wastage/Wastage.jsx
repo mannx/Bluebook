@@ -1,7 +1,7 @@
 import React from "react";
 import NumberFormat from "react-number-format";
 import DatePicker from "react-datepicker";
-import UrlGet from "../URLs/URLs.jsx";
+import {UrlGet, GetPostOptions} from "../URLs/URLs.jsx";
 
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -18,8 +18,11 @@ export default class Wastage extends React.Component {
 		this.state = {
 			date: d,
 			data: null,
+
 			errorMsg: "",
 			error: false,
+
+			shown: false,			// have we shown waste for a day yet? require before export
 		}
 	}
 
@@ -42,6 +45,7 @@ export default class Wastage extends React.Component {
 			<div><span>Pick Week To View:</span>
 				<DatePicker selected={this.state.date} onChange={(d)=>this.setState({date:d})} />
 				<button onClick={this.updateView}>View</button>
+				<button onClick={this.exportWaste}>Export</button>
 				<div>{this.state.errorMsg}</div>
 			</div>);
 	}
@@ -58,6 +62,32 @@ export default class Wastage extends React.Component {
 		}
 
 		this.loadData();
+
+		// mark that we have shown a wastage day
+		this.setState({shown: true});
+	}
+
+	exportWaste = () => {
+		// make sure a day has been viewed before we try and export
+		if(this.state.shown !== true) {
+			this.setState({error: true, errorMsg: "View data before exporting"});
+			return;
+		}
+
+		// get the end of week date
+		const month=this.state.date.getMonth()+1;
+		const day = this.state.date.getDate();
+		const year = this.state.date.getFullYear();
+
+		const body = {
+			Month: month,
+			Day: day,
+			Year: year,
+		}
+
+		const options = GetPostOptions(JSON.stringify(body));
+
+		fetch(UrlGet("WasteExport"), options);
 	}
 
 	render() {

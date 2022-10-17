@@ -2,7 +2,6 @@ import React from "react";
 import {UrlGet, GetPostOptions} from "../URLs/URLs.jsx";
 import DatePicker from "react-datepicker";
 import DialogBox from "../Dialog/DialogBox.jsx";
-import FormatUTC from "../Utils/Utils.jsx";
 
 import "../Dialog/dialog.css";
 import "react-datepicker/dist/react-datepicker.css";
@@ -77,6 +76,12 @@ export default class WasteInput extends React.Component {
 		}
 
 		if(data.length !== 0) {
+			for(var i = 0; i < data.length; i++) {
+				// create the date fields
+				// server sends date in broken format, assemble to make sure correct
+				data[i].Date = new Date(data[i].Year, data[i].Month, data[i].Day, 0, 0, 0, 0);
+			}
+
 			this.setState({items: data});
 		}
 
@@ -184,11 +189,8 @@ export default class WasteInput extends React.Component {
 	}
 
 	dateField = (obj, idx, edit) => {
-		// const date = new Date(obj.Date);
-		const date =  FormatUTC(obj.Date, true);
-
 		return (<>
-			<DatePicker selected={date} tabIndex={-1} onChange={
+			<DatePicker selected={obj.Date} tabIndex={-1} onChange={
 				(e) => {
 					var items = this.state.items;
 					items[idx].Date = e;
@@ -215,7 +217,13 @@ export default class WasteInput extends React.Component {
 
 
 	NewItem = () => {
-		this.setState({items: [...this.state.items, {Date: this.state.currDate, Name: "",Quantity:0}]});
+		const year = this.state.currDate.getFullYear();
+		const month = this.state.currDate.getMonth();
+		const day = this.state.currDate.getDate();
+		// const date = new Date(year, month, day, 0, 0, 0, 0);
+		const date = this.state.currDate;
+
+		this.setState({items: [...this.state.items, {Date: date, Year: year, Month: month, Day: day, Name: "",Quantity:0}]});
 	}
 
 	// take the current item and send to the server to add to the holding table

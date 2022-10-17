@@ -8,6 +8,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	env "github.com/mannx/Bluebook/environ"
+	models "github.com/mannx/Bluebook/models"
 	"github.com/rs/zerolog/log"
 	"github.com/xuri/excelize/v2"
 	"gorm.io/gorm"
@@ -100,4 +101,8 @@ func ExportWeekly(c echo.Context, db *gorm.DB) error {
 	// adjust ownership to PUID/PGID (container runs as root?)
 	os.Chown(outPath, env.Environment.GroupID, env.Environment.UserID)
 	return ReturnServerMessage(c, "OK", false)
+}
+
+func exportWaste(waste []models.WastageEntry) error {
+	return nil
 }
