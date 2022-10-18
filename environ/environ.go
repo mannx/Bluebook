@@ -41,3 +41,13 @@ func (e *EnvironmentDefinition) Default() {
 	e.TempPath = "/tmp"
 	e.DataPath = "/data"
 }
+
+// Log all the currently set environment data
+func (e *EnvironmentDefinition) Log() {
+	log.Debug().Msgf("ImportPath: %v", e.ImportPath)
+	log.Debug().Msgf("OutputPath: %v", e.OutputPath)
+	log.Debug().Msgf("TempPath: %v", e.TempPath)
+	log.Debug().Msgf("DataPath: %v", e.DataPath)
+	log.Debug().Msgf("UserID: %v", e.UserID)
+	log.Debug().Msgf("GroupID: %v", e.GroupID)
+}

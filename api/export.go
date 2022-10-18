@@ -32,6 +32,16 @@ var targetHours = "D25"
 var gcSold = "D26"
 var gcRedeem = "D27"
 
+// mapings for the initial cells for the waste chart
+//
+//	only noted are columns, and the starting row, since cell name is formed at runtime
+var wasteDate = "A"
+var wasteItem = "B"
+var wasteWeight = "C"
+var wasteReason = "D"
+
+var wasteStartRow = 2
+
 // Export weekly from given date into excel template
 // outputs in Environment.OutputDir
 func ExportWeekly(c echo.Context, db *gorm.DB) error {
@@ -103,6 +113,37 @@ func ExportWeekly(c echo.Context, db *gorm.DB) error {
 	return ReturnServerMessage(c, "OK", false)
 }
 
-func exportWaste(waste []models.WastageEntry) error {
+// exportWaste creates a new wastage chart with the given wastage entries on it
+func exportWaste(waste []models.WastageEntryNamed, weekEnding time.Time) error {
+	// get the path to the template
+	path := filepath.Join(env.Environment.DataPath, "waste.xlsx")
+	f, err := excelize.OpenFile(path)
+	if err != nil {
+		log.Error().Err(err).Msgf("Unable to open waste template: %v", path)
+		return err
+	}
+
+	defer f.Close()
+
+	// loop through each entry and add it to the sheet
+	for i, e := range waste {
+		// generate the required cell values
+		date := fmt.Sprintf("%v%v", wasteDate, i+wasteStartRow)
+		item := fmt.Sprintf("%v%v", wasteItem, i+wasteStartRow)
+		weight := fmt.Sprintf("%v%v", wasteWeight, i+wasteStartRow)
+
+		// log.Debug().Msgf("[Date: %v] [Item: %v] [Weight: %v] [Name: %v", date, item, weight, e.Name)
+		f.SetCellValue("Waste Sheet", date, e.Date)
+		f.SetCellValue("Waste Sheet", item, e.Name)
+		f.SetCellValue("Waste Sheet", weight, e.Amount)
+	}
+
+	// generate our output file name and save
+	fname := fmt.Sprintf("%v Waste Chart.xlsx", weekEnding.Format("01-02-06"))
+	outPath := filepath.Join(env.Environment.OutputPath, fname)
+	f.SaveAs(outPath)
+
+	// adjust ownership to PUID/PGID (container runs as root?)
+	os.Chown(outPath, env.Environment.GroupID, env.Environment.UserID)
 	return nil
 }

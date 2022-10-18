@@ -40,6 +40,7 @@ func main() {
 
 	log.Info().Msg("Initializing environment...")
 	env.Environment.Init()
+	// env.Environment.Log()
 
 	log.Info().Msg("Initializing top5 list...")
 	api.InitTop5()

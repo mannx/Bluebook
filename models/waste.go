@@ -67,6 +67,13 @@ type WastageEntry struct {
 	Amount float64        `gorm:"column:Amount"`
 }
 
+// WastageEntry but with the Item name instead of the index.  Not stored in DB, only used to pass data along
+type WastageEntryNamed struct {
+	Name   string
+	Date   datatypes.Date
+	Amount float64
+}
+
 // Contains a WastageEntry entry while editing.  Once all entries have been added,
 // will get moved into WastageEntry table and these entries cleared out.
 // This lets us start entering data, but dont have to submit until ready to the main tables

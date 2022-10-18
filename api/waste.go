@@ -550,8 +550,35 @@ func WasteExport(c echo.Context, db *gorm.DB) error {
 		return LogAndReturnError(c, "[WasteExport] Unable to retrieve wastage data", res.Error)
 	}
 
+	// retrieve all entry item names to prepare for export
+	names := make(map[uint]string)
+	output := make([]models.WastageEntryNamed, 0)
+
+	for _, e := range waste {
+		// retrieve the entry name
+		n, ok := names[e.Item]
+		if !ok {
+			// not found, lookup and store
+			var item models.WastageItem
+			res = db.Find(&item, "ID = ?", e.Item)
+			if res.Error != nil {
+				return LogAndReturnError(c, "[WasteExport] Unable to retrieve item data", res.Error)
+			}
+
+			// store and return the name
+			names[e.Item] = item.Name
+			n = item.Name
+		}
+
+		output = append(output, models.WastageEntryNamed{
+			Name:   n,
+			Date:   e.Date,
+			Amount: e.Amount,
+		})
+	}
+
 	// perform the actual export of the data
-	err := exportWaste(waste)
+	err := exportWaste(output, endDate)
 	if err != nil {
 		return LogAndReturnError(c, "[WasteExport] Unable to export data", err)
 	}

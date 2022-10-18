@@ -3,10 +3,6 @@ Issues to fix
 
 * Implement deletion of item from waste holding (DONE?)
 
-* Include date with items on wastage entry
-	- date for each item is stored in db, but shown as 1 day prior to user (timezone issue? manually fix time server side?)
-	- allow generation of wastage sheet based off input dates/items/amounts (reverse wastage import)
-
 * Wastage editing
 	- Can delete items, but doesn't refresh after doing so
 		+ calls both loadData() and forceUpdate() but wont update
