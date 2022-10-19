@@ -28,15 +28,12 @@ func UpdateCommentHandler(c echo.Context, db *gorm.DB) error {
 	var cp CommentPost
 
 	if err := c.Bind(&cp); err != nil {
-		log.Error().Err(err).Msg("Unable to bind from POST")
-		return err
+		return LogAndReturnError(c, "Unable to bind from POST", err)
 	}
 
 	// do we have a valid linkedID?
 	// check to see if we have an entry already
 	if cp.LinkedID == 0 {
-		log.Debug().Msgf("Linked id == 0, checking for existing day...[date: %v]", cp.Date)
-
 		dd := models.DayData{}
 		res := db.Where("Date = ?", cp.Date).Find(&dd)
 		if res.Error == nil && res.RowsAffected != 0 {
@@ -56,8 +53,7 @@ func UpdateCommentHandler(c echo.Context, db *gorm.DB) error {
 		dd := models.DayData{}
 		res := db.Find(&dd, "ID = ?", cp.LinkedID)
 		if res.Error != nil {
-			//return c.String(http.StatusInternalServerError, "Unable to find linked day")
-			return ReturnServerMessage(c, "Unable to find linked day", true)
+			return LogAndReturnError(c, "Unable to find linked day", res.Error)
 		}
 
 		dd.Comment = cp.Comment

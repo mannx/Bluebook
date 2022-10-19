@@ -72,7 +72,7 @@ func UpdateWasteSettingHandler(c echo.Context, db *gorm.DB) error {
 			log.Error().Err(res.Error).Msgf("Unable to retrieve item [ID: %v] [Name: %v]", n.ID, n.Name)
 			continue
 		} else if res.RowsAffected == 0 {
-			log.Debug().Msgf("Unable to find any objects id: %v", n.ID)
+			log.Warn().Msgf("Unable to find any objects id: %v", n.ID)
 			continue
 		}
 
@@ -126,8 +126,6 @@ func GetWasteViewHandler(c echo.Context, db *gorm.DB) error {
 	weekEnding := time.Date(year, time.Month(month), day, 0, 0, 0, 0, time.UTC)
 	weekStart := weekEnding.AddDate(0, 0, -6)
 
-	log.Debug().Msgf("Retrieving waste from %v/%v - %v/%v",
-		weekStart.Day(), weekStart.Month(), weekEnding.Day(), weekEnding.Month())
 	// make sure we have a tuesday, week ending day
 	if weekEnding.Weekday() != time.Tuesday {
 		return ReturnServerMessage(c, "Can only view from a tuesday", true)
@@ -308,9 +306,7 @@ func getWasteHoldingEntries(db *gorm.DB) []wasteHoldingJSON {
 		}
 
 		// format the date to the expected type
-		dateStr := time.Time(i.Date)
 		date := time.Time(i.Date)
-		log.Debug().Msgf("dateStr: [%v]", dateStr)
 
 		out = append(out,
 			wasteHoldingJSON{
@@ -539,9 +535,6 @@ func WasteExport(c echo.Context, db *gorm.DB) error {
 	// build the end date, and determine the start of the week
 	endDate := time.Date(input.Year, time.Month(input.Month), input.Day, 0, 0, 0, 0, time.UTC)
 	startDate := endDate.AddDate(0, 0, -6)
-
-	log.Debug().Msgf("[WasteExport] Start: [%v]", startDate)
-	log.Debug().Msgf("              End: [%v]", endDate)
 
 	// retrieve the data
 	waste := make([]models.WastageEntry, 0)

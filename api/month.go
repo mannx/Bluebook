@@ -81,8 +81,7 @@ func GetMonthViewHandler(c echo.Context, db *gorm.DB) error {
 	res := db.Order("Date").Find(&data, "Date >= ? AND Date <= ?", start, end)
 
 	if res.Error != nil {
-		log.Error().Err(res.Error).Msg("Error retrieving data")
-		return res.Error
+		return LogAndReturnError(c, "Error retrieving data", res.Error)
 	}
 
 	//	we no longer pre fill the database with empty rows, instead if a day is missing we generate a new empty node

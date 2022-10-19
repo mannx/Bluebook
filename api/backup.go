@@ -62,7 +62,7 @@ func BackupHandler(c echo.Context, db *gorm.DB) error {
 		obj.DateString = time.Time(obj.Date).Format("Jan 02, 2006")
 		bkp[i] = obj
 	}
-	log.Debug().Msg("Returning backup data to client...")
+
 	return c.JSON(http.StatusOK, &data{
 		Backup: bkp,
 		List:   lst,
@@ -73,8 +73,7 @@ func BackupRevertHandler(c echo.Context, db *gorm.DB) error {
 	var idList []uint // list of id's to copy back
 
 	if err := c.Bind(&idList); err != nil {
-		log.Error().Err(err).Msg("Unable to retrieve id list for [BackupRevertHandler]")
-		return ReturnServerMessage(c, "Unable to retrieve id list for [BackupRevertHandler]", true)
+		return LogAndReturnError(c, "Unable to retrieve id list for [BackupRevertHandler]", err)
 	}
 
 	for _, id := range idList {
@@ -90,8 +89,6 @@ func BackupRevertHandler(c echo.Context, db *gorm.DB) error {
 			continue
 		}
 
-		log.Debug().Msgf("Reverting id=%v for day %v", id, dd.DayData.GetDate())
-
 		// get the original data
 		data := dd.DayData
 
@@ -105,8 +102,7 @@ func BackupUndoHandler(c echo.Context, db *gorm.DB) error {
 	var idList []uint // list of id's to copy back
 
 	if err := c.Bind(&idList); err != nil {
-		log.Error().Err(err).Msg("Unable to retrieve id list for [BackupUndoHandler]")
-		return ReturnServerMessage(c, "Unable to retrieve id list for [BackupUndoHandler]", true)
+		return LogAndReturnError(c, "Unable to retrieve id list for [BackupUndoHandler]", err)
 	}
 
 	// list of id's points to DayData objects

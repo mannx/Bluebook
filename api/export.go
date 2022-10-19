@@ -59,10 +59,6 @@ func ExportWeekly(c echo.Context, db *gorm.DB) error {
 		return err
 	}
 
-	log.Info().Msgf("Exporting weekly report %v\\%v\\%v", month, day, year)
-	log.Debug().Msgf("  => Hours: %v", hours)
-	log.Debug().Msgf("  => Manager: %v", manager)
-
 	// get the weekly data
 	err, weekly := getWeeklyData(month, day, year, c, db)
 	if err != nil {
@@ -133,7 +129,8 @@ func exportWaste(waste []models.WastageEntryNamed, weekEnding time.Time) error {
 		weight := fmt.Sprintf("%v%v", wasteWeight, i+wasteStartRow)
 
 		// log.Debug().Msgf("[Date: %v] [Item: %v] [Weight: %v] [Name: %v", date, item, weight, e.Name)
-		f.SetCellValue("Waste Sheet", date, e.Date)
+		dateStr := time.Time(e.Date)
+		f.SetCellValue("Waste Sheet", date, dateStr)
 		f.SetCellValue("Waste Sheet", item, e.Name)
 		f.SetCellValue("Waste Sheet", weight, e.Amount)
 	}

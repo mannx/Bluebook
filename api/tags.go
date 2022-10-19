@@ -25,7 +25,6 @@ func getTagDataWithCount(db *gorm.DB) ([]tagData, error) {
 	res := db.Order("Tag").Find(&tl)
 	if res.Error != nil {
 		log.Error().Err(res.Error).Msg("Unable to retrieve tag list")
-		//return res.Error
 		return nil, res.Error
 	}
 
@@ -36,7 +35,6 @@ func getTagDataWithCount(db *gorm.DB) ([]tagData, error) {
 
 		res = db.Where("TagID = ?", i.ID).Find(&data)
 		if res.Error != nil {
-			//return LogAndReturnError(c, "Unable to retrieve tag counts", res.Error)
 			return nil, res.Error
 		}
 
@@ -51,30 +49,6 @@ func getTagDataWithCount(db *gorm.DB) ([]tagData, error) {
 
 // TagListViewHandler returns a list of all tags paired with their id
 func TagListViewHandler(c echo.Context, db *gorm.DB) error {
-	/*var tl []models.TagList
-
-	res := db.Order("Tag").Find(&tl)
-	if res.Error != nil {
-		log.Error().Err(res.Error).Msg("Unable to retrieve tag list")
-		return res.Error
-	}
-
-	var td []tagData
-	for _, i := range tl {
-		// get the number of entries using this tag
-		var data []models.TagData
-
-		res = db.Where("TagID = ?", i.ID).Find(&data)
-		if res.Error != nil {
-			return LogAndReturnError(c, "Unable to retrieve tag counts", res.Error)
-		}
-
-		td = append(td, tagData{
-			TagList:  i,
-			TagCount: len(data),
-		})
-	}*/
-
 	td, err := getTagDataWithCount(db)
 	if err != nil {
 		return LogAndReturnError(c, "Unable to retrieve tag counts", err)
@@ -97,17 +71,13 @@ func TagDataViewHandler(c echo.Context, db *gorm.DB) error {
 		Uint("id", &id).
 		BindError()
 	if err != nil {
-		log.Error().Err(err).Msg("Unable to bind to parameter: id")
-		return err
+		return LogAndReturnError(c, "[TagDataViewHandler] Unable to bind to parameter: id", err)
 	}
-
-	log.Debug().Msgf("TagDataViewHandler(%v) => start", id)
 
 	var vd []models.TagData
 	res := db.Find(&vd, "TagID = ?", id) // get all the days with this tag
 	if res.Error != nil {
-		log.Error().Err(res.Error).Msg("Unable to retrieve tag data (1)")
-		return res.Error
+		return LogAndReturnError(c, "Unable to retrieve tag data (1)", res.Error)
 	}
 
 	var data []TagList
@@ -153,15 +123,12 @@ func TagUpdateViewHandler(c echo.Context, db *gorm.DB) error {
 
 	var tu tagUpdate
 	if err := c.Bind(&tu); err != nil {
-		log.Error().Err(err).Msg("Unable to bind from POST")
-		return err
+		return LogAndReturnError(c, "Unable to bind from POST", err)
 	}
 
 	// are we updating tags on a linked day?
 	if tu.LinkedID != 0 {
 		// update tags linked to this day
-		log.Debug().Msg("Updating tags linked to id")
-
 		updateTags(tu.LinkedID, tu.Tag, db)
 
 	} else {
@@ -172,7 +139,6 @@ func TagUpdateViewHandler(c echo.Context, db *gorm.DB) error {
 			return c.String(http.StatusInternalServerError, "Error")
 		}
 
-		log.Debug().Msg("Updating tags linked to new day")
 		updateTags(id, tu.Tag, db)
 	}
 
@@ -244,8 +210,6 @@ func updateTags(id uint, tags string, db *gorm.DB) {
 			db.Save(&td)
 		}
 
-		log.Debug().Msgf("Adding tag id %v to day id %v", td.ID, id)
-
 		go func() {
 			td := models.TagData{
 				TagID: td.ID,
@@ -274,7 +238,6 @@ func TagCleanHandler(c echo.Context, db *gorm.DB) error {
 	}
 
 	// remove all ids from the db
-	log.Debug().Msg("Removing all unused tags")
 	db.Delete(&models.TagList{}, ids)
 
 	return ReturnServerMessage(c, "Success", false)

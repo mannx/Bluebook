@@ -43,8 +43,6 @@ func GetWeeklyViewHandler(c echo.Context, db *gorm.DB) error {
 		return err
 	}
 
-	log.Debug().Msgf("Weekly report for %v\\%v\\%v", month, day, year)
-
 	err, weekly := getWeeklyData(month, day, year, c, db)
 	if err != nil {
 		return err
@@ -85,13 +83,12 @@ func getWeeklyData(month int, day int, year int, c echo.Context, db *gorm.DB) (e
 	wi := models.WeeklyInfo{}
 	res = db.Find(&wi, "Date = ?", endDate) // we ignore any errors and we use a default strcut anyway
 	if res.Error != nil {
-		log.Debug().Err(res.Error).Msg("No weekly info, using defaults")
+		log.Warn().Err(res.Error).Msg("No weekly info, using defaults")
 	}
 
 	weekly.FoodCostAmount = wi.FoodCostAmount
 	weekly.LabourCostAmount = wi.LabourCostAmount
 	weekly.PartySales = wi.PartySales
-	log.Debug().Msgf("[GetWeeklyData] [Party Sales: %v | %v", weekly.PartySales, wi.PartySales)
 
 	// retrieve the last years data if available
 	lastYear := weekEnding.AddDate(-1, 0, 0)

@@ -42,7 +42,7 @@ func readConfig() ([]byte, error) {
 	return nil, err
 }
 
-//func init() {
+// func init() {
 func InitTop5() {
 	f, err := readConfig()
 	if err != nil {
@@ -84,9 +84,6 @@ func GetTop5ViewHandler(c echo.Context, db *gorm.DB) error {
 		limit = 5
 	}
 
-	log.Debug().Msg("[GetTop5ViewHandler]")
-	log.Debug().Msgf("[Month: %v][Year: %v][Limit: %v]", month, year, limit)
-
 	type message struct {
 		Message string
 		Years   []int // list of the years we have data for
@@ -97,14 +94,12 @@ func GetTop5ViewHandler(c echo.Context, db *gorm.DB) error {
 
 	res := db.Select("Date").Order("Date").Take(&first)
 	if res.Error != nil {
-		log.Error().Err(res.Error).Msg("Unable to retrieve date list (1)")
-		return res.Error
+		return LogAndReturnError(c, "Unable to retrieve date list (1)", res.Error)
 	}
 
 	res = db.Order("Date desc").Select("Date").Take(&last)
 	if res.Error != nil {
-		log.Error().Err(res.Error).Msg("Unable to retrieve date list (2)")
-		return res.Error
+		return LogAndReturnError(c, "Unable to retrieve date list (2)", res.Error)
 	}
 
 	// assume we have continous data between all years
@@ -145,17 +140,15 @@ func getTop5Data(month int, year int, limit int, db *gorm.DB) []top5Data {
 		return top5Year(year, limit, db)
 	}
 
-	log.Debug().Msg("getTop5Data() => return nil.  Shouldnt get here")
-	log.Debug().Msgf("  [Year: %v] [Month: %v] [Limit: %v]", month, year, limit)
+	log.Warn().Msg("getTop5Data() => return nil.  Shouldnt get here")
+	log.Warn().Msgf("  [Year: %v] [Month: %v] [Limit: %v]", month, year, limit)
 	return nil
 }
 
 func top5All(limit int, db *gorm.DB) []top5Data {
-	log.Debug().Msgf("top5All() :: Table Size: %v", len(top5Table))
 	var out []top5Data
 
 	for _, n := range top5Table {
-		log.Debug().Msgf("  => [Title: %v] [Field: %v]", n.Title, n.Field)
 		tbl := top5Data{
 			Title:  n.Title,
 			Column: n.Column,
@@ -179,8 +172,6 @@ func top5All(limit int, db *gorm.DB) []top5Data {
 }
 
 func top5Month(month int, year int, limit int, db *gorm.DB) []top5Data {
-	log.Debug().Msg("top5Month() ::")
-
 	start := time.Date(year, time.Month(month), 1, 0, 0, 0, 0, time.UTC)
 	end := time.Date(year, time.Month(month+1), 1, 0, 0, 0, 0, time.UTC)
 
@@ -206,7 +197,6 @@ func top5Month(month int, year int, limit int, db *gorm.DB) []top5Data {
 }
 
 func top5Year(year int, limit int, db *gorm.DB) []top5Data {
-	log.Debug().Msg("top5Year() ::")
 	var out []top5Data
 
 	for _, n := range top5Table {
@@ -218,9 +208,6 @@ func top5Year(year int, limit int, db *gorm.DB) []top5Data {
 
 		start := time.Date(year, time.January, 1, 0, 0, 0, 0, time.UTC)
 		end := time.Date(year, time.December, 31, 0, 0, 0, 0, time.UTC)
-
-		log.Debug().Msgf("  [] start: %v", start.String())
-		log.Debug().Msgf("  [] end: %v", end.String())
 
 		res := db.Where("Date >= ? AND Date <= ?", start, end).Order(n.Column + " desc").Limit(limit).Find(&tbl.Data)
 		if res.Error != nil {

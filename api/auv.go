@@ -1,12 +1,12 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/labstack/echo/v4"
 	models "github.com/mannx/Bluebook/models"
-	"github.com/rs/zerolog/log"
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
@@ -20,14 +20,12 @@ func GetAUVViewHandler(c echo.Context, db *gorm.DB) error {
 		Int("year", &year).
 		BindError()
 	if err != nil {
-		log.Debug().Msg("AUV() => Unable to bind parameters")
-		return err
+		return LogAndReturnError(c, "AUV() => Unable to bind parameters", err)
 	}
 
 	// if either month or year is 0, return a new auv object
 	auv := models.AUVEntry{}
 	if month == 0 || year == 0 {
-		log.Debug().Msg("AUV() => Month || Year == 0")
 		return c.JSON(http.StatusOK, &auv)
 	}
 
@@ -36,10 +34,9 @@ func GetAUVViewHandler(c echo.Context, db *gorm.DB) error {
 	end := start.AddDate(0, 1, 0) // get the next month
 	res := db.Find(&auv, "week1_date >= ? AND week1_date < ?", start, end)
 	if res.Error != nil {
-		log.Debug().Msg("Unable to find auv data")
-		return res.Error
+		return LogAndReturnError(c, "Unable to find auv data", res.Error)
 	}
-	log.Debug().Msgf("  => AUV rows affected: %v", res.RowsAffected)
+
 	if res.RowsAffected == 0 {
 		// no auv data found, make sure to set the default fields to the month/year
 		d := time.Date(year, time.Month(month), 1, 0, 0, 0, 0, time.UTC)
@@ -75,8 +72,7 @@ func UpdateAUVPostHandler(c echo.Context, db *gorm.DB) error {
 
 	var auv auvData
 	if err := c.Bind(&auv); err != nil {
-		log.Error().Err(err).Msg("Unable to bind auv data")
-		return err
+		return LogAndReturnError(c, "Unable to bind auv data", err)
 	}
 
 	w1d, _ := time.Parse(time.RFC3339, auv.Week1Date)
@@ -91,7 +87,7 @@ func UpdateAUVPostHandler(c echo.Context, db *gorm.DB) error {
 	if auv.Id != 0 {
 		res := db.Find(&e, "ID = ?", auv.Id)
 		if res.Error != nil {
-			return res.Error
+			return LogAndReturnError(c, fmt.Sprintf("Unable to find AUV with ID=%v", auv.Id), res.Error)
 		}
 	}
 
@@ -112,10 +108,6 @@ func UpdateAUVPostHandler(c echo.Context, db *gorm.DB) error {
 	e.Week3Hours = auv.Week3Hours
 	e.Week4Hours = auv.Week4Hours
 	e.Week5Hours = auv.Week5Hours
-
-	log.Debug().Msgf("  => Week1Date: %v", time.Time(e.Week1Date).String())
-	log.Debug().Msgf("  => Week3Auv: %v", e.Week3AUV)
-	log.Debug().Msgf("  => ID: %v", auv.Id)
 
 	// save/update the entries
 	db.Save(&e)
