@@ -194,7 +194,7 @@ export default class WasteInput extends React.Component {
 				(e) => {
 					var items = this.state.items;
 					items[idx].Date = e;
-					this.setState({items: items});
+					this.setState({items: items, date: e});
 				}}
 			/>
 		</>);
@@ -220,8 +220,7 @@ export default class WasteInput extends React.Component {
 		const year = this.state.currDate.getFullYear();
 		const month = this.state.currDate.getMonth();
 		const day = this.state.currDate.getDate();
-		// const date = new Date(year, month, day, 0, 0, 0, 0);
-		const date = this.state.currDate;
+		const date = this.state.date;
 
 		this.setState({items: [...this.state.items, {Date: date, Year: year, Month: month, Day: day, Name: "",Quantity:0}]});
 	}
