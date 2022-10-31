@@ -26,4 +26,4 @@ jobs:
         uses: docker/build-push-action@v3.2.0
         with:
           push: true
-          tags: mannx/Bluebook:latest
+          tags: mannx/bluebook:latest
