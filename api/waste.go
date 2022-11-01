@@ -412,21 +412,6 @@ func WasteHoldingDeleteHandler(c echo.Context, db *gorm.DB) error {
 //
 //	expects a week ending date POST'd to the Date field
 func WasteHoldingConfirmHandler(c echo.Context, db *gorm.DB) error {
-	type wasteConfirm struct {
-		Month int
-		Day   int
-		Year  int
-	}
-
-	var data wasteConfirm
-
-	if err := c.Bind(&data); err != nil {
-		return LogAndReturnError(c, "[WasteHoldingConfirm] Unable to bind week ending date", err)
-	}
-
-	// build the date object for each item
-	date := time.Date(data.Year, time.Month(data.Month), data.Day, 0, 0, 0, 0, time.UTC)
-
 	// get all the holding entries
 	var holding []models.WastageEntryHolding
 	res := db.Find(&holding)
@@ -441,7 +426,7 @@ func WasteHoldingConfirmHandler(c echo.Context, db *gorm.DB) error {
 		waste = append(waste,
 			models.WastageEntry{
 				Item:   i.Item,
-				Date:   datatypes.Date(date),
+				Date:   i.Date,
 				Amount: i.Amount,
 			})
 	}
