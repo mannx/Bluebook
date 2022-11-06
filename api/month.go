@@ -46,6 +46,38 @@ type dayViewData struct {
 //	query url: /API_URL?month=MM&year=YYYY
 //
 
+// calcWeekEnding retrieves data for a given week ending and generates the totals
+func calcWeekEnding(d time.Time, db *gorm.DB, eow *endOfWeek) {
+	// end of week, pull in the required data
+	pw := d.Add(-time.Hour * 24 * 6) // get previous 7 days
+	dat := make([]models.DayData, 7)
+
+	r := db.Find(&dat, "Date >= ? AND Date <= ?", pw, d)
+	if r.Error != nil {
+		log.Error().Err(r.Error).Msg("Unable to retrieve data to compute end of week calculations")
+	} else {
+		net := 0.0
+		cc := 0
+		tps := 0.0 //3rd party sales
+		gsw := 0.0 //gross sales for hte week
+
+		for _, n := range dat {
+			net += n.NetSales
+			cc += n.CustomerCount
+			tps += n.DoorDash + n.SkipTheDishes
+			gsw += n.NetSales + n.BottleDeposit + n.HST
+		}
+
+		eow.NetSales = net
+		eow.CustomerCount = cc
+		eow.ThirdPartyTotal = tps
+
+		if gsw > 0 {
+			eow.ThirdPartyPercent = (tps / gsw) * 100.0
+		}
+	}
+}
+
 // GetMonthViewHandler handles returning data for viewing a given month
 func GetMonthViewHandler(c echo.Context, db *gorm.DB) error {
 
@@ -94,6 +126,12 @@ func GetMonthViewHandler(c echo.Context, db *gorm.DB) error {
 		genEmptyMonth(&mvd, start, endDay)
 	}
 
+	// keep a running total of days processed, and the data itself.  reset once we hit a week ending
+	// if we have less than 7 days when the loop is done, calculate the weekly total on the partial data and
+	// add empty rows to pad out the data until a week end is required
+	dayCount := 0
+	dayList := make([]models.DayData, 0)
+
 	for _, o := range data {
 		d := time.Time(o.Date)
 
@@ -102,34 +140,15 @@ func GetMonthViewHandler(c echo.Context, db *gorm.DB) error {
 
 		eow := endOfWeek{} // initialize the end of week of it is required
 		if d.Weekday() == time.Tuesday {
-			// end of week, pull in the required data
-			pw := d.Add(-time.Hour * 24 * 6) // get previous 7 days
-			dat := make([]models.DayData, 7)
+			calcWeekEnding(d, db, &eow)
 
-			r := db.Find(&dat, "Date >= ? AND Date <= ?", pw, d)
-			if r.Error != nil {
-				log.Error().Err(res.Error).Msg("Unable to retrieve data to compute end of week calculations")
-			} else {
-				net := 0.0
-				cc := 0
-				tps := 0.0 //3rd party sales
-				gsw := 0.0 //gross sales for hte week
-
-				for _, n := range dat {
-					net += n.NetSales
-					cc += n.CustomerCount
-					tps += n.DoorDash + n.SkipTheDishes
-					gsw += n.NetSales + n.BottleDeposit + n.HST
-				}
-
-				eow.NetSales = net
-				eow.CustomerCount = cc
-				eow.ThirdPartyTotal = tps
-
-				if gsw > 0 {
-					eow.ThirdPartyPercent = (tps / gsw) * 100.0
-				}
-			}
+			// reset day count and holding data
+			dayCount = 0
+			dayList = make([]models.DayData, 0)
+		} else {
+			// increment day count and store the current day value
+			dayCount += 1
+			dayList = append(dayList, o)
 		}
 
 		// calculate the weekly average of previous weeks if we havent already done so
@@ -170,6 +189,37 @@ func GetMonthViewHandler(c echo.Context, db *gorm.DB) error {
 		}
 
 		mvd[d.Day()-1] = dvd
+	}
+
+	// if dayCount == 0, we had a perfect week
+	if dayCount < 7 && dayCount != 0 {
+		// from the first entry in dayList add 6 days to get the normal end of the week
+		// if the end of the week is after the end of the month (ie. week ends in next month), we are done
+		// ( we don't calculate partial weeks that end in the following month)
+		// otherwise call calcWeekEnding with the generated end of week date
+		start := time.Time(dayList[0].Date)
+		end := start.AddDate(0, 0, 6)
+
+		if start.Month() == end.Month() {
+			// calculate week ending and generate a blank entry for the last day of the week
+			eow := endOfWeek{}
+			calcWeekEnding(end, db, &eow)
+
+			day := models.DayData{
+				Date: datatypes.Date(end),
+			}
+
+			dvd := dayViewData{
+				DayData:     day,
+				IsEndOfWeek: true,
+				EOW:         eow,
+				DayOfMonth:  end.Day(),
+				DayOfWeek:   end.Weekday().String(),
+				Exists:      true,
+			}
+
+			mvd[end.Day()-1] = dvd
+		}
 	}
 
 	// any missing entries (Exists==false) generate a default node
