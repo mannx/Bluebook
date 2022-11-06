@@ -9,28 +9,34 @@ const controlURL = UrlGet("Control");
 const wisrURL = UrlGet("WISR");
 const wasteURL = UrlGet("Waste");
 
+// navigation pages to display items to import
+const PageBlank = 0;
+const PageDaily = 1;
+const PageControl = 2;
+const PageWISR = 3;
+const PageWaste = 4;
+
 export default class Imports extends React.Component {
 	constructor(props) {
 		super(props)
 
 		this.state = {
-			page: 0,		// 0 blank, 1-> daily, 2-> control, 3-> wisr, 4-> waste
+			page: PageBlank,
 			result: null,
 		}
 	}
 
 	render() {
-		switch(this.state.page) {
-			case 0: return this.blank()
-			case 1: return (<>{this.blank()}<ImportControl URL={dailyURL} page={this.state.page} title="Daily Sheets" result={this.result}/> </>);
-			case 2: return (<>{this.blank()}<ImportControl URL={controlURL} page={this.state.page}  title="Control Sheets" result={this.result}/></>);
-			case 3: return (<>{this.blank()}<ImportControl URL={wisrURL} page={this.state.page} title="WISR" result={this.result}/></>);
-			case 4: return (<>{this.blank()}<ImportControl URL={wasteURL} page={this.state.page} title="Waste Sheets" result={this.result}/></>);
-			default: return (<>{this.blank()} <h1>Bad page #{this.state.page}</h1></>);
-		}
+		return (<>
+			{this.nav()}
+			<ImportControl URL={dailyURL} title="Daily Sheets" visible={this.state.page === PageDaily} result={this.result} />
+			<ImportControl URL={controlURL} title="Control Sheets" visible={this.state.page === PageControl} result={this.result} />
+			<ImportControl URL={wisrURL} title="WISR" visible={this.state.page === PageWISR} result={this.result} />
+			<ImportControl URL={wasteURL} title="Waste Sheets" visible={this.state.page === PageWaste} result={this.result} />
+		</>);
 	}
 
-	blank() {
+	nav() {
 		return (<>
 			<button onClick={this.dailies}>Import Dailies</button>
 			<button onClick={this.control}>Import Control Sheet</button>
@@ -40,10 +46,10 @@ export default class Imports extends React.Component {
 		</>);
 	}
 
-	dailies = () => {this.setState({page: 1});}
-	control = () => { this.setState({page: 2});}
-	wisr = () => { this.setState({page: 3});}
-	waste = () => { this.setState({page: 4});}
+	dailies = () => {this.setState({page: PageDaily});}
+	control = () => { this.setState({page: PageControl});}
+	wisr = () => { this.setState({page: PageWISR});}
+	waste = () => { this.setState({page: PageWaste});}
 
 	result = (msg) => {
 		this.setState({result: msg});
