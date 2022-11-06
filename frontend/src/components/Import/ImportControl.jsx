@@ -12,7 +12,6 @@ export default class ImportControl extends React.Component {
 		this.state = {
 			data: null,		// data containing availble files to import
 			imports: null,	// list of all the files that will be imported
-			page: props.page,
 		}
 	}
 
@@ -29,18 +28,6 @@ export default class ImportControl extends React.Component {
 		this.loadData();
 	}
 
-	componentDidUpdate(prev) {
-		if(prev.page !== this.props.page){
-			this.loadData();
-		}
-	}
-
-	getControls = () => {
-		this.state.data.map(function(obj, i) {
-			return <span>{obj}</span>;
-		});
-	}
-
 	addImp = (e) => {
 		if(this.state.imports == null ) {
 			this.setState({imports: [e.target.name]});
@@ -54,8 +41,10 @@ export default class ImportControl extends React.Component {
 			return <h1>Loading Data...</h1>;
 		}
 
+		const hidden = this.props.visible === true ? "block" : "none";
+
 		return (
-			<div><h3>{this.props.title} Available for Import (page {this.props.page})</h3>
+			<div style={{display: hidden}}><h3>{this.props.title} Available for Import (page {this.props.page})</h3>
 				<button onClick={this.performUpdate}>Update</button>
 				<ul className="Import">
 				{this.state.data.map(function(obj, i) {
