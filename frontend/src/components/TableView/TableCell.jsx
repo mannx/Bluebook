@@ -95,12 +95,12 @@ export default class TableCell extends React.Component {
 				<td className="MyStyle">{this.O(this.props.data.Factor)}</td>
 				<td className="MyStyle">{this.O(this.props.data.AdjustedSales)}</td>
 				<td className="MyStyle">{this.O(this.props.data.CustomerCount)}</td>
-				<td className="MyStyle">{this.Dol(this.props.data.ThirdPartyDollar)}</td>
-				<td className="MyStyle">{this.P(this.props.data.ThirdPartyPercent)}</td>
+				<td className="MyStyle no-print">{this.Dol(this.props.data.ThirdPartyDollar)}</td>
+				<td className="MyStyle no-print">{this.P(this.props.data.ThirdPartyPercent)}</td>
 				<td className="div"></td>
 
 				<td className="MyStyle" onDoubleClick={this.editComment} >{this.commentField()}</td>
-				<td className="MyStyle" onDoubleClick={this.editTag} >{this.tagField()}</td>
+				<td className="MyStyle no-print" onDoubleClick={this.editTag} >{this.tagField()}</td>
 			</tr>
 		);
 	}
