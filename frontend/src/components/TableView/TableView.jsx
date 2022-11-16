@@ -68,12 +68,12 @@ export default class TableView extends React.Component {
 						<th className="MyStyle">Factor</th>
 						<th className="MyStyle">Adj Sales</th>
 						<th className="MyStyle">Cust Count</th>
-						<th className="MyStyle">$ 3rd Party</th>
-						<th className="MyStyle">% 3rd Party</th>
+						<th className="MyStyle no-print">$ 3rd Party</th>
+						<th className="MyStyle no-print">% 3rd Party</th>
 						<th className="div"></th>
 
 						<th className="MyStyle">Comments</th>
-						<th className="MyStyle">Tags</th>
+						<th className="MyStyle no-print">Tags</th>
 					</tr>
 				</thead>
 				<tbody>

@@ -96,7 +96,7 @@ export default class Navigation extends React.Component {
 		//<li className={"navControl navExtra"}><NavButton name={"..."} func={this.ExtraSettings} /></li>
 		return (
 			<>
-			<div><ul className={"navControl"}>
+			<div className="no-print"><ul className={"navControl"}>
 				{nav}
 				<li className={"navControl"}><NavButton name={"Today"} func={this.funcToday} /></li>
 				<li className={"navControl"}><NavButton name={"Search Tags"} func={this.NavigateTags} /></li>
