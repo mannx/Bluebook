@@ -20,7 +20,7 @@ export default class TableCell extends React.Component {
 			editTag: false,
 			tagFunc: props.searchTag,
 			comment: this.props.data.Comment,
-			tag: null,
+			// tag: null,
 		}
 
 		var tag = "";
@@ -164,6 +164,7 @@ export default class TableCell extends React.Component {
 			});
 
 		this.setState({editTag: !this.state.editTag});
+		if(this.props.reload !== null) { this.props.reload(); }
 	}
 
 	editComment = () => {
@@ -175,6 +176,14 @@ export default class TableCell extends React.Component {
 	}
 
 	tagField = () => {
+		// get the tag list as a string
+		var tagList = "";
+		if(this.props.data.Tags !== null) {
+			this.props.data.Tags.map(function (obj){
+				tagList += "#"+obj+" ";
+			});
+		}
+
 		if(this.state.editTag === false) {
 			if(this.props.data.Tags !== null) {
 				return (<div className='tag'>
@@ -186,7 +195,7 @@ export default class TableCell extends React.Component {
 		}else{
 			return (
 				<form onSubmit={this.submitTag} >
-					<input type={"text"} name={"tag"} defaultValue={this.state.tag} onChange={this.tagChange}/>
+					<input type={"text"} name={"tag"} defaultValue={tagList} onChange={this.tagChange}/>
 					<input type={"submit"} value={"Update"} />
 				</form>
 			);
