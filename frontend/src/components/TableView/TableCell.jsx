@@ -20,7 +20,7 @@ export default class TableCell extends React.Component {
 			editTag: false,
 			tagFunc: props.searchTag,
 			comment: this.props.data.Comment,
-			// tag: null,
+			tag: null,
 		}
 
 		var tag = "";
