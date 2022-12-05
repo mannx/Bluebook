@@ -30,6 +30,11 @@ export default class TableView extends React.Component {
 		this.setState({data: data, loading: false, month: month, year:  year});
 	}
 
+	reload = () => {
+		this.loadData(this.props.month, this.props.year);
+		console.log("reloading data...");
+	}
+
 	render() {
 		if(this.state.loading === true || this.state.data == null) {
 			this.loadData(this.props.month, this.props.year);
@@ -81,7 +86,7 @@ export default class TableView extends React.Component {
 					if(obj.IsEndOfWeek) {
 						return (
 							<>
-								<TableCell data={obj} searchTag={this.props.navTag} />
+								<TableCell data={obj} searchTag={this.props.navTag} reload={this.reload} />
 								<TableEOW data={obj} />
 							</>
 						);
