@@ -66,6 +66,11 @@ COPY --from=react /app/build /static
 # copy in default config file for top5 api
 COPY ./api/data.json /top5.json
 
+# copy run and backup scripts
+COPY ./run.sh /run.sh
+COPY ./backup.sh /backup.sh
+
 EXPOSE 8080
 
-ENTRYPOINT ["/bluebook"]
+# ENTRYPOINT ["/bluebook"]
+ENTRYPOINT ["/run.sh"]
