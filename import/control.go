@@ -64,9 +64,6 @@ func ImportControl(fileName string, db *gorm.DB) error {
 	endDate := time.Date(year, time.Month(month), day, 0, 0, 0, 0, time.UTC)
 	startDate := endDate.Add(-time.Hour * 24 * 6) // remove 6 days to get the correct start of the week
 
-	log.Debug().Msgf("Start Date: %v", startDate)
-	log.Debug().Msgf("End Date: %v", endDate)
-
 	// extract the relevant information
 	prod := reProductivity.FindStringSubmatch(cstr)
 	if prod == nil {
@@ -117,18 +114,12 @@ func ImportControl(fileName string, db *gorm.DB) error {
 	} else {
 		breadOverShort = bos[1]
 	}
-	//breadOverShort := bos[1]
-	log.Debug().Msgf("over short: %v", breadOverShort)
-
-	log.Debug().Msg("Preparing to update each day...")
-	log.Warn().Msgf("hours worked[0]: %v (%T)", hoursWorkd[0], hoursWorkd[0])
 
 	// if we have data already, retrieve it, otherwise starta new entry
 	// loop through either day, update and save back to the db
 	for i := 0; i < 7; i++ {
 		dur := time.Hour * 24 * time.Duration(i)
 		currentDay := startDate.Add(dur)
-		log.Debug().Msgf("checking if we have data... day(%v)", currentDay)
 
 		dd, _ := getDataOrNew(currentDay, db)
 
@@ -142,7 +133,6 @@ func ImportControl(fileName string, db *gorm.DB) error {
 		dd.BreadOverShort, _ = strconv.ParseFloat(breadOverShort[i+1], 64)
 
 		// save it
-		log.Debug().Msgf(" Updating record for date %v, with ID: %v", dd.Date, dd.ID)
 		db.Save(&dd)
 
 	}

@@ -47,7 +47,6 @@ func main() {
 	dbName = filepath.Join(env.Environment.DataPath, "db.db")
 
 	log.Info().Msg("Initializing database...")
-	log.Debug().Msgf("  => Database path: %v", dbName)
 	dbo, err := gorm.Open(sqlite.Open(dbName), &gorm.Config{})
 	if err != nil {
 		log.Fatal().Err(err).Msg("Unable to open database...")

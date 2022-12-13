@@ -20,8 +20,6 @@ var reLabourCost = regexp.MustCompile(`LABOR\s&\sTAXES\s+(\d+,?\d+)\s+(\d+)`) //
 var reFoodCost = regexp.MustCompile(`COST OF GOODS\s+(\d+,?\d+)\s+(\d+)`)     // 2 groups -> [0] dollar value [1] percent
 
 func ImportWISR(fileName string, db *gorm.DB) error {
-	log.Info().Msgf("ImportWISR(%v)", fileName)
-
 	txtFile, err := PDFToText(fileName)
 	if err != nil {
 		log.Error().Err(err).Msgf("Unable to convert [%v] from pdf to text", fileName)
@@ -48,10 +46,7 @@ func ImportWISR(fileName string, db *gorm.DB) error {
 
 	// get the start and ending days of the week
 	endDate := time.Date(year, time.Month(month), day, 0, 0, 0, 0, time.UTC)
-	startDate := endDate.Add(-time.Hour * 24 * 6) // remove 6 days to get the correct start of the week
-
-	log.Debug().Msgf("Start Date: %v", startDate)
-	log.Debug().Msgf("End Date: %v", endDate)
+	// startDate := endDate.Add(-time.Hour * 24 * 6) // remove 6 days to get the correct start of the week
 
 	catering := reCateringSales.FindStringSubmatch(cstr)
 	if catering == nil {
@@ -75,11 +70,6 @@ func ImportWISR(fileName string, db *gorm.DB) error {
 	foodCost, _ := strconv.ParseFloat(strings.ReplaceAll(food[1], ",", ""), 64)
 	foodPerc, _ := strconv.ParseFloat(food[2], 64)
 
-	// TODO:
-	//		save in a db entry
-	log.Debug().Msgf("labour:%v|%v", labourCost, labourPerc)
-	log.Debug().Msgf("food:%v|%v", foodCost, foodPerc)
-
 	wi := getWeeklyInfoOrNew(endDate, db)
 	wi.Date = datatypes.Date(endDate) //make sure the date is correct
 	wi.FoodCostAmount = foodCost
@@ -87,14 +77,11 @@ func ImportWISR(fileName string, db *gorm.DB) error {
 	wi.LabourCostAmount = labourCost
 	wi.LabourCostPercent = labourPerc
 	wi.PartySales, err = strconv.ParseFloat(strings.ReplaceAll(strings.TrimSpace(catering[1]), ",", ""), 64)
-	log.Debug().Msgf("[ImportWisr] [Party Sales: %v]", wi.PartySales)
-	log.Debug().Msgf("  [Catering[1]: %v]", catering[1])
 
 	if err != nil {
 		log.Error().Err(err).Msgf("Unable to convert catering sales value: %v", catering[1])
 	}
 
-	log.Debug().Msg("Saving weekly info object")
 	db.Save(&wi)
 
 	return nil

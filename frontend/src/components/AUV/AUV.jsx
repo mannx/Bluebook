@@ -50,9 +50,6 @@ export default class AUV extends React.Component {
 
 	//async componentDidMount() {
 	loadData = async (month, year) => {
-		//const month = this.state.date.getMonth()+1;
-		//const year= this.state.date.getFullYear();
-
 		const url =UrlGet("AUV") + "?month="+month+"&year="+year;
 		const resp = await fetch(url);
 		const data = await resp.json();

@@ -6,12 +6,12 @@ EXT=".db"
 INPUT="$PREFIX$EXT"
 OUTPUT="$PREFIX-$(date +%m-%d-%Y)$EXT"
 
-#set path to /data unless BLUEBOOK_DATA_PATH is set
-if [ ! -z "$BLUEBOOK_DATA_PATH" ] 
+#set path to /data unless BLUEBOOK_BACKUP_PATH is set
+if [ ! -z "$BLUEBOOK_BACKUP_PATH" ] 
 then
-	OUTPATH="$BLUEBOOK_DATA_PATH"
+	OUTPATH="$BLUEBOOK_BACKUP_PATH"
 else
-	OUTPATH="/data"
+	OUTPATH="/backup"
 fi
 
 # check to make sure input exists and output doesn't

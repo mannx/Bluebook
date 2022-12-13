@@ -62,12 +62,11 @@ type DayData struct {
 //	2) if an entry is getting updated, copy it to a backup entry
 
 // DayDataBackup is used to hold a copy of DayData when an import updates an entry
+//
 //	ID will be the same for this item and the other items
 type DayDataBackup struct {
 	gorm.Model
 	DayData
-
-	//BackupID uint `gorm:"column:BackupID"` // id of the entry that was updated
 }
 
 type DayDataImportList struct {

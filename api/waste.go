@@ -390,20 +390,22 @@ func WasteHoldingDeleteHandler(c echo.Context, db *gorm.DB) error {
 	type returnData struct {
 		Error   bool
 		Message string
-		Items   []models.WastageEntryHolding
+		// Items   []models.WastageEntryHolding
+		Items []wasteHoldingJSON
 	}
 
 	ret := returnData{
 		Error:   false,
 		Message: "",
+		Items:   getWasteHoldingEntries(db),
 	}
 
 	// return a blank error message (allows front end to process result same either way)
 	// along with the current holding table
-	res = db.Find(&ret.Items)
-	if res.Error != nil {
-		return LogAndReturnError(c, "Unable to retrieve holding table (2) for [WasteHoldingDeleteHandler]", res.Error)
-	}
+	// res = db.Find(&ret.Items)
+	// if res.Error != nil {
+	// 	return LogAndReturnError(c, "Unable to retrieve holding table (2) for [WasteHoldingDeleteHandler]", res.Error)
+	// }
 
 	return c.JSON(http.StatusOK, &ret)
 }
@@ -474,8 +476,6 @@ func RemoveUnusedWasteItems(c echo.Context, db *gorm.DB) error {
 
 	res := db.Find(&items)
 	if res.Error != nil {
-		// log.Error().Err(res.Error).Msg("Unable to retrieve wastage items")
-		// return ReturnServerMessage(c, "Unable to retrieve wastage items", true)
 		return LogAndReturnError(c, "Unable to retrieve wastage items", res.Error)
 	}
 

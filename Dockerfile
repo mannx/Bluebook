@@ -72,5 +72,4 @@ COPY ./backup.sh /backup.sh
 
 EXPOSE 8080
 
-# ENTRYPOINT ["/bluebook"]
 ENTRYPOINT ["/run.sh"]

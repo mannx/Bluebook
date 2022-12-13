@@ -124,7 +124,6 @@ func GetTop5ViewHandler(c echo.Context, db *gorm.DB) error {
 }
 
 func getTop5Data(month int, year int, limit int, db *gorm.DB) []top5Data {
-	log.Debug().Msg("getTop5Data(m,y,l,db) ::")
 	if month == 0 && year == 0 {
 		// top all time
 		return top5All(limit, db)
