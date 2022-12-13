@@ -33,7 +33,7 @@
 	{"Data": [
 		{"Title": "Title to show",
 		"Column": "Database column",
-		"Field: "Model field to get data"}
+		"Field": "Model field to get data"}
 	]}
 ```
 
