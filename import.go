@@ -16,7 +16,6 @@ import (
 // File contains all functions related to importing data
 //
 
-//
 // This function returns the list of files that can be imported
 // uses fileMask to only return files types that match
 func importFileHandler(c echo.Context, fileMask string) error {

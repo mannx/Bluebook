@@ -57,7 +57,6 @@ func getWeeklyData(month int, day int, year int, c echo.Context, db *gorm.DB) (e
 
 	// make sure a tuesday
 	if weekEnding.Weekday() != time.Tuesday {
-		log.Debug().Msg("Request date is not a tuesday")
 		return c.JSON(http.StatusOK, "Can only view from a tuesday"), weeklyInfo{}
 	}
 

@@ -135,8 +135,7 @@ func TagUpdateViewHandler(c echo.Context, db *gorm.DB) error {
 		// attempt to generate an empty day and then try and link again
 		id, err := genEmptyDay(db, tu.Date)
 		if err != nil {
-			log.Warn().Err(err).Msg("Unable to add tag to empty day")
-			return c.String(http.StatusInternalServerError, "Error")
+			return LogAndReturnError(c, "Unable to add tag to empty day", err)
 		}
 
 		updateTags(id, tu.Tag, db)

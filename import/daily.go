@@ -55,7 +55,6 @@ func ImportDaily(fileName string, db *gorm.DB) error {
 
 		if n == "" {
 			// empty value, end our search here
-			log.Debug().Msgf("found empty day, leaving after: %v", numDays)
 			break
 		}
 
@@ -65,17 +64,14 @@ func ImportDaily(fileName string, db *gorm.DB) error {
 		if de != nil {
 			_, de = time.Parse(altDateFormat, n)
 			if de != nil {
-				log.Debug().Err(de).Msgf("Unable to parse time (alt format): %v", n)
+				log.Warn().Err(de).Msgf("Unable to parse time (alt format): %v", n)
 				// bad dates should cause a stop
 				break
 			}
 		}
 
-		log.Debug().Msgf("another day. value: %v (%T)", n, n)
 		numDays = numDays + 1
 	}
-
-	log.Debug().Msgf("Processing %v days", numDays)
 
 	// loop through all the entries we have
 	for i := 0; i < numDays; i++ {
@@ -105,8 +101,6 @@ func ImportDaily(fileName string, db *gorm.DB) error {
 		log.Debug().Msgf("Creating import list entry: %v", blank)
 		if blank == true {
 			// save the id that was just added to the db
-			log.Debug().Msgf("Creating import list entry ID: %v", dd.ID)
-
 			ent := models.DayDataImportList{
 				EntryID: dd.ID,
 			}
@@ -142,8 +136,6 @@ func getFloat(file *excelize.File, sheet string, cell string) float64 {
 
 // extractData builds the DayData data from the sheet, returns true if was a new entry, or false if it was updated
 func extractData(sheet *excelize.File, index int, date time.Time, ver int, db *gorm.DB) (models.DayData, bool) {
-	log.Debug().Msgf("extractData(%v, %v, %v)", index, date, ver)
-
 	// 1) check if we already have an entry, if so, we will update it
 	//   otherwise use a fresh copy
 	dd, blank := getDataOrNew(date, db)

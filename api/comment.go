@@ -6,7 +6,6 @@ import (
 
 	"github.com/labstack/echo/v4"
 	models "github.com/mannx/Bluebook/models"
-	"github.com/rs/zerolog/log"
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
@@ -48,8 +47,6 @@ func UpdateCommentHandler(c echo.Context, db *gorm.DB) error {
 	}
 
 	if cp.LinkedID != 0 {
-		log.Debug().Msgf("Adding comment to linked day: %v", cp.LinkedID)
-
 		dd := models.DayData{}
 		res := db.Find(&dd, "ID = ?", cp.LinkedID)
 		if res.Error != nil {
@@ -60,7 +57,6 @@ func UpdateCommentHandler(c echo.Context, db *gorm.DB) error {
 		db.Save(&dd)
 	} else {
 		// use the provided date to generate a new database entry for this date
-		log.Debug().Msg("UpdateCommentHandler() => No DayData found, generating new entry...")
 		dd := models.DayData{
 			Date:    datatypes.Date(cp.Date),
 			Comment: cp.Comment,
@@ -69,6 +65,5 @@ func UpdateCommentHandler(c echo.Context, db *gorm.DB) error {
 		db.Save(&dd)
 	}
 
-	//return c.String(http.StatusOK, "Update Success")
 	return ReturnServerMessage(c, "Update Success", false)
 }

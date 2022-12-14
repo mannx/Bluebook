@@ -14,6 +14,7 @@ type EnvironmentDefinition struct {
 	OutputPath string `envconfig:"BLUEBOOK_OUTPUT_PATH"` // used when exporting weekly sheets
 	TempPath   string `envconfig:"BLUEBOOK_TEMP_PATH"`
 	DataPath   string `envconfig:"BLUEBOOK_DATA_PATH"`
+	BackupPath string `envconfig:"BLUEBOOK_BACKUP_PATH"` // where to make the db backup on startup
 
 	// UserID and GroupID are used to set the file permissions for all exported files
 	UserID  int `envconfig:"PUID"` // userid the container should be running under
@@ -40,4 +41,5 @@ func (e *EnvironmentDefinition) Default() {
 	e.OutputPath = "/import" // defaults to the same as the import path
 	e.TempPath = "/tmp"
 	e.DataPath = "/data"
+	e.BackupPath = "/backup"
 }
