@@ -57,6 +57,12 @@ func main() {
 	log.Info().Msg("Auto migrating the database...")
 	migrateDB()
 
+	log.Info().Msg("Updating database backup list...")
+	err = UpdateBackupTable(DB)
+	if err != nil {
+		log.Error().Err(err).Msg("Unable to manage database backup...")
+	}
+
 	log.Info().Msg("Initialiing server and middleware")
 
 	e := initServer()
@@ -92,4 +98,6 @@ func migrateDB() {
 
 	DB.AutoMigrate(&models.TagList{})
 	DB.AutoMigrate(&models.TagData{})
+
+	DB.AutoMigrate(&models.BackupEntry{})
 }
