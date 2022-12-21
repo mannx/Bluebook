@@ -13,6 +13,14 @@ import (
 	"gorm.io/gorm"
 )
 
+type fileInfo struct {
+	id       int // id into the database if available
+	fileName string
+	month    int
+	day      int
+	year     int
+}
+
 // UpdateBackupTable catalogs current db backups, removes any entries no longer present or required
 func UpdateBackupTable(db *gorm.DB) error {
 	log.Debug().Msgf("Updating Backup Table...")
@@ -26,13 +34,6 @@ func UpdateBackupTable(db *gorm.DB) error {
 	}
 
 	log.Debug().Msg("Contents of /backup:")
-	type fileInfo struct {
-		fileName string
-		month    int
-		day      int
-		year     int
-	}
-
 	files := make([]fileInfo, 0)
 
 	re := regexp.MustCompile(`db-(\d\d)-(\d\d)-(\d\d\d\d).db`)
@@ -89,4 +90,26 @@ func UpdateBackupTable(db *gorm.DB) error {
 	// 	return res.Error
 	// }
 	return nil
+}
+
+// getMisssingFiles return a list of files of database backups that are in the database
+//
+//	but are no longer found in the filessytem
+//	files -> list of found on disk
+//
+// TODO
+func getMissingFiles(files []fileInfo, db *gorm.DB) ([]fileInfo, error) {
+	// get the data form the database
+	dbe := make([]models.BackupEntry, 0)
+	res := db.Find(&dbe)
+	if res.Error != nil {
+		return nil, res.Error
+	}
+
+	if res.RowsAffected == 0 {
+		// nothing found,
+		return nil, nil
+	}
+
+	return nil, nil
 }
