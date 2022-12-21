@@ -26,8 +26,15 @@ if [ -f "$OUTPATH/$OUTPUT" ]; then
 	exit 1
 fi
 
+if [ ! -z "$BLUEBOOK_DATA_PATH" ]
+then
+	INPATH="$BLUEBOOK_DATA_PATH"
+else
+	INPATH="/data"
+fi
+
 # create the backup
 echo "[INFO] Creating backup of database to: $OUTPATH/$OUTPUT"
-cp $OUTPATH/$INPUT $OUTPATH/$OUTPUT
+cp $INPATH/$INPUT $OUTPATH/$OUTPUT
 
 exit 0
