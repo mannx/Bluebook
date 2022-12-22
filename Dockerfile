@@ -56,7 +56,7 @@ FROM alpine
 # make sure required packages are installed
 # poppler-utils required for pdf parsing 
 RUN apk update
-RUN apk add tzdata poppler-utils
+RUN apk add tzdata poppler-utils sqlite
 
 WORKDIR /
 
