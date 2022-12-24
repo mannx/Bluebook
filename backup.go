@@ -4,12 +4,10 @@ import (
 	"os"
 	"regexp"
 	"strconv"
-	"time"
 
 	env "github.com/mannx/Bluebook/environ"
 	models "github.com/mannx/Bluebook/models"
 	"github.com/rs/zerolog/log"
-	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
 
@@ -33,9 +31,7 @@ func UpdateBackupTable(db *gorm.DB) error {
 		return err
 	}
 
-	log.Debug().Msg("Contents of /backup:")
 	files := make([]fileInfo, 0)
-
 	re := regexp.MustCompile(`db-(\d\d)-(\d\d)-(\d\d\d\d).db`)
 
 	for _, f := range dir {
@@ -61,34 +57,51 @@ func UpdateBackupTable(db *gorm.DB) error {
 
 	// check if in db, add if not
 	for _, f := range files {
-		entry := make([]models.BackupEntry, 0)
-		res := db.Where("FileName = ?", f.fileName).Find(&entry)
-		if res.Error != nil {
-			return res.Error
-		}
+		log.Debug().Msgf(" - Checking if [%v] already in db...", f.fileName)
 
-		if len(entry) == 0 {
-			log.Debug().Msgf("Adding [%v] to database...", f)
+		// entry := make([]models.BackupEntry, 0)
+		// res := db.Where("file_name = ?", f.fileName).Find(&entry)
+		// if res.Error != nil {
+		// 	return res.Error
+		// }
 
-			ent := models.BackupEntry{
-				FileName: f.fileName,
-				Uploaded: false,
-				Date:     datatypes.Date(time.Date(f.year, time.Month(f.month), f.day, 0, 0, 0, 0, time.UTC)),
-			}
+		// log.Debug().Msgf("Rows Affected [filename: %v] %v", f.fileName, res.RowsAffected)
+		// if res.RowsAffected >= 1 {
+		// 	log.Debug().Msgf("Backup found. skipping...%v", f.fileName)
+		// }
 
-			db.Save(&ent)
-		} else {
-			log.Debug().Msgf("[%v] in database. ID: %v", f, entry[0].ID)
-		}
+		// if len(entry) == 0 {
+		// 	log.Debug().Msgf("Adding [%v] to database...", f)
+
+		// 	ent := models.BackupEntry{
+		// 		FileName: f.fileName,
+		// 		Uploaded: false,
+		// 		Date:     datatypes.Date(time.Date(f.year, time.Month(f.month), f.day, 0, 0, 0, 0, time.UTC)),
+		// 	}
+
+		// 	db.Save(&ent)
+		// } else {
+		// 	log.Debug().Msgf("[%v] in database. ID: %v", f, entry[0].ID)
+		// }
 	}
 
 	// make sure all entries in the database still exist, remove any that point to files no longer exist
-	// TODO:
-	// entry:=make([]models.BackupEntry,0)
-	// res:=db.Find(&entry)
-	// if res.Error!=nil{
-	// 	return res.Error
-	// }
+	missing, err := getMissingFiles(files, db)
+	if err != nil {
+		return err
+	}
+
+	if missing == nil {
+		// no missing files
+		return nil
+	}
+
+	log.Debug().Msg("Removing missing backup entries from database...")
+	for _, m := range missing {
+		log.Debug().Msgf(" =] Removing %v", m)
+	}
+	// db.Where("1 = 1").Delete(&models.BackupEntry{}, missing)
+
 	return nil
 }
 
@@ -98,7 +111,7 @@ func UpdateBackupTable(db *gorm.DB) error {
 //	files -> list of found on disk
 //
 // TODO
-func getMissingFiles(files []fileInfo, db *gorm.DB) ([]fileInfo, error) {
+func getMissingFiles(files []fileInfo, db *gorm.DB) ([]uint, error) {
 	// get the data form the database
 	dbe := make([]models.BackupEntry, 0)
 	res := db.Find(&dbe)
@@ -111,5 +124,38 @@ func getMissingFiles(files []fileInfo, db *gorm.DB) ([]fileInfo, error) {
 		return nil, nil
 	}
 
-	return nil, nil
+	type missingData struct {
+		id       uint
+		fileName string
+		exist    bool
+	}
+
+	data := make(map[string]missingData) // store each db entry as false, mark each actual file as true, remove all false entries
+	for _, e := range dbe {
+		data[e.FileName] = missingData{
+			id:       e.ID,
+			fileName: e.FileName,
+			exist:    false,
+		}
+	}
+
+	for _, e := range files {
+		// data[e.fileName].exist=true
+		o, ok := data[e.fileName]
+		if ok {
+			o.exist = true
+			data[e.fileName] = o
+		}
+	}
+
+	missing := make([]uint, 0)
+
+	for _, v := range data {
+		if v.exist == false {
+			log.Debug().Msgf("File %v [%v] no longer exists", v.fileName, v.id)
+			missing = append(missing, v.id)
+		}
+	}
+
+	return missing, nil
 }
