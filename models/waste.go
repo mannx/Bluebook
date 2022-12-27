@@ -65,13 +65,17 @@ type WastageEntry struct {
 	Item   uint           `gorm:"column:Item"` // item ID for an entry in the WastageItem table
 	Date   datatypes.Date `gorm:"column:Date"`
 	Amount float64        `gorm:"column:Amount"`
+	Reason string         `gorm:"column:Reason"`
 }
 
 // WastageEntry but with the Item name instead of the index.  Not stored in DB, only used to pass data along
 type WastageEntryNamed struct {
-	Name   string
-	Date   datatypes.Date
-	Amount float64
+	// Name   string
+	// Date   datatypes.Date
+	// Amount float64
+	WastageEntry
+
+	Name string
 }
 
 // Contains a WastageEntry entry while editing.  Once all entries have been added,
