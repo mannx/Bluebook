@@ -333,6 +333,7 @@ func AddWasteHoldingHandler(c echo.Context, db *gorm.DB) error {
 		Date     string
 		Name     string
 		Quantity string
+		Reason   string
 	}
 
 	var data addWasteHolding
@@ -362,6 +363,7 @@ func AddWasteHoldingHandler(c echo.Context, db *gorm.DB) error {
 		Item:   item,
 		Amount: amount,
 		Date:   datatypes.Date(date),
+		Reason: data.Reason,
 	}
 
 	db.Save(&entry)
@@ -430,6 +432,7 @@ func WasteHoldingConfirmHandler(c echo.Context, db *gorm.DB) error {
 				Item:   i.Item,
 				Date:   i.Date,
 				Amount: i.Amount,
+				Reason: i.Reason,
 			})
 	}
 
@@ -549,9 +552,10 @@ func WasteExport(c echo.Context, db *gorm.DB) error {
 		}
 
 		output = append(output, models.WastageEntryNamed{
-			Name:   n,
-			Date:   e.Date,
-			Amount: e.Amount,
+			Name: n,
+			// Date:   e.Date,
+			// Amount: e.Amount,
+			WastageEntry: e,
 		})
 	}
 

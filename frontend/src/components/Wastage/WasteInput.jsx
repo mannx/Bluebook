@@ -144,6 +144,7 @@ export default class WasteInput extends React.Component {
 						<th>Date</th>
 						<th>Item</th>
 						<th>Quantity</th>
+                        <th>Reason</th>
 						<th></th>
 					</tr>
 					</thead>
@@ -217,6 +218,22 @@ export default class WasteInput extends React.Component {
 		</>);
 	}
 
+    reasonField = (obj, idx, edit) => {
+        if( edit === true ) {
+            return ( <>
+                <input type="text" tabIndex={-1} defaultValue={obj.Reason} onChange = {
+                    (e) => {
+                        var items = this.state.items;
+                        items[idx].Reason = e.target.value;
+                        this.setState({items: items});
+                    } }
+                />
+                </>);
+        } else {
+            return <span>{obj.Reason}</span>;
+        }
+    }
+
 	entryFields = (obj, idx) => {
 		const size = this.state.items.length - 1;
 		const edit = idx === size;
@@ -225,6 +242,7 @@ export default class WasteInput extends React.Component {
 			<td>{this.dateField(obj, idx, edit)}</td>
 			<td>{this.itemField(obj,idx,edit)}</td>
 			<td>{this.quantityField(obj, idx, edit)}</td>
+            <td>{this.reasonField(obj, idx, edit)}</td>
 			<td>{idx === size ? this.addBtn(idx) : this.updateBtn(idx)}</td>
 		</tr>);
 	}
