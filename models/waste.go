@@ -90,6 +90,7 @@ type WastageEntryHolding struct {
 	Date   datatypes.Date `gorm:"column:Date"`
 	Item   uint           `gorm:"column:Item"`
 	Amount float64        `gorm:"column:Amount"`
+	Reason string         `gorm:"column:Reason"`
 }
 
 //
