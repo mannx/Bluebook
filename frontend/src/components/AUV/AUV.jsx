@@ -91,8 +91,8 @@ export default class AUV extends React.Component {
 	}
 
 	showErrorMsg = () => {
-		if this.state.errorMsg === null { return <></>; }
-		if this.state.errorMsg.Error === undefined || this.state.errorMsg.Error === false {
+		if ( this.state.errorMsg === null ) { return <></>; }
+		if ( this.state.errorMsg.Error === undefined || this.state.errorMsg.Error === false ) {
 			return <></>;
 		}
 
