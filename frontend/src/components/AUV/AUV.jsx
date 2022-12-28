@@ -104,7 +104,7 @@ export default class AUV extends React.Component {
 			<span>Pick month to view</span>
 			<DatePicker selected={this.state.date} onChange={(e) => {this.dateUpdate(e)}} dateFormat="MM/yyyy" showMonthYearPicker showFullMonthYearPicker />
 			<button onClick={this.loadData}>View</button>
-			<div>{showErrorMsg()}</div>
+			<div>{this.showErrorMsg()}</div>
 		</>);
 	}
 

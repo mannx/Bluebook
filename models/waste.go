@@ -26,6 +26,7 @@ const (
 	WasteLocationVegetable  = 2
 	WasteLocationCookieChip = 3 // item is either cookies or chips
 	WasteLocationBread      = 4 // item is a type of bread
+	WasteMAX                = 4 // max Location value
 )
 
 var unitStringTable = map[int]string{

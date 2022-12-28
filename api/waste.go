@@ -92,19 +92,19 @@ func UpdateWasteSettingHandler(c echo.Context, db *gorm.DB) error {
 //		/api/../?month=MONTH&year=YEAR&day=DAY
 //		where month and year are 2 and 4 digits each
 
+// WasteViewItem is  a single item and its total waste amount
+type WasteViewItem struct {
+	Name           string  `json:"Name"`
+	Amount         float64 `json:"Amount"`
+	Location       int     `json:"Location"`
+	LocationString string  `json:"LocationString"`
+	UnitOfMeasure  string  `json:"UnitOfMeasure"` // unit of measure in string form
+}
+
 // GetWasteViewHandler handls the waste report generation
 func GetWasteViewHandler(c echo.Context, db *gorm.DB) error {
 	type wasteError struct {
 		Message string `json:"Message"`
-	}
-
-	// WasteViewItem is  a single item and its total waste amount
-	type WasteViewItem struct {
-		Name           string  `json:"Name"`
-		Amount         float64 `json:"Amount"`
-		Location       int     `json:"Location"`
-		LocationString string  `json:"LocationString"`
-		UnitOfMeasure  string  `json:"UnitOfMeasure"` // unit of measure in string form
 	}
 
 	// WasteView for returning to the client
@@ -165,14 +165,11 @@ func GetWasteViewHandler(c echo.Context, db *gorm.DB) error {
 		})
 	}
 
-	// sort output by location insert an empty entry between location switches
-	sort.Slice(output.Data, func(i, j int) bool {
-		return output.Data[i].Location > output.Data[j].Location
-	})
-
+	sorted := sortWasteOutput(output.Data)
 	loc := 0
 	final := make([]WasteViewItem, 0)
-	for _, v := range output.Data {
+
+	for _, v := range sorted {
 		if loc == 0 {
 			loc = v.Location
 		} else if loc != v.Location {
@@ -184,6 +181,34 @@ func GetWasteViewHandler(c echo.Context, db *gorm.DB) error {
 	}
 
 	return c.JSON(http.StatusOK, &WasteView{WeekEnding: weekEnding, Data: final})
+}
+
+// sort the data by category, then alphabetically
+func sortWasteOutput(data []WasteViewItem) []WasteViewItem {
+	// add all items to a map given its location
+	col := make(map[int][]WasteViewItem)
+
+	// sort by location
+	for _, obj := range data {
+		col[obj.Location] = append(col[obj.Location], obj)
+	}
+
+	// sort by name within location
+	for key, val := range col {
+		sort.Slice(val, func(i, j int) bool {
+			return val[i].Name < val[j].Name
+		})
+
+		col[key] = val
+	}
+
+	// collapse back into a single slice
+	out := make([]WasteViewItem, 0)
+	for i := models.WasteMAX; i >= 0; i-- {
+		out = append(out, col[i]...)
+	}
+
+	return out
 }
 
 func DeleteWasteItemHandler(c echo.Context, db *gorm.DB) error {
@@ -392,8 +417,7 @@ func WasteHoldingDeleteHandler(c echo.Context, db *gorm.DB) error {
 	type returnData struct {
 		Error   bool
 		Message string
-		// Items   []models.WastageEntryHolding
-		Items []wasteHoldingJSON
+		Items   []wasteHoldingJSON
 	}
 
 	ret := returnData{
@@ -401,13 +425,6 @@ func WasteHoldingDeleteHandler(c echo.Context, db *gorm.DB) error {
 		Message: "",
 		Items:   getWasteHoldingEntries(db),
 	}
-
-	// return a blank error message (allows front end to process result same either way)
-	// along with the current holding table
-	// res = db.Find(&ret.Items)
-	// if res.Error != nil {
-	// 	return LogAndReturnError(c, "Unable to retrieve holding table (2) for [WasteHoldingDeleteHandler]", res.Error)
-	// }
 
 	return c.JSON(http.StatusOK, &ret)
 }
@@ -552,9 +569,7 @@ func WasteExport(c echo.Context, db *gorm.DB) error {
 		}
 
 		output = append(output, models.WastageEntryNamed{
-			Name: n,
-			// Date:   e.Date,
-			// Amount: e.Amount,
+			Name:         n,
 			WastageEntry: e,
 		})
 	}
