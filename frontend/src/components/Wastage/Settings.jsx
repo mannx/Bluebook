@@ -190,6 +190,7 @@ export default class WasteSettings extends React.Component {
 						<th>Name</th>
 						<th>Unit</th>
 						<th>Location</th>
+						<th>Conversion</th>
 					</tr></thead>
 					<tbody>
 						{this.state.data.map(function (obj, i) {
@@ -199,6 +200,7 @@ export default class WasteSettings extends React.Component {
 								<td>{obj.Name}</td>
 								<td>{this.renderUnitOptions(obj)}</td>
 								<td>{this.renderLocationOptions(obj)}</td>
+								<td>{this.renderConversion(obj)}</td>
 							</tr>);
 						}, this)}
 					</tbody>
@@ -222,6 +224,10 @@ export default class WasteSettings extends React.Component {
 				return <option value={i}>{obj}</option>;
 			})}
 		</select>);
+	}
+
+	renderConversion = (obj) => {
+		return (<input type="text" value={obj.CustomConversion}/>);
 	}
 
 	updateUnitMeasure = (val, obj) => {
