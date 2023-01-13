@@ -2,12 +2,16 @@ package api
 
 import (
 	"net/http"
+	"os"
+	"regexp"
+	"strconv"
 	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
 
+	env "github.com/mannx/Bluebook/environ"
 	models "github.com/mannx/Bluebook/models"
 )
 
@@ -121,4 +125,45 @@ func BackupEmptyHandler(c echo.Context, db *gorm.DB) error {
 	db.Where("1 = 1").Delete(&models.DayDataImportList{})
 
 	return ReturnServerMessage(c, "Success", false)
+}
+
+// Return list of databases to revert to or remove
+func BackupDBView(c echo.Context, db *gorm.DB) error {
+	type fileInfo struct {
+		FileName string
+		Month    int
+		Day      int
+		Year     int
+	}
+
+	dir, err := os.ReadDir(env.Environment.BackupPath)
+	if err != nil {
+		return err
+	}
+
+	files := make([]fileInfo, 0)
+	re := regexp.MustCompile(`db-(\d\d)-(\d\d)-(\d\d\d\d).db`)
+
+	for _, f := range dir {
+		// do we have a backup file?
+		match := re.FindStringSubmatch(f.Name())
+		if len(match) == 0 {
+			// no matches found, skip file
+			continue
+		}
+
+		// extract the date information
+		month, _ := strconv.Atoi(match[1])
+		day, _ := strconv.Atoi(match[2])
+		year, _ := strconv.Atoi(match[3])
+
+		files = append(files, fileInfo{
+			FileName: f.Name(),
+			Month:    month,
+			Day:      day,
+			Year:     year,
+		})
+	}
+
+	return c.JSON(http.StatusOK, &files)
 }

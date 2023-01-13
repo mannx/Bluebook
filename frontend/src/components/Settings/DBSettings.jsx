@@ -60,6 +60,8 @@ export default class DBSettings extends React.Component {
 			emptyConfirm: false,		// display empty table dialog?
 			error: false,
 			errorMsg: null,
+
+            dbBackup: null,             // list of databases we can revert to or purge
 		}
 	}
 
@@ -69,6 +71,13 @@ export default class DBSettings extends React.Component {
 		const data = await resp.json();
 
 		this.setState({data: data});
+
+        // can redef const?
+        const url = UrlGet("DBBackupList");
+        const resp = await fetch(url);
+        const data = await resp.json();
+
+        this.setState({dbBackup: data});
 	}
 
 	componentDidMount = () => {
