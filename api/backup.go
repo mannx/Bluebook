@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 	"regexp"
@@ -193,6 +194,38 @@ func BackupDBRemove(c echo.Context, db *gorm.DB) error {
 
 	// get the file name we are removing
 	fname := dbListing[input.ID].FileName
-	log.Debug().Msgf("Removing file: %v", fname)
+	path := fmt.Sprintf("%v/%v", env.Environment.BackupPath, fname)
+	log.Debug().Msgf("Removing file: %v", path)
+
+	// remove the file
+	err := os.Remove(path)
+	if err != nil {
+		return LogAndReturnError(c, fmt.Sprintf("Unable to remove file: %v", path), err)
+	}
+
+	return ReturnServerOK(c)
+}
+
+func BackupDBRestore(c echo.Context, db *gorm.DB) error {
+	type inputData struct {
+		ID int
+	}
+
+	var input inputData
+	if err := c.Bind(&input); err != nil {
+		return LogAndReturnError(c, "Unable to bind data for BackupDBRestore", err)
+	}
+
+	// get the file name
+	fname := dbListing[input.ID].FileName
+	path := fmt.Sprintf("%v/%v", env.Environment.BackupPath, fname)
+
+	log.Debug().Msgf("Restoring db: %v", path)
+
+	// todo:
+	//	setup script/timer to copy db to correct location once exited
+	//	exit program
+	//	once script is run, restart app
+
 	return ReturnServerOK(c)
 }
