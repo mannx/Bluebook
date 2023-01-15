@@ -46,6 +46,12 @@ func main() {
 
 	dbName = filepath.Join(env.Environment.DataPath, "db.db")
 
+	log.Info().Msg("Initializing database backup list...")
+	err := api.InitializeDBListing()
+	if err != nil {
+		log.Error().Err(err).Msgf("Unable to generate listing of backed up database files...")
+	}
+
 	log.Info().Msg("Initializing database...")
 	dbo, err := gorm.Open(sqlite.Open(dbName), &gorm.Config{})
 	if err != nil {

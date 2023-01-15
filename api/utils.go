@@ -20,3 +20,7 @@ func LogAndReturnError(c echo.Context, message string, err error) error {
 	log.Error().Err(err).Msg(message)
 	return ReturnServerMessage(c, message, true)
 }
+
+func ReturnServerOK(c echo.Context) error {
+	return ReturnServerMessage(c, "Success", false)
+}

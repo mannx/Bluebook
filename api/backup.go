@@ -127,24 +127,27 @@ func BackupEmptyHandler(c echo.Context, db *gorm.DB) error {
 	return ReturnServerMessage(c, "Success", false)
 }
 
-// Return list of databases to revert to or remove
-func BackupDBView(c echo.Context, db *gorm.DB) error {
-	type fileInfo struct {
-		FileName string
-		Month    int
-		Day      int
-		Year     int
-	}
+// FileInfo is used to store the information about a given db file
+type FileInfo struct {
+	ID       int
+	FileName string
+	Month    int
+	Day      int
+	Year     int
+}
 
+var dbListing []FileInfo
+
+func InitializeDBListing() error {
 	dir, err := os.ReadDir(env.Environment.BackupPath)
 	if err != nil {
 		return err
 	}
 
-	files := make([]fileInfo, 0)
+	dbListing = make([]FileInfo, 0)
 	re := regexp.MustCompile(`db-(\d\d)-(\d\d)-(\d\d\d\d).db`)
 
-	for _, f := range dir {
+	for i, f := range dir {
 		// do we have a backup file?
 		match := re.FindStringSubmatch(f.Name())
 		if len(match) == 0 {
@@ -157,13 +160,39 @@ func BackupDBView(c echo.Context, db *gorm.DB) error {
 		day, _ := strconv.Atoi(match[2])
 		year, _ := strconv.Atoi(match[3])
 
-		files = append(files, fileInfo{
+		dbListing = append(dbListing, FileInfo{
+			ID:       i - 1,
 			FileName: f.Name(),
 			Month:    month,
 			Day:      day,
 			Year:     year,
 		})
+
+		log.Debug().Msgf("Adding db backup to dbListing: %v", f.Name())
 	}
 
-	return c.JSON(http.StatusOK, &files)
+	return nil
+}
+
+// Return list of databases to revert to or remove
+func BackupDBView(c echo.Context, db *gorm.DB) error {
+	log.Debug().Msgf("dbListing len: %v", len(dbListing))
+	return c.JSON(http.StatusOK, &dbListing)
+}
+
+func BackupDBRemove(c echo.Context, db *gorm.DB) error {
+	type inputData struct {
+		ID     int
+		Remove bool
+	}
+
+	var input inputData
+	if err := c.Bind(&input); err != nil {
+		return LogAndReturnError(c, "Failed to bind data for BackupDBRemove", err)
+	}
+
+	// get the file name we are removing
+	fname := dbListing[input.ID].FileName
+	log.Debug().Msgf("Removing file: %v", fname)
+	return ReturnServerOK(c)
 }
