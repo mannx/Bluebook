@@ -43,7 +43,8 @@ export default class AUV extends React.Component {
 
 			id: 0,
 
-			date: new Date()
+			date: new Date(),
+			errorMsg: null,
 		}
 
 	}
@@ -89,11 +90,21 @@ export default class AUV extends React.Component {
 		this.loadData(month, year);
 	}
 
+	showErrorMsg = () => {
+		if ( this.state.errorMsg === null ) { return <></>; }
+		if ( this.state.errorMsg.Error === undefined || this.state.errorMsg.Error === false ) {
+			return <></>;
+		}
+
+		return <><span className="error">{this.state.errorMsg}</span></>;
+	}
+
 	header = () => {
 		return ( <>
 			<span>Pick month to view</span>
 			<DatePicker selected={this.state.date} onChange={(e) => {this.dateUpdate(e)}} dateFormat="MM/yyyy" showMonthYearPicker showFullMonthYearPicker />
 			<button onClick={this.loadData}>View</button>
+			<div>{this.showErrorMsg()}</div>
 		</>);
 	}
 
@@ -121,27 +132,27 @@ export default class AUV extends React.Component {
 				</tr></thead>
 				<tbody>
 					<tr>
-					<td><DatePicker selected={this.state.week1date} value={this.state.week1date} onChange={(d) => this.setState({week1date: d})} /></td>
+					<td><DatePicker selected={this.state.week1date} value={this.state.week1date} onChange={(d) => this.setState({week1date: d})} tabIndex={-1}/></td>
 						<td><NumericInput value={this.state.week1auv} strict min={0} onChange={(n,s,i) => {this.setState({week1auv: n})}} /></td>
 						<td><NumericInput value={this.state.week1hours} strict min={0} onChange={(n,s,i) => {this.setState({week1hours: n})}}/></td>
 					</tr>
 					<tr>
-					<td><DatePicker selected={this.state.week2date} onChange={(d) => this.setState({week2date: d})} /></td>
+					<td><DatePicker selected={this.state.week2date} onChange={(d) => this.setState({week2date: d})} tabIndex={-1}/></td>
 						<td><NumericInput value={this.state.week2auv} strict min={0} onChange={(n,s,i) => {this.setState({week2auv: n})}} /></td>
 						<td><NumericInput value={this.state.week2hours} strict min={0} onChange={(n,s,i) => {this.setState({week2hours: n})}}/></td>
 					</tr>
 					<tr>
-					<td><DatePicker selected={this.state.week3date} onChange={(d) => this.setState({week3date: d})} /></td>
+					<td><DatePicker selected={this.state.week3date} onChange={(d) => this.setState({week3date: d})} tabIndex={-1}/></td>
 						<td><NumericInput value={this.state.week3auv} strict min={0} onChange={(n,s,i) => {this.setState({week3auv: n})}} /></td>
 						<td><NumericInput value={this.state.week3hours} strict min={0} onChange={(n,s,i) => {this.setState({week3hours: n})}}/></td>
 					</tr>
 					<tr>
-					<td><DatePicker selected={this.state.week4date} onChange={(d) => this.setState({week4date: d})} /></td>
+					<td><DatePicker selected={this.state.week4date} onChange={(d) => this.setState({week4date: d})} tabIndex={-1}/></td>
 						<td><NumericInput value={this.state.week4auv} strict min={0} onChange={(n,s,i) => {this.setState({week4auv: n})}} /></td>
 						<td><NumericInput value={this.state.week4hours} strict min={0} onChange={(n,s,i) => {this.setState({week4hours: n})}}/></td>
 					</tr>
 					<tr>
-					<td><DatePicker selected={this.state.week5date} onChange={(d) => this.setState({week5date: d})} /></td>
+					<td><DatePicker selected={this.state.week5date} onChange={(d) => this.setState({week5date: d})} tabIndex={-1}/></td>
 						<td><NumericInput value={this.state.week5auv} strict min={0} onChange={(n,s,i) => {this.setState({week5auv: n})}} /></td>
 						<td><NumericInput value={this.state.week5hours} strict min={0} onChange={(n,s,i) => {this.setState({week5hours: n})}}/></td>
 					</tr>
@@ -160,6 +171,8 @@ export default class AUV extends React.Component {
 		};
 
 		fetch(UrlGet("AUVUpdate"), options)
-			.then(r=>console.log(r));
+			// .then(r => console.log(r));
+			.then(r => r.json())
+			.then(r => this.setState({errorMsg: r}))
 	}
 }

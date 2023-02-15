@@ -56,7 +56,7 @@ FROM alpine
 # make sure required packages are installed
 # poppler-utils required for pdf parsing 
 RUN apk update
-RUN apk add tzdata poppler-utils
+RUN apk add tzdata poppler-utils sqlite
 
 WORKDIR /
 
@@ -67,9 +67,8 @@ COPY --from=react /app/build /static
 COPY ./api/data.json /top5.json
 
 # copy run and backup scripts
-COPY ./run.sh /run.sh
-COPY ./backup.sh /backup.sh
+COPY ./scripts /scripts
 
 EXPOSE 8080
 
-ENTRYPOINT ["/run.sh"]
+ENTRYPOINT ["/scripts/run.sh"]

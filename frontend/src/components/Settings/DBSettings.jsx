@@ -8,10 +8,12 @@ function RevertConfirmDialog(props) {
 			<div>
 			{props.ids.map(function(obj){
 				for(var i = 0;i < props.data.Backup.length; i++) {
-					if(props.data.Backup[i].ID == obj) {
+					if(props.data.Backup[i].ID === obj) {
 						return <li>{props.data.Backup[i].DateString}</li>;
 					}
 				}
+
+                return null;
 			})}
 		</div>
 	</>);
@@ -27,10 +29,12 @@ function UndoConfirmDialog(props) {
 			<div>
 			{props.ids.map(function(obj){
 				for(var i = 0;i < props.data.List.length; i++) {
-					if(props.data.List[i].EntryID == obj) {
+					if(props.data.List[i].EntryID === obj) {
 						return <li>{props.data.List[i].Item.DateString}</li>;
 					}
 				}
+
+                return null;
 			})}
 		</div>
 	</>);
@@ -60,6 +64,7 @@ export default class DBSettings extends React.Component {
 			emptyConfirm: false,		// display empty table dialog?
 			error: false,
 			errorMsg: null,
+
 		}
 	}
 
@@ -69,6 +74,13 @@ export default class DBSettings extends React.Component {
 		const data = await resp.json();
 
 		this.setState({data: data});
+
+        // can redef const?
+        const url2 = UrlGet("DBBackupList");
+        const resp2 = await fetch(url2);
+        const data2 = await resp2.json();
+
+        this.setState({dbBackup: data2});
 	}
 
 	componentDidMount = () => {
@@ -78,11 +90,16 @@ export default class DBSettings extends React.Component {
 	render = () => {
 		var backup = null;
 		var list = null;
+        var db = null;
 
 		if(this.state.data !== null ) { 
 			backup = this.ShowBackupTable();
 			list = this.ShowImportTable();
 		}
+
+        if(this.state.dbBackup !== null) { 
+            db = this.ShowDBTable();
+        }
 
 		const error = this.state.errorMsg !== null ? <span class="ErrorMsg">{this.state.errorMsg}</span> : <span></span>;
 
@@ -94,6 +111,7 @@ export default class DBSettings extends React.Component {
 			<div>
 				{backup}
 				{list}
+                {db}
 			</div>
 
 			<RevertConfirmDialog visible={this.state.revertConfirm} onClose={()=>this.setState({revertConfirm: false})} onConfirm={this.ConfirmRevert} data={this.state.data} ids={this.state.backupRevertList}/>

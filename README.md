@@ -40,7 +40,7 @@
 ## Docker Compose Example
 
 ```dockerfile
-version: "3.8"
+version: "3.3"
 
 services:
   bluebook:

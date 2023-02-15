@@ -46,6 +46,12 @@ func main() {
 
 	dbName = filepath.Join(env.Environment.DataPath, "db.db")
 
+	log.Info().Msg("Initializing database backup list...")
+	err := api.InitializeDBListing()
+	if err != nil {
+		log.Error().Err(err).Msgf("Unable to generate listing of backed up database files...")
+	}
+
 	log.Info().Msg("Initializing database...")
 	dbo, err := gorm.Open(sqlite.Open(dbName), &gorm.Config{})
 	if err != nil {
@@ -56,6 +62,12 @@ func main() {
 
 	log.Info().Msg("Auto migrating the database...")
 	migrateDB()
+
+	log.Info().Msg("Updating database backup list...")
+	err = UpdateBackupTable(DB)
+	if err != nil {
+		log.Error().Err(err).Msg("Unable to manage database backup...")
+	}
 
 	log.Info().Msg("Initialiing server and middleware")
 
@@ -92,4 +104,6 @@ func migrateDB() {
 
 	DB.AutoMigrate(&models.TagList{})
 	DB.AutoMigrate(&models.TagData{})
+
+	DB.AutoMigrate(&models.BackupEntry{})
 }

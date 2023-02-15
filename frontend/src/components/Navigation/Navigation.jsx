@@ -10,6 +10,7 @@ import WasteSettings from "../Wastage/Settings.jsx";
 import WasteInput from "../Wastage/WasteInput.jsx";
 
 import DBSettings from "../Settings/DBSettings.jsx";
+import DBBackup from "../Settings/DBBackup.jsx";
 import "./header.css";
 
 //
@@ -33,6 +34,7 @@ const PageTop5 = 7;
 const PageWasteSettings = 10;
 const PageWasteInput = 11;
 const PageDBSettings = 12;
+const PageDBBackup = 13;
 
 function Navigate(props) {
 	switch(props.page) {
@@ -56,6 +58,8 @@ function Navigate(props) {
 			return <WasteInput/>;
 		case PageDBSettings:
 			return <DBSettings/>;
+        case PageDBBackup:
+            return <DBBackup/>;
 		default:
 			return <h2>Invalid page number {props.page}</h2>;
 	}
@@ -111,7 +115,8 @@ export default class Navigation extends React.Component {
 					<NavButton name={"..."} func={this.ExtraSettings} />
 					<div className={"dropdown-content"} style={{display: this.state.ExtraCSS}}>
 						<ul className={"navControl"}>
-							<li className={"navControl"}><NavButton name={"Database"} func={this.NavDBSettings} /></li>
+							<li className={"navControl"}><NavButton name={"Settings"} func={this.NavDBSettings} /></li>
+							<li className={"navControl"}><NavButton name={"Backup"} func={this.NavDBBackup} /></li>
 						</ul>
 					</div>
 				</li>
@@ -168,6 +173,11 @@ export default class Navigation extends React.Component {
 
 	NavDBSettings = () => {
 		this.setState({page: PageDBSettings});
+		this.ExtraSettings();
+	}
+
+	NavDBBackup = () => {
+		this.setState({page: PageDBBackup});
 		this.ExtraSettings();
 	}
 	

@@ -18,6 +18,7 @@ export default class WasteSettings extends React.Component {
 			isLoading: true,
 			units: [],
 			locations: [],
+            conversion: [],         // for custom conversion amounts
 
 			combined: [],			// which items are marked for combining
 			combineCheck: [],
@@ -190,6 +191,8 @@ export default class WasteSettings extends React.Component {
 						<th>Name</th>
 						<th>Unit</th>
 						<th>Location</th>
+						<th>Conversion</th>
+                        <th>Unit Weight</th>
 					</tr></thead>
 					<tbody>
 						{this.state.data.map(function (obj, i) {
@@ -199,6 +202,8 @@ export default class WasteSettings extends React.Component {
 								<td>{obj.Name}</td>
 								<td>{this.renderUnitOptions(obj)}</td>
 								<td>{this.renderLocationOptions(obj)}</td>
+								<td>{this.renderConversion(obj)}</td>
+                                <td>{this.renderUnitWeight(obj)}</td>
 							</tr>);
 						}, this)}
 					</tbody>
@@ -224,6 +229,26 @@ export default class WasteSettings extends React.Component {
 		</select>);
 	}
 
+	renderConversion = (obj) => {
+		// return (<input type="text" value={obj.CustomConversion}/>);
+        console.log(obj.Name + " custom? " + obj.CustomConversion);
+        return (
+            <select value={obj.CustomConversion} onChange={(v)=>{this.updateCustomConversion(v.target.value,obj)}} >
+                <option value={0}>False</option>
+                <option value={1}>True</option>
+            </select>
+        );
+	}
+
+    renderUnitWeight = (obj) => {
+        return <input type="text" onChange={ (e) => { this.updateUnitWeight(e.target.value, obj) } }/>;
+    }
+
+    updateUnitWeight = (val, obj) => {
+        obj.UnitWeight = val;
+        obj.Changed = true;
+    }
+
 	updateUnitMeasure = (val, obj) => {
 		obj.UnitMeasure = parseInt(val);
 		obj.Changed = true;
@@ -235,6 +260,17 @@ export default class WasteSettings extends React.Component {
 		obj.Changed = true;
 		this.forceUpdate();
 	}
+
+    updateCustomConversion = (val, obj) => {
+        var out = false;
+        if( val === 1 ) {
+            out = true;
+        }
+
+        obj.CustomConversion = out;
+        obj.Changed = true;
+        this.forceUpdate();
+    }
 
 	// send the updated items back to the server to update
 	updateWastage = () => {
