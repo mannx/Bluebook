@@ -6,22 +6,22 @@ require (
 	github.com/kelseyhightower/envconfig v1.4.0
 	// github.com/labstack/echo/v4 v4.9.0
 	github.com/labstack/echo/v4 v4.10.1
-	github.com/rs/zerolog v1.28.0
-	github.com/xuri/excelize/v2 v2.6.1
-	gorm.io/datatypes v1.0.7
-	gorm.io/driver/sqlite v1.4.2
-	gorm.io/gorm v1.24.0
+	github.com/rs/zerolog v1.29.0
+	github.com/xuri/excelize/v2 v2.7.0
+	gorm.io/datatypes v1.1.0
+	gorm.io/driver/sqlite v1.4.4
+	gorm.io/gorm v1.24.5
 )
 
 require (
-	github.com/go-sql-driver/mysql v1.6.0 // indirect
+	github.com/go-sql-driver/mysql v1.7.0 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/labstack/gommon v0.4.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.17 // indirect
-	github.com/mattn/go-sqlite3 v1.14.15 // indirect
+	github.com/mattn/go-sqlite3 v1.14.16 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/richardlehane/mscfb v1.0.4 // indirect
 	github.com/richardlehane/msoleps v1.0.3 // indirect
@@ -34,7 +34,7 @@ require (
 	golang.org/x/sys v0.5.0 // indirect
 	golang.org/x/text v0.7.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
-	gorm.io/driver/mysql v1.4.1 // indirect
+	gorm.io/driver/mysql v1.4.7 // indirect
 )
 
 replace (
