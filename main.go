@@ -32,7 +32,6 @@ var dbName string
 
 func main() {
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
-	zerolog.SetGlobalLevel(zerolog.DebugLevel)
 
 	log.Info().Msgf("Bluebook Helper")
 	log.Info().Msgf("  => Version: %v", BuildVersion)
@@ -40,6 +39,9 @@ func main() {
 
 	log.Info().Msg("Initializing environment...")
 	env.Environment.Init()
+
+	log.Info().Msgf("Setting log level to: %v", env.Environment.LogLevelString)
+	zerolog.SetGlobalLevel(env.Environment.LogLevel)
 
 	log.Info().Msg("Initializing top5 list...")
 	api.InitTop5()

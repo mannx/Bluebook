@@ -306,6 +306,7 @@ type wasteHoldingJSON struct {
 	Year     int
 	Month    int
 	Day      int
+	Reason   string
 }
 
 func getWasteHoldingEntries(db *gorm.DB) []wasteHoldingJSON {
@@ -341,6 +342,7 @@ func getWasteHoldingEntries(db *gorm.DB) []wasteHoldingJSON {
 				Year:     date.Year(),
 				Month:    int(date.Month()) - 1,
 				Day:      date.Day(),
+				Reason:   i.Reason,
 			})
 	}
 

@@ -1,7 +1,10 @@
 package environ
 
 import (
+	"strings"
+
 	"github.com/kelseyhightower/envconfig"
+	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
 
@@ -19,6 +22,9 @@ type EnvironmentDefinition struct {
 	// UserID and GroupID are used to set the file permissions for all exported files
 	UserID  int `envconfig:"PUID"` // userid the container should be running under
 	GroupID int `envconfig:"PGID"` // groupid "								"
+
+	LogLevelString string        `envconfig:"BLUEBOOK_LOG_LEVEL"`
+	LogLevel       zerolog.Level // set the log level for zerolog once parsed from the env variable
 }
 
 var Environment = EnvironmentDefinition{}
@@ -32,6 +38,9 @@ func (e *EnvironmentDefinition) Init() {
 		return
 	}
 
+	// parse the log level
+	e.LogLevel = e.parseLogLevel()
+
 	log.Debug().Msgf("  => [EnvironmentDefinition] UserID: %v", e.UserID)
 	log.Debug().Msgf("  => [EnvironmentDefinition] GroupID: %v", e.GroupID)
 }
@@ -42,4 +51,22 @@ func (e *EnvironmentDefinition) Default() {
 	e.TempPath = "/tmp"
 	e.DataPath = "/data"
 	e.BackupPath = "/backup"
+	e.LogLevelString = "Info"
+}
+
+// parse the log level string.  Default to INFO if unable to parse
+func (e *EnvironmentDefinition) parseLogLevel() zerolog.Level {
+	str := strings.ToLower(e.LogLevelString)
+
+	if str == "debug" {
+		return zerolog.DebugLevel
+	} else if str == "info" {
+		return zerolog.InfoLevel
+	} else if str == "warn" {
+		return zerolog.WarnLevel
+	} else if str == "error" {
+		return zerolog.ErrorLevel
+	}
+
+	return zerolog.InfoLevel
 }
