@@ -32,7 +32,6 @@ var dbName string
 
 func main() {
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
-	zerolog.SetGlobalLevel(zerolog.DebugLevel)
 
 	log.Info().Msgf("Bluebook Helper")
 	log.Info().Msgf("  => Version: %v", BuildVersion)
@@ -41,13 +40,21 @@ func main() {
 	log.Info().Msg("Initializing environment...")
 	env.Environment.Init()
 
+	log.Info().Msgf("Setting log level to: %v", env.Environment.LogLevelString)
+	zerolog.SetGlobalLevel(env.Environment.LogLevel)
+
 	log.Info().Msg("Initializing top5 list...")
 	api.InitTop5()
 
 	dbName = filepath.Join(env.Environment.DataPath, "db.db")
 
+	log.Info().Msg("Initializing database backup list...")
+	err := api.InitializeDBListing()
+	if err != nil {
+		log.Error().Err(err).Msgf("Unable to generate listing of backed up database files...")
+	}
+
 	log.Info().Msg("Initializing database...")
-	log.Debug().Msgf("  => Database path: %v", dbName)
 	dbo, err := gorm.Open(sqlite.Open(dbName), &gorm.Config{})
 	if err != nil {
 		log.Fatal().Err(err).Msg("Unable to open database...")
@@ -57,6 +64,12 @@ func main() {
 
 	log.Info().Msg("Auto migrating the database...")
 	migrateDB()
+
+	log.Info().Msg("Updating database backup list...")
+	err = UpdateBackupTable(DB)
+	if err != nil {
+		log.Error().Err(err).Msg("Unable to manage database backup...")
+	}
 
 	log.Info().Msg("Initialiing server and middleware")
 
@@ -93,4 +106,6 @@ func migrateDB() {
 
 	DB.AutoMigrate(&models.TagList{})
 	DB.AutoMigrate(&models.TagData{})
+
+	DB.AutoMigrate(&models.BackupEntry{})
 }

@@ -151,10 +151,9 @@ func GetMonthViewHandler(c echo.Context, db *gorm.DB) error {
 			dayList = append(dayList, o)
 		}
 
-		// calculate the weekly average of previous weeks if we havent already done so
-		if o.WeeklyAverage == 0 {
-			o.WeeklyAverage = calculateWeeklyAverage(d, 4, db)
-		}
+		// calculate the average sales for the day based on past 4 weeks
+		// we no longer cache this value
+		o.WeeklyAverage = calculateWeeklyAverage(d, 4, db)
 
 		tags, ids := getTags(o.ID, db)
 
@@ -267,7 +266,9 @@ func calculateWeeklyAverage(date time.Time, numWeeks int, db *gorm.DB) float64 {
 	var dates []time.Time
 
 	for i := 0; i < numWeeks; i++ {
-		dates = append(dates, date.AddDate(0, 0, -7))
+		// generate the previous date for the given week1
+		d := date.AddDate(0, 0, -7*(i+1))
+		dates = append(dates, d)
 	}
 
 	var total float64

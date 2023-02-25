@@ -76,7 +76,13 @@ export default class TableCell extends React.Component {
 				<td className="MyStyle">{this.O(this.props.data.GrossSales)}</td>
 				<td className="MyStyle">{this.O(this.props.data.HST)}</td>
 				<td className="MyStyle">{this.O(this.props.data.BottleDeposit)}</td>
-				<td className={`${cls} ${"MyStyle"}`}>{this.O(this.props.data.NetSales)}</td>
+				{/* <td className={`${cls} ${"MyStyle"}`}>{this.O(this.props.data.NetSales)}</td> */}
+				<td className={`${cls} ${"MyStyle"}`}>
+					<div className="tooltip">
+						{this.O(this.props.data.NetSales)}
+						<span className="tooltiptext">{this.O(this.props.data.WeeklyAverage)}</span>
+					</div>
+				</td>
 				<td className="div"></td>
 
 				<td className="MyStyle">{this.O(this.props.data.DebitCard)}</td>
@@ -95,12 +101,12 @@ export default class TableCell extends React.Component {
 				<td className="MyStyle">{this.O(this.props.data.Factor)}</td>
 				<td className="MyStyle">{this.O(this.props.data.AdjustedSales)}</td>
 				<td className="MyStyle">{this.O(this.props.data.CustomerCount)}</td>
-				<td className="MyStyle">{this.Dol(this.props.data.ThirdPartyDollar)}</td>
-				<td className="MyStyle">{this.P(this.props.data.ThirdPartyPercent)}</td>
+				<td className="MyStyle no-print">{this.Dol(this.props.data.ThirdPartyDollar)}</td>
+				<td className="MyStyle no-print">{this.P(this.props.data.ThirdPartyPercent)}</td>
 				<td className="div"></td>
 
 				<td className="MyStyle" onDoubleClick={this.editComment} >{this.commentField()}</td>
-				<td className="MyStyle" onDoubleClick={this.editTag} >{this.tagField()}</td>
+				<td className="MyStyle no-print" onDoubleClick={this.editTag} >{this.tagField()}</td>
 			</tr>
 		);
 	}
@@ -164,6 +170,7 @@ export default class TableCell extends React.Component {
 			});
 
 		this.setState({editTag: !this.state.editTag});
+		if(this.props.reload !== null) { this.props.reload(); }
 	}
 
 	editComment = () => {
@@ -175,6 +182,14 @@ export default class TableCell extends React.Component {
 	}
 
 	tagField = () => {
+		// get the tag list as a string
+		var tagList = "";
+		if(this.props.data.Tags !== null) {
+			this.props.data.Tags.map(function (obj){
+				tagList += "#"+obj+" ";
+			});
+		}
+
 		if(this.state.editTag === false) {
 			if(this.props.data.Tags !== null) {
 				return (<div className='tag'>
@@ -186,7 +201,7 @@ export default class TableCell extends React.Component {
 		}else{
 			return (
 				<form onSubmit={this.submitTag} >
-					<input type={"text"} name={"tag"} defaultValue={this.state.tag} onChange={this.tagChange}/>
+					<input type={"text"} name={"tag"} defaultValue={tagList} onChange={this.tagChange}/>
 					<input type={"submit"} value={"Update"} />
 				</form>
 			);

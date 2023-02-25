@@ -79,5 +79,9 @@ func initServer() *echo.Echo {
 
 	// Export
 	e.GET("/api/export/weekly", func(c echo.Context) error { return api.ExportWeekly(c, DB) })
+
+	// DB backup/revert
+	e.GET("/api/backup/list", func(c echo.Context) error { return api.BackupDBView(c, DB) })
+	e.POST("/api/backup/remove", func(c echo.Context) error { return api.BackupDBRemove(c, DB) })
 	return e
 }

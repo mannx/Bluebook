@@ -1,13 +1,18 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
+	"os"
+	"regexp"
+	"strconv"
 	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
 
+	env "github.com/mannx/Bluebook/environ"
 	models "github.com/mannx/Bluebook/models"
 )
 
@@ -121,4 +126,106 @@ func BackupEmptyHandler(c echo.Context, db *gorm.DB) error {
 	db.Where("1 = 1").Delete(&models.DayDataImportList{})
 
 	return ReturnServerMessage(c, "Success", false)
+}
+
+// FileInfo is used to store the information about a given db file
+type FileInfo struct {
+	ID       int
+	FileName string
+	Month    int
+	Day      int
+	Year     int
+}
+
+var dbListing []FileInfo
+
+func InitializeDBListing() error {
+	dir, err := os.ReadDir(env.Environment.BackupPath)
+	if err != nil {
+		return err
+	}
+
+	dbListing = make([]FileInfo, 0)
+	re := regexp.MustCompile(`db-(\d\d)-(\d\d)-(\d\d\d\d).db`)
+
+	for i, f := range dir {
+		// do we have a backup file?
+		match := re.FindStringSubmatch(f.Name())
+		if len(match) == 0 {
+			// no matches found, skip file
+			continue
+		}
+
+		// extract the date information
+		month, _ := strconv.Atoi(match[1])
+		day, _ := strconv.Atoi(match[2])
+		year, _ := strconv.Atoi(match[3])
+
+		dbListing = append(dbListing, FileInfo{
+			ID:       i - 1,
+			FileName: f.Name(),
+			Month:    month,
+			Day:      day,
+			Year:     year,
+		})
+
+		log.Debug().Msgf("Adding db backup to dbListing: %v", f.Name())
+	}
+
+	return nil
+}
+
+// Return list of databases to revert to or remove
+func BackupDBView(c echo.Context, db *gorm.DB) error {
+	log.Debug().Msgf("dbListing len: %v", len(dbListing))
+	return c.JSON(http.StatusOK, &dbListing)
+}
+
+func BackupDBRemove(c echo.Context, db *gorm.DB) error {
+	type inputData struct {
+		ID     int
+		Remove bool
+	}
+
+	var input inputData
+	if err := c.Bind(&input); err != nil {
+		return LogAndReturnError(c, "Failed to bind data for BackupDBRemove", err)
+	}
+
+	// get the file name we are removing
+	fname := dbListing[input.ID].FileName
+	path := fmt.Sprintf("%v/%v", env.Environment.BackupPath, fname)
+	log.Debug().Msgf("Removing file: %v", path)
+
+	// remove the file
+	err := os.Remove(path)
+	if err != nil {
+		return LogAndReturnError(c, fmt.Sprintf("Unable to remove file: %v", path), err)
+	}
+
+	return ReturnServerOK(c)
+}
+
+func BackupDBRestore(c echo.Context, db *gorm.DB) error {
+	type inputData struct {
+		ID int
+	}
+
+	var input inputData
+	if err := c.Bind(&input); err != nil {
+		return LogAndReturnError(c, "Unable to bind data for BackupDBRestore", err)
+	}
+
+	// get the file name
+	fname := dbListing[input.ID].FileName
+	path := fmt.Sprintf("%v/%v", env.Environment.BackupPath, fname)
+
+	log.Debug().Msgf("Restoring db: %v", path)
+
+	// todo:
+	//	setup script/timer to copy db to correct location once exited
+	//	exit program
+	//	once script is run, restart app
+
+	return ReturnServerOK(c)
 }

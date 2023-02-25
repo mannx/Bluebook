@@ -29,8 +29,6 @@ func getCell(row int, col int) string {
 
 // Import a waste sheet given its filename
 func ImportWaste(fileName string, db *gorm.DB) error {
-	log.Info().Msgf("ImportWaste(%v)", fileName)
-
 	f, err := excelize.OpenFile(fileName)
 	if err != nil {
 		return err
@@ -98,7 +96,6 @@ func ImportWaste(fileName string, db *gorm.DB) error {
 		if res.RowsAffected == 0 {
 			// unable to retrieve the item, create a new entry
 			obj.Name = item
-			log.Debug().Msgf("Adding wastem item: %v", obj.Name)
 			r := db.Save(&obj)
 			if r.Error != nil {
 				return err
@@ -131,8 +128,6 @@ func ImportWaste(fileName string, db *gorm.DB) error {
 
 // ImportWasteDefinition imports waste entries give a simple JSON config
 func ImportWasteDefinition(fileName string, db *gorm.DB) error {
-	log.Debug().Msg("ImportWasteDefinition()")
-
 	f, err := ioutil.ReadFile(fileName)
 	if err != nil {
 		log.Error().Err(err).Msgf("Unable to read file: %v", fileName)
@@ -144,6 +139,7 @@ func ImportWasteDefinition(fileName string, db *gorm.DB) error {
 		UnitCount int
 		Location  int
 	}
+
 	type WasteInfo struct {
 		Data []WasteData
 	}
@@ -155,8 +151,6 @@ func ImportWasteDefinition(fileName string, db *gorm.DB) error {
 		log.Error().Err(err).Msg("Unable to parse waste data...")
 		return err
 	}
-
-	log.Debug().Msg("Import waste definition success")
 
 	for _, n := range obj.Data {
 		wi := models.WastageItem{

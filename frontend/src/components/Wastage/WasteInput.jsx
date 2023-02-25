@@ -65,6 +65,10 @@ export default class WasteInput extends React.Component {
 		this.setState({names: data});
 	}
 
+	getDate = (obj) => {
+		return new Date(obj.Year, obj.Month, obj.Day, 0, 0, 0, 0);
+	}
+
 	loadItems = async () => {
 		const url = UrlGet("WasteInputGet")
 		const resp=await fetch(url);
@@ -79,7 +83,7 @@ export default class WasteInput extends React.Component {
 			for(var i = 0; i < data.length; i++) {
 				// create the date fields
 				// server sends date in broken format, assemble to make sure correct
-				data[i].Date = new Date(data[i].Year, data[i].Month, data[i].Day, 0, 0, 0, 0);
+				data[i].Date = this.getDate(data[i]);
 			}
 
 			this.setState({items: data});
@@ -90,9 +94,22 @@ export default class WasteInput extends React.Component {
 
 	loadItems2 = (data) => {
 		if(data.Error === false) {
-			// have valid item data
-			const items = data.Items === null ? this.NewItem() : data.Items;
-			this.setState({items: items,Error:false});
+			if(data.Items !== null) {
+				var items = data.Items;
+				if(items.length !== 0) {
+					for(var i = 0; i < items.length; i++) {
+						items[i].Date = this.getDate(items[i]);
+					}
+				}
+
+				this.setState({items: items, Error: false});
+			}else{
+				// make sure items is cleared out
+				this.setState({items: [], Error: false});
+			}
+
+			// make sure we have a blank item
+			this.NewItem();
 		}else{
 			this.setState({Error:true,Message:data.Message});
 		}
@@ -127,6 +144,7 @@ export default class WasteInput extends React.Component {
 						<th>Date</th>
 						<th>Item</th>
 						<th>Quantity</th>
+                        <th>Reason</th>
 						<th></th>
 					</tr>
 					</thead>
@@ -200,6 +218,22 @@ export default class WasteInput extends React.Component {
 		</>);
 	}
 
+    reasonField = (obj, idx, edit) => {
+        if( edit === true ) {
+            return ( <>
+                <input type="text" tabIndex={-1} defaultValue={obj.Reason} onChange = {
+                    (e) => {
+                        var items = this.state.items;
+                        items[idx].Reason = e.target.value;
+                        this.setState({items: items});
+                    } }
+                />
+                </>);
+        } else {
+            return <span>{obj.Reason}</span>;
+        }
+    }
+
 	entryFields = (obj, idx) => {
 		const size = this.state.items.length - 1;
 		const edit = idx === size;
@@ -208,6 +242,7 @@ export default class WasteInput extends React.Component {
 			<td>{this.dateField(obj, idx, edit)}</td>
 			<td>{this.itemField(obj,idx,edit)}</td>
 			<td>{this.quantityField(obj, idx, edit)}</td>
+            <td>{this.reasonField(obj, idx, edit)}</td>
 			<td>{idx === size ? this.addBtn(idx) : this.updateBtn(idx)}</td>
 		</tr>);
 	}

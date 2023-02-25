@@ -52,3 +52,9 @@ div.dropdown-content {
 div.dropdown:hover div.dropdown-content {
 	display: block;
 }
+
+@media print {
+	.no-print, .no-print * {
+		display: none !important;
+	}
+}

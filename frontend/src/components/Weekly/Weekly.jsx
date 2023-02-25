@@ -24,6 +24,7 @@ export default class Weekly extends React.Component {
 
 			managerHours: 0,
 			hoursUsed: 0,
+            syscoCost: 0,
 		}
 
 		// if not a tuesday, display an error 
@@ -125,8 +126,11 @@ export default class Weekly extends React.Component {
 
 		const hours = this.state.hoursUsed;
 		const manager = this.state.managerHours;
+        const sysco = this.state.syscoCost;
 
-		const url = UrlGet("Export") + "?month="+month+"&day="+day+"&year="+year+"&hours="+hours+"&manager="+manager;
+        // change to a post instead?
+        //  also need to fix server side? GET not appropriate for amount of data anymore
+		const url = UrlGet("Export") + "?month="+month+"&day="+day+"&year="+year+"&hours="+hours+"&manager="+manager+"&sysco="+sysco;
 		const resp = await fetch(url);
 		const data = await resp.json();
 
@@ -172,6 +176,7 @@ export default class Weekly extends React.Component {
 			<div>
 				Hours Used: <input type="text" autoFocus onChange={this.hoursUsedChanged}/><br/>
 				Manager Hours: <input type="text" onChange={this.managerHoursChanged}/><br/>
+                Sysco Cost: <input type="text" onChange={this.syscoCostChanged}/><br/>
 			</div>
 			</>
 		);
@@ -179,4 +184,5 @@ export default class Weekly extends React.Component {
 
 	managerHoursChanged = (e) => { this.setState({managerHours: e.target.value}); }
 	hoursUsedChanged = (e) => { this.setState({hoursUsed: e.target.value}); }
+    syscoCostChanged = (e) => { this.setState({syscoCost: e.target.value}); }
 }

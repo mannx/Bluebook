@@ -24,7 +24,6 @@ func PDFToText(fileName string) (string, error) {
 	_, rawfname := filepath.Split(fileName) // extract just the file name
 	outFile := filepath.Join(env.Environment.TempPath, fmt.Sprintf("%v.txt", rawfname))
 
-	log.Debug().Msgf("running pdftotext %v %v", fileName, outFile)
 	cmd := exec.Command("pdftotext", "-layout", fileName, outFile)
 	err := cmd.Run()
 	if err != nil {
@@ -51,24 +50,8 @@ func getDataOrNew(date time.Time, db *gorm.DB) (models.DayData, bool) {
 		return n, true
 	}
 
-	log.Info().Msgf("date: %v [id: %v]", n.Date, n.ID)
-
 	// non empty entry, create a backup if not present already
 	backup := models.DayDataBackup{}
-	/*res = db.Find(&backup, "BackupID = ?", n.ID)
-	if res.Error != nil {
-		log.Warn().Err(res.Error).Msg(" => Unable to check for day backup entry, continuing without...")
-		return n, false
-	}
-
-	if res.RowsAffected != 0 {
-		// found an entry, we don't update
-		return n, false
-	}
-
-	// no entry found, create the entry
-	backup.DayData = n
-	db.Save(&backup)*/
 
 	// create a copy of the data and save it
 	backup.DayData = n

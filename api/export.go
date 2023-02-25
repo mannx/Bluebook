@@ -21,16 +21,17 @@ var lastYearSales = "D8"
 var netSales = "D9"
 var upcomingSales = "D12"
 var breadCount = "D13"
-var foodCost = "D14"
-var labourCost = "D16"
-var customerCount = "D18"
-var customerPrev = "D19"
-var partySales = "D21"
+var foodCost = "D15"
+var syscoCost = "D17"
+var labourCost = "D20"
+var customerCount = "D27"
+var customerPrev = "D28"
+var partySales = "D30"
 var hoursUsed = "D22"
 var managerHours = "D23"
 var targetHours = "D25"
-var gcSold = "D26"
-var gcRedeem = "D27"
+var gcSold = "D31"
+var gcRedeem = "D32"
 
 // mapings for the initial cells for the waste chart
 //
@@ -46,7 +47,7 @@ var wasteStartRow = 2
 // outputs in Environment.OutputDir
 func ExportWeekly(c echo.Context, db *gorm.DB) error {
 	var month, day, year int
-	var hours, manager float64 // hours used and manager hours
+	var hours, manager, sysco float64 // hours used and manager hours
 
 	err := echo.QueryParamsBinder(c).
 		Int("month", &month).
@@ -54,6 +55,7 @@ func ExportWeekly(c echo.Context, db *gorm.DB) error {
 		Int("year", &year).
 		Float64("hours", &hours).
 		Float64("manager", &manager).
+		Float64("sysco", &sysco).
 		BindError()
 	if err != nil {
 		return err
@@ -94,6 +96,7 @@ func ExportWeekly(c echo.Context, db *gorm.DB) error {
 
 	f.SetCellValue("Sheet1", hoursUsed, hours)
 	f.SetCellValue("Sheet1", managerHours, manager)
+	f.SetCellValue("Sheet1", syscoCost, sysco)
 
 	// set the correct date
 	weekEnding := time.Date(year, time.Month(month), day, 0, 0, 0, 0, time.UTC)
@@ -127,12 +130,14 @@ func exportWaste(waste []models.WastageEntryNamed, weekEnding time.Time) error {
 		date := fmt.Sprintf("%v%v", wasteDate, i+wasteStartRow)
 		item := fmt.Sprintf("%v%v", wasteItem, i+wasteStartRow)
 		weight := fmt.Sprintf("%v%v", wasteWeight, i+wasteStartRow)
+		reason := fmt.Sprintf("%v%v", wasteReason, i+wasteStartRow)
 
 		// log.Debug().Msgf("[Date: %v] [Item: %v] [Weight: %v] [Name: %v", date, item, weight, e.Name)
 		dateStr := time.Time(e.Date)
 		f.SetCellValue("Waste Sheet", date, dateStr)
 		f.SetCellValue("Waste Sheet", item, e.Name)
 		f.SetCellValue("Waste Sheet", weight, e.Amount)
+		f.SetCellValue("Waste Sheet", reason, e.Reason)
 	}
 
 	// generate our output file name and save
