@@ -40,8 +40,6 @@ func ImportDaily(fileName string, db *gorm.DB) error {
 	// TODO: setup for future, but unliekly to add in support for older versions
 	version := getSheetVersion(f) // default to current version
 
-	log.Debug().Msgf("Sheet version: %v", version)
-
 	// determine the number of days we are parsing
 	// work right to left, then top down
 	numDays := 0
@@ -98,7 +96,6 @@ func ImportDaily(fileName string, db *gorm.DB) error {
 		// save to database
 		db.Save(&dd)
 
-		log.Debug().Msgf("Creating import list entry: %v", blank)
 		if blank == true {
 			// save the id that was just added to the db
 			ent := models.DayDataImportList{

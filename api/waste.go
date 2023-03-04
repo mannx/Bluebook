@@ -354,8 +354,6 @@ func GetWasteHoldingHandler(c echo.Context, db *gorm.DB) error {
 }
 
 func AddWasteHoldingHandler(c echo.Context, db *gorm.DB) error {
-	log.Debug().Msg("[AddWasteHoldingHandler]")
-
 	type addWasteHolding struct {
 		Date     string
 		Name     string
@@ -372,8 +370,6 @@ func AddWasteHoldingHandler(c echo.Context, db *gorm.DB) error {
 	if err != nil {
 		return LogAndReturnError(c, fmt.Sprintf("Unable to parse input time [%v]", data.Date), err)
 	}
-
-	log.Debug().Msgf("Date: [%v]", date)
 
 	// get the item we are adding to the hold
 	// if we dont have it, add it to the db and returns its id
@@ -479,10 +475,7 @@ func getWastageIdByName(db *gorm.DB, name string) uint {
 			Name: name,
 		}
 
-		log.Debug().Msgf("Creating new waste item: %v", name)
 		db.Save(&entry)
-
-		log.Debug().Msgf("New ID: %v", entry.ID)
 		return entry.ID
 	}
 

@@ -71,6 +71,12 @@ func main() {
 		log.Error().Err(err).Msg("Unable to manage database backup...")
 	}
 
+	// check for any duplicate day entries
+	err = checkDuplicateEntries()
+	if err != nil {
+		log.Error().Err(err).Msg("Error checking for duplicate days")
+	}
+
 	log.Info().Msg("Initialiing server and middleware")
 
 	e := initServer()
@@ -108,4 +114,54 @@ func migrateDB() {
 	DB.AutoMigrate(&models.TagData{})
 
 	DB.AutoMigrate(&models.BackupEntry{})
+}
+
+// check to see if we have any duplicated day_data entries
+// if we have more than 1 entry with the same date, log id of both
+// to fix: TODO
+func checkDuplicateEntries() error {
+	log.Info().Msg("Checking for duplicate day entries...")
+
+	// get the first and last date in the database
+	var first, last models.DayData
+
+	res := DB.Select("Date").Order("Date").Take(&first)
+	if res.Error != nil {
+		return res.Error
+	}
+
+	res = DB.Order("Date desc").Select("Date").Take(&last)
+	if res.Error != nil {
+		return res.Error
+	}
+
+	// get start/end date
+	start := time.Time(first.Date)
+	end := time.Time(last.Date)
+
+	log.Info().Msgf(" => Starting at: %v", start)
+	log.Info().Msgf(" => Ending at: %v", end)
+
+	// for each day, check if we can retrieve multiple entries
+	currDate := start
+	for !currDate.After(end) {
+		// check for multiple days with the current date
+		var data []models.DayData
+		res := DB.Where("Date = ?", currDate).Find(&data)
+		if res.Error != nil {
+			log.Error().Err(res.Error).Msgf("Unable to retrieve entries for day %v", currDate)
+		}
+
+		if len(data) > 1 {
+			log.Warn().Msgf(" => [Date: %v] Has entry count: %v", currDate, len(data))
+			for _, d := range data {
+				log.Warn().Msgf("   => [ID: %v]", d.ID)
+			}
+		}
+
+		// move to the next day
+		currDate = currDate.AddDate(0, 0, 1)
+	}
+
+	return nil
 }

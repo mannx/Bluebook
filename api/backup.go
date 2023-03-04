@@ -168,8 +168,6 @@ func InitializeDBListing() error {
 			Day:      day,
 			Year:     year,
 		})
-
-		log.Debug().Msgf("Adding db backup to dbListing: %v", f.Name())
 	}
 
 	return nil
@@ -177,7 +175,6 @@ func InitializeDBListing() error {
 
 // Return list of databases to revert to or remove
 func BackupDBView(c echo.Context, db *gorm.DB) error {
-	log.Debug().Msgf("dbListing len: %v", len(dbListing))
 	return c.JSON(http.StatusOK, &dbListing)
 }
 
@@ -195,7 +192,6 @@ func BackupDBRemove(c echo.Context, db *gorm.DB) error {
 	// get the file name we are removing
 	fname := dbListing[input.ID].FileName
 	path := fmt.Sprintf("%v/%v", env.Environment.BackupPath, fname)
-	log.Debug().Msgf("Removing file: %v", path)
 
 	// remove the file
 	err := os.Remove(path)
@@ -217,10 +213,8 @@ func BackupDBRestore(c echo.Context, db *gorm.DB) error {
 	}
 
 	// get the file name
-	fname := dbListing[input.ID].FileName
-	path := fmt.Sprintf("%v/%v", env.Environment.BackupPath, fname)
-
-	log.Debug().Msgf("Restoring db: %v", path)
+	// fname := dbListing[input.ID].FileName
+	// path := fmt.Sprintf("%v/%v", env.Environment.BackupPath, fname)
 
 	// todo:
 	//	setup script/timer to copy db to correct location once exited

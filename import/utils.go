@@ -38,7 +38,6 @@ func PDFToText(fileName string) (string, error) {
 func getDataOrNew(date time.Time, db *gorm.DB) (models.DayData, bool) {
 	n := models.DayData{}
 
-	log.Debug().Msgf("[getDataOrNew] Checking for object date: %v", date.String())
 	res := db.Find(&n, "Date = ?", date)
 	if res.Error != nil {
 		log.Error().Err(res.Error).Msg("Unable to load data, using new data")
@@ -46,7 +45,7 @@ func getDataOrNew(date time.Time, db *gorm.DB) (models.DayData, bool) {
 	}
 
 	if res.RowsAffected == 0 {
-		log.Debug().Msg("No data available, creating blank entry")
+		// no data available, creating a blank entry
 		return n, true
 	}
 

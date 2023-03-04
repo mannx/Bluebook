@@ -132,7 +132,6 @@ func exportWaste(waste []models.WastageEntryNamed, weekEnding time.Time) error {
 		weight := fmt.Sprintf("%v%v", wasteWeight, i+wasteStartRow)
 		reason := fmt.Sprintf("%v%v", wasteReason, i+wasteStartRow)
 
-		// log.Debug().Msgf("[Date: %v] [Item: %v] [Weight: %v] [Name: %v", date, item, weight, e.Name)
 		dateStr := time.Time(e.Date)
 		f.SetCellValue("Waste Sheet", date, dateStr)
 		f.SetCellValue("Waste Sheet", item, e.Name)

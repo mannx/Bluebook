@@ -40,9 +40,6 @@ func (e *EnvironmentDefinition) Init() {
 
 	// parse the log level
 	e.LogLevel = e.parseLogLevel()
-
-	log.Debug().Msgf("  => [EnvironmentDefinition] UserID: %v", e.UserID)
-	log.Debug().Msgf("  => [EnvironmentDefinition] GroupID: %v", e.GroupID)
 }
 
 func (e *EnvironmentDefinition) Default() {
