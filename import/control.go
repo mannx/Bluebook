@@ -2,7 +2,6 @@ package daily
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"regexp"
 	"strconv"
@@ -67,32 +66,32 @@ func ImportControl(fileName string, db *gorm.DB) error {
 	// extract the relevant information
 	prod := reProductivity.FindStringSubmatch(cstr)
 	if prod == nil {
-		return reFail("Productivity")
+		return reFail("control.go", "Productivity")
 	}
 
 	factor := reFactor.FindStringSubmatch(cstr)
 	if factor == nil {
-		return reFail("Factor")
+		return reFail("control.go", "Factor")
 	}
 
 	unitSold := reUnitsSold.FindStringSubmatch(cstr)
 	if unitSold == nil {
-		return reFail("Units Sold")
+		return reFail("control.go", "Units Sold")
 	}
 
 	custCount := reCustomerCount.FindStringSubmatch(cstr)
 	if custCount == nil {
-		return reFail("Customer count")
+		return reFail("control.go", "Customer count")
 	}
 
 	hoursWorkd := reHoursWorked.FindStringSubmatch(cstr)
 	if hoursWorkd == nil {
-		return reFail("Hours worked")
+		return reFail("control.go", "Hours worked")
 	}
 
 	breadCredits := reBreadWaste.FindStringSubmatch(cstr)
 	if breadCredits == nil {
-		return reFail("Bread Credits")
+		return reFail("control.go", "Bread Credits")
 	}
 
 	// multiple possible results, we need the 2nd result
@@ -102,7 +101,7 @@ func ImportControl(fileName string, db *gorm.DB) error {
 		// find way of not having to use 2 regex for this
 		bos = reBreadOverShort2.FindAllStringSubmatch(cstr, -1)
 		if bos == nil {
-			return reFail("Bread over short")
+			return reFail("control.go", "Bread over short")
 		}
 	}
 
@@ -138,9 +137,4 @@ func ImportControl(fileName string, db *gorm.DB) error {
 	}
 
 	return nil
-}
-
-func reFail(item string) error {
-	log.Error().Msgf("[control.go]{reFail} Unable to parse data for: %v", item)
-	return errors.New(fmt.Sprintf("Unable to parse data for: %v", item))
 }

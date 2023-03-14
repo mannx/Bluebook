@@ -19,11 +19,12 @@ type weeklyInfo struct {
 	LabourCostAmount float64
 	PartySales       float64
 
-	NetSales       float64
-	CustomerCount  int
-	GiftCardSold   float64
-	GiftCardRedeem float64
-	BreadOverShort float64
+	NetSales         float64
+	NetSalesMismatch bool // true if net sales calculated from dailies differs from what was taken from wisr
+	CustomerCount    int
+	GiftCardSold     float64
+	GiftCardRedeem   float64
+	BreadOverShort   float64
 
 	LastYearSales         float64
 	LastYearCustomerCount int
@@ -88,6 +89,7 @@ func getWeeklyData(month int, day int, year int, c echo.Context, db *gorm.DB) (e
 	weekly.FoodCostAmount = wi.FoodCostAmount
 	weekly.LabourCostAmount = wi.LabourCostAmount
 	weekly.PartySales = wi.PartySales
+	weekly.NetSalesMismatch = weekly.NetSales != wi.NetSales
 
 	// retrieve the last years data if available
 	lastYear := weekEnding.AddDate(-1, 0, 0)

@@ -5,8 +5,7 @@ import (
 	"gorm.io/gorm"
 )
 
-//
-//	 Contains various bit of data for a given week
+// Contains various bit of data for a given week
 type WeeklyInfo struct {
 	gorm.Model
 
@@ -18,6 +17,8 @@ type WeeklyInfo struct {
 
 	LabourCostAmount  float64 `gorm:"column:LabourCostAmount"`
 	LabourCostPercent float64 `gorm:"column:LabourCostPercent"`
+
+	NetSales float64 `gorm:"column:NetSales"`
 
 	PartySales float64 `gorm:"column:PartySales"`
 }

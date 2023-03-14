@@ -18,6 +18,7 @@ var reWISRWeekEnd = regexp.MustCompile(`Week Ending:\s*(\d\d?)/(\d\d?)/(\d{4})`)
 var reCateringSales = regexp.MustCompile(`CATERING SALES\s+(\d+.?\d?)`)       // 1 group -> total catering sales
 var reLabourCost = regexp.MustCompile(`LABOR\s&\sTAXES\s+(\d+,?\d+)\s+(\d+)`) // 2 groups -> [0] dollar value [1] percent
 var reFoodCost = regexp.MustCompile(`COST OF GOODS\s+(\d+,?\d+)\s+(\d+)`)     // 2 groups -> [0] dollar value [1] percent
+var reNetSales = regexp.MustCompile(`NET SUBWAY SALES\s+(\d+,?\d+)`)          // 1 group -> weekly net sales
 
 func ImportWISR(fileName string, db *gorm.DB) error {
 	txtFile, err := PDFToText(fileName)
@@ -50,17 +51,22 @@ func ImportWISR(fileName string, db *gorm.DB) error {
 
 	catering := reCateringSales.FindStringSubmatch(cstr)
 	if catering == nil {
-		return reFail("Catering")
+		return reFail("wisr.go", "Catering")
 	}
 
 	labour := reLabourCost.FindStringSubmatch(cstr)
 	if labour == nil {
-		return reFail("labour")
+		return reFail("wisr.go", "labour")
 	}
 
 	food := reFoodCost.FindStringSubmatch(cstr)
 	if food == nil {
-		return reFail("food")
+		return reFail("wisr.go", "food")
+	}
+
+	netSales := reNetSales.FindStringSubmatch(cstr)
+	if netSales == nil {
+		return reFail("wisr.go", "netSales")
 	}
 
 	lstr := strings.ReplaceAll(labour[1], ",", "")
@@ -70,17 +76,31 @@ func ImportWISR(fileName string, db *gorm.DB) error {
 	foodCost, _ := strconv.ParseFloat(strings.ReplaceAll(food[1], ",", ""), 64)
 	foodPerc, _ := strconv.ParseFloat(food[2], 64)
 
+	// convert net sales to a float, remove all , to get a 1000+ value as just digits
+	ns, err := strconv.ParseFloat(strings.ReplaceAll(strings.TrimSpace(netSales[1]), ",", ""), 64)
+	if err != nil {
+		return reFail("wisr.go", "netSales parse")
+	}
+
+	party, err := strconv.ParseFloat(strings.ReplaceAll(strings.TrimSpace(catering[1]), ",", ""), 64)
+	if err != nil {
+		return reFail("wisr.go", "catering parse")
+	}
+
 	wi := getWeeklyInfoOrNew(endDate, db)
 	wi.Date = datatypes.Date(endDate) //make sure the date is correct
 	wi.FoodCostAmount = foodCost
 	wi.FoodCostPercent = foodPerc
 	wi.LabourCostAmount = labourCost
 	wi.LabourCostPercent = labourPerc
-	wi.PartySales, err = strconv.ParseFloat(strings.ReplaceAll(strings.TrimSpace(catering[1]), ",", ""), 64)
+	wi.NetSales = ns
+	wi.PartySales = party
+	// wi.PartySales, err = strconv.ParseFloat(strings.ReplaceAll(strings.TrimSpace(catering[1]), ",", ""), 64)
 
-	if err != nil {
-		log.Error().Err(err).Msgf("Unable to convert catering sales value: %v", catering[1])
-	}
+	// if err != nil {
+	// 	log.Error().Err(err).Msgf("Unable to convert catering sales value: %v", catering[1])
+
+	// }
 
 	db.Save(&wi)
 
