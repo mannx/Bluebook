@@ -5,8 +5,10 @@ import (
 	"os"
 	"regexp"
 	"strconv"
+	"strings"
 	"time"
 
+	"github.com/mannx/Bluebook/models"
 	"github.com/rs/zerolog/log"
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
@@ -28,6 +30,8 @@ var reBreadOverShort = regexp.MustCompile(`= OVER\/SHORT\s+(-?\d+[.]\d+)\s+(-?\d
 // this allows us to parse values in the thousands, should only be required rarely, and doesnt seem to work well as the main regex
 // find way to fix instead?
 var reBreadOverShort2 = regexp.MustCompile(`/= OVER\/SHORT\s+(-?\d*,?\d+[.]\d+)\s+(-?\d*,?\d+[.]\d+)\s+(-?\d*,?\d+[.]\d+)\s+(-?\d*,?\d+[.]\d+)\s+(-?\d*,?\d+[.]\d+)\s+(-?\d*,?\d+[.]\d+)\s+(-?\d*,?\d+[.]\d+)\s+`)
+
+var reNetSales = regexp.MustCompile(`NET SUBWAY SALES\s+(\d+,?\d+[.]\d+)`) // 1 group -> weekly net sales
 
 func ImportControl(fileName string, db *gorm.DB) error {
 	log.Info().Msgf("ImportControl(%v)", fileName)
@@ -94,6 +98,11 @@ func ImportControl(fileName string, db *gorm.DB) error {
 		return reFail("control.go", "Bread Credits")
 	}
 
+	netSales := reNetSales.FindStringSubmatch(cstr)
+	if netSales == nil {
+		return reFail("control.go", "Net Sales")
+	}
+
 	// multiple possible results, we need the 2nd result
 	bos := reBreadOverShort.FindAllStringSubmatch(cstr, -1)
 	if bos == nil {
@@ -134,6 +143,47 @@ func ImportControl(fileName string, db *gorm.DB) error {
 		// save it
 		db.Save(&dd)
 
+	}
+
+	// save the netsales in the weeklyinfo table
+	// check if we have a current entry
+	wi := models.WeeklyInfo{}
+	log.Debug().Msgf("Retrieve weekly info for date: %v", time.Time(endDate).Format("2006-01-02"))
+
+	// below doesn't find correct entry.  returns earliest instead of record with date
+	// wrong function calls?
+	res := db.Find(&wi).Where("Date = ?", endDate)
+	if res.Error != nil {
+		log.Error().Err(res.Error).Msg("DB Error")
+		return reFail("control.go", "Unable to retrieve weekly information for netsales")
+	}
+
+	if res.RowsAffected == 0 {
+		// nothing found, make sure we set the date
+		wi.Date = datatypes.Date(endDate)
+	} else {
+		log.Debug().Msgf("found weekly info. Date: %v", time.Time(wi.Date).Format("2006-01-02"))
+	}
+
+	// update the netsales value and save
+	// dd.AdjustedSales, _ = strconv.ParseFloat(unitSold[i+1], 64)
+	ns, err := strconv.ParseFloat(strings.ReplaceAll(netSales[1], ",", ""), 64)
+	if err != nil {
+		log.Debug().Msgf("[control.go] net sales failed parse: [%v]", netSales[1])
+		return reFail("control.go", "Unable to convert net sales to float")
+	}
+
+	wi.NetSales = ns
+	d := time.Time(wi.Date).Format("2006-01-02")
+	log.Debug().Msgf("saving weekly info NetSales: [%v] Date: [%v]", wi.NetSales, d)
+	res = db.Save(&wi)
+	if res.Error != nil {
+		log.Error().Err(res.Error).Msgf("Unable to save weekly info")
+		return reFail("control.go", "weekly info save")
+	}
+
+	if res.RowsAffected == 0 {
+		log.Debug().Msgf("NO ENTRY CREATED FOR WEEKL INFO")
 	}
 
 	return nil

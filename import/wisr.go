@@ -18,7 +18,7 @@ var reWISRWeekEnd = regexp.MustCompile(`Week Ending:\s*(\d\d?)/(\d\d?)/(\d{4})`)
 var reCateringSales = regexp.MustCompile(`CATERING SALES\s+(\d+.?\d?)`)       // 1 group -> total catering sales
 var reLabourCost = regexp.MustCompile(`LABOR\s&\sTAXES\s+(\d+,?\d+)\s+(\d+)`) // 2 groups -> [0] dollar value [1] percent
 var reFoodCost = regexp.MustCompile(`COST OF GOODS\s+(\d+,?\d+)\s+(\d+)`)     // 2 groups -> [0] dollar value [1] percent
-var reNetSales = regexp.MustCompile(`NET SUBWAY SALES\s+(\d+,?\d+)`)          // 1 group -> weekly net sales
+// var reNetSales = regexp.MustCompile(`NET SUBWAY SALES\s+(\d+,?\d+)`)          // 1 group -> weekly net sales
 
 func ImportWISR(fileName string, db *gorm.DB) error {
 	txtFile, err := PDFToText(fileName)
@@ -64,10 +64,10 @@ func ImportWISR(fileName string, db *gorm.DB) error {
 		return reFail("wisr.go", "food")
 	}
 
-	netSales := reNetSales.FindStringSubmatch(cstr)
-	if netSales == nil {
-		return reFail("wisr.go", "netSales")
-	}
+	// netSales := reNetSales.FindStringSubmatch(cstr)
+	// if netSales == nil {
+	// 	return reFail("wisr.go", "netSales")
+	// }
 
 	lstr := strings.ReplaceAll(labour[1], ",", "")
 	labourCost, _ := strconv.ParseFloat(lstr, 64)
@@ -77,10 +77,10 @@ func ImportWISR(fileName string, db *gorm.DB) error {
 	foodPerc, _ := strconv.ParseFloat(food[2], 64)
 
 	// convert net sales to a float, remove all , to get a 1000+ value as just digits
-	ns, err := strconv.ParseFloat(strings.ReplaceAll(strings.TrimSpace(netSales[1]), ",", ""), 64)
-	if err != nil {
-		return reFail("wisr.go", "netSales parse")
-	}
+	// ns, err := strconv.ParseFloat(strings.ReplaceAll(strings.TrimSpace(netSales[1]), ",", ""), 64)
+	// if err != nil {
+	// 	return reFail("wisr.go", "netSales parse")
+	// }
 
 	party, err := strconv.ParseFloat(strings.ReplaceAll(strings.TrimSpace(catering[1]), ",", ""), 64)
 	if err != nil {
@@ -93,7 +93,7 @@ func ImportWISR(fileName string, db *gorm.DB) error {
 	wi.FoodCostPercent = foodPerc
 	wi.LabourCostAmount = labourCost
 	wi.LabourCostPercent = labourPerc
-	wi.NetSales = ns
+	// wi.NetSales = ns
 	wi.PartySales = party
 	// wi.PartySales, err = strconv.ParseFloat(strings.ReplaceAll(strings.TrimSpace(catering[1]), ",", ""), 64)
 
