@@ -150,9 +150,8 @@ func ImportControl(fileName string, db *gorm.DB) error {
 	wi := models.WeeklyInfo{}
 	log.Debug().Msgf("Retrieve weekly info for date: %v", time.Time(endDate).Format("2006-01-02"))
 
-	// below doesn't find correct entry.  returns earliest instead of record with date
-	// wrong function calls?
-	res := db.Find(&wi).Where("Date = ?", endDate)
+	// get the weekly info table entry, or create a new one if not already in db
+	res := db.Where("Date = ?", endDate).Find(&wi)
 	if res.Error != nil {
 		log.Error().Err(res.Error).Msg("DB Error")
 		return reFail("control.go", "Unable to retrieve weekly information for netsales")
@@ -166,7 +165,6 @@ func ImportControl(fileName string, db *gorm.DB) error {
 	}
 
 	// update the netsales value and save
-	// dd.AdjustedSales, _ = strconv.ParseFloat(unitSold[i+1], 64)
 	ns, err := strconv.ParseFloat(strings.ReplaceAll(netSales[1], ",", ""), 64)
 	if err != nil {
 		log.Debug().Msgf("[control.go] net sales failed parse: [%v]", netSales[1])
@@ -174,8 +172,6 @@ func ImportControl(fileName string, db *gorm.DB) error {
 	}
 
 	wi.NetSales = ns
-	d := time.Time(wi.Date).Format("2006-01-02")
-	log.Debug().Msgf("saving weekly info NetSales: [%v] Date: [%v]", wi.NetSales, d)
 	res = db.Save(&wi)
 	if res.Error != nil {
 		log.Error().Err(res.Error).Msgf("Unable to save weekly info")
@@ -183,7 +179,7 @@ func ImportControl(fileName string, db *gorm.DB) error {
 	}
 
 	if res.RowsAffected == 0 {
-		log.Debug().Msgf("NO ENTRY CREATED FOR WEEKL INFO")
+		log.Warn().Msgf("Unable to save WEEKLY_INFO record for date: %v", time.Time(endDate).Format("2006-01-02"))
 	}
 
 	return nil

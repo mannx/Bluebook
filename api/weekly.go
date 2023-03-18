@@ -91,10 +91,6 @@ func getWeeklyData(month int, day int, year int, c echo.Context, db *gorm.DB) (e
 	weekly.PartySales = wi.PartySales
 	weekly.NetSalesMismatch = weekly.NetSales != wi.NetSales
 
-	if weekly.NetSalesMismatch == true {
-		log.Debug().Msgf("[NetSalesMismatch] weekly: %v,  wi: %v", weekly.NetSales, wi.NetSales)
-	}
-
 	// retrieve the last years data if available
 	lastYear := weekEnding.AddDate(-1, 0, 0)
 
