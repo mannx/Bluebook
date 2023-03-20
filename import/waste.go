@@ -56,7 +56,6 @@ func ImportWaste(fileName string, db *gorm.DB) error {
 			break
 		}
 
-		log.Debug().Msgf("   Date: %v", dat)
 		if dat != "" {
 			// have a new date
 			currDate, err = time.Parse(wasteDateFormat, dat)
@@ -73,7 +72,6 @@ func ImportWaste(fileName string, db *gorm.DB) error {
 			break
 		}
 
-		log.Debug().Msgf("    Item: %v", item)
 		if item == "" {
 			// empty item means end of list
 			break

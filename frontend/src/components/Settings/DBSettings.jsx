@@ -97,9 +97,9 @@ export default class DBSettings extends React.Component {
 			list = this.ShowImportTable();
 		}
 
-        if(this.state.dbBackup !== null) { 
-            db = this.ShowDBTable();
-        }
+        // if(this.state.dbBackup !== null) { 
+        //     db = this.ShowDBTable();
+        // }
 
 		const error = this.state.errorMsg !== null ? <span class="ErrorMsg">{this.state.errorMsg}</span> : <span></span>;
 

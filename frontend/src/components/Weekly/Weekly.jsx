@@ -147,6 +147,12 @@ export default class Weekly extends React.Component {
 			<>
 			<div>Week Ending: {this.D(this.state.date)}</div>
 			{this.header()}
+            <div>
+            { data.NetSalesMismatch === true ? 
+                <span>Net Sales Mismatch</span>
+                : <></>
+            }
+            </div>
 			<table><caption>Weekly Report</caption>
 				<thead><tr>
 					<th>Name</th><th>Value</th>

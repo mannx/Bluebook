@@ -1,6 +1,7 @@
 package daily
 
 import (
+	"errors"
 	"fmt"
 	"os/exec"
 	"path/filepath"
@@ -38,7 +39,6 @@ func PDFToText(fileName string) (string, error) {
 func getDataOrNew(date time.Time, db *gorm.DB) (models.DayData, bool) {
 	n := models.DayData{}
 
-	log.Debug().Msgf("[getDataOrNew] Checking for object date: %v", date.String())
 	res := db.Find(&n, "Date = ?", date)
 	if res.Error != nil {
 		log.Error().Err(res.Error).Msg("Unable to load data, using new data")
@@ -46,7 +46,7 @@ func getDataOrNew(date time.Time, db *gorm.DB) (models.DayData, bool) {
 	}
 
 	if res.RowsAffected == 0 {
-		log.Debug().Msg("No data available, creating blank entry")
+		// no data available, creating a blank entry
 		return n, true
 	}
 
@@ -70,4 +70,10 @@ func getWeeklyInfoOrNew(date time.Time, db *gorm.DB) models.WeeklyInfo {
 	}
 
 	return n
+}
+
+// reFail will display an error message noting the function and which item failed its regex check
+func reFail(from string, item string) error {
+	log.Error().Msgf("[%v]{reFail} Unable to parse data for: %v", from, item)
+	return errors.New(fmt.Sprintf("Unable to parse data for: %v", item))
 }

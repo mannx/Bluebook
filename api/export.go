@@ -23,15 +23,15 @@ var upcomingSales = "D12"
 var breadCount = "D13"
 var foodCost = "D15"
 var syscoCost = "D17"
-var labourCost = "D20"
-var customerCount = "D27"
-var customerPrev = "D28"
-var partySales = "D30"
-var hoursUsed = "D22"
-var managerHours = "D23"
-var targetHours = "D25"
-var gcSold = "D31"
-var gcRedeem = "D32"
+var labourCost = "D21"
+var customerCount = "D28"
+var customerPrev = "D29"
+var partySales = "D31"
+var hoursUsed = "D23"
+var managerHours = "D24"
+var targetHours = "D26"
+var gcSold = "D32"
+var gcRedeem = "D33"
 
 // mapings for the initial cells for the waste chart
 //
@@ -132,7 +132,6 @@ func exportWaste(waste []models.WastageEntryNamed, weekEnding time.Time) error {
 		weight := fmt.Sprintf("%v%v", wasteWeight, i+wasteStartRow)
 		reason := fmt.Sprintf("%v%v", wasteReason, i+wasteStartRow)
 
-		// log.Debug().Msgf("[Date: %v] [Item: %v] [Weight: %v] [Name: %v", date, item, weight, e.Name)
 		dateStr := time.Time(e.Date)
 		f.SetCellValue("Waste Sheet", date, dateStr)
 		f.SetCellValue("Waste Sheet", item, e.Name)

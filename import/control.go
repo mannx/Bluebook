@@ -2,12 +2,13 @@ package daily
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"regexp"
 	"strconv"
+	"strings"
 	"time"
 
+	"github.com/mannx/Bluebook/models"
 	"github.com/rs/zerolog/log"
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
@@ -29,6 +30,8 @@ var reBreadOverShort = regexp.MustCompile(`= OVER\/SHORT\s+(-?\d+[.]\d+)\s+(-?\d
 // this allows us to parse values in the thousands, should only be required rarely, and doesnt seem to work well as the main regex
 // find way to fix instead?
 var reBreadOverShort2 = regexp.MustCompile(`/= OVER\/SHORT\s+(-?\d*,?\d+[.]\d+)\s+(-?\d*,?\d+[.]\d+)\s+(-?\d*,?\d+[.]\d+)\s+(-?\d*,?\d+[.]\d+)\s+(-?\d*,?\d+[.]\d+)\s+(-?\d*,?\d+[.]\d+)\s+(-?\d*,?\d+[.]\d+)\s+`)
+
+var reNetSales = regexp.MustCompile(`NET SUBWAY SALES\s+(\d+,?\d+[.]\d+)`) // 1 group -> weekly net sales
 
 func ImportControl(fileName string, db *gorm.DB) error {
 	log.Info().Msgf("ImportControl(%v)", fileName)
@@ -67,32 +70,37 @@ func ImportControl(fileName string, db *gorm.DB) error {
 	// extract the relevant information
 	prod := reProductivity.FindStringSubmatch(cstr)
 	if prod == nil {
-		return reFail("Productivity")
+		return reFail("control.go", "Productivity")
 	}
 
 	factor := reFactor.FindStringSubmatch(cstr)
 	if factor == nil {
-		return reFail("Factor")
+		return reFail("control.go", "Factor")
 	}
 
 	unitSold := reUnitsSold.FindStringSubmatch(cstr)
 	if unitSold == nil {
-		return reFail("Units Sold")
+		return reFail("control.go", "Units Sold")
 	}
 
 	custCount := reCustomerCount.FindStringSubmatch(cstr)
 	if custCount == nil {
-		return reFail("Customer count")
+		return reFail("control.go", "Customer count")
 	}
 
 	hoursWorkd := reHoursWorked.FindStringSubmatch(cstr)
 	if hoursWorkd == nil {
-		return reFail("Hours worked")
+		return reFail("control.go", "Hours worked")
 	}
 
 	breadCredits := reBreadWaste.FindStringSubmatch(cstr)
 	if breadCredits == nil {
-		return reFail("Bread Credits")
+		return reFail("control.go", "Bread Credits")
+	}
+
+	netSales := reNetSales.FindStringSubmatch(cstr)
+	if netSales == nil {
+		return reFail("control.go", "Net Sales")
 	}
 
 	// multiple possible results, we need the 2nd result
@@ -102,7 +110,7 @@ func ImportControl(fileName string, db *gorm.DB) error {
 		// find way of not having to use 2 regex for this
 		bos = reBreadOverShort2.FindAllStringSubmatch(cstr, -1)
 		if bos == nil {
-			return reFail("Bread over short")
+			return reFail("control.go", "Bread over short")
 		}
 	}
 
@@ -137,10 +145,42 @@ func ImportControl(fileName string, db *gorm.DB) error {
 
 	}
 
-	return nil
-}
+	// save the netsales in the weeklyinfo table
+	// check if we have a current entry
+	wi := models.WeeklyInfo{}
+	log.Debug().Msgf("Retrieve weekly info for date: %v", time.Time(endDate).Format("2006-01-02"))
 
-func reFail(item string) error {
-	log.Error().Msgf("[control.go]{reFail} Unable to parse data for: %v", item)
-	return errors.New(fmt.Sprintf("Unable to parse data for: %v", item))
+	// get the weekly info table entry, or create a new one if not already in db
+	res := db.Where("Date = ?", endDate).Find(&wi)
+	if res.Error != nil {
+		log.Error().Err(res.Error).Msg("DB Error")
+		return reFail("control.go", "Unable to retrieve weekly information for netsales")
+	}
+
+	if res.RowsAffected == 0 {
+		// nothing found, make sure we set the date
+		wi.Date = datatypes.Date(endDate)
+	} else {
+		log.Debug().Msgf("found weekly info. Date: %v", time.Time(wi.Date).Format("2006-01-02"))
+	}
+
+	// update the netsales value and save
+	ns, err := strconv.ParseFloat(strings.ReplaceAll(netSales[1], ",", ""), 64)
+	if err != nil {
+		log.Debug().Msgf("[control.go] net sales failed parse: [%v]", netSales[1])
+		return reFail("control.go", "Unable to convert net sales to float")
+	}
+
+	wi.NetSales = ns
+	res = db.Save(&wi)
+	if res.Error != nil {
+		log.Error().Err(res.Error).Msgf("Unable to save weekly info")
+		return reFail("control.go", "weekly info save")
+	}
+
+	if res.RowsAffected == 0 {
+		log.Warn().Msgf("Unable to save WEEKLY_INFO record for date: %v", time.Time(endDate).Format("2006-01-02"))
+	}
+
+	return nil
 }

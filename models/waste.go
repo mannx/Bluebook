@@ -3,7 +3,6 @@ package models
 import (
 	"sort"
 
-	"github.com/rs/zerolog/log"
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
@@ -145,17 +144,14 @@ func (wi *WastageItem) Units() []string {
 // Convert the weight to custom weight type or conversion factor
 func (wi *WastageItem) Convert(n float64) float64 {
 	if wi.CustomConversion == true {
-		log.Debug().Msg("WastageItem::Convert() => custom conversion")
 		return n * wi.UnitWeight
 	}
 
 	// convert to kilo/gram if required
 	switch wi.UnitMeasure {
 	case WasteKilo:
-		log.Debug().Msgf("WastageItem::Convert() %v => Kilos", wi.Name)
 		return n * 0.45359237
 	case WasteGram:
-		log.Debug().Msgf("WastageItem::Convert() %v => Grams", wi.Name)
 		return n * 453.59237
 	case WasteOunce:
 		// convert from ounce to pounds

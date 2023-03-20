@@ -67,7 +67,6 @@ func InitTop5() {
 
 // GetTop5ViewHandler expects params of none (top all time, year=YYYY for top of year, year=YYYY&month=MM for best of month
 func GetTop5ViewHandler(c echo.Context, db *gorm.DB) error {
-	log.Debug().Msg("Top5 View Handler()")
 	var month, year, limit int
 
 	err := echo.QueryParamsBinder(c).
@@ -214,7 +213,6 @@ func top5Year(year int, limit int, db *gorm.DB) []top5Data {
 			continue
 		}
 
-		log.Debug().Msgf("   [] Found: %v", res.RowsAffected)
 		for i, n := range tbl.Data {
 			tbl.Data[i].DateString = n.GetDate()
 		}
