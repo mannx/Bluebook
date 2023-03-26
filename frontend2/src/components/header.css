@@ -4,7 +4,7 @@ ul.navControl {
 	padding: 0;
 	overflow: hidden;
 	/* background-color: limegreen; */
-	background-color: cornflowerblue;
+	background-color: dodgerblue;
 }
 
 li.navControl {
@@ -24,7 +24,8 @@ li.navExtra {
 }
 
 li.navControl a.navLink:hover {
-	background-color: lime;
+	/* background-color: lime; */
+	background-color: deepskyblue;
 }
 
 li.navDropDown {

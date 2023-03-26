@@ -39,6 +39,11 @@ type dayViewData struct {
 	TagID             []uint
 	SalesLastWeek     int  // 0 if same, -1 if less, 1 if > than last weeks sales for this day
 	Exists            bool // true if found in db, false if auto filled
+
+	// below is the extracted date.  Issues parsing date client side in js so this workaround is used for now
+	Day   int
+	Month time.Month
+	Year  int
 }
 
 //
@@ -157,7 +162,7 @@ func GetMonthViewHandler(c echo.Context, db *gorm.DB) error {
 		// we no longer cache this value
 		o.WeeklyAverage = calculateWeeklyAverage(d, 4, db)
 
-		tags, ids := getTags(o.ID, db)
+		tags, ids := GetTags(o.ID, db)
 
 		// caluclate the % of 3rd party sales
 		tp := o.DoorDash + o.SkipTheDishes
@@ -187,6 +192,9 @@ func GetMonthViewHandler(c echo.Context, db *gorm.DB) error {
 			TagID:             ids,
 			SalesLastWeek:     slw,
 			Exists:            true,
+			Day:               d.Day(),
+			Month:             d.Month(),
+			Year:              d.Year(),
 		}
 
 		mvd[d.Day()-1] = dvd
@@ -241,7 +249,7 @@ func GetMonthViewHandler(c echo.Context, db *gorm.DB) error {
 }
 
 // returns a list of tags and their id's in seperate lists
-func getTags(id uint, db *gorm.DB) ([]string, []uint) {
+func GetTags(id uint, db *gorm.DB) ([]string, []uint) {
 	// retrieve all tags for this day
 	tags := make([]models.TagData, 0)
 	res := db.Find(&tags, "DayID = ?", id)
@@ -314,6 +322,9 @@ func genEmptyDVD(date time.Time) dayViewData {
 		DayOfWeek:   date.Weekday().String(),
 		DayOfMonth:  date.Day(),
 		IsEndOfWeek: eow,
+		Day:         date.Day(),
+		Month:       date.Month(),
+		Year:        date.Year(),
 	}
 
 	return dvd

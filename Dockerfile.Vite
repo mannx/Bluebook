@@ -8,30 +8,30 @@
 # Go Build Stage
 #
 
-# FROM golang:alpine AS build
+FROM golang:alpine AS build
 
-# # require gcc for some of the modules
-# RUN apk add build-base
+# require gcc for some of the modules
+RUN apk add build-base
 
-# ENV GOPATH /go/src
-# WORKDIR /go/src/github.com/mannx/Bluebook
+ENV GOPATH /go/src
+WORKDIR /go/src/github.com/mannx/Bluebook
 
-# # copy in go.mod and go.sum files
-# COPY go.* ./
+# copy in go.mod and go.sum files
+COPY go.* ./
 
-# RUN go mod download
+RUN go mod download
 
-# # copy source files and directories (need separate COPY for directories?)
-# COPY *.go ./
+# copy source files and directories (need separate COPY for directories?)
+COPY *.go ./
 
-# COPY ./api ./api
-# COPY ./environ ./environ
-# COPY ./import ./import
-# COPY ./models ./models
+COPY ./api ./api
+COPY ./environ ./environ
+COPY ./import ./import
+COPY ./models ./models
 
-# COPY go-build.sh .
+COPY go-build.sh .
 
-# RUN ./go-build.sh
+RUN ./go-build.sh
 
 #
 # React Build Stage

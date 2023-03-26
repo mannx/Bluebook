@@ -4,6 +4,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	api "github.com/mannx/Bluebook/api"
+	api2 "github.com/mannx/Bluebook/api2"
 )
 
 func initServer() *echo.Echo {
@@ -83,5 +84,16 @@ func initServer() *echo.Echo {
 	// DB backup/revert
 	e.GET("/api/backup/list", func(c echo.Context) error { return api.BackupDBView(c, DB) })
 	e.POST("/api/backup/remove", func(c echo.Context) error { return api.BackupDBRemove(c, DB) })
+
+	//
+	// VERSION 2
+	//
+	// API's for the v2 rewrite are found below to keep things organized
+	// all v2 functions should be in either a seperate mod or clearly noted as v2
+	//
+
+	e.GET("/api2/day/edit", func(c echo.Context) error { return api2.DayDataEdit(c, DB) })
+	e.POST("/api2/day/update", func(c echo.Context) error { return api2.DayDataUpdate(c, DB) })
+
 	return e
 }

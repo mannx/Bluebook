@@ -3,6 +3,9 @@
 const production = false;
 const baseURL = "http://localhost:8080";
 
+// urls for all our api endpoints
+// /api is the original endpoints
+// /api2 is the newer endpoints and part of the api redo
 const urls = {
 	"AUV": "/api/auv/view",
 	"AUVUpdate": "/api/auv/update",
@@ -14,6 +17,9 @@ const urls = {
 
 	"Month": "/api/month",
 	"Comment": "/api/update/comment",
+
+    "DayEdit": "/api2/day/edit",                            // edit a single day, comment & tags
+    "DayUpdate": "/api2/day/update",                        // update the edited day data
 
 	"Tags": "/api/tags/view",
 	"TagData": "/api/tags/data",							// get data about a single tag

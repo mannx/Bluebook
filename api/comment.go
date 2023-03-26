@@ -10,13 +10,14 @@ import (
 	"gorm.io/gorm"
 )
 
-const dateFormat = "02012006"
+// const dateFormat = "02012006"
 
 // we are expecting 3 values in the post
 //   comment:	the comment we are updating/creating
 //	 linkedid:	the id of the day we are linked to
 
 // UpdateCommentHandler is used to handle comments
+// Deprecated: no longer used in frontend v2
 func UpdateCommentHandler(c echo.Context, db *gorm.DB) error {
 	type CommentPost struct {
 		Comment  string    `json:"Comment" query:"Comment"`

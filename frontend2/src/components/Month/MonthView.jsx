@@ -29,10 +29,12 @@ export default function MonthView() {
     // month navigation buttons are to be shows beside the month instead of the main navigation menu as previously done
     return (
         <table className="Month">
-            <caption><h1>
-                {prevMonth(data)}
+        <caption><h3>
+                <span>{nextMonth(data)} </span>
+                <span>{prevMonth(data)} </span>
+                <span>{prevYear(data)} </span>
+            </h3><h1>
                 {data.MonthName} {data.Year}
-                {nextMonth(data)}
             </h1></caption>
             <thead>
                 <tr >
@@ -66,6 +68,7 @@ export default function MonthView() {
 
                     <th className="Month">Comments</th>
                     <th className="Month no-print">Tags</th>
+                    <th className="Month no-print">Edit</th>
                 </tr>
             </thead>
             <tbody>
@@ -154,10 +157,26 @@ function Row(data) {
         <td className="Month no-print">{Dol(data.ThirdPartyDollar)}</td>
         <td className="Month no-print">{P(data.ThirdPartyPercent)}</td>
         <td className="blank"></td>
+        <td className="Month">{data.Comment}</td>
+        <td className="Month no-print">{Tag(data.Tags)}</td>
+        <td className="Month no-print">
+        {data.ID !== 0 ?
+            <Link to={"/edit/" + data.ID}>E</Link>
+            : <Link to={"/edit/0/" + hashDate(data)}>C</Link>
+        }</td>
         </tr>
     );
 }
 
+// output the date as a series of only numbers. used to reference the day when we dont have
+// a db entry yet
+function hashDate(data) {
+    const year = "" + data.Year;
+    const month = Zero("" + data.Month);
+    const day = Zero("" + data.Day);
+
+    return year+month+day;
+}
 function EOW(data) {
 	return (
 		<tr className="blank">
@@ -189,6 +208,22 @@ function EOW(data) {
 	);
 }
 
+// Tag builds the user friendly display of all tags on this day
+// returns as a string
+function Tag(data) {
+    
+    if(data !== null) {
+        return (<>
+            {data.map( (o) => {
+                return <Link to={"/tags/" + o}>#{o}</Link>;
+            })}
+            </>
+        );
+    }
+
+    return <></>;
+}
+
 // return a link for the next month
 function nextMonth(data) {
     var month = data.Month + 1;
@@ -215,6 +250,10 @@ function prevMonth(data) {
     }
 
     return monthNavLink(month, year, "Prev");
+}
+
+function prevYear(data) {
+    return monthNavLink(data.Month, data.Year - 1, "Prev Year");
 }
 
 // return the nav link for the given data

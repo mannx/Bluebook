@@ -91,7 +91,7 @@ func TagDataViewHandler(c echo.Context, db *gorm.DB) error {
 			continue // skip if bad
 		}
 
-		tstr, _ := getTags(d.ID, db)
+		tstr, _ := GetTags(d.ID, db)
 
 		tl := TagList{
 			Day:  d,

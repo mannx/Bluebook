@@ -15,6 +15,15 @@ import MonthView, {
     today as monthTodayLoader,
 } from "./components/Month/MonthView";
 
+import DayEdit, {
+    loader as dayEditLoader,
+    action as dayEditAction,
+} from "./components/Month/DayEdit";
+
+import Tags  from "./components/Tags/Tags";
+
+import Import from "./components/Import/Import";
+
 import './index.css'
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
@@ -36,6 +45,23 @@ const router = createBrowserRouter([
                 path: "/today",
                 loader: monthTodayLoader,
             }, 
+            {
+                path: "/tags/:tag?",
+                element: <Tags />,
+            },
+            {
+                // edit day information including comments/tags.
+                // id is unused if date is provided
+                // date format: YYYYMMDD
+                path: "/edit/:id/:date?",
+                element: <DayEdit />, 
+                loader: dayEditLoader,
+                action: dayEditAction,
+            },
+            {
+                path: "/import",
+                element: <Import />,
+            },
         ],
     },
 ]);

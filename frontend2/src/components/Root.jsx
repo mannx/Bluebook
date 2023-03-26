@@ -25,7 +25,7 @@ function navHeader() {
         <li className={"navControl"}><NavButton name="Weekly Info" /></li>
         <li className={"navControl"}><NavButton name="Wastage" /></li>
         <li className={"navControl"}><NavButton name="Top 5" /></li>
-        <li className={"navControl"}><NavButton name="Import" /></li>
+        <li className={"navControl"}><NavButton url="/import" name="Import" /></li>
         <li className={"navControl"}><NavButton name="Waste Settings" /></li>
         <li className={"navControl"}><NavButton name="Waste Input" /></li>
         </ul>
