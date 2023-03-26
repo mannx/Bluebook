@@ -64,8 +64,7 @@ RUN apk add tzdata poppler-utils sqlite
 
 WORKDIR /
 
-# COPY --from=build /bluebook /bluebook
-COPY ./Bluebook /bluebook
+COPY --from=build /bluebook /bluebook
 COPY --from=react /app/build /static
 
 # copy in default config file for top5 api
