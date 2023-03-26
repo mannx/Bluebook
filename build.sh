@@ -49,7 +49,8 @@ echo "Building docker image with tag: $TAG..."
 
 if [ $LOCAL -eq 1 ]; then
 	echo "Building local image..."
-	docker build -t bluebook:$TAG -t bluebook:latest .
+	# docker build -t bluebook:$TAG -t bluebook:latest  -f Dockerfile.Vite .
+    docker buildx build --platform linux/amd64 -t bluebook:$TAG -t bluebook:latest -f Dockerfile.Vite .
 else
 	echo "Building repo image..."
 	docker buildx build --platform linux/amd64 -t mannx/bluebook:$TAG -t mannx/bluebook:latest . --push

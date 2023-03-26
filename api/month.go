@@ -85,6 +85,8 @@ func GetMonthViewHandler(c echo.Context, db *gorm.DB) error {
 	type monthlyView struct {
 		Data      []dayViewData
 		MonthName string // month in a user friendly format
+		Month     int    // the month we are returning data for
+		Year      int    // the year we are returning data for
 	}
 	var month, year int
 
@@ -229,7 +231,12 @@ func GetMonthViewHandler(c echo.Context, db *gorm.DB) error {
 		}
 	}
 
-	mv := monthlyView{Data: mvd, MonthName: time.Month(month).String()}
+	mv := monthlyView{
+		Data:      mvd,
+		MonthName: time.Month(month).String(),
+		Month:     month, // include both month and year in our data
+		Year:      year,
+	}
 	return c.JSON(http.StatusOK, &mv)
 }
 

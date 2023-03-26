@@ -6,13 +6,14 @@ import {
     RouterProvider,
 } from 'react-router-dom';
 
-import Root, {
-    loader as rootLoader, 
-} from "./components/Root";
+import ErrorPage from "./components/ErrorPage";
+
+import Root from "./components/Root";
 
 import MonthView, {
     loader as monthLoader,
-} from "./components/MonthView";
+    today as monthTodayLoader,
+} from "./components/Month/MonthView";
 
 import './index.css'
 import '@fontsource/roboto/300.css';
@@ -24,12 +25,18 @@ const router = createBrowserRouter([
     {
         path: "/",
         element: <Root />,
-        loader: rootLoader,
-    },
-    {
-        path: "/:month/:year",
-        element: <MonthView />,
-        loader: monthLoader,
+        errorElement: <ErrorPage />,
+        children: [
+            {
+                path: "/:month/:year",
+                element: <MonthView />,
+                loader: monthLoader,
+            },
+            {
+                path: "/today",
+                loader: monthTodayLoader,
+            }, 
+        ],
     },
 ]);
 

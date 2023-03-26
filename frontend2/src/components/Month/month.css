@@ -1,0 +1,107 @@
+/**
+    this contains the custom css we need to ensure our table looks correct for our needs
+    most other css should be handled by the css framework in use
+*/
+table.Month, th.Month, td.Month, tbody.Month
+{
+	border: 1px solid black;
+	border-collapse: collapse;
+	text-align: center;
+}
+
+/* table, th, td, tbody */
+/* { */
+/* 	border: 1px solid black; */
+/* 	border-collapse: collapse; */
+/* 	text-align: center; */
+/* } */
+
+/* button.tagButton { */
+/* 	background-color: transparent; */
+/* 	border: none; */
+/* 	cursor: pointer; */
+/* 	text-decoration: underline; */
+/* 	display: inline; */
+/* 	margin: 0; */
+/* 	padding: 0; */
+/* 	color: blue; */
+/* } */
+
+/* button.tagButton:hover { */
+/* 	color: red; */
+/* } */
+
+.tooltip-month
+{
+	position: relative;
+	display: inline-block;
+}
+
+.tooltip-month .tooltiptext-month
+{
+	visibility: hidden;
+	width: 120px;
+	background-color: black;
+	color: #fff;
+	text-align: center;
+	padding: 5px 0;
+	border-radius: 6px;
+	position: absolute;
+	z-index: 1;
+}
+
+.tooltip-month:hover .tooltiptext-month
+{
+	visibility: visible;
+}
+
+@media print {
+	.no-print, .no-print * {
+		display: none !important;
+	}
+}
+
+th.spacer, td.spacer
+{
+	border: none;
+}
+
+/* Used to highlight net sales total */
+td.Net
+{
+	background-color: yellow;
+	color: black;
+	border: 1px solid black;
+	border-collapse: collapse;
+	text-align: center;
+}
+
+td.NetSalesUp
+{
+	background-color: springgreen;
+	color: black;
+}
+
+td.NetSalesDown
+{
+	background-color: tomato;
+	color: black;
+}
+
+td.NetSalesSame
+{
+	background-color: lightblue;
+}
+
+td.CustomerCount, td.ThirdPartyPerc
+{
+	background-color: yellow;
+	border: 1px solid black;
+	border-collapse: collapse;
+	text-align: center;
+}
+
+th.blank, td.blank
+{
+	background-color: black;
+}

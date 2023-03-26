@@ -1,20 +1,34 @@
-import {redirect} from "react-router-dom";
-
-
-export async function loader() {
-    const d = new Date();
-    const url = "/"+(d.getMonth()+1)+"/"+d.getFullYear();
-
-    console.log("root loader redirect to " + url);
-    return redirect(url);
-}
-
+import {Outlet, Link} from "react-router-dom";
+import "./header.css";
 
 export default function Root() {
     return (
         <>
-        <h1>Bluebook Helper Frontend v2</h1>
-        <span>Loading current month</span>
+        {navHeader()}
+        <div><Outlet /></div>
         </>
+    );
+}
+
+function NavButton(props) {
+    return (
+        <Link className="navLink" to={props.url}>{props.name}</Link>
+    );
+}
+
+function navHeader() {
+    return (
+        <div className="no-print"><ul className={"navControl"}>
+        <li className={"navControl"}><NavButton url="/today" name="Today"/></li>
+        <li className={"navControl"}><NavButton name="Search Tags" /></li>
+        <li className={"navControl"}><NavButton name="AUV" /></li>
+        <li className={"navControl"}><NavButton name="Weekly Info" /></li>
+        <li className={"navControl"}><NavButton name="Wastage" /></li>
+        <li className={"navControl"}><NavButton name="Top 5" /></li>
+        <li className={"navControl"}><NavButton name="Import" /></li>
+        <li className={"navControl"}><NavButton name="Waste Settings" /></li>
+        <li className={"navControl"}><NavButton name="Waste Input" /></li>
+        </ul>
+        </div>
     );
 }
