@@ -1,6 +1,9 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+
 import {
     createBrowserRouter,
     RouterProvider,
@@ -22,7 +25,13 @@ import DayEdit, {
 
 import Tags  from "./components/Tags/Tags";
 
-import Import from "./components/Import/Import";
+import Import, {
+    loader as importLoader,
+    action as importAction,
+} from "./components/Import/Import";
+
+import WeeklyNav from "./components/Weekly/WeeklyNav";
+import Weekly from "./components/Weekly/Weekly";
 
 import './index.css'
 import '@fontsource/roboto/300.css';
@@ -61,6 +70,18 @@ const router = createBrowserRouter([
             {
                 path: "/import",
                 element: <Import />,
+                loader: importLoader, 
+                action: importAction,
+            },
+            {
+                path: "/weekly",
+                element: <WeeklyNav />,
+                children: [
+                    {
+                        path: "/weekly/:day/:month/:year",
+                        element: <Weekly />,
+                    },
+                ],
             },
         ],
     },
@@ -68,6 +89,8 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <RouterProvider router={router} />
+    </LocalizationProvider>
   </React.StrictMode>,
 )

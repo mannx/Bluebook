@@ -11,7 +11,16 @@ li.navControl {
 	float: left;
 }
 
-li.navControl a.navLink {
+/* li.navControl a.navLink { */
+/* 	display: block; */
+/* 	color: white; */
+/* 	text-align: center; */
+/* 	padding: 14px 16px; */
+/* 	text-decoration: none; */
+/* } */
+
+
+li.navControl a{
 	display: block;
 	color: white;
 	text-align: center;
@@ -19,13 +28,21 @@ li.navControl a.navLink {
 	text-decoration: none;
 }
 
+a.active { 
+    background-color: royalblue;
+}
+
 li.navExtra {
 	float: right;
 }
 
-li.navControl a.navLink:hover {
-	/* background-color: lime; */
-	background-color: deepskyblue;
+/* li.navControl a.navLink:hover { */
+/* 	/1* background-color: lime; *1/ */
+/* 	background-color: deepskyblue; */
+/* } */
+
+li.navControl a:hover {
+    background-color: deepskyblue;
 }
 
 li.navDropDown {

@@ -1,5 +1,6 @@
 import {Form, useLoaderData, redirect} from "react-router-dom";
-import {UrlGet, GetPostOptions} from "../URLs.jsx";
+// import {UrlGet, GetPostOptions} from "../URLs.jsx";
+import {UrlGet, UrlApi2DayEdit, UrlApi2DayUpdate, GetPostOptions} from "../URLs.jsx";
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -55,7 +56,7 @@ export async function loader({params}) {
         q = "?id=0&date=" + params.date;
     }
 
-    const url = UrlGet("DayEdit") + q;
+    const url = UrlGet(UrlApi2DayEdit) + q;
     const resp = await fetch(url);
     const data = await resp.json();
 
@@ -76,7 +77,7 @@ export async function action({request, params}) {
     };
 
     const opt = GetPostOptions(JSON.stringify(body));
-    await fetch(UrlGet("DayUpdate"), opt)
+    await fetch(UrlGet(UrlApi2DayUpdate), opt)
     
     return redirect("/today");
 }

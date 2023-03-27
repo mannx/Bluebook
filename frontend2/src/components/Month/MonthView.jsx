@@ -1,6 +1,6 @@
 import {useLoaderData, redirect, Link} from "react-router-dom";
 import {NumericFormat} from "react-number-format";
-import UrlGet from "../URLs.jsx";
+import {UrlGet, UrlApiMonth} from "../URLs.jsx";
 
 // make sure we have the correct css for our table
 import "./month.css";
@@ -8,7 +8,7 @@ import "./month.css";
 // retrieve the month/year we want to see
 export async function loader({params}) {
     // get the api url to get the data
-    const url = UrlGet("Month") + "?month=" + params.month + "&year=" + params.year;
+    const url = UrlGet(UrlApiMonth) + "?month=" + params.month + "&year=" + params.year;
     const resp = await fetch(url);
     const data = await resp.json();
 
@@ -30,8 +30,8 @@ export default function MonthView() {
     return (
         <table className="Month">
         <caption><h3>
-                <span>{nextMonth(data)} </span>
                 <span>{prevMonth(data)} </span>
+                <span>{nextMonth(data)} </span>
                 <span>{prevYear(data)} </span>
             </h3><h1>
                 {data.MonthName} {data.Year}
