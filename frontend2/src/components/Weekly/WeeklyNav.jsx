@@ -2,8 +2,12 @@
 // this page provides a date picker to validate a week ending date
 import * as React from 'react';
 
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import {Link, Outlet, useNavigate} from "react-router-dom";
+
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import Button from '@mui/material/Button';
+import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
 
 // true if day is not a tuesday to disable in the picker
 // avoid picking unusable dates and needing an error message
@@ -14,7 +18,7 @@ const notTuesday = (date) => {
 // pick our week ending, display error if not a tuesday
 export default function WeeklyNav() {
     const [date, setDate] = React.useState(null);
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
 
     // if we have a selected date, get its values and pull in the weekly data
     let url = null;
@@ -28,11 +32,13 @@ export default function WeeklyNav() {
     }
 
     return (<>
+        <Container maxWidth="sm">
         <DatePicker value={date} onChange={(e) => setDate(e)} shouldDisableDate={notTuesday}/>
         {url !== null ?
-            <Link to={url}>Load</Link>
+            <><br/><Link to={url}><Button variant="contained">Load</Button></Link></>
             : <></>
         }
+        </Container>
         <div><Outlet/></div>
         </>
     );

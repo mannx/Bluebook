@@ -66,6 +66,9 @@ export const UrlApi2DayUpdate = "/api2/day/update";
 
 export const UrlApi2ImportList = "/api2/import/list";   // get list of all files we can import
 
+export const UrlApiWeekly = "/api/weekly/view";
+export const UrlApi2WeeklyExport = "/api2/weekly/export";
+
 export function UrlGet(name) {
 	var base = "";
 	if(production === false) {

@@ -31,7 +31,10 @@ import Import, {
 } from "./components/Import/Import";
 
 import WeeklyNav from "./components/Weekly/WeeklyNav";
-import Weekly from "./components/Weekly/Weekly";
+import Weekly, {
+    loader as weeklyLoader,
+    action as weeklyAction,
+} from "./components/Weekly/Weekly";
 
 import './index.css'
 import '@fontsource/roboto/300.css';
@@ -80,6 +83,8 @@ const router = createBrowserRouter([
                     {
                         path: "/weekly/:day/:month/:year",
                         element: <Weekly />,
+                        loader: weeklyLoader,
+                        action: weeklyAction,
                     },
                 ],
             },

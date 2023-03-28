@@ -25,14 +25,15 @@ function Tag(data) {
 }
 
 // extract the date from the url in form of YYYYMMDD and return a date object
-function extractDate(str) {
-    const year = str.substring(0,4);
-    const month = str.substring(4,6);
-    const day = str.substring(6,8);
+// function extractDate(str) {
+//     const year = str.substring(0,4);
+//     const month = str.substring(4,6);
+//     const day = str.substring(6,8);
 
-    console.log("year: " + year + "  month: " + month + "  day: " + day);
-    return new Date(year, month, day, 0, 0, 0);
-}
+//     console.log("year: " + year + "  month: " + month + "  day: " + day);
+//     return new Date(year, month, day, 0, 0, 0);
+// }
+
 export async function loader({params}) {
     // const id = params.id;
     // const date = params.date;
