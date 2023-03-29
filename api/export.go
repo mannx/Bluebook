@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -43,36 +44,76 @@ var wasteReason = "D"
 
 var wasteStartRow = 2
 
-// Export weekly from given date into excel template
-// outputs in Environment.OutputDir
-func ExportWeekly(c echo.Context, db *gorm.DB) error {
-	var month, day, year int
-	var hours, manager, sysco float64 // hours used and manager hours
-
-	err := echo.QueryParamsBinder(c).
-		Int("month", &month).
-		Int("day", &day).
-		Int("year", &year).
-		Float64("hours", &hours).
-		Float64("manager", &manager).
-		Float64("sysco", &sysco).
-		BindError()
-	if err != nil {
-		return err
+func ExportWeeklyHandler(c echo.Context, db *gorm.DB) error {
+	type weeklyParams struct {
+		Month   string `query:"month"`
+		Day     string `query:"day"`
+		Year    string `query:"year"`
+		Hours   string `query:"hours"`
+		Manager string `query:"manager"`
+		Sysco   string `query:"sysco"`
 	}
 
-	// get the weekly data
+	var params weeklyParams
+	if err := c.Bind(&params); err != nil {
+		return LogAndReturnError(c, "Unable to bind parameters", err)
+	}
+
+	// convert from strig to usuable types
+	month, err := strconv.Atoi(params.Month)
+	if err != nil {
+		return LogAndReturnError(c, "Unable to parse [month]", err)
+	}
+
+	day, err := strconv.Atoi(params.Day)
+	if err != nil {
+		return LogAndReturnError(c, "Unable to parse [day]", err)
+	}
+
+	year, err := strconv.Atoi(params.Year)
+	if err != nil {
+		return LogAndReturnError(c, "Unable to parse [year]", err)
+	}
+
+	hours, err := strconv.ParseFloat(params.Hours, 64)
+	if err != nil {
+		return LogAndReturnError(c, "Unable to parse [hours]", err)
+	}
+
+	manager, err := strconv.ParseFloat(params.Manager, 64)
+	if err != nil {
+		return LogAndReturnError(c, "Unable to parse [manager]", err)
+	}
+
+	sysco, err := strconv.ParseFloat(params.Sysco, 64)
+	if err != nil {
+		return LogAndReturnError(c, "Unable to parse [sysco]", err)
+	}
+
 	err, weekly := getWeeklyData(month, day, year, c, db)
 	if err != nil {
-		return err
+		return LogAndReturnError(c, "unable to retrieve weekly data", err)
 	}
 
+	weekEnding := time.Date(year, time.Month(month), day, 0, 0, 0, 0, time.UTC)
+
+	err = exportWeekly(weekly, weekEnding, hours, manager, sysco)
+	if err != nil {
+		return LogAndReturnError(c, "Unable to export weekly", err)
+	}
+
+	return ReturnServerMessage(c, "Success", false)
+}
+
+// Export weekly from given date into excel template
+// outputs in Environment.OutputDir
+func exportWeekly(weekly weeklyInfo, weekEnding time.Time, hours float64, manager float64, sysco float64) error {
 	// open the template and set the fields we need
 	path := filepath.Join(env.Environment.DataPath, "weekly.xlsx")
 	f, err := excelize.OpenFile(path)
 	if err != nil {
 		log.Error().Err(err).Msgf("Unable to open weekly template: %v", path)
-		return ReturnServerMessage(c, "Unable to open weekly template", true)
+		return err
 	}
 
 	defer f.Close()
@@ -99,7 +140,6 @@ func ExportWeekly(c echo.Context, db *gorm.DB) error {
 	f.SetCellValue("Sheet1", syscoCost, sysco)
 
 	// set the correct date
-	weekEnding := time.Date(year, time.Month(month), day, 0, 0, 0, 0, time.UTC)
 	f.SetCellValue("Sheet1", weekEndingCell, weekEnding)
 
 	// generate our output file name and save
@@ -109,7 +149,7 @@ func ExportWeekly(c echo.Context, db *gorm.DB) error {
 
 	// adjust ownership to PUID/PGID (container runs as root?)
 	os.Chown(outPath, env.Environment.GroupID, env.Environment.UserID)
-	return ReturnServerMessage(c, "OK", false)
+	return nil
 }
 
 // exportWaste creates a new wastage chart with the given wastage entries on it

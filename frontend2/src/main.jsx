@@ -36,6 +36,8 @@ import Weekly, {
     action as weeklyAction,
 } from "./components/Weekly/Weekly";
 
+import AUV from "./components/AUV/AUV";
+
 import './index.css'
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
@@ -87,6 +89,10 @@ const router = createBrowserRouter([
                         action: weeklyAction,
                     },
                 ],
+            },
+            {
+                path: "/auv",
+                element: <AUV />,
             },
         ],
     },

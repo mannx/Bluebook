@@ -24,7 +24,7 @@ function navHeader() {
         <div className="no-print"><ul className={"navControl"}>
         <li className={"navControl"}><NavButton url="/today" name="Today"/></li>
         <li className={"navControl"}><NavButton url="/" name="Search Tags" /></li>
-        <li className={"navControl"}><NavButton url="/" name="AUV" /></li>
+        <li className={"navControl"}><NavButton url="/auv" name="AUV" /></li>
         <li className={"navControl"}><NavButton url="/weekly" name="Weekly Info" /></li>
         <li className={"navControl"}><NavButton url="/" name="Wastage" /></li>
         <li className={"navControl"}><NavButton url="/" name="Top 5" /></li>
