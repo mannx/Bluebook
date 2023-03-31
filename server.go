@@ -66,8 +66,8 @@ func initServer() *echo.Echo {
 	e.GET("/api/weekly/view", func(c echo.Context) error { return api.GetWeeklyViewHandler(c, DB) })
 
 	// AUV
-	e.GET("/api/auv/view", func(c echo.Context) error { return api.GetAUVViewHandler(c, DB) })
-	e.POST("/api/auv/update", func(c echo.Context) error { return api.UpdateAUVPostHandler(c, DB) })
+	// e.GET("/api/auv/view", func(c echo.Context) error { return api.GetAUVViewHandler(c, DB) })
+	// e.POST("/api/auv/update", func(c echo.Context) error { return api.UpdateAUVPostHandler(c, DB) })
 
 	// Tags
 	// e.GET("/api/tags/view", func(c echo.Context) error { return api.TagListViewHandler(c, DB) })
@@ -98,6 +98,9 @@ func initServer() *echo.Echo {
 	e.GET("/api2/import/list", func(c echo.Context) error { return api2.GetImportList(c, DB) })
 
 	e.POST("/api2/weekly/export", func(c echo.Context) error { return api.ExportWeeklyHandler(c, DB) })
+
+	e.GET("/api2/auv/view", func(c echo.Context) error { return api2.GetAUVViewHandler(c, DB) })
+	e.POST("/api2/auv/update", func(c echo.Context) error { return api2.UpdateAUVHandler(c, DB) })
 
 	return e
 }

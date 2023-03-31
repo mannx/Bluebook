@@ -13,6 +13,19 @@ import (
 
 // GetAUVViewHandler returns the data for a given month or empty data if none found
 func GetAUVViewHandler(c echo.Context, db *gorm.DB) error {
+	// format the auventry into a form easier to handle with js (timezone causes date to shift 1 day too early, fix?)
+	type auvViewData struct {
+		// Week1Date     string
+		// Week2Date     string
+		// Week3Date     string
+		// Week4Date     string
+		// Week5Date     string
+		Dates         []string
+		AUV           []int
+		Hours         []int
+		Week5Required bool
+	}
+
 	var month, year int
 
 	err := echo.QueryParamsBinder(c).
@@ -39,11 +52,26 @@ func GetAUVViewHandler(c echo.Context, db *gorm.DB) error {
 
 	if res.RowsAffected == 0 {
 		// no auv data found, make sure to set the default fields to the month/year
-		d := time.Date(year, time.Month(month), 1, 0, 0, 0, 0, time.UTC)
-		auv.Default(datatypes.Date(d))
+		// d := time.Date(year, time.Month(month), 1, 0, 0, 0, 0, time.UTC)
+		// auv.Default(datatypes.Date(d))
+		// auv.Default(d)
 	}
 
-	return c.JSON(http.StatusOK, &auv)
+	// convert the auventry to the output
+	ret := auvViewData{
+		Dates:         make([]string, 5),
+		AUV:           make([]int, 5),
+		Hours:         make([]int, 5),
+		Week5Required: auv.Week5Required,
+	}
+
+	ret.Dates[0] = time.Time(auv.Week1Date).Format("2006-01-02")
+	ret.Dates[1] = time.Time(auv.Week2Date).Format("2006-01-02")
+	ret.Dates[2] = time.Time(auv.Week3Date).Format("2006-01-02")
+	ret.Dates[3] = time.Time(auv.Week4Date).Format("2006-01-02")
+	ret.Dates[4] = time.Time(auv.Week5Date).Format("2006-01-02")
+
+	return c.JSON(http.StatusOK, &ret)
 }
 
 // UpdateAUVPostHandler updates auv data from user form

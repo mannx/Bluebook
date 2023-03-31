@@ -1,5 +1,5 @@
 import * as React from "react";
-import {Form, useLoaderData} from "react-router-dom";
+import {Outlet, Form, useLoaderData, useNavigate} from "react-router-dom";
 
 import TextField from '@mui/material/TextField';
 import Container from '@mui/material/Container';
@@ -15,60 +15,95 @@ import Stack from '@mui/material/Stack';
 
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
+import {
+    UrlGet,
+    UrlApi2AUVView,
+    UrlApi2AUVUpdate,
+    GetPostOptions,
+} from "../URLs";
+
 import dayjs from "dayjs";
 
-// return an array of all the week endings for a given month
-function getWeekendings(month, year) {
-    // month is 0 based, so sub 1
-    month -= 1;
-    let days = [];
-    let day = 1;
-    let done = false;
-    let date = new Date(year, month, 1);    // initial date
-
-    do {
-        // do we have a tuesday?
-        if( date.getDay() === 2) {
-            // add to the list
-            days.push(new Date(year, month, day));
-        }
-
-        // next day
-        day += 1;
-        date.setDate(day);
-
-        // check if different month
-        if(date.getMonth() !== month) {
-            done = true;
-        }
-    }while(!done);
-
-    return days;
-}
-
 export default function AUV() {
-    const [date, setDate] = React.useState(null); 
-    const {data} = useLoaderData();
-
-    let weekEndings = [];
-    if(date !== null) {
-        weekEndings = getWeekendings(date.month()+1, date.year());
-    }
+    const nav = useNavigate();
 
     return (<>
         <Container>
-        <DatePicker value={date} views={['month', 'year']} onChange={(e) => setDate(e)} />
-        </Container>
+        <DatePicker  views={['month', 'year']} onChange={(e) => {
+            const month = e.month() + 1;        // month is 0 based, add 1 to correct
+            const year = e.year();
+            const url = "/auv/" + month + "/" + year;
 
+            nav(url);
+        }} />
+        </Container>
+        <Outlet />
+        </>
+    );
+}
+
+export async function loader({params}) {
+    // get the data from the server
+    const month = params.month;
+    const year = params.year;
+    const q = "?month=" + month + "&year=" + year;
+
+    const url = UrlGet(UrlApi2AUVView) + q;
+    const resp = await fetch(url);
+    const data = await resp.json();
+
+    return {data};
+}
+
+export async function action({request, params}) {
+    const formData = await request.formData();
+
+    // combine the data into arrays
+    let auv = [];
+    let hours = [];
+
+    for(let i = 0; i <= 4; i++){
+        const a = formData.get("auv" + i);
+        if (a !== null) {
+            auv.push(parseInt(a));
+        }
+
+        const h = formData.get("hours" + i);
+        if (h !== null) {
+            hours.push(parseInt(h));
+        }
+    }
+
+    // build the object
+    const body = {
+        Month: parseInt(params.month),
+        Year: parseInt(params.year),
+        AUV: auv,
+        Hours: hours,
+    };
+
+    console.log(body);
+
+    // send to the server
+    const opts = GetPostOptions(JSON.stringify(body));
+    await fetch(UrlGet(UrlApi2AUVUpdate), opts);
+
+    return null;
+}
+
+export function AUVLayout() { 
+    // get the data from the server with dates and/or values
+    const {data} = useLoaderData();
+
+    const auv = getAuvData(data);
+
+    return (
         <Container>
         <Form method="post"> 
 
-        {date !== null ?
         <Stack direction="row" spacing={2}>
             <Button variant="contained" type="submit">Update</Button>
         </Stack>
-            : <></>
-        }
 
         <TableContainer component={Paper}>
         <Table>
@@ -81,34 +116,42 @@ export default function AUV() {
         </TableHead>
 
         <TableBody>
-        {weekEndings !== null ?
-            weekEndings.map( (o, i) => {
-                return AUVData(o, i);
-            }) : <></>
-        }
+        {auv}
         </TableBody>
 
         </Table>
         </TableContainer>
         </Form>
         </Container>
-        </>
     );
 }
 
-function AUVData(weekEnding, index) {
-    const d = dayjs(weekEnding);
+function getAuvData(data) {
+    let auv = [];
+    const end = data.Dates.length;
+
+    for(let i = 0; i < end; i++) {
+        auv.push(AUVData(data, i));
+    }
+
+    return auv.map( (o) => { return o; });
+}
+
+function AUVData(data, index) {
+    // date is sometimes off by 1, remove time zone info before parsing?
+    // TODO
+    const date = dayjs(data.Dates[index]);
 
     return (<>
         <TableRow key={index}>
             <TableCell>
-                <DatePicker value={d} disabled tabIndex={-1}/>
+                <DatePicker value={date} disabled tabIndex={-1}/>
             </TableCell>
             <TableCell>
-                <TextField id={"auv"+index} type="number" label="AUV"/>
+                <TextField name={"auv"+index} id={"auv"+index} type="number" label="AUV" defaultValue={data.AUV[index]}/>
             </TableCell>
             <TableCell>
-                <TextField id={"hours"+index} type="number" label="Hours"/>
+                <TextField name={"hours"+index} id={"hours"+index} type="number" label="Hours" defaultValue={data.Hours[index]}/>
             </TableCell>
         </TableRow>
         </>
