@@ -1,12 +1,15 @@
 package models
 
 import (
+	"time"
+
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
 
 // AUVEntry holds data for a given month for auv and hours
-type AUVEntry struct {
+// still in use for migrating old data into new table
+type _AUVEntry struct {
 	gorm.Model
 
 	Week1Date  datatypes.Date
@@ -55,47 +58,81 @@ type AUVEntry2 struct {
 	Week5Hours int
 }
 
-// Default sets the date fields to the provided date
-func (auv *AUVEntry) Default(date datatypes.Date) {
-	auv.Week1Date = date
-	auv.Week2Date = date
-	auv.Week3Date = date
-	auv.Week4Date = date
-	auv.Week5Date = date
+// Holds an AUVEntry2 but stored in arrays instead of Week?__ fields
+// this is not stored in the db and is only used by converting an
+// AUVEntry2 struct
+type AUVEntryArray struct {
+	Month int
+	Year  int
+
+	Dates []time.Time
+	AUV   []int
+	Hours []int
 }
 
-// sets the week ending dates to the correct tuesday of the month
-// func (auv *AUVEntry) Default(date time.Time) {
-// 	// get the week ending days
-// 	days := daysInMonth(date)
+func (entry *AUVEntry2) ToArray() AUVEntryArray {
+	auv := AUVEntryArray{
+		Month: entry.Month,
+		Year:  entry.Year,
+		Dates: daysInMonth(time.Month(entry.Month), entry.Year),
+	}
 
-// 	auv.Week1Date = datatypes.Date(days[0])
-// 	auv.Week2Date = datatypes.Date(days[1])
-// 	auv.Week3Date = datatypes.Date(days[2])
-// 	auv.Week4Date = datatypes.Date(days[3])
+	auv.Hours = make([]int, len(auv.Dates))
+	auv.AUV = make([]int, len(auv.Dates))
 
-// 	if len(days) == 5 {
-// 		log.Debug().Msgf("[AUVENTRY-DEFAULT] WEEK 5 FOUND")
-// 		auv.Week5Date = datatypes.Date(days[4])
-// 	}
+	auv.Hours[0] = entry.Week1Hours
+	auv.Hours[1] = entry.Week2Hours
+	auv.Hours[2] = entry.Week3Hours
+	auv.Hours[3] = entry.Week4Hours
+	if len(auv.Dates) > 4 {
+		auv.Hours[4] = entry.Week5Hours
+	}
+
+	auv.AUV[0] = entry.Week1AUV
+	auv.AUV[1] = entry.Week2AUV
+	auv.AUV[2] = entry.Week3AUV
+	auv.AUV[3] = entry.Week4AUV
+	if len(auv.Dates) > 4 {
+		auv.AUV[4] = entry.Week5AUV
+	}
+
+	return auv
+}
+
+func (entry *AUVEntryArray) Blank(month time.Month, year int) {
+	entry.Month = int(month)
+	entry.Year = year
+
+	entry.Dates = daysInMonth(month, year)
+	entry.AUV = make([]int, len(entry.Dates))
+	entry.Hours = make([]int, len(entry.Dates))
+}
+
+// Default sets the date fields to the provided date
+// func (auv *AUVEntry) Default(date datatypes.Date) {
+// 	auv.Week1Date = date
+// 	auv.Week2Date = date
+// 	auv.Week3Date = date
+// 	auv.Week4Date = date
+// 	auv.Week5Date = date
 // }
 
-// returns a list of all the days in a given month that fall on a tuesday
-// func daysInMonth(t time.Time) []time.Time {
-// 	// move to the 32nd day which forces a rollover to the next month
-// 	t = time.Date(t.Year(), t.Month(), 32, 0, 0, 0, 0, time.UTC)
-// 	total := 32 - t.Day()
-// 	days := make([]time.Time, 5)
-// 	index := 0
+func daysInMonth(month time.Month, year int) []time.Time {
+	// move to the 32nd day which forces a rollover to the next month
+	t := time.Date(year, month, 32, 0, 0, 0, 0, time.UTC)
+	total := 32 - t.Day()
+	days := make([]time.Time, 0)
+	// index := 0
 
-// 	// check each day
-// 	for i := 1; i <= total; i++ {
-// 		d := time.Date(t.Year(), t.Month(), i, 0, 0, 0, 0, time.UTC)
-// 		if d.Weekday() == time.Tuesday {
-// 			days[index] = d
-// 			index += 1
-// 		}
-// 	}
+	// check each day
+	for i := 1; i <= total; i++ {
+		d := time.Date(year, month, i, 0, 0, 0, 0, time.UTC)
+		if d.Weekday() == time.Tuesday {
+			// days[index] = d
+			// index += 1
+			days = append(days, d)
+		}
+	}
 
-// 	return days
-// }
+	return days
+}

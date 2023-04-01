@@ -1,3 +1,8 @@
 ## Frontend v2 Issues/Todo
 
-* weekly pulls auv/hour data from old auv tables, switch over to the newer v2 tables
+* waste input started
+    - delete needs to be handled
+    - add needs to be handled
+    - setting date to last selected?
+
+* waste settings not yet begun

@@ -46,21 +46,21 @@ func initServer() *echo.Echo {
 	// e.POST("/api/update/comment", func(c echo.Context) error { return api.UpdateCommentHandler(c, DB) })
 
 	// Waste handling
-	// e.GET("/api/waste/view", func(c echo.Context) error { return api.GetWasteViewHandler(c, DB) })
+	e.GET("/api/waste/view", func(c echo.Context) error { return api.GetWasteViewHandler(c, DB) })
 	// e.GET("/api/waste/settings", func(c echo.Context) error { return api.GetWasteSettingHandler(c, DB) })
 	// e.POST("/api/waste/update", func(c echo.Context) error { return api.UpdateWasteSettingHandler(c, DB) })
 	// e.POST("/api/waste/delete", func(c echo.Context) error { return api.DeleteWasteItemHandler(c, DB) })
 	// e.POST("/api/waste/new", func(c echo.Context) error { return api.AddNewWasteItemHandler(c, DB) })
 	// e.POST("/api/waste/combine", func(c echo.Context) error { return api.CombineWasteHandler(c, DB) })
-	// e.GET("/api/waste/names", func(c echo.Context) error { return api.GetWasteNamesHandler(c, DB) })
+	e.GET("/api/waste/names", func(c echo.Context) error { return api.GetWasteNamesHandler(c, DB) })
 	// e.GET("/api/waste/unused", func(c echo.Context) error { return api.RemoveUnusedWasteItems(c, DB) })
 
-	// e.GET("/api/waste/holding", func(c echo.Context) error { return api.GetWasteHoldingHandler(c, DB) })
+	e.GET("/api/waste/holding", func(c echo.Context) error { return api.GetWasteHoldingHandler(c, DB) })
 	// e.POST("/api/waste/holding/add", func(c echo.Context) error { return api.AddWasteHoldingHandler(c, DB) })
 	// e.POST("/api/waste/holding/confirm", func(c echo.Context) error { return api.WasteHoldingConfirmHandler(c, DB) })
 	// e.POST("/api/waste/holding/delete", func(c echo.Context) error { return api.WasteHoldingDeleteHandler(c, DB) })
 
-	// e.POST("/api/waste/export", func(c echo.Context) error { return api.WasteExport(c, DB) })
+	e.POST("/api/waste/export", func(c echo.Context) error { return api.WasteExport(c, DB) })
 
 	// Weekly reports
 	e.GET("/api/weekly/view", func(c echo.Context) error { return api.GetWeeklyViewHandler(c, DB) })

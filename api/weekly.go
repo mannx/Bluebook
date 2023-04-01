@@ -7,7 +7,6 @@ import (
 	"github.com/labstack/echo/v4"
 	models "github.com/mannx/Bluebook/models"
 	"github.com/rs/zerolog/log"
-	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
 
@@ -142,38 +141,24 @@ func calculateWeekly(data []models.DayData, wi *weeklyInfo) {
 }
 
 func getAuvData(weekEnding time.Time, wi *weeklyInfo, db *gorm.DB) error {
-	// get the auv data for the month
-	start := time.Date(weekEnding.Year(), weekEnding.Month(), 1, 0, 0, 0, 0, time.UTC)
-	end := start.AddDate(0, 1, 0) // get the next month
-	auv := models.AUVEntry{}
+	month := int(weekEnding.Month())
+	auv := models.AUVEntry2{}
 
-	res := db.Find(&auv, "week1_date >= ? AND week1_date < ?", start, end)
+	res := db.Where("Month = ? AND Year = ?", month, weekEnding.Year()).Find(&auv)
 	if res.Error != nil {
+		log.Error().Err(res.Error).Msgf("Error getting auv for %v/%v: [%v]", month, weekEnding.Year(), res.Error)
 		return res.Error
 	}
 
-	if res.RowsAffected == 0 {
-		// no auv data available
-		return nil
-	}
+	auvArr := auv.ToArray()
 
-	we := datatypes.Date(weekEnding)
-	// determine which week ending date matches ours, if no match, return error
-	if auv.Week1Date == we {
-		wi.TargetHours = auv.Week1Hours
-		wi.TargetAUV = auv.Week1AUV
-	} else if auv.Week2Date == we {
-		wi.TargetHours = auv.Week2Hours
-		wi.TargetAUV = auv.Week2AUV
-	} else if auv.Week3Date == we {
-		wi.TargetHours = auv.Week3Hours
-		wi.TargetAUV = auv.Week3AUV
-	} else if auv.Week4Date == we {
-		wi.TargetHours = auv.Week4Hours
-		wi.TargetAUV = auv.Week4AUV
-	} else if auv.Week5Date == we {
-		wi.TargetHours = auv.Week5Hours
-		wi.TargetAUV = auv.Week5AUV
+	for i, d := range auvArr.Dates {
+		// did we find a matching week ending?
+		if d == weekEnding {
+			wi.TargetHours = auvArr.Hours[i]
+			wi.TargetAUV = auvArr.AUV[i]
+			break
+		}
 	}
 
 	return nil

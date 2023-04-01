@@ -26,11 +26,11 @@ function navHeader() {
         <li className={"navControl"}><NavButton url="/" name="Search Tags" /></li>
         <li className={"navControl"}><NavButton url="/auv" name="AUV" /></li>
         <li className={"navControl"}><NavButton url="/weekly" name="Weekly Info" /></li>
-        <li className={"navControl"}><NavButton url="/" name="Wastage" /></li>
+        <li className={"navControl"}><NavButton url="/waste" name="Wastage" /></li>
         <li className={"navControl"}><NavButton url="/" name="Top 5" /></li>
         <li className={"navControl"}><NavButton url="/import" name="Import" /></li>
         <li className={"navControl"}><NavButton url="/" name="Waste Settings" /></li>
-        <li className={"navControl"}><NavButton url="/" name="Waste Input" /></li>
+        <li className={"navControl"}><NavButton url="/waste/input" name="Waste Input" /></li>
         </ul>
         </div>
     );

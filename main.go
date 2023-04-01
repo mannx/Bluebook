@@ -83,7 +83,8 @@ func main() {
 
 	log.Info().Msg("Starting server...")
 	go func() {
-		if err := e.Start(":8080"); err != nil && err != http.ErrServerClosed {
+		// if err := e.Start(":8080"); err != nil && err != http.ErrServerClosed {
+		if err := e.Start(":9080"); err != nil && err != http.ErrServerClosed {
 			e.Logger.Fatal("shutting server down")
 		}
 	}()
@@ -108,7 +109,7 @@ func migrateDB() {
 	DB.AutoMigrate(&models.WastageEntry{})
 	DB.AutoMigrate(&models.WastageEntryHolding{})
 
-	DB.AutoMigrate(&models.AUVEntry{})
+	// DB.AutoMigrate(&models.AUVEntry{})
 	DB.AutoMigrate(&models.AUVEntry2{})
 
 	DB.AutoMigrate(&models.TagList{})

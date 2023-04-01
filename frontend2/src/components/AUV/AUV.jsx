@@ -82,8 +82,6 @@ export async function action({request, params}) {
         Hours: hours,
     };
 
-    console.log(body);
-
     // send to the server
     const opts = GetPostOptions(JSON.stringify(body));
     await fetch(UrlGet(UrlApi2AUVUpdate), opts);
@@ -138,9 +136,12 @@ function getAuvData(data) {
 }
 
 function AUVData(data, index) {
-    // date is sometimes off by 1, remove time zone info before parsing?
-    // TODO
-    const date = dayjs(data.Dates[index]);
+    // remove timezone info to prevent showing a previous day
+    //  (date has UTC timezone and dayjs will shift that to local time)
+    const dateStr = data.Dates[index].slice(0, data.Dates[index].length-10);
+
+    // const date = dayjs(data.Dates[index]);
+    const date=dayjs(dateStr);
 
     return (<>
         <TableRow key={index}>
@@ -148,7 +149,7 @@ function AUVData(data, index) {
                 <DatePicker value={date} disabled tabIndex={-1}/>
             </TableCell>
             <TableCell>
-                <TextField name={"auv"+index} id={"auv"+index} type="number" label="AUV" defaultValue={data.AUV[index]}/>
+        <TextField name={"auv"+index} id={"auv"+index} type="number" label="AUV" defaultValue={data.AUV[index]}/>
             </TableCell>
             <TableCell>
                 <TextField name={"hours"+index} id={"hours"+index} type="number" label="Hours" defaultValue={data.Hours[index]}/>

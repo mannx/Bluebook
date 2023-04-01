@@ -1,7 +1,7 @@
 
 // development, set to http://localhost:8080, for production, leave empty
 const production = false;
-const baseURL = "http://localhost:8080";
+const baseURL = "http://localhost:9080";
 
 // urls for all our api endpoints
 // /api is the original endpoints
@@ -22,6 +22,11 @@ export const UrlApi2WeeklyExport = "/api2/weekly/export";
 
 export const UrlApi2AUVView = "/api2/auv/view";
 export const UrlApi2AUVUpdate = "/api2/auv/update";
+
+export const UrlApiWasteView = "/api/waste/view";
+export const UrlApiWasteExport = "/api/waste/export";
+export const UrlApiWasteNames = "/api/waste/names";
+export const UrlApiWasteHolding = "/api/waste/holding";
 
 export function UrlGet(name) {
 	var base = "";

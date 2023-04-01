@@ -42,6 +42,17 @@ import AUV, {
     action as auvAction,
 } from "./components/AUV/AUV";
 
+import WasteView, {
+    WasteTable,
+    loader as wasteLoader,
+    action as wasteAction,
+} from "./components/Waste/Wastage";
+
+import WasteInput,{
+    loader as wasteInputLoader,
+    action as wasteInputAction,
+} from "./components/Waste/Input";
+
 import './index.css'
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
@@ -105,6 +116,24 @@ const router = createBrowserRouter([
                         action: auvAction,
                     },
                 ],
+            },
+            {
+                path: "/waste",
+                element: <WasteView />,
+                children: [
+                    {
+                        path: "/waste/:day/:month/:year",
+                        element: <WasteTable />,
+                        loader: wasteLoader,
+                        action: wasteAction,
+                    },
+                ],
+            },
+            {
+                path: "/waste/input",
+                element: <WasteInput />,
+                loader: wasteInputLoader,
+                action: wasteInputAction,
             },
         ],
     },
