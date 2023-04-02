@@ -125,7 +125,6 @@ function Row(data) {
         default: cls="NetSalesSame"; break;
     }
 
-    // TODO: comments & tags
     return (
         <tr key={data.ID}>
         <td className="Month">{Zero(data.DayOfMonth)}</td>

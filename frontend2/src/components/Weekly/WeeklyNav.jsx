@@ -1,4 +1,3 @@
-
 // this page provides a date picker to validate a week ending date
 import * as React from 'react';
 

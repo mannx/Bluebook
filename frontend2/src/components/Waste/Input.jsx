@@ -1,18 +1,13 @@
 // Input.jsx is used to entry wastage entries to be later combined and shown with Wastage.jsx
 
 import * as React from "react";
-import {Form, useLoaderData} from "react-router-dom";
-// import {NumericFormat} from "react-number-format";
+import {Form, useLoaderData, useNavigate, redirect } from "react-router-dom";
 
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-// import Picker from "./Picker";
-// import DatePicker  from "react-datepicker";
-// import "react-datepicker/dist/react-datepicker.css";
 
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -22,29 +17,24 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+
 import Autocomplete from '@mui/material/Autocomplete';
-import Stack from '@mui/material/Stack';
 
 import {
     UrlGet,
     UrlApiWasteNames,
     UrlApiWasteHolding,
+    UrlApiWasteHoldingAdd,
+    UrlApiWasteHoldingConfirm,
+    UrlApiWasteHoldingDelete,
     GetPostOptions,
 } from "../URLs";
 
-
-
-const notTuesday = (date) => {
-    return date.day() !== 2;
-}
-
-// function WasteTest(params) {
-//     console.log(params);
-
-//     return (
-//         <><span>Waste Test</span></>
-//     );
-// }
 
 // load the current waste data in the holding table, the waste names for autocomplete
 export async function loader({params}) {
@@ -74,31 +64,55 @@ export async function action({request, params}) {
     const formData = await request.formData();
     const updates = Object.fromEntries(formData);
 
-    console.log(updates);
+    const opt = GetPostOptions(JSON.stringify(updates));
+    await fetch(UrlGet(UrlApiWasteHoldingAdd), opt);
 
-    return null;
+    return redirect("/waste/input");
 }
 
 export default function WasteInput() {
-    const [date, setDate] = React.useState(null);
     const [wasteDate, setWasteDate] = React.useState(null);
-    
+    const [confirm, setConfirm] = React.useState(false);
+
+    const navigate = useNavigate();
     const data = useLoaderData();
 
     const names = data.Names;
 
+    // button handler for removing an item
+    const deleteItem = async (id) => {
+        const url = UrlGet(UrlApiWasteHoldingDelete);
+        const body = {
+            ID: id,
+        };
+
+        const opts = GetPostOptions(JSON.stringify(body));
+        await fetch(url, opts);
+    }
+
+
+    // handlers for showing and hiding the confirmation dialog box
+    const handleConfirmOpen = () => { setConfirm(true); }
+    const handleConfirmClose = () => { setConfirm(false); }
+    
+    const confirmBtn = async () => {
+        const url = UrlGet(UrlApiWasteHoldingConfirm);
+        const opts = GetPostOptions("");
+        await fetch(url, opts);
+
+        handleConfirmClose();
+    }
+
     return (<>
         <Container>
         <h3>Waste Input</h3>
-        <span>Week Ending:</span><br/>
-        <DatePicker value={date} onChange={(e)=>setDate(e)} shouldDisableDate={notTuesday} />
-        <Button variant="contained">Submit</Button>
+        <Button variant="contained" onClick={handleConfirmOpen}>Submit</Button>
         </Container>
 
         <TableContainer component={Paper} >
         <Form method="post">
 
-        <Table>
+        <Table size="small">
         <TableHead>
         <TableRow>
             <th className="Month">Date</th>
@@ -116,7 +130,10 @@ export default function WasteInput() {
                 <TableCell>{obj.Name}</TableCell>
                 <TableCell>{obj.Quantity}</TableCell>
                 <TableCell>{obj.Reason}</TableCell>
-                <TableCell><Button>Delete</Button></TableCell>
+                <TableCell><Button onClick={ () => {
+                    deleteItem(obj.ID);
+                    navigate("/waste/input");
+                }}>Delete</Button></TableCell>
                 </TableRow>);
         })}
 
@@ -124,12 +141,12 @@ export default function WasteInput() {
             <TableCell>
                 <DatePicker value={wasteDate} onChange={(e) => setWasteDate(e) }/>
                 {wasteDate !== null &&
-                <input type="hidden" name="date" value={wasteDate.format("DD-MM-YYYY")} /> 
+                    <input type="hidden" name="Date" value={wasteDate.format("MM-DD-YYYY")} /> 
                 }
             </TableCell>
             <TableCell>
         <Autocomplete autoSelect autoHighlight id="freeSolo" options={names.map( (n) => n) }
-        renderInput={(params) => <TextField {...params} label="Name" name="Name"/>} />
+        renderInput={(params) => <TextField autoFocus {...params} label="Name" name="Name"/>} />
             </TableCell>
             <TableCell>
                 <TextField label="Quantity" type="number" variant="standard" name="Quantity"/>
@@ -146,6 +163,24 @@ export default function WasteInput() {
         </Table>
         </Form>
         </TableContainer>
+
+        <Dialog open={confirm} onClose={handleConfirmClose}>
+            <DialogTitle>Confirm wastage entries?</DialogTitle>
+
+            <DialogContent>
+                <DialogContentText>
+                Confirm merge of wastage entries from holding table?
+                </DialogContentText>
+            </DialogContent>
+
+            <DialogActions>
+                <Button onClick={handleConfirmClose}>Disagree</Button>
+                <Button onClick={() => {
+                    confirmBtn();
+                    navigate("/waste");
+                }}>Confirm</Button>
+            </DialogActions>
+        </Dialog>
         </>
     );
 }

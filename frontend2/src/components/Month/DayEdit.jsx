@@ -1,5 +1,4 @@
 import {Form, useLoaderData, redirect} from "react-router-dom";
-// import {UrlGet, GetPostOptions} from "../URLs.jsx";
 import {UrlGet, UrlApi2DayEdit, UrlApi2DayUpdate, GetPostOptions} from "../URLs.jsx";
 
 import Table from '@mui/material/Table';
@@ -25,28 +24,7 @@ function Tag(data) {
 }
 
 // extract the date from the url in form of YYYYMMDD and return a date object
-// function extractDate(str) {
-//     const year = str.substring(0,4);
-//     const month = str.substring(4,6);
-//     const day = str.substring(6,8);
-
-//     console.log("year: " + year + "  month: " + month + "  day: " + day);
-//     return new Date(year, month, day, 0, 0, 0);
-// }
-
 export async function loader({params}) {
-    // const id = params.id;
-    // const date = params.date;
-
-    // if(date === null || date === undefined) {
-    //     console.log("no date provided, using id: " + id);
-    // }else{
-    //     console.log("date provided, using: " + date);
-    //     // dObj = extractDate(date);
-    //     console.error("only date not yet implemented");
-    //     throw new Error("ID required for edit. date only not yet implemented");
-    // }
-
     var q = "";
     if(params.date === undefined) {
         // no date, use id

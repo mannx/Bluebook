@@ -47,7 +47,7 @@ func initServer() *echo.Echo {
 
 	// Waste handling
 	e.GET("/api/waste/view", func(c echo.Context) error { return api.GetWasteViewHandler(c, DB) })
-	// e.GET("/api/waste/settings", func(c echo.Context) error { return api.GetWasteSettingHandler(c, DB) })
+	e.GET("/api/waste/settings", func(c echo.Context) error { return api.GetWasteSettingHandler(c, DB) })
 	// e.POST("/api/waste/update", func(c echo.Context) error { return api.UpdateWasteSettingHandler(c, DB) })
 	// e.POST("/api/waste/delete", func(c echo.Context) error { return api.DeleteWasteItemHandler(c, DB) })
 	// e.POST("/api/waste/new", func(c echo.Context) error { return api.AddNewWasteItemHandler(c, DB) })
@@ -56,9 +56,9 @@ func initServer() *echo.Echo {
 	// e.GET("/api/waste/unused", func(c echo.Context) error { return api.RemoveUnusedWasteItems(c, DB) })
 
 	e.GET("/api/waste/holding", func(c echo.Context) error { return api.GetWasteHoldingHandler(c, DB) })
-	// e.POST("/api/waste/holding/add", func(c echo.Context) error { return api.AddWasteHoldingHandler(c, DB) })
-	// e.POST("/api/waste/holding/confirm", func(c echo.Context) error { return api.WasteHoldingConfirmHandler(c, DB) })
-	// e.POST("/api/waste/holding/delete", func(c echo.Context) error { return api.WasteHoldingDeleteHandler(c, DB) })
+	e.POST("/api/waste/holding/add", func(c echo.Context) error { return api.AddWasteHoldingHandler(c, DB) })
+	e.POST("/api/waste/holding/confirm", func(c echo.Context) error { return api.WasteHoldingConfirmHandler(c, DB) })
+	e.POST("/api/waste/holding/delete", func(c echo.Context) error { return api.WasteHoldingDeleteHandler(c, DB) })
 
 	e.POST("/api/waste/export", func(c echo.Context) error { return api.WasteExport(c, DB) })
 
@@ -70,8 +70,8 @@ func initServer() *echo.Echo {
 	// e.POST("/api/auv/update", func(c echo.Context) error { return api.UpdateAUVPostHandler(c, DB) })
 
 	// Tags
-	// e.GET("/api/tags/view", func(c echo.Context) error { return api.TagListViewHandler(c, DB) })
-	// e.GET("/api/tags/data", func(c echo.Context) error { return api.TagDataViewHandler(c, DB) })
+	e.GET("/api/tags/view", func(c echo.Context) error { return api.TagListViewHandler(c, DB) })
+	e.GET("/api/tags/data", func(c echo.Context) error { return api.TagDataViewHandler(c, DB) })
 	// e.POST("/api/tags/update", func(c echo.Context) error { return api.TagUpdateViewHandler(c, DB) })
 	// e.GET("/api/tags/clean", func(c echo.Context) error { return api.TagCleanHandler(c, DB) })
 

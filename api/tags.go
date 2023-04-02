@@ -60,9 +60,10 @@ func TagListViewHandler(c echo.Context, db *gorm.DB) error {
 // TagDataViewHandler returns all the days that use the given tag. Provided by parameter ID
 func TagDataViewHandler(c echo.Context, db *gorm.DB) error {
 	type TagList struct {
-		Day  models.DayData //data for day with the tag
-		Date string         // friendly string for the date
-		Tags []string       // list of all other tags associated with this day
+		Day    models.DayData //data for day with the tag
+		Date   string         // friendly string for the date
+		Tags   []string       // list of all other tags associated with this day
+		TagIDs []uint
 	}
 
 	var id uint
@@ -91,12 +92,13 @@ func TagDataViewHandler(c echo.Context, db *gorm.DB) error {
 			continue // skip if bad
 		}
 
-		tstr, _ := GetTags(d.ID, db)
+		tstr, tids := GetTags(d.ID, db)
 
 		tl := TagList{
-			Day:  d,
-			Date: (time.Time(d.Date)).Format("Mon Jan _2 2006"),
-			Tags: tstr,
+			Day:    d,
+			Date:   (time.Time(d.Date)).Format("Mon Jan _2 2006"),
+			Tags:   tstr,
+			TagIDs: tids,
 		}
 
 		data = append(data, tl)

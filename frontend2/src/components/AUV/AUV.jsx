@@ -139,8 +139,6 @@ function AUVData(data, index) {
     // remove timezone info to prevent showing a previous day
     //  (date has UTC timezone and dayjs will shift that to local time)
     const dateStr = data.Dates[index].slice(0, data.Dates[index].length-10);
-
-    // const date = dayjs(data.Dates[index]);
     const date=dayjs(dateStr);
 
     return (<>

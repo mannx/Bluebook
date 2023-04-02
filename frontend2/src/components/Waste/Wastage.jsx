@@ -39,7 +39,7 @@ export default function WasteView() {
         const month = date.month() + 1; // month is 0 based
         const year = date.year();
 
-        url = "/waste/"+day+"/"+month+"/"+year;
+        url = "/wastage/"+day+"/"+month+"/"+year;
     }
 
     return (<>
@@ -78,8 +78,6 @@ function NF(obj) {
 }
 
 export async function action({params}) {
-    console.log("exporting waste data...");
-
     const url = UrlGet(UrlApiWasteExport);
     const body = {
         Month: parseInt(params.month),
@@ -95,7 +93,6 @@ export async function action({params}) {
 
 export function WasteTable() {
     const data = useLoaderData();
-    // const exUrl = "/waste/export/"+data.month+"/"+data.day+"/"+data.year;
 
     return (<>
         <TableContainer component={Paper} sx={{width: 1/4}}>

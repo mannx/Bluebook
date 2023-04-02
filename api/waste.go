@@ -340,7 +340,7 @@ func getWasteHoldingEntries(db *gorm.DB) []wasteHoldingJSON {
 				Quantity: i.Amount,
 				ID:       i.ID,
 				Year:     date.Year(),
-				Month:    int(date.Month()) - 1,
+				Month:    int(date.Month()),
 				Day:      date.Day(),
 				Reason:   i.Reason,
 			})
@@ -366,10 +366,13 @@ func AddWasteHoldingHandler(c echo.Context, db *gorm.DB) error {
 		return LogAndReturnError(c, "Unable to bind paramters", err)
 	}
 
-	date, err := time.Parse(time.RFC3339, data.Date)
+	// date, err := time.Parse(time.RFC3339, data.Date)
+	date, err := time.Parse("01-02-2006", data.Date)
 	if err != nil {
 		return LogAndReturnError(c, fmt.Sprintf("Unable to parse input time [%v]", data.Date), err)
 	}
+
+	log.Debug().Msgf("Adding item [%] for date of [%v/%v/%v] [%v]", data.Name, date.Month(), date.Day(), date.Year(), data.Date)
 
 	// get the item we are adding to the hold
 	// if we dont have it, add it to the db and returns its id

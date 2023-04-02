@@ -9,28 +9,6 @@ table.Month, th.Month, td.Month, tbody.Month
 	text-align: center;
 }
 
-/* table, th, td, tbody */
-/* { */
-/* 	border: 1px solid black; */
-/* 	border-collapse: collapse; */
-/* 	text-align: center; */
-/* } */
-
-/* button.tagButton { */
-/* 	background-color: transparent; */
-/* 	border: none; */
-/* 	cursor: pointer; */
-/* 	text-decoration: underline; */
-/* 	display: inline; */
-/* 	margin: 0; */
-/* 	padding: 0; */
-/* 	color: blue; */
-/* } */
-
-/* button.tagButton:hover { */
-/* 	color: red; */
-/* } */
-
 .tooltip-month
 {
 	position: relative;

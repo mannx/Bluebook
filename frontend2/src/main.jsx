@@ -23,7 +23,11 @@ import DayEdit, {
     action as dayEditAction,
 } from "./components/Month/DayEdit";
 
-import Tags  from "./components/Tags/Tags";
+import Tags, {
+    TagID,
+    loader as tagLoader,
+    idLoader as tagIdLoader,
+} from "./components/Tags/Tags";
 
 import Import, {
     loader as importLoader,
@@ -53,6 +57,11 @@ import WasteInput,{
     action as wasteInputAction,
 } from "./components/Waste/Input";
 
+import WasteSettings, {
+    WasteSettingsEdit,
+    loader as wasteSettingsLoader,
+} from "./components/Waste/Settings";
+
 import './index.css'
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
@@ -75,8 +84,16 @@ const router = createBrowserRouter([
                 loader: monthTodayLoader,
             }, 
             {
-                path: "/tags/:tag?",
+                path: "/tags",
                 element: <Tags />,
+                loader: tagLoader,
+                children: [
+                    {
+                        path: "/tags/:id",
+                        element: <TagID />,
+                        loader: tagIdLoader,
+                    },
+                ],
             },
             {
                 // edit day information including comments/tags.
@@ -118,11 +135,11 @@ const router = createBrowserRouter([
                 ],
             },
             {
-                path: "/waste",
+                path: "/wastage",
                 element: <WasteView />,
                 children: [
                     {
-                        path: "/waste/:day/:month/:year",
+                        path: "/wastage/:day/:month/:year",
                         element: <WasteTable />,
                         loader: wasteLoader,
                         action: wasteAction,
@@ -134,6 +151,15 @@ const router = createBrowserRouter([
                 element: <WasteInput />,
                 loader: wasteInputLoader,
                 action: wasteInputAction,
+            },
+            {
+                path: "/waste/settings",
+                element: <WasteSettings />,
+                loader: wasteSettingsLoader,
+            },
+            {
+                path: "/waste/settings/:id",
+                element: <WasteSettingsEdit />,
             },
         ],
     },
