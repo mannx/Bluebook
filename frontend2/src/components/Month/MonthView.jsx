@@ -29,7 +29,7 @@ export default function MonthView() {
     // month navigation buttons are to be shows beside the month instead of the main navigation menu as previously done
     return (
         <table className="Month">
-        <caption><h3>
+        <caption><h3 className="no-print">
                 <span>{prevMonth(data)} </span>
                 <span>{nextMonth(data)} </span>
                 <span>{prevYear(data)} </span>

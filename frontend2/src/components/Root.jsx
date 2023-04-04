@@ -52,7 +52,7 @@ function navHeader2() {
     ];
 
     return (
-        <Box sx={{flexGrow:1}}>
+        <Box sx={{flexGrow:1}} className="no-print" >
         <AppBar position="static">
 
         <Toolbar variant="dense">
@@ -66,7 +66,6 @@ function navHeader2() {
         </Toolbar>
 
         </AppBar>
-        <Toolbar/>
         </Box>
     );
 }
