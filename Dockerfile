@@ -29,7 +29,7 @@ FROM node:alpine as react
 
 WORKDIR /app
 
-COPY ./frontend .
+COPY ./frontend2 .
 RUN npm install 
 RUN npm run build
 
