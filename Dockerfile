@@ -12,13 +12,10 @@ RUN apk add build-base
 ENV GOPATH /go/src
 WORKDIR /go/src/github.com/mannx/Bluebook
 
-# copy in go.mod and go.sum files
-COPY go.* ./
-
-RUN go mod download
-
 # copy source files and directories (need separate COPY for directories?)
 COPY backend/ ./
+
+RUN go mod download
 RUN go build -o /bluebook .
 
 #
@@ -51,7 +48,7 @@ COPY --from=build /bluebook /bluebook
 COPY --from=react /app/dist /static
 
 # copy in default config file for top5 api
-COPY ./api/data.json /top5.json
+COPY ./backend/api/data.json /top5.json
 
 # copy run and backup scripts
 COPY ./scripts /scripts
