@@ -18,11 +18,11 @@ import (
 	models "github.com/mannx/Bluebook/models"
 )
 
-// Version of the current build/release
-var (
-	BuildVersion string = ""
-	BuildTime    string = ""
-)
+// // Version of the current build/release
+// var (
+// 	BuildVersion string = ""
+// 	BuildTime    string = ""
+// )
 
 // DB is the database connection for the entire run
 var DB *gorm.DB
@@ -34,9 +34,6 @@ func main() {
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 
 	log.Info().Msgf("Bluebook Helper")
-	log.Info().Msgf("  => Version: %v", BuildVersion)
-	log.Info().Msgf("  => Build Time: %v", BuildTime)
-
 	log.Info().Msg("Initializing environment...")
 	env.Environment.Init()
 

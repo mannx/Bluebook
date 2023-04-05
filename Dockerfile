@@ -18,16 +18,8 @@ COPY go.* ./
 RUN go mod download
 
 # copy source files and directories (need separate COPY for directories?)
-COPY *.go ./
-
-COPY ./api ./api
-COPY ./environ ./environ
-COPY ./import ./import
-COPY ./models ./models
-
-COPY go-build.sh .
-
-RUN ./go-build.sh
+COPY backend/ ./
+RUN go build -o /bluebook .
 
 #
 # React Build Stage
@@ -36,14 +28,9 @@ RUN ./go-build.sh
 FROM node:alpine as react
 
 WORKDIR /app
-ENV NODE_ENV=production
-
-COPY ["./frontend/package.json", "./frontend/package-lock.json", "./"]
-
-RUN npm install --production
 
 COPY ./frontend .
-
+RUN npm install 
 RUN npm run build
 
 
@@ -61,7 +48,7 @@ RUN apk add tzdata poppler-utils sqlite
 WORKDIR /
 
 COPY --from=build /bluebook /bluebook
-COPY --from=react /app/build /static
+COPY --from=react /app/dist /static
 
 # copy in default config file for top5 api
 COPY ./api/data.json /top5.json
