@@ -51,7 +51,7 @@ COPY --from=build /bluebook /bluebook
 COPY --from=react /app/dist /static
 
 # copy in default config file for top5 api
-COPY ./api/data.json /top5.json
+COPY ./backend/api/data.json /top5.json
 
 # copy run and backup scripts
 COPY ./scripts /scripts
