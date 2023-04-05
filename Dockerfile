@@ -12,13 +12,10 @@ RUN apk add build-base
 ENV GOPATH /go/src
 WORKDIR /go/src/github.com/mannx/Bluebook
 
-# copy in go.mod and go.sum files
-COPY go.* ./
-
-RUN go mod download
-
 # copy source files and directories (need separate COPY for directories?)
 COPY backend/ ./
+
+RUN go mod download
 RUN go build -o /bluebook .
 
 #
