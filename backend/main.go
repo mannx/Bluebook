@@ -80,8 +80,7 @@ func main() {
 
 	log.Info().Msg("Starting server...")
 	go func() {
-		// if err := e.Start(":8080"); err != nil && err != http.ErrServerClosed {
-		if err := e.Start(":9080"); err != nil && err != http.ErrServerClosed {
+		if err := e.Start(":8080"); err != nil && err != http.ErrServerClosed {
 			e.Logger.Fatal("shutting server down")
 		}
 	}()

@@ -1,7 +1,7 @@
 
 // development, set to http://localhost:8080, for production, leave empty
 const production = false;
-const baseURL = "http://localhost:9080";
+const baseURL = "http://localhost:8080";
 
 // urls for all our api endpoints
 // /api is the original endpoints
