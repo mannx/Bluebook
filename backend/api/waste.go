@@ -367,6 +367,8 @@ func AddWasteHoldingHandler(c echo.Context, db *gorm.DB) error {
 	}
 
 	// date, err := time.Parse(time.RFC3339, data.Date)
+	// s1 := strings.Split(data.Date, "T")
+	// date, err := time.Parse("2006-01-02", s1[0])
 	date, err := time.Parse("01-02-2006", data.Date)
 	if err != nil {
 		return LogAndReturnError(c, fmt.Sprintf("Unable to parse input time [%v]", data.Date), err)
@@ -579,4 +581,35 @@ func WasteExport(c echo.Context, db *gorm.DB) error {
 	}
 
 	return ReturnServerMessage(c, "Success", false)
+}
+
+// Return the information about a single waste entry to be used to edit
+func GetWasteItemInfo(c echo.Context, db *gorm.DB) error {
+	// combined data we will be returning
+	type returnData struct {
+		Item  models.WastageItem
+		Count uint // total number of wastage entries
+	}
+
+	var id uint
+
+	err := echo.QueryParamsBinder(c).
+		Uint("id", &id).
+		BindError()
+	if err != nil {
+		return LogAndReturnError(c, "Unable to bind paramter: id", err)
+	}
+
+	var entry models.WastageItem
+	res := db.Where("ID = ?", id).First(&entry)
+	if res.Error != nil {
+		return LogAndReturnError(c, "ID not found for wastage item", res.Error)
+	}
+
+	obj := returnData{
+		Item:  entry,
+		Count: 0,
+	}
+
+	return c.JSON(http.StatusOK, &obj)
 }

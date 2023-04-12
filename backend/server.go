@@ -53,7 +53,8 @@ func initServer() *echo.Echo {
 	// e.POST("/api/waste/new", func(c echo.Context) error { return api.AddNewWasteItemHandler(c, DB) })
 	// e.POST("/api/waste/combine", func(c echo.Context) error { return api.CombineWasteHandler(c, DB) })
 	e.GET("/api/waste/names", func(c echo.Context) error { return api.GetWasteNamesHandler(c, DB) })
-	// e.GET("/api/waste/unused", func(c echo.Context) error { return api.RemoveUnusedWasteItems(c, DB) })
+	e.GET("/api/waste/unused", func(c echo.Context) error { return api.RemoveUnusedWasteItems(c, DB) })
+	e.GET("/api/waste/item", func(c echo.Context) error { return api.GetWasteItemInfo(c, DB) })
 
 	e.GET("/api/waste/holding", func(c echo.Context) error { return api.GetWasteHoldingHandler(c, DB) })
 	e.POST("/api/waste/holding/add", func(c echo.Context) error { return api.AddWasteHoldingHandler(c, DB) })

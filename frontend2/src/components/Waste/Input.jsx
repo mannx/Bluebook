@@ -59,7 +59,7 @@ export async function loader({params}) {
     };
 }
 
-export async function action({request, params}) {
+export async function action({request}) {
     // add the item to the holding db
     const formData = await request.formData();
     const updates = Object.fromEntries(formData);
@@ -73,6 +73,7 @@ export async function action({request, params}) {
 export default function WasteInput() {
     const [wasteDate, setWasteDate] = React.useState(null);
     const [confirm, setConfirm] = React.useState(false);
+    // const submit = useSubmit();
 
     const navigate = useNavigate();
     const data = useLoaderData();
@@ -102,6 +103,13 @@ export default function WasteInput() {
 
         handleConfirmClose();
     }
+
+    // const onSubmit = (e) => {
+    //     const form = document.getElementById("waste-form");
+    //     console.log(form);
+    //     submit(form, {method: "post", action: "waste/input"});
+    //     document.getElementById("waste-form").reset();
+    // }
 
     return (<>
         <Container>
@@ -149,7 +157,7 @@ export default function WasteInput() {
         renderInput={(params) => <TextField autoFocus {...params} label="Name" name="Name"/>} />
             </TableCell>
             <TableCell>
-                <TextField label="Quantity" type="number" variant="standard" name="Quantity"/>
+        <TextField label="Quantity" type="number" variant="standard" name="Quantity" inputProps={{ step: 'any', inputMode: 'numeric', pattern: '[0-9](\.[0-9]*)?' }}/>
             </TableCell>
             <TableCell>
                 <TextField label="Reason" variant="standard" name="Reason"/>
@@ -183,4 +191,85 @@ export default function WasteInput() {
         </Dialog>
         </>
     );
+
+    // return (
+    //     <>
+    //     <Container>
+    //     <h3>Waste Input</h3>
+    //     <Button variant="contained" onClick={handleConfirmOpen}>Submit</Button>
+    //     </Container>
+
+    //     <Form method="post" id="waste-form">
+    //     <table>
+    //     <thead>
+    //     <tr>
+    //         <th>Date</th>
+    //         <th>Item</th>
+    //         <th>Quantity</th>
+    //         <th>Reason</th>
+    //         <th></th>
+    //     </tr>
+    //     </thead>
+
+    //     <tbody>
+    //     {data.Holding !== null && data.Holding.map( (obj) => {
+    //         return (<tr>
+    //             <td>{obj.Month}/{obj.Day}/{obj.Year}</td>
+    //             <td>{obj.Name}</td>
+    //             <td>{obj.Quantity}</td>
+    //             <td>{obj.Reason}</td>
+    //             <td><Button onClick={ () => {
+    //                 deleteItem(obj.ID);
+    //                 navigate("/waste/input");
+    //             }}>Delete</Button></td>
+    //             </tr>
+    //         );
+    //     })}
+
+    //     <tr>
+    //     <td><DatePicker selected={wasteDate} tabIndex={-1} 
+    //         onChange={ (e) => {
+    //             setWasteDate(e);
+    //         }} />
+    //         {wasteDate !== null &&
+    //             <input type="hidden" name="Date" value={wasteDate.toISOString()} /> }
+    //         </td>
+
+    //         <td>
+    //         <input autoFocus list="types" name="Name"/>
+    //         <datalist id="types">
+    //             {names.map( (o) => { return <option value={o} />;} )}
+    //         </datalist>
+    //         </td>
+
+    //         <td>
+    //         <input type="text" name="Quantity" />
+    //         </td>
+
+    //         <td><input type="text" name="Reason" tabIndex={-1} /></td>
+    //         <td><Button type="submit" onClick={onSubmit}>Add</Button></td>
+    //     </tr>
+    //     </tbody>
+    //     </table>
+    //     </Form>
+
+    //     <Dialog open={confirm} onClose={handleConfirmClose}>
+    //         <DialogTitle>Confirm wastage entries?</DialogTitle>
+
+    //         <DialogContent>
+    //             <DialogContentText>
+    //             Confirm merge of wastage entries from holding table?
+    //             </DialogContentText>
+    //         </DialogContent>
+
+    //         <DialogActions>
+    //             <Button onClick={handleConfirmClose}>Disagree</Button>
+    //             <Button onClick={() => {
+    //                 confirmBtn();
+    //                 navigate("/waste");
+    //             }}>Confirm</Button>
+    //         </DialogActions>
+    //     </Dialog>
+    //     </>
+    // );
 }

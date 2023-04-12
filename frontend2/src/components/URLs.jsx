@@ -27,12 +27,15 @@ export const UrlApiWasteView = "/api/waste/view";
 export const UrlApiWasteExport = "/api/waste/export";
 export const UrlApiWasteNames = "/api/waste/names";
 
+export const UrlApiWasteRemoveUnused = "/api/waste/unused";
+
 export const UrlApiWasteHolding = "/api/waste/holding";
 export const UrlApiWasteHoldingAdd = "/api/waste/holding/add";
 export const UrlApiWasteHoldingConfirm = "/api/waste/holding/confirm";
 export const UrlApiWasteHoldingDelete = "/api/waste/holding/delete";
 
 export const UrlApiWasteSettingsGet = "/api/waste/settings";
+export const UrlApiWasteItem = "/api/waste/item";   // retreive a single wastage item information
 
 export const UrlApiGetTags = "/api/tags/view";
 export const UrlApiGetTagId = "/api/tags/data";
