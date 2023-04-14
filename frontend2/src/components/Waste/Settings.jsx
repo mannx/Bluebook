@@ -1,6 +1,8 @@
 // Settings.jsx is used to configure wastage entries in the database
 import * as React from "react";
-import {Link, Outlet, useLoaderData } from "react-router-dom";
+import {Form, Link, Outlet, useSubmit, useLoaderData, useNavigate, redirect} from "react-router-dom";
+
+import TextField from '@mui/material/TextField';
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -14,14 +16,21 @@ import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import Checkbox from '@mui/material/Checkbox';
 
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+import InputLabel from '@mui/material/InputLabel';
+
 import { Typography } from '@mui/material';
 import { Container } from '@mui/material';
 
 import {
+    GetPostOptions,
     UrlGet,
     UrlApiWasteSettingsGet,
     UrlApiWasteRemoveUnused,
     UrlApiWasteItem,
+    UrlApiWasteItemUpdate,
+    UrlApiWasteItemNew,
 } from "../URLs";
 
 export async function loader() {
@@ -34,6 +43,8 @@ export async function loader() {
 
 export default function WasteSettings() {
     const {data} = useLoaderData();
+    const navigate = useNavigate();
+    // const submit = useSubmit();
 
     const [serverMessage, setServerMessage] = React.useState(null);
 
@@ -46,28 +57,43 @@ export default function WasteSettings() {
         setServerMessage(json);
     }
 
+    const addNew = async () => {
+        const url = UrlGet(UrlApiWasteItemNew);
+        const opt = GetPostOptions(null);
+        const resp = await fetch(url, opt);
+        const json = await resp.json();
+
+        // redirect to the edit view
+        navigate(`/waste/settings/${json.ID}`);
+    }
+
+    // const onCombine = async () => {
+    //     const form = document.getElementById("form-data");
+    //     console.log(form);
+    //     submit(form,{method: "post", action: "waste/settings/combine"});
+    // }
+
     const displayMessage = () => {
         if(serverMessage === null) {
             return <></>;
         }
 
-        let css = "";
+        let css = {};
 
         if(serverMessage !== null && serverMessage.Error === true) {
             css = {color: "red"};
         }
 
-        console.log(css);
         return (
             <Typography sx={css}>{serverMessage.Message}</Typography>
         );
     }
 
     return (<>
+        <Form method="post" id="form-data">
+
         <Stack spacing={2} direction="row">
-            <Button variant="contained">New</Button>
-            <Button variant="contained">Combine</Button>
-            <Button variant="contained">Delete</Button>
+            <Button variant="contained" onClick={addNew}>New</Button>
             <Button variant="contained" onClick={removeUnused}>Remove Unused</Button>
         </Stack>
 
@@ -93,19 +119,19 @@ export default function WasteSettings() {
         <TableBody>
         {data !== null && data.Data.map( (obj, i) => {
             return (
-                <TableRow>
+                <TableRow key={i}>
                 <TableCell>
                     <Link to={"/waste/settings/"+obj.ID}>
                     <Button>Edit</Button>
                     </Link>
                 </TableCell>
-                <TableCell><Checkbox /></TableCell>
+                <TableCell><Checkbox name={'cb'+i} value={obj.ID}/></TableCell>
                 <TableCell>{data.Counts[i]}</TableCell>
                 <TableCell>{obj.Name}</TableCell>
                 <TableCell>{obj.UnitString}</TableCell>
                 <TableCell>{obj.LocationString}</TableCell>
-                <TableCell>{obj.CustomerConversion === true ? "True" : "False"}</TableCell>
-                <TableCell>{obj.UnitWeight}</TableCell>
+                <TableCell>{obj.CustomConversion === true ? "True" : "False"}</TableCell>
+                {obj.CustomConversion === true ? <TableCell>{obj.UnitWeight}</TableCell> : <></>}
                 </TableRow>
             );
         })}
@@ -114,7 +140,8 @@ export default function WasteSettings() {
 
         </Table>
         </TableContainer>
-        <Outlet/>
+
+        </Form>
         </>);
 }
 
@@ -126,10 +153,124 @@ export async function EditLoader({params}) {
     return {data};
 }
 
+export async function EditAction({request, params}) {
+    const formData = await request.formData();
+    const updates = Object.fromEntries(formData);
+    const id = parseInt(params.id);
+
+
+    // build the update body
+    const body = {
+        ID: id,
+        Unit: parseInt(updates.Unit),
+        HasCustom: updates.custom !== undefined,
+        Conversion: updates.conversion === undefined ? 0.0 : parseFloat(updates.conversion),
+        Name: updates.Name,
+        Location: parseInt(updates.Location)
+    };
+
+    console.log(body);
+
+    const opt = GetPostOptions(JSON.stringify(body));
+    await fetch(UrlGet(UrlApiWasteItemUpdate), opt);
+
+    return redirect('/waste/settings/');
+}
+
+
 export function WasteSettingsEdit() {
     const {data} = useLoaderData();
+    const navigate = useNavigate();
 
-    return (
+    const [unit, setUnit] = React.useState(data.Item.UnitMeasure);
+    const [location, setLocation] = React.useState(data.Item.Location);
+    const [checked, setChecked] = React.useState(data.Item.CustomConversion);
+
+    const updateUnit = (e) => {
+        setUnit(e.target.value);
+    }
+
+    const updateLocation = (e) => {
+        setLocation(e.target.value);
+    }
+
+    const unitKeys = Object.keys(data.Units);
+    const locations = Object.keys(data.Locations);
+
+    return (<>
         <h1>Edit {data.Item.Name}</h1>
+        <Form method="post">
+        <Stack spacing={2} direction="row">
+            <Button variant="contained" type="submit">Save</Button>
+            <Button variant="contained" onClick={ () => navigate(-1) }>Back</Button>
+        </Stack>
+
+
+        <TableContainer component={Paper} sx={{width: 0.75}}>
+        <Table size="small">
+
+        <TableHead>
+        </TableHead>
+
+        <TableBody>
+
+        <TableRow>
+        <TableCell>Wastage Counts</TableCell>
+        <TableCell>{data.Count}</TableCell>
+        </TableRow>
+
+        <TableRow>
+        <TableCell>Name</TableCell>
+        <TableCell><TextField defaultValue={data.Item.Name} name="Name" /></TableCell>
+        </TableRow>
+
+        <TableRow>
+        <TableCell>Unit Measure</TableCell>
+        <TableCell>
+        <InputLabel id="unit">Unit</InputLabel>
+        <Select labelId="unit" name="Unit" label="Unit" value={unit} onChange={updateUnit}>
+        {unitKeys.map( (u) => {
+            return <MenuItem key={u} value={u}>{data.Units[u]}</MenuItem>;
+        })}
+        </Select>
+        </TableCell>
+        </TableRow>
+
+        <TableRow>
+        <TableCell>Location</TableCell>
+        <TableCell>
+        <InputLabel id="Location">Location</InputLabel>
+        <Select labelId="Location" name="Location" label="Loc" value={location} onChange={updateLocation}>
+        {locations.map( (i) => {
+            return <MenuItem key={i} value={i}>{data.Locations[i]}</MenuItem>;
+        })}
+        </Select>
+        </TableCell>
+        </TableRow>
+
+        <TableRow>
+        <TableCell>Custom Conversion</TableCell>
+        <TableCell><Checkbox name="custom" checked={checked} onChange={ (e) => setChecked(e.target.checked) } /></TableCell>
+        <TableCell><TextField label="Conversion" type="number" variant="standard" name="conversion" inputProps={{ step: 'any'}} defaultValue={data.Item.UnitWeight} /></TableCell>
+        </TableRow>
+
+        </TableBody>
+
+        </Table>
+        </TableContainer>
+
+        </Form>
+        </>
     );
 }
+
+// export async function CombineAction({request}) {
+//     const formData = await request.formData();
+//     const updates = Object.fromEntries(formData);
+
+//     const keys = Object.keys(updates);
+//     const ids = keys.map( (i) => parseInt(updates[i]));
+//     console.log(ids);
+
+//     return redirect('/waste/settings/');
+// }

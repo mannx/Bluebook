@@ -30,6 +30,10 @@ function navHeader2() {
             Url: "/weekly",
         },
         {
+            Title: "AUV",
+            Url: "/auv",
+        },
+        {
             Title: "Wastage",
             Url: "/wastage",
         },

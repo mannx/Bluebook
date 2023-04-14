@@ -34,7 +34,7 @@ var unitStringTable = map[int]string{
 	WasteKilo:      "kilo",
 	WasteGram:      "gram",
 	WasteOunce:     "ounce",
-	WasteFrac:      "Frac",
+	// WasteFrac:      "Frac",
 }
 
 var locationStringTable = map[int]string{
@@ -139,6 +139,14 @@ func (wi *WastageItem) Units() []string {
 	}
 
 	return d
+}
+
+func GetWasteUnitMapping() map[int]string {
+	return unitStringTable
+}
+
+func GetWasteLocationMapping() map[int]string {
+	return locationStringTable
 }
 
 // Convert the weight to custom weight type or conversion factor

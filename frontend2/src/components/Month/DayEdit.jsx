@@ -1,4 +1,4 @@
-import {Form, useLoaderData, redirect} from "react-router-dom";
+import {Form, useLoaderData, useNavigate, redirect} from "react-router-dom";
 import {UrlGet, UrlApi2DayEdit, UrlApi2DayUpdate, GetPostOptions} from "../URLs.jsx";
 
 import Table from '@mui/material/Table';
@@ -65,6 +65,7 @@ export async function action({request, params}) {
 // we are provided with either a db ID or a date if no entry has been created yet
 export default function DayEdit() {
     const {data} = useLoaderData();
+    const navigate = useNavigate();
 
     return (
         <>
@@ -73,7 +74,7 @@ export default function DayEdit() {
 
         <Stack direction="row" spacing={2}>
             <Button variant="contained" type="submit">Save</Button>
-            <Button variant="contained">Cancel</Button>
+            <Button variant="contained" onClick={ () => navigate(-1) }>Cancel</Button>
         </Stack>
 
         <TableContainer component={Paper}>

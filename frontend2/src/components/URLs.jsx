@@ -36,6 +36,8 @@ export const UrlApiWasteHoldingDelete = "/api/waste/holding/delete";
 
 export const UrlApiWasteSettingsGet = "/api/waste/settings";
 export const UrlApiWasteItem = "/api/waste/item";   // retreive a single wastage item information
+export const UrlApiWasteItemUpdate = "/api/waste/item/update";
+export const UrlApiWasteItemNew = "/api/waste/item/new";
 
 export const UrlApiGetTags = "/api/tags/view";
 export const UrlApiGetTagId = "/api/tags/data";

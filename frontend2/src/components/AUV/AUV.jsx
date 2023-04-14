@@ -52,6 +52,8 @@ export async function loader({params}) {
     const resp = await fetch(url);
     const data = await resp.json();
 
+    console.log(`loader: month: ${month} year: ${year}`);
+    console.log(data);
     return {data};
 }
 
