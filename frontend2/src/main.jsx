@@ -67,6 +67,12 @@ import WasteSettings, {
     // WasteSettingsCombine,
 } from "./components/Waste/Settings";
 
+import Top5, {
+    Top5Data,
+    loader as top5Loader,
+    dataLoader as top5DataLoader,
+} from "./components/Top5/Top5";
+
 import './index.css'
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
@@ -172,6 +178,18 @@ const router = createBrowserRouter([
             //     path: "/waste/settings/combine",
             //     action: wasteSettingsAction,
             // },
+            {
+                path: "/top5",
+                element: <Top5 />,
+                loader: top5Loader,
+                children: [
+                    {
+                        path: "/top5/:month/:year",
+                        element: <Top5Data />,
+                        loader: top5DataLoader,
+                    },
+                ],
+            },
         ],
     },
 ]);

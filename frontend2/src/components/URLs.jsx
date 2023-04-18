@@ -42,6 +42,9 @@ export const UrlApiWasteItemNew = "/api/waste/item/new";
 export const UrlApiGetTags = "/api/tags/view";
 export const UrlApiGetTagId = "/api/tags/data";
 
+export const UrlApiTop5 = "/api/top5";
+export const UrlApiTop5Data = "/api/top5/data";
+
 export function UrlGet(name) {
 	var base = "";
 	if(production === false) {
