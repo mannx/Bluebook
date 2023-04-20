@@ -41,12 +41,32 @@ export async function loader() {
     return {data};
 }
 
+export async function action({request}) {
+    const formData = await request.formData();
+    const updates = Object.fromEntries(formData);
+
+    console.log(updates);
+
+    return null;
+}
+
+function genState(len) {
+    let arr = [];
+
+    for(let i = 0; i < len; i++) {
+        arr.push(false);
+    }
+
+    return arr;
+}
+
 export default function WasteSettings() {
     const {data} = useLoaderData();
     const navigate = useNavigate();
     // const submit = useSubmit();
 
     const [serverMessage, setServerMessage] = React.useState(null);
+    const [combined, setCombined] = React.useState(genState(data.Data.length));
 
     const removeUnused = async () => {
         const url = UrlGet(UrlApiWasteRemoveUnused);
@@ -67,11 +87,14 @@ export default function WasteSettings() {
         navigate(`/waste/settings/${json.ID}`);
     }
 
-    // const onCombine = async () => {
-    //     const form = document.getElementById("form-data");
-    //     console.log(form);
-    //     submit(form,{method: "post", action: "waste/settings/combine"});
-    // }
+    const onCombine = async () => {
+    }
+    
+    const onCombineChange = (i) => {
+        let n = combined;
+        n[i] = !n[i];
+        setCombined(n);
+    }
 
     const displayMessage = () => {
         if(serverMessage === null) {
@@ -95,6 +118,7 @@ export default function WasteSettings() {
         <Stack spacing={2} direction="row">
             <Button variant="contained" onClick={addNew}>New</Button>
             <Button variant="contained" onClick={removeUnused}>Remove Unused</Button>
+            <Button variant="contained" type="submit" onClick={onCombine}>Combine</Button>
         </Stack>
 
         <Container>
@@ -125,7 +149,7 @@ export default function WasteSettings() {
                     <Button>Edit</Button>
                     </Link>
                 </TableCell>
-                <TableCell><Checkbox name={'cb'+i} value={obj.ID}/></TableCell>
+                <TableCell><Checkbox name={'cb'+i} value={obj.ID} checked={combined[i]} onChange={() => {onCombineChange(i) }}/></TableCell>
                 <TableCell>{data.Counts[i]}</TableCell>
                 <TableCell>{obj.Name}</TableCell>
                 <TableCell>{obj.UnitString}</TableCell>

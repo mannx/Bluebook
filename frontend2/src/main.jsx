@@ -60,6 +60,7 @@ import WasteInput,{
 import WasteSettings, {
     WasteSettingsEdit,
     loader as wasteSettingsLoader,
+    action as wasteSettingsAction,
     EditLoader as wasteSettingsEditLoader,
     EditAction as wasteSettingsEditAction,
     // CombineAction as wasteSettingsAction,
@@ -167,6 +168,7 @@ const router = createBrowserRouter([
                 path: "/waste/settings",
                 element: <WasteSettings />,
                 loader: wasteSettingsLoader,
+                action: wasteSettingsAction,
             },
             {
                 path: "/waste/settings/:id",

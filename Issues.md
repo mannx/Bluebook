@@ -4,4 +4,7 @@
     - fields don't update when new date is selected
 
 * waste settings displayed
-    - edit/combine/delete not yet implemented
+    - combine not yet implemented
+        + getting checked items to list issues
+        + if using state with an arry, doesn't seem to update ui after check
+        + better way to do?

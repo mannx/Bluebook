@@ -185,7 +185,7 @@ export default function WasteInput() {
                 <Button onClick={handleConfirmClose}>Disagree</Button>
                 <Button onClick={() => {
                     confirmBtn();
-                    navigate("/waste");
+                    navigate("/wastage");
                 }}>Confirm</Button>
             </DialogActions>
         </Dialog>

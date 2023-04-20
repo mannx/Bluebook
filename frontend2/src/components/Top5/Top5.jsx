@@ -1,9 +1,12 @@
 import * as React from "react";
 import {Outlet, Link, useLoaderData} from "react-router-dom";
+import {NumericFormat} from "react-number-format";
 
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Stack from '@mui/material/Stack';
+
+import Typography from '@mui/material/Typography';
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -15,7 +18,6 @@ import Paper from '@mui/material/Paper';
 
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
-// import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 
 import {
@@ -24,9 +26,7 @@ import {
     UrlApiTop5Data,
 } from "../URLs";
 
-// import UrlApiTop5Data from "../URLs";
-
-const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const monthNames = ['Any', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 export async function loader() {
     const url = UrlGet(UrlApiTop5);
@@ -44,8 +44,6 @@ export default function Top5() {
 
     const updateMonth = (e) => { setMonth(e.target.value); }
     const updateYear = (e) => {setYear(e.target.value); }
-
-    const loadData = () => {};
 
     return (<>
         <Container component={Paper}>
@@ -69,7 +67,7 @@ export default function Top5() {
         })}
         </Select>
 
-        <Link to={`/top5/${month+1}/${year}`}>
+        <Link to={`/top5/${month}/${year}`}>
         <Button variant="contained" >View</Button>
         </Link>
         </Stack>
@@ -82,7 +80,6 @@ export default function Top5() {
 
 // top5Data loader /:month/:year  if either is unused, is 0
 export async function dataLoader({params}) {
-    // const p = "?month=${params.month}&year=${params.year}&limit=5";
     const p = "?month=" + params.month + "&year=" + params.year + "&limit=5";
     const url = UrlGet(UrlApiTop5Data) + p;
     const resp = await fetch(url);
@@ -96,16 +93,46 @@ export async function dataLoader({params}) {
 
 export function Top5Data() {
     const data = useLoaderData();
-    console.log(data);
 
-    // return (
-    //     <TableContainer sx={{width: 1/2}} >
-    //     <Table>
-    //     </Table>
-    //     </TableContainer>
-    // );
+    const NF = (obj) => {
+        return <NumericFormat
+            value={obj}
+            displayType={"text"}
+            prefix={"$"}
+            decimalScale={2}
+            fixedDecimalScale={true}
+        / >;
+    }
 
     return data.Data.map( (n) => {
-        return <span>{n.Title}</span>;
+        return (<>
+            <Typography sx={{flex: '1 1 100%' }}
+            component='div' variant='h6'>{n.Title}</Typography>
+
+            <TableContainer sx={{width: 1/8}} >
+            <Table size="small">
+
+            <TableHead>
+                <TableRow>
+                    <TableCell>Date</TableCell>
+                    <TableCell>$</TableCell>
+                </TableRow>
+            </TableHead>
+
+            <TableBody>
+            {n.Data.map( (obj) => {
+                const f = n.Field;
+                const val = obj[f];
+
+                return (<TableRow>
+                    <TableCell>{obj.DateString}</TableCell>
+                    <TableCell>{NF(val)}</TableCell>
+                    </TableRow>);
+            })}
+            </TableBody>
+
+            </Table>
+            </TableContainer>
+            </>);
     });
 }
