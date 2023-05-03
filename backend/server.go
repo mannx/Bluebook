@@ -18,7 +18,11 @@ func initServer() *echo.Echo {
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
 	}))
 
-	e.Use(middleware.Static("./static"))
+	// e.Use(middleware.Static("./static"))
+	e.Use(middleware.StaticWithConfig(middleware.StaticConfig{
+		Root:  "./static",
+		HTML5: true, // redirects all not found requests to the root to let the frontend handle routing
+	}))
 
 	// routes
 	e.GET("/api/month", func(c echo.Context) error { return api.GetMonthViewHandler(c, DB) })
