@@ -65,6 +65,34 @@ func InitTop5() {
 	top5Table = obj.Data
 }
 
+func GetTop5Data(c echo.Context, db *gorm.DB) error {
+
+	var first, last models.DayData
+
+	res := db.Select("Date").Order("Date").Take(&first)
+	if res.Error != nil {
+		return LogAndReturnError(c, "Unable to retrieve date list (1)", res.Error)
+	}
+
+	res = db.Order("Date desc").Select("Date").Take(&last)
+	if res.Error != nil {
+		return LogAndReturnError(c, "Unable to retrieve date list (2)", res.Error)
+	}
+
+	// assume we have continous data between all years
+	numYear := (time.Time(last.Date).Year() - time.Time(first.Date).Year())
+	var years []int
+
+	for i := 0; i <= numYear; i++ {
+		years = append(years, time.Time(first.Date).Year()+i)
+	}
+
+	// make sure years is sorted current to earliest
+	sort.Sort(sort.Reverse(sort.IntSlice(years)))
+
+	return c.JSON(http.StatusOK, years)
+}
+
 // GetTop5ViewHandler expects params of none (top all time, year=YYYY for top of year, year=YYYY&month=MM for best of month
 func GetTop5ViewHandler(c echo.Context, db *gorm.DB) error {
 	var month, year, limit int

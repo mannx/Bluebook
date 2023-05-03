@@ -39,6 +39,7 @@ require (
 
 replace (
 	github.com/mannx/Bluebook/api => ../api
+	github.com/mannx/Bluebook/api2 => ../api2
 	github.com/mannx/Bluebook/environ => ../environ
 	github.com/mannx/Bluebook/import => ../import
 	github.com/mannx/Bluebook/models => ../models
