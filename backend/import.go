@@ -63,21 +63,21 @@ func importPostHandler(c echo.Context, handler func(string, *gorm.DB) error) err
 
 // returns a list of all files in the BB_IMPORT_?? enviromnet variable that are
 // available for import
-func importDailyHandler(c echo.Context) error {
-	return importFileHandler(c, "*.xlsx")
-}
+// func importDailyHandler(c echo.Context) error {
+// 	return importFileHandler(c, "*.xlsx")
+// }
 
 func importPostDaily(c echo.Context) error {
 	return importPostHandler(c, daily.ImportDaily)
 }
 
-func importControlHandler(c echo.Context) error {
-	return importFileHandler(c, "ControlSheetReport_*.pdf")
-}
+// func importControlHandler(c echo.Context) error {
+// 	return importFileHandler(c, "ControlSheetReport_*.pdf")
+// }
 
-func importWISRHandler(c echo.Context) error {
-	return importFileHandler(c, "WISRReport_*.pdf")
-}
+// func importWISRHandler(c echo.Context) error {
+// 	return importFileHandler(c, "WISRReport_*.pdf")
+// }
 
 func importPostControl(c echo.Context) error {
 	return importPostHandler(c, daily.ImportControl)
@@ -87,10 +87,10 @@ func importPostWISR(c echo.Context) error {
 	return importPostHandler(c, daily.ImportWISR)
 }
 
-func importWasteHandler(c echo.Context) error {
-	return importFileHandler(c, "*.xlsx")
-}
+// func importWasteHandler(c echo.Context) error {
+// 	return importFileHandler(c, "*.xlsx")
+// }
 
-func importPostWaste(c echo.Context) error {
-	return importPostHandler(c, daily.ImportWaste)
-}
+// func importPostWaste(c echo.Context) error {
+// 	return importPostHandler(c, daily.ImportWaste)
+// }

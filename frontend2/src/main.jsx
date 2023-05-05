@@ -63,9 +63,6 @@ import WasteSettings, {
     action as wasteSettingsAction,
     EditLoader as wasteSettingsEditLoader,
     EditAction as wasteSettingsEditAction,
-    // CombineAction as wasteSettingsAction,
-    // CombineLoader as wasteSettingsLoader,
-    // WasteSettingsCombine,
 } from "./components/Waste/Settings";
 
 import Top5, {
@@ -176,10 +173,6 @@ const router = createBrowserRouter([
                 loader: wasteSettingsEditLoader,
                 action: wasteSettingsEditAction,
             },
-            // {
-            //     path: "/waste/settings/combine",
-            //     action: wasteSettingsAction,
-            // },
             {
                 path: "/top5",
                 element: <Top5 />,

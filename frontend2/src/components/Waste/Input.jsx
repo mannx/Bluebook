@@ -104,13 +104,6 @@ export default function WasteInput() {
         handleConfirmClose();
     }
 
-    // const onSubmit = (e) => {
-    //     const form = document.getElementById("waste-form");
-    //     console.log(form);
-    //     submit(form, {method: "post", action: "waste/input"});
-    //     document.getElementById("waste-form").reset();
-    // }
-
     return (<>
         <Container>
         <h3>Waste Input</h3>
@@ -191,85 +184,4 @@ export default function WasteInput() {
         </Dialog>
         </>
     );
-
-    // return (
-    //     <>
-    //     <Container>
-    //     <h3>Waste Input</h3>
-    //     <Button variant="contained" onClick={handleConfirmOpen}>Submit</Button>
-    //     </Container>
-
-    //     <Form method="post" id="waste-form">
-    //     <table>
-    //     <thead>
-    //     <tr>
-    //         <th>Date</th>
-    //         <th>Item</th>
-    //         <th>Quantity</th>
-    //         <th>Reason</th>
-    //         <th></th>
-    //     </tr>
-    //     </thead>
-
-    //     <tbody>
-    //     {data.Holding !== null && data.Holding.map( (obj) => {
-    //         return (<tr>
-    //             <td>{obj.Month}/{obj.Day}/{obj.Year}</td>
-    //             <td>{obj.Name}</td>
-    //             <td>{obj.Quantity}</td>
-    //             <td>{obj.Reason}</td>
-    //             <td><Button onClick={ () => {
-    //                 deleteItem(obj.ID);
-    //                 navigate("/waste/input");
-    //             }}>Delete</Button></td>
-    //             </tr>
-    //         );
-    //     })}
-
-    //     <tr>
-    //     <td><DatePicker selected={wasteDate} tabIndex={-1} 
-    //         onChange={ (e) => {
-    //             setWasteDate(e);
-    //         }} />
-    //         {wasteDate !== null &&
-    //             <input type="hidden" name="Date" value={wasteDate.toISOString()} /> }
-    //         </td>
-
-    //         <td>
-    //         <input autoFocus list="types" name="Name"/>
-    //         <datalist id="types">
-    //             {names.map( (o) => { return <option value={o} />;} )}
-    //         </datalist>
-    //         </td>
-
-    //         <td>
-    //         <input type="text" name="Quantity" />
-    //         </td>
-
-    //         <td><input type="text" name="Reason" tabIndex={-1} /></td>
-    //         <td><Button type="submit" onClick={onSubmit}>Add</Button></td>
-    //     </tr>
-    //     </tbody>
-    //     </table>
-    //     </Form>
-
-    //     <Dialog open={confirm} onClose={handleConfirmClose}>
-    //         <DialogTitle>Confirm wastage entries?</DialogTitle>
-
-    //         <DialogContent>
-    //             <DialogContentText>
-    //             Confirm merge of wastage entries from holding table?
-    //             </DialogContentText>
-    //         </DialogContent>
-
-    //         <DialogActions>
-    //             <Button onClick={handleConfirmClose}>Disagree</Button>
-    //             <Button onClick={() => {
-    //                 confirmBtn();
-    //                 navigate("/waste");
-    //             }}>Confirm</Button>
-    //         </DialogActions>
-    //     </Dialog>
-    //     </>
-    // );
 }

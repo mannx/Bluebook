@@ -92,42 +92,6 @@ func UpdateWasteSettingHandler(c echo.Context, db *gorm.DB) error {
 	return ReturnServerMessage(c, "Success", false)
 }
 
-// UpdateWasteSettingHandler handles waste setting updates. Only items that have changed are POST'd in
-//func _UpdateWasteSettingHandler(c echo.Context, db *gorm.DB) error {
-//	data := make([]models.WastageItem, 0)
-
-//	if err := c.Bind(&data); err != nil {
-//		return LogAndReturnError(c, "Failed to bind data for UpdateWasteSettign", err)
-//	}
-
-//	// process changes
-//	for _, n := range data {
-//		// get the item from the db
-//		//	can use the passed item as it should be a direct copy
-//		//	from the db, but do this to prevent any issues from appearing
-//		var obj models.WastageItem
-
-//		res := db.First(&obj, n.ID)
-//		if res.Error != nil {
-//			log.Error().Err(res.Error).Msgf("Unable to retrieve item [ID: %v] [Name: %v]", n.ID, n.Name)
-//			continue
-//		} else if res.RowsAffected == 0 {
-//			log.Warn().Msgf("Unable to find any objects id: %v", n.ID)
-//			continue
-//		}
-
-//		obj.UnitMeasure = n.UnitMeasure
-//		obj.Location = n.Location
-//		obj.CustomConversion = n.CustomConversion
-//		obj.UnitWeight = n.UnitWeight
-
-//		// save the obj
-//		db.Save(&obj)
-//	}
-
-//	return ReturnServerMessage(c, "Successfully updated", false)
-//}
-
 // return a combined waste report for week ending
 //		/api/../?month=MONTH&year=YEAR&day=DAY
 //		where month and year are 2 and 4 digits each
@@ -280,29 +244,6 @@ func AddNewWasteItemHandler(c echo.Context, db *gorm.DB) error {
 	})
 }
 
-// func AddNewWasteItemHandler(c echo.Context, db *gorm.DB) error {
-// 	type itemInfo struct {
-// 		Name     string `json:"name"`
-// 		Unit     int    `json:"unit"`
-// 		Location int    `json:"location"`
-// 	}
-
-// 	var info itemInfo
-// 	if err := c.Bind(&info); err != nil {
-// 		return LogAndReturnError(c, "Unable to bind parameters", err)
-// 	}
-
-// 	wi := models.WastageItem{
-// 		Name:        info.Name,
-// 		UnitMeasure: info.Unit,
-// 		Location:    info.Location,
-// 	}
-
-// 	db.Save(&wi)
-
-// 	return ReturnServerMessage(c, "Item Addedd Successfully", false)
-// }
-
 func CombineWasteHandler(c echo.Context, db *gorm.DB) error {
 	type combineData struct {
 		Items  []uint // list of id's to combine to
@@ -422,9 +363,6 @@ func AddWasteHoldingHandler(c echo.Context, db *gorm.DB) error {
 		return LogAndReturnError(c, "Unable to bind paramters", err)
 	}
 
-	// date, err := time.Parse(time.RFC3339, data.Date)
-	// s1 := strings.Split(data.Date, "T")
-	// date, err := time.Parse("2006-01-02", s1[0])
 	date, err := time.Parse("01-02-2006", data.Date)
 	if err != nil {
 		return LogAndReturnError(c, fmt.Sprintf("Unable to parse input time [%v]", data.Date), err)

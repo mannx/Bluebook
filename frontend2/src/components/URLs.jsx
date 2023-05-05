@@ -1,6 +1,5 @@
 
 // development, set to http://localhost:8080, for production, leave empty
-// const production = true;
 const production = false;
 const baseURL = "http://localhost:8080";
 

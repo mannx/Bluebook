@@ -18,12 +18,6 @@ import (
 	models "github.com/mannx/Bluebook/models"
 )
 
-// // Version of the current build/release
-// var (
-// 	BuildVersion string = ""
-// 	BuildTime    string = ""
-// )
-
 // DB is the database connection for the entire run
 var DB *gorm.DB
 
