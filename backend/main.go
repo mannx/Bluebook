@@ -99,7 +99,6 @@ func migrateDB() {
 	DB.AutoMigrate(&models.WastageEntry{})
 	DB.AutoMigrate(&models.WastageEntryHolding{})
 
-	// DB.AutoMigrate(&models.AUVEntry{})
 	DB.AutoMigrate(&models.AUVEntry2{})
 
 	DB.AutoMigrate(&models.TagList{})
