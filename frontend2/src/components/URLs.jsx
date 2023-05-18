@@ -45,6 +45,10 @@ export const UrlApiGetTagId = "/api/tags/data";
 export const UrlApiTop5 = "/api/top5";
 export const UrlApiTop5Data = "/api/top5/data";
 
+export const UrlApiGetBackupTable = "/api/backup/get";
+export const UrlApiDailyUndo = "/api/backup/undo";          // undo 
+export const UrlApiDailyRevert = "/api/backup/revert";          // retrieve the daily data undo list
+
 export function UrlGet(name) {
 	var base = "";
 	if(production === false) {

@@ -71,6 +71,11 @@ import Top5, {
     dataLoader as top5DataLoader,
 } from "./components/Top5/Top5";
 
+import Settings, {
+    loader as settingsLoader,
+    action as settingsAction,
+} from "./components/Settings/Settings";
+
 import './index.css'
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
@@ -184,6 +189,12 @@ const router = createBrowserRouter([
                         loader: top5DataLoader,
                     },
                 ],
+            },
+            {
+                path: "/settings",
+                element: <Settings />,
+                loader: settingsLoader,
+                action: settingsAction,
             },
         ],
     },

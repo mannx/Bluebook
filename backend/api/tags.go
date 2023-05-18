@@ -42,6 +42,7 @@ func getTagDataWithCount(db *gorm.DB) ([]tagData, error) {
 			TagList:  i,
 			TagCount: len(data),
 		})
+
 	}
 
 	return td, nil
@@ -92,7 +93,21 @@ func TagDataViewHandler(c echo.Context, db *gorm.DB) error {
 			continue // skip if bad
 		}
 
+		//	DEBUG INFO
+		//		if we have a tag for a day that no longer exists, it will be logged here
+		//		currently this requires manual clean up of the db.
+		//		ideally the data should be linked and deleted the day should delete the tag data also
+		if err.RowsAffected == 0 {
+			log.Debug().Msgf("  DayID (%v) for tag (%v) not found in day_data", i.DayID, i.ID)
+		}
+
 		tstr, tids := GetTags(d.ID, db)
+
+		log.Debug().Msgf("[TAG] Day Id: %v", d.ID)
+		if d.ID == 0 {
+			log.Debug().Msgf("  => d.ID == 0")
+			log.Debug().Msgf("  => i.DayID = %v", i.DayID)
+		}
 
 		tl := TagList{
 			Day:    d,
