@@ -295,6 +295,11 @@ func calculateWeeklyAverage(date time.Time, numWeeks int, db *gorm.DB) float64 {
 			continue
 		}
 
+		// ignore days with 0 sales or days not found
+		if res.RowsAffected == 0 || obj.NetSales == 0 {
+			numWeeks -= 1
+		}
+
 		total = total + obj.NetSales
 	}
 
