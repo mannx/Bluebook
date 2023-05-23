@@ -53,12 +53,19 @@ function navHeader2() {
             Url: "/import",
         },
         {
-            Title: "Waste Settings",
-            Url: "/waste/settings",
-        },
-        {
             Title: "Waste Input",
             Url: "/waste/input",
+        },
+    ];
+
+    const settingsMenu = [
+        {
+            Title: "DB Settings",
+            Url: "/settings",
+        },
+        {
+            Title: "Waste Settings",
+            Url: "/waste/settings",
         },
     ];
 
@@ -72,10 +79,6 @@ function navHeader2() {
 
     const handleCloseUserMenu = () => {
         setAnchorE1user(null);
-    }
-
-    const goDbSettings = () => {
-        navigate("/settings");
     }
 
     return (
@@ -98,10 +101,12 @@ function navHeader2() {
                 </IconButton>
             </Tooltip>
 
-            <Menu sx={{mt:'45px'}} id='menu-appbar' anchorE1={anchorE1user} anchorOrigin={{vertical: 'top', horizontal: 'right',}} keepMounted transformOrigin={{vertical: 'top', horizontal: 'right',}} open={Boolean(anchorE1user)} onClose={handleCloseUserMenu}>
-                <MenuItem key={0} onClick={goDbSettings}>
-                    <Typography textAlign="center">DB Settings</Typography>
-                </MenuItem>
+            <Menu sx={{mt:'45px'}} id='menu-appbar' anchorEl={anchorE1user} anchorOrigin={{vertical: 'top', horizontal: 'right',}} keepMounted transformOrigin={{vertical: 'top', horizontal: 'right',}} open={Boolean(anchorE1user)} onClose={handleCloseUserMenu}>
+                {settingsMenu.map( (item, i) => {
+                    return <MenuItem key={i} onClick={()=>{navigate(item.Url)}}>
+                        <Typography textAlign="center">{item.Title}</Typography>
+                        </MenuItem>
+                })}
             </Menu>
         </Box>
 
