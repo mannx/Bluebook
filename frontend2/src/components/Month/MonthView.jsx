@@ -178,7 +178,7 @@ function hashDate(data) {
 }
 function EOW(data) {
 	return (
-		<tr className="blank">
+		<tr key={"eow-"+data.ID} className="blank">
 			<td className="spacer"></td>
 			<td className="spacer"></td>
 			<td className="spacer"></td>

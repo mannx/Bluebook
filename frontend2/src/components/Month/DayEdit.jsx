@@ -43,8 +43,6 @@ export async function loader({params}) {
 }
 
 export async function action({request, params}) {
-    // const navigate = useNavigate();
-
     const formData = await request.formData();  // get the data from the form
     const updates = Object.fromEntries(formData);   // pull everything into an object (otherwise use formData.get(...))
     const id = parseInt(params.id);
@@ -61,7 +59,6 @@ export async function action({request, params}) {
     await fetch(UrlGet(UrlApi2DayUpdate), opt)
     
     return redirect("/today");
-    // return redirect(-1);
 }
 
 // this page is used to edit DayData information including comments and tags
@@ -69,8 +66,6 @@ export async function action({request, params}) {
 export default function DayEdit() {
     const {data} = useLoaderData();
     const navigate = useNavigate();
-
-    console.log(data);
 
     return (
         <>
