@@ -3,7 +3,9 @@
 import * as React from "react";
 import {Form, useLoaderData, useNavigate, redirect } from "react-router-dom";
 
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+// import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
@@ -63,6 +65,9 @@ export async function action({request}) {
     // add the item to the holding db
     const formData = await request.formData();
     const updates = Object.fromEntries(formData);
+
+    console.log("adding new item...");
+    console.log(updates);
 
     const opt = GetPostOptions(JSON.stringify(updates));
     await fetch(UrlGet(UrlApiWasteHoldingAdd), opt);
@@ -140,14 +145,10 @@ export default function WasteInput() {
 
         <TableRow>
             <TableCell>
-                <DatePicker value={wasteDate} onChange={(e) => setWasteDate(e) }/>
-                {wasteDate !== null &&
-                    <input type="hidden" name="Date" value={wasteDate.format("MM-DD-YYYY")} /> 
-                }
+                <DatePicker selected={wasteDate} name="Date" tabIndex={-1} onChange={ (e)=> setWasteDate(e) } />
             </TableCell>
             <TableCell>
-        <Autocomplete autoSelect autoHighlight id="freeSolo" options={names.map( (n) => n) }
-        renderInput={(params) => <TextField autoFocus {...params} label="Name" name="Name"/>} />
+                {ItemField(names)}
             </TableCell>
             <TableCell>
         <TextField label="Quantity" type="number" variant="standard" name="Quantity" inputProps={{ step: 'any', inputMode: 'numeric', pattern: '[0-9](\.[0-9]*)?' }}/>
@@ -182,6 +183,18 @@ export default function WasteInput() {
                 }}>Confirm</Button>
             </DialogActions>
         </Dialog>
+        </>
+    );
+}
+
+function ItemField(props) {
+    return (<>
+        <input autoFocus list="types" name="Name"/>
+        <datalist id="types">
+            {props.map( (n) => {
+                return <option value={n}/>;
+            })}
+        </datalist>
         </>
     );
 }
