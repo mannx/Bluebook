@@ -1,3 +1,8 @@
+/*
+    *
+    *
+    * Old version of the waste input that was used before frontend redo.  Not used, but want to keep just in case revert
+    */
 import React from "react";
 import {UrlGet, GetPostOptions} from "../URLs/URLs.jsx";
 import DatePicker from "react-datepicker";
