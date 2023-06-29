@@ -3,9 +3,7 @@
 import * as React from "react";
 import {Form, useLoaderData, useNavigate, redirect } from "react-router-dom";
 
-// import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
@@ -66,9 +64,6 @@ export async function action({request}) {
     const formData = await request.formData();
     const updates = Object.fromEntries(formData);
 
-    console.log("adding new item...");
-    console.log(updates);
-
     const opt = GetPostOptions(JSON.stringify(updates));
     await fetch(UrlGet(UrlApiWasteHoldingAdd), opt);
 
@@ -78,7 +73,6 @@ export async function action({request}) {
 export default function WasteInput() {
     const [wasteDate, setWasteDate] = React.useState(null);
     const [confirm, setConfirm] = React.useState(false);
-    // const submit = useSubmit();
 
     const navigate = useNavigate();
     const data = useLoaderData();
@@ -145,10 +139,14 @@ export default function WasteInput() {
 
         <TableRow>
             <TableCell>
-                <DatePicker selected={wasteDate} name="Date" tabIndex={-1} onChange={ (e)=> setWasteDate(e) } />
+                <DatePicker value={wasteDate} onChange={(e) => setWasteDate(e) }/>
+                {wasteDate !== null &&
+                    <input type="hidden" name="Date" value={wasteDate.format("MM-DD-YYYY")} /> 
+                }
             </TableCell>
             <TableCell>
-                {ItemField(names)}
+        <Autocomplete autoSelect autoHighlight id="freeSolo" options={names.map( (n) => n) }
+        renderInput={(params) => <TextField autoFocus {...params} label="Name" name="Name"/>} />
             </TableCell>
             <TableCell>
         <TextField label="Quantity" type="number" variant="standard" name="Quantity" inputProps={{ step: 'any', inputMode: 'numeric', pattern: '[0-9](\.[0-9]*)?' }}/>
@@ -183,18 +181,6 @@ export default function WasteInput() {
                 }}>Confirm</Button>
             </DialogActions>
         </Dialog>
-        </>
-    );
-}
-
-function ItemField(props) {
-    return (<>
-        <input autoFocus list="types" name="Name"/>
-        <datalist id="types">
-            {props.map( (n) => {
-                return <option value={n}/>;
-            })}
-        </datalist>
         </>
     );
 }
