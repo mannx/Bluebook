@@ -155,6 +155,11 @@ func splitTags(tags string) []string {
 }
 
 func processTags(id uint, tags string, db *gorm.DB) error {
+	if len(tags) == 0 {
+		// empty tag, ignore
+		return nil
+	}
+
 	// delete any tags currently linked to this day
 	//	? required? better way to prevent adding it twice?
 	db.Delete(&models.TagData{}, "DayID = ?", id)

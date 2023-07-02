@@ -64,16 +64,16 @@ type DayData struct {
 // DayDataBackup is used to hold a copy of DayData when an import updates an entry
 //
 //	ID will be the same for this item and the other items
-type DayDataBackup struct {
-	gorm.Model
-	DayData
-}
+// type DayDataBackup struct {
+// 	gorm.Model
+// 	DayData
+// }
 
-type DayDataImportList struct {
-	gorm.Model
+// type DayDataImportList struct {
+// 	gorm.Model
 
-	EntryID uint // id of the entry that was added (can use this table to remove from db easily)
-}
+// 	EntryID uint // id of the entry that was added (can use this table to remove from db easily)
+// }
 
 // Sets the user friendly version of the date string
 func (d *DayData) GetDate() string {

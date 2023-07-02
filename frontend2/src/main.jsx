@@ -63,9 +63,6 @@ import WasteSettings, {
     action as wasteSettingsAction,
     EditLoader as wasteSettingsEditLoader,
     EditAction as wasteSettingsEditAction,
-    // CombineAction as wasteSettingsAction,
-    // CombineLoader as wasteSettingsLoader,
-    // WasteSettingsCombine,
 } from "./components/Waste/Settings";
 
 import Top5, {
@@ -73,6 +70,11 @@ import Top5, {
     loader as top5Loader,
     dataLoader as top5DataLoader,
 } from "./components/Top5/Top5";
+
+import Settings, {
+    loader as settingsLoader,
+    action as settingsAction,
+} from "./components/Settings/Settings";
 
 import './index.css'
 import '@fontsource/roboto/300.css';
@@ -176,10 +178,6 @@ const router = createBrowserRouter([
                 loader: wasteSettingsEditLoader,
                 action: wasteSettingsEditAction,
             },
-            // {
-            //     path: "/waste/settings/combine",
-            //     action: wasteSettingsAction,
-            // },
             {
                 path: "/top5",
                 element: <Top5 />,
@@ -191,6 +189,12 @@ const router = createBrowserRouter([
                         loader: top5DataLoader,
                     },
                 ],
+            },
+            {
+                path: "/settings",
+                element: <Settings />,
+                loader: settingsLoader,
+                action: settingsAction,
             },
         ],
     },

@@ -51,11 +51,11 @@ func getDataOrNew(date time.Time, db *gorm.DB) (models.DayData, bool) {
 	}
 
 	// non empty entry, create a backup if not present already
-	backup := models.DayDataBackup{}
+	// backup := models.DayDataBackup{}
 
-	// create a copy of the data and save it
-	backup.DayData = n
-	db.Save(&backup)
+	// // create a copy of the data and save it
+	// backup.DayData = n
+	// db.Save(&backup)
 
 	return n, false
 }

@@ -3,22 +3,12 @@ ul.navControl {
 	margin: 0;
 	padding: 0;
 	overflow: hidden;
-	/* background-color: limegreen; */
 	background-color: dodgerblue;
 }
 
 li.navControl {
 	float: left;
 }
-
-/* li.navControl a.navLink { */
-/* 	display: block; */
-/* 	color: white; */
-/* 	text-align: center; */
-/* 	padding: 14px 16px; */
-/* 	text-decoration: none; */
-/* } */
-
 
 li.navControl a{
 	display: block;
@@ -35,11 +25,6 @@ a.active {
 li.navExtra {
 	float: right;
 }
-
-/* li.navControl a.navLink:hover { */
-/* 	/1* background-color: lime; *1/ */
-/* 	background-color: deepskyblue; */
-/* } */
 
 li.navControl a:hover {
     background-color: deepskyblue;

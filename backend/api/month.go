@@ -152,6 +152,8 @@ func GetMonthViewHandler(c echo.Context, db *gorm.DB) error {
 			// reset day count and holding data
 			dayCount = 0
 			dayList = make([]models.DayData, 0)
+
+			log.Debug().Msgf("Week Ending found: [%v]", d)
 		} else {
 			// increment day count and store the current day value
 			dayCount += 1
@@ -202,6 +204,7 @@ func GetMonthViewHandler(c echo.Context, db *gorm.DB) error {
 
 	// if dayCount == 0, we had a perfect week
 	if dayCount < 7 && dayCount != 0 {
+
 		// from the first entry in dayList add 6 days to get the normal end of the week
 		// if the end of the week is after the end of the month (ie. week ends in next month), we are done
 		// ( we don't calculate partial weeks that end in the following month)
@@ -293,6 +296,11 @@ func calculateWeeklyAverage(date time.Time, numWeeks int, db *gorm.DB) float64 {
 		if res.Error != nil {
 			log.Error().Err(res.Error).Msgf("Unable to retrieve data for: %v", time.Time(d).String())
 			continue
+		}
+
+		// ignore days with 0 sales or days not found
+		if res.RowsAffected == 0 || obj.NetSales == 0 {
+			numWeeks -= 1
 		}
 
 		total = total + obj.NetSales

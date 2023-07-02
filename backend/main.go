@@ -18,12 +18,6 @@ import (
 	models "github.com/mannx/Bluebook/models"
 )
 
-// // Version of the current build/release
-// var (
-// 	BuildVersion string = ""
-// 	BuildTime    string = ""
-// )
-
 // DB is the database connection for the entire run
 var DB *gorm.DB
 
@@ -45,11 +39,11 @@ func main() {
 
 	dbName = filepath.Join(env.Environment.DataPath, "db.db")
 
-	log.Info().Msg("Initializing database backup list...")
-	err := api.InitializeDBListing()
-	if err != nil {
-		log.Error().Err(err).Msgf("Unable to generate listing of backed up database files...")
-	}
+	// log.Info().Msg("Initializing database backup list...")
+	// err := api.InitializeDBListing()
+	// if err != nil {
+	// 	log.Error().Err(err).Msgf("Unable to generate listing of backed up database files...")
+	// }
 
 	log.Info().Msg("Initializing database...")
 	dbo, err := gorm.Open(sqlite.Open(dbName), &gorm.Config{})
@@ -61,12 +55,6 @@ func main() {
 
 	log.Info().Msg("Auto migrating the database...")
 	migrateDB()
-
-	log.Info().Msg("Updating database backup list...")
-	err = UpdateBackupTable(DB)
-	if err != nil {
-		log.Error().Err(err).Msg("Unable to manage database backup...")
-	}
 
 	// check for any duplicate day entries
 	err = checkDuplicateEntries()
@@ -97,15 +85,14 @@ func main() {
 
 func migrateDB() {
 	DB.AutoMigrate(&models.DayData{})
-	DB.AutoMigrate(&models.DayDataBackup{})
-	DB.AutoMigrate(&models.DayDataImportList{})
+	// DB.AutoMigrate(&models.DayDataBackup{})
+	// DB.AutoMigrate(&models.DayDataImportList{})
 
 	DB.AutoMigrate(&models.WeeklyInfo{})
 	DB.AutoMigrate(&models.WastageItem{})
 	DB.AutoMigrate(&models.WastageEntry{})
 	DB.AutoMigrate(&models.WastageEntryHolding{})
 
-	// DB.AutoMigrate(&models.AUVEntry{})
 	DB.AutoMigrate(&models.AUVEntry2{})
 
 	DB.AutoMigrate(&models.TagList{})

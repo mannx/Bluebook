@@ -1,6 +1,6 @@
 // Settings.jsx is used to configure wastage entries in the database
 import * as React from "react";
-import {Form, Link, Outlet, useSubmit, useLoaderData, useNavigate, redirect} from "react-router-dom";
+import {Form, Link, useLoaderData, useNavigate, redirect} from "react-router-dom";
 
 import TextField from '@mui/material/TextField';
 
@@ -63,7 +63,6 @@ function genState(len) {
 export default function WasteSettings() {
     const {data} = useLoaderData();
     const navigate = useNavigate();
-    // const submit = useSubmit();
 
     const [serverMessage, setServerMessage] = React.useState(null);
     const [combined, setCombined] = React.useState(genState(data.Data.length));
@@ -287,14 +286,3 @@ export function WasteSettingsEdit() {
         </>
     );
 }
-
-// export async function CombineAction({request}) {
-//     const formData = await request.formData();
-//     const updates = Object.fromEntries(formData);
-
-//     const keys = Object.keys(updates);
-//     const ids = keys.map( (i) => parseInt(updates[i]));
-//     console.log(ids);
-
-//     return redirect('/waste/settings/');
-// }

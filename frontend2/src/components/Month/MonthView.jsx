@@ -157,7 +157,7 @@ function Row(data) {
         <td className="Month no-print">{P(data.ThirdPartyPercent)}</td>
         <td className="blank"></td>
         <td className="Month">{data.Comment}</td>
-        <td className="Month no-print">{Tag(data.Tags)}</td>
+        <td className="Month no-print">{Tag(data.Tags, data.TagID)}</td>
         <td className="Month no-print">
         {data.ID !== 0 ?
             <Link to={"/edit/" + data.ID}>E</Link>
@@ -178,7 +178,7 @@ function hashDate(data) {
 }
 function EOW(data) {
 	return (
-		<tr className="blank">
+		<tr key={"eow-"+data.ID} className="blank">
 			<td className="spacer"></td>
 			<td className="spacer"></td>
 			<td className="spacer"></td>
@@ -209,12 +209,12 @@ function EOW(data) {
 
 // Tag builds the user friendly display of all tags on this day
 // returns as a string
-function Tag(data) {
+function Tag(data, ids) {
     
     if(data !== null) {
         return (<>
-            {data.map( (o) => {
-                return <Link to={"/tags/" + o}>#{o}</Link>;
+            {data.map( (o, i) => {
+                return <Link to={"/tags/" + ids[i]}>#{o}</Link>;
             })}
             </>
         );

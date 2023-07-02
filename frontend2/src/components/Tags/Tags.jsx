@@ -65,6 +65,7 @@ export function TagID() {
         <Table size="small" sx={{width: 1/2}}>
         <TableHead>
         <TableRow>
+            <TableCell>ID</TableCell>
             <TableCell>Date</TableCell>
             <TableCell>Net Sales</TableCell>
             <TableCell>Comments</TableCell>
@@ -74,6 +75,7 @@ export function TagID() {
         <TableBody>
         {data !== null && data.map( (obj, i) => {
             return (<TableRow key={i}>
+                <TableCell>{obj.Day.ID}</TableCell>
                 <TableCell>{dayLink(obj.Date)}</TableCell>
                 <TableCell>{obj.Day.NetSales}</TableCell>
                 <TableCell>{obj.Day.Comment}</TableCell>
@@ -91,6 +93,8 @@ export function TagID() {
 
 // generate a user friendly linkable list of tags for a given day
 function tagList(obj) {
+    if(!obj.Tags) return null;
+
     const out = obj.Tags.map( (o, i) => {
         return (
             <Link to={"/tags/"+obj.TagIDs[i]}>#{o}</Link>

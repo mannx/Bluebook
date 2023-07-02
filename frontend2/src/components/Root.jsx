@@ -1,10 +1,17 @@
-import {Outlet, NavLink} from "react-router-dom";
+import * as React from 'react';
+import {Outlet, NavLink, useNavigate} from "react-router-dom";
 import "./header.css";
 
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Button from '@mui/material/Button';
+import SettingsIcon from '@mui/icons-material/Settings';
+import Tooltip from '@mui/material/Tooltip';
+import IconButton from '@mui/material/IconButton';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import Typography from '@mui/material/Typography';
 
 export default function Root() {
     return (
@@ -46,14 +53,33 @@ function navHeader2() {
             Url: "/import",
         },
         {
-            Title: "Waste Settings",
-            Url: "/waste/settings",
-        },
-        {
             Title: "Waste Input",
             Url: "/waste/input",
         },
     ];
+
+    const settingsMenu = [
+        {
+            Title: "DB Settings",
+            Url: "/settings",
+        },
+        {
+            Title: "Waste Settings",
+            Url: "/waste/settings",
+        },
+    ];
+
+    const [anchorE1user, setAnchorE1user] = React.useState(null);
+
+    const navigate = useNavigate();
+
+    const settingsHandler = (e) => {
+        setAnchorE1user(e.currentTarget);
+    }
+
+    const handleCloseUserMenu = () => {
+        setAnchorE1user(null);
+    }
 
     return (
         <Box sx={{flexGrow:1}} className="no-print" >
@@ -67,6 +93,23 @@ function navHeader2() {
             </NavLink>
         ))}
         </Box>
+
+        <Box sx={{ flexGrow: 0}}>
+            <Tooltip title="Settings">
+                <IconButton onClick={settingsHandler} sx={{p:0}}>
+                    <SettingsIcon />
+                </IconButton>
+            </Tooltip>
+
+            <Menu sx={{mt:'45px'}} id='menu-appbar' anchorEl={anchorE1user} anchorOrigin={{vertical: 'top', horizontal: 'right',}} keepMounted transformOrigin={{vertical: 'top', horizontal: 'right',}} open={Boolean(anchorE1user)} onClose={handleCloseUserMenu}>
+                {settingsMenu.map( (item, i) => {
+                    return <MenuItem key={i} onClick={()=>{navigate(item.Url)}}>
+                        <Typography textAlign="center">{item.Title}</Typography>
+                        </MenuItem>
+                })}
+            </Menu>
+        </Box>
+
         </Toolbar>
 
         </AppBar>

@@ -108,15 +108,6 @@ func (entry *AUVEntryArray) Blank(month time.Month, year int) {
 	entry.Hours = make([]int, len(entry.Dates))
 }
 
-// Default sets the date fields to the provided date
-// func (auv *AUVEntry) Default(date datatypes.Date) {
-// 	auv.Week1Date = date
-// 	auv.Week2Date = date
-// 	auv.Week3Date = date
-// 	auv.Week4Date = date
-// 	auv.Week5Date = date
-// }
-
 func daysInMonth(month time.Month, year int) []time.Time {
 	// move to the 32nd day which forces a rollover to the next month
 	t := time.Date(year, month, 32, 0, 0, 0, 0, time.UTC)

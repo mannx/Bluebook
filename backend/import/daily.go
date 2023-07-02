@@ -91,18 +91,18 @@ func ImportDaily(fileName string, db *gorm.DB) error {
 			}
 		}
 
-		dd, blank := extractData(f, i, d, version, db)
+		dd, _ := extractData(f, i, d, version, db)
 
 		// save to database
 		db.Save(&dd)
 
-		if blank == true {
-			// save the id that was just added to the db
-			ent := models.DayDataImportList{
-				EntryID: dd.ID,
-			}
-			db.Save(&ent)
-		}
+		// if blank == true {
+		// 	// save the id that was just added to the db
+		// 	ent := models.DayDataImportList{
+		// 		EntryID: dd.ID,
+		// 	}
+		// 	db.Save(&ent)
+		// }
 	}
 
 	return nil
