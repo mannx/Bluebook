@@ -1,7 +1,7 @@
 
 // development, set to http://localhost:8080, for production, leave empty
-const production = false;
-const baseURL = "http://localhost:8080";
+//const production = false;
+//const baseURL = "http://localhost:8080";
 
 // urls for all our api endpoints
 // /api is the original endpoints
@@ -50,12 +50,13 @@ export const UrlApiDailyUndo = "/api/backup/undo";          // undo
 export const UrlApiDailyRevert = "/api/backup/revert";          // retrieve the daily data undo list
 
 export function UrlGet(name) {
-	var base = "";
-	if(production === false) {
-		base = baseURL;
-	}
+	// var base = "";
+	// if(production === false) {
+	// 	base = baseURL;
+	// }
 
-    return base+name;
+    // return base+name;
+	return name;
 }
 
 
