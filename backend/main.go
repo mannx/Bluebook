@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"fmt"
+	// "fmt"
 	"net/http"
 	"os"
 	"os/signal"
@@ -69,10 +69,11 @@ func main() {
 
 	log.Info().Msg("Starting server...")
 	go func() {
-		port := fmt.Sprintf(":%v", env.Environment.Port)
+		// port := fmt.Sprintf(":%v", env.Environment.Port)
 
-		// if err := e.Start(":8080"); err != nil && err != http.ErrServerClosed {
-		if err := e.Start(port); err != nil && err != http.ErrServerClosed {
+		if err := e.Start(":8080"); err != nil && err != http.ErrServerClosed {
+		// if err := e.Start(port); err != nil && err != http.ErrServerClosed {
+			log.Error().Err(err).Msg("Unable to start server!")
 			e.Logger.Fatal("shutting server down")
 		}
 	}()

@@ -1,58 +1,45 @@
 package api
 
-// we are expecting 3 values in the post
-//   comment:	the comment we are updating/creating
-//	 linkedid:	the id of the day we are linked to
+import (
+	"fmt"
+	"net/http"
+	"time"
 
-// UpdateCommentHandler is used to handle comments
-// Deprecated: no longer used in frontend v2
-// func _UpdateCommentHandler(c echo.Context, db *gorm.DB) error {
-// 	type CommentPost struct {
-// 		Comment  string    `json:"Comment" query:"Comment"`
-// 		LinkedID int       `json:"LinkedID" query:"LinkedID"` // id of the day we are adding the comment to, 0 if we dont have a linked day
-// 		Date     time.Time `json:"Date" query:"Date"`
-// 	}
+	"github.com/labstack/echo/v4"
+	models "github.com/mannx/Bluebook/models"
+	"gorm.io/gorm"
+)
 
-// 	var cp CommentPost
+func CommentSearchHandler(c echo.Context, db *gorm.DB) error {
+	var search string
 
-// 	if err := c.Bind(&cp); err != nil {
-// 		return LogAndReturnError(c, "Unable to bind from POST", err)
-// 	}
+	err := echo.QueryParamsBinder(c).String("q", &search).BindError()
+	if err != nil {
+		return LogAndReturnError(c, "Unable to bind to parameter: q", err)
+	}
 
-// 	// do we have a valid linkedID?
-// 	// check to see if we have an entry already
-// 	if cp.LinkedID == 0 {
-// 		dd := models.DayData{}
-// 		res := db.Where("Date = ?", cp.Date).Find(&dd)
-// 		if res.Error == nil && res.RowsAffected != 0 {
-// 			// save the comment to this day
-// 			dd.Comment = cp.Comment
-// 			db.Save(&dd)
+	var data []models.DayData
 
-// 			return c.String(http.StatusOK, "Update Success")
-// 		}
+	res := db.Where("Comment LIKE ?", fmt.Sprintf("%%%v%%", search)).Find(&data)
+	if res.Error != nil {
+		return LogAndReturnError(c, "Error searchin db", res.Error)
+	}
 
-// 		// otherwise fall through
-// 	}
+	type CommentData struct {
+		Day  models.DayData
+		Date string // user friendly string for the date
+	}
 
-// 	if cp.LinkedID != 0 {
-// 		dd := models.DayData{}
-// 		res := db.Find(&dd, "ID = ?", cp.LinkedID)
-// 		if res.Error != nil {
-// 			return LogAndReturnError(c, "Unable to find linked day", res.Error)
-// 		}
+	var out []CommentData
 
-// 		dd.Comment = cp.Comment
-// 		db.Save(&dd)
-// 	} else {
-// 		// use the provided date to generate a new database entry for this date
-// 		dd := models.DayData{
-// 			Date:    datatypes.Date(cp.Date),
-// 			Comment: cp.Comment,
-// 		}
+	for _, d := range data {
+		cd := CommentData{
+			Day:  d,
+			Date: (time.Time(d.Date)).Format("Mon Jan _2 2006"),
+		}
 
-// 		db.Save(&dd)
-// 	}
+		out = append(out, cd)
+	}
 
-// 	return ReturnServerMessage(c, "Update Success", false)
-// }
+	return c.JSON(http.StatusOK, &out)
+}

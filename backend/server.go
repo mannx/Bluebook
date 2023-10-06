@@ -80,5 +80,6 @@ func initServer() *echo.Echo {
 	e.GET("/api2/auv/view", func(c echo.Context) error { return api2.GetAUVViewHandler(c, DB) })
 	e.POST("/api2/auv/update", func(c echo.Context) error { return api2.UpdateAUVHandler(c, DB) })
 
+	e.GET("/api/comment/search", func(c echo.Context) error{return api.CommentSearchHandler(c,DB)})
 	return e
 }
