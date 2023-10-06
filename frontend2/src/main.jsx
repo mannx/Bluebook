@@ -77,6 +77,9 @@ import Settings, {
 } from "./components/Settings/Settings";
 
 import DebugSettings from "./components/Settings/Debug";
+import CommentSearch, {
+    loader as commentSearchLoader,
+} from "./components/Search/CommentSearch";
 
 import './index.css'
 import '@fontsource/roboto/300.css';
@@ -201,6 +204,11 @@ const router = createBrowserRouter([
             {
                 path: "/debug",
                 element: <DebugSettings />,
+            },
+            {
+                path: "/search",
+                element: <CommentSearch />,
+                loader: commentSearchLoader,
             },
         ],
     },

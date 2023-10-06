@@ -50,6 +50,8 @@ export const UrlApiGetBackupTable = "/api/backup/get";
 export const UrlApiDailyUndo = "/api/backup/undo";          // undo 
 export const UrlApiDailyRevert = "/api/backup/revert";          // retrieve the daily data undo list
 
+export const UrlApiCommentSearch = "/api/comment/search"; 		// search for all comments containing the search term
+
 export function UrlGet(name) {
 	var base = "";
 	if(production === false) {
