@@ -76,6 +76,8 @@ import Settings, {
     action as settingsAction,
 } from "./components/Settings/Settings";
 
+import DebugSettings from "./components/Settings/Debug";
+
 import './index.css'
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
@@ -195,6 +197,10 @@ const router = createBrowserRouter([
                 element: <Settings />,
                 loader: settingsLoader,
                 action: settingsAction,
+            },
+            {
+                path: "/debug",
+                element: <DebugSettings />,
             },
         ],
     },

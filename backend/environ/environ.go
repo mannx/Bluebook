@@ -25,6 +25,8 @@ type EnvironmentDefinition struct {
 
 	LogLevelString string        `envconfig:"BLUEBOOK_LOG_LEVEL"`
 	LogLevel       zerolog.Level // set the log level for zerolog once parsed from the env variable
+
+	Port int `envconfig:"BLUEBOOK_PORT"` // port to run the server to listen on
 }
 
 var Environment = EnvironmentDefinition{}
@@ -49,6 +51,7 @@ func (e *EnvironmentDefinition) Default() {
 	e.DataPath = "/data"
 	e.BackupPath = "/backup"
 	e.LogLevelString = "Info"
+	e.Port = 8080
 }
 
 // parse the log level string.  Default to INFO if unable to parse

@@ -67,6 +67,10 @@ function navHeader2() {
             Title: "Waste Settings",
             Url: "/waste/settings",
         },
+        {
+            Title: "Debug Page",
+            Url: "/debug",
+        },
     ];
 
     const [anchorE1user, setAnchorE1user] = React.useState(null);
