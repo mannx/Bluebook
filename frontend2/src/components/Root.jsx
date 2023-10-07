@@ -71,6 +71,10 @@ function navHeader2() {
             Title: "Comment Search",
             Url: "/search",
         },
+        {
+            Title: "Hockey Schedule",
+            Url: "/hockey",
+        },
     ];
 
     const [anchorE1user, setAnchorE1user] = React.useState(null);

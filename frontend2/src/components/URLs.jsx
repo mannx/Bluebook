@@ -12,6 +12,7 @@ export const UrlApiMonth = "/api/month";
 export const UrlApiImportDaily = "/api/import/daily";
 export const UrlApiImportControl = "/api/import/control";
 export const UrlApiImportWISR = "/api/import/wisr";
+export const UrlApiImportHockeySchedule = "/api/import/hockey";
 
 export const UrlApi2DayEdit = "/api2/day/edit";
 export const UrlApi2DayUpdate = "/api2/day/update";

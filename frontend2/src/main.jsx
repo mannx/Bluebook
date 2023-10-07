@@ -81,6 +81,10 @@ import CommentSearch, {
     loader as commentSearchLoader,
 } from "./components/Search/CommentSearch";
 
+import HockeySchedule, {
+    action as hockeyAction,
+} from "./components/Import/HockeySchedule";
+
 import './index.css'
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
@@ -209,6 +213,11 @@ const router = createBrowserRouter([
                 path: "/search",
                 element: <CommentSearch />,
                 loader: commentSearchLoader,
+            },
+            {
+                path: "/hockey",
+                element: <HockeySchedule />,
+                action: hockeyAction,
             },
         ],
     },

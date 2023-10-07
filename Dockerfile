@@ -49,6 +49,7 @@ COPY --from=react /app/dist /static
 
 # copy in default config file for top5 api
 COPY ./backend/api/data.json /top5.json
+COPY ./backend/team-names.json /team-names.json
 
 # copy run and backup scripts
 COPY ./scripts /scripts

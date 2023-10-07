@@ -1,0 +1,74 @@
+{"Data": [
+{
+	"Raw": "Acadie-BathurstAcadie-Bathurst",
+	"Correct":"Acadie-Bathurst"
+},
+{
+	"Raw": "MonctonMoncton",
+	"Correct":"Moncton"
+},
+{
+	"Raw": "DrummondvilleDrummondville",
+	"Correct":"Drummondville"
+},
+{
+	"Raw": "ChicoutimiChicoutimi",
+	"Correct":"Chicoutimi"
+},
+{
+	"Raw": "Blainville-BoisbriandBlainville-Boisbriand",
+	"Correct":"Blainville-Boisbriand"
+},
+{
+	"Raw": "HalifaxHalifax",
+	"Correct":"Halifax"
+},
+{
+	"Raw": "ShawiniganShawinigan",
+	"Correct":"Shawnigan"
+},
+{
+	"Raw": "Baie-ComeauBaie-Comeau",
+	"Correct":"Baie-Comeau"
+},
+{
+	"Raw": "SherbrookeSherbrooke",
+	"Correct":"Sherbroke"
+},
+{
+	"Raw": "Rouyn-NorandaRouyn-Noranda",
+	"Correct":"Rouyn-Noranda"
+},
+{
+	"Raw": "RimouskiRimouski",
+	"Correct":"Rimouski"
+},
+{
+	"Raw": "GatineauGatineau",
+	"Correct":"Gatineau"
+},
+{
+	"Raw": "Val-d'OrVal-d'Or",
+	"Correct":"Val-d'Or"
+},
+{
+	"Raw": "QuébecQuébec",
+	"Correct":"Québec"
+},
+{
+	"Raw": "Cape BretonCape Breton",
+	"Correct":"Cape Breton"
+},
+{
+	"Raw": "CharlottetownCharlottetown",
+	"Correct":"Charlottetown"
+},
+{
+	"Raw": "VictoriavilleVictoriaville",
+	"Correct":"Victoriaville"
+},
+{
+	"Raw": "Saint JohnSaint John",
+	"Correct":"Saint John"
+}
+]}
