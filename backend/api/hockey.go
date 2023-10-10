@@ -3,7 +3,7 @@ package api
 import (
 	"bufio"
 	"encoding/json"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -76,7 +76,6 @@ func ImportHockeyScheduleHandler(c echo.Context, db *gorm.DB) error {
 	return ReturnServerMessage(c, "Import Done", false)
 }
 
-// var teamNameData []TeamNameData
 var teamNameData map[string]string
 
 func getTeamName(name string) string {
@@ -93,7 +92,7 @@ func getTeamName(name string) string {
 func readHockeyConfig() ([]byte, error) {
 	// try and read the user supplied config file
 	fname := filepath.Join(env.Environment.DataPath, "hockey.json")
-	f, err := ioutil.ReadFile(fname)
+	f, err := os.ReadFile(fname)
 	if err == nil {
 		return f, nil // read success
 	}
@@ -124,7 +123,6 @@ func InitHockeySchedule() {
 		return
 	}
 
-	// teamNameData = data.Data
 	teamNameData = make(map[string]string)
 	for _, i := range data.Data {
 		teamNameData[i.Raw] = i.Correct

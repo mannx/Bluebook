@@ -98,7 +98,7 @@ function navHeader2() {
         <Box sx={{flexGrow: 1, display: {xs:'none',md: 'flex'} }}>
         {pages.map( (p) => (
             <NavLink key={p.Title} to={p.Url} className={({isActive, isPending}) => isPending ? "pending" : isActive ? "active" : ""}>
-            <Button key={p.Title} sx={{my:2,color:'white',display: 'block' }}>{p.Title}</Button>
+            <Button key={p.Title} sx={{my:2,color:'white',display: 'block', "text-decoration": "none" }}>{p.Title}</Button>
             </NavLink>
         ))}
         </Box>
