@@ -44,6 +44,8 @@ type dayViewData struct {
 	Day   int
 	Month time.Month
 	Year  int
+
+	Hockey models.HockeySchedule
 }
 
 //
@@ -181,6 +183,9 @@ func GetMonthViewHandler(c echo.Context, db *gorm.DB) error {
 			slw = -1
 		}
 
+		// // retrieve related hockey data for this day
+		hd, _ := genHockeyData(db, time.Time(o.Date))
+
 		dvd := dayViewData{
 			DayData:           o,
 			ThirdPartyDollar:  tp,
@@ -197,6 +202,7 @@ func GetMonthViewHandler(c echo.Context, db *gorm.DB) error {
 			Day:               d.Day(),
 			Month:             d.Month(),
 			Year:              d.Year(),
+			Hockey:            hd,
 		}
 
 		mvd[d.Day()-1] = dvd
@@ -236,9 +242,12 @@ func GetMonthViewHandler(c echo.Context, db *gorm.DB) error {
 
 	// any missing entries (Exists==false) generate a default node
 	for i, n := range mvd {
-		if n.Exists == false {
+		if !n.Exists {
 			date := start.AddDate(0, 0, i)
 			mvd[i] = genEmptyDVD(date)
+
+			hd, _ := genHockeyData(db, date)
+			mvd[i].Hockey = hd
 		}
 	}
 
@@ -336,4 +345,38 @@ func genEmptyDVD(date time.Time) dayViewData {
 	}
 
 	return dvd
+}
+
+func genHockeyData(db *gorm.DB, date time.Time) (models.HockeySchedule, error) {
+	// retrieve related hockey data for this day
+	var hockey []models.HockeySchedule
+	res := db.Where("Date = ?", date).Find(&hockey)
+	if res.Error != nil {
+		log.Error().Err(res.Error).Msgf("Unable to retrieve hockey schedule for date: %v", date)
+		return models.HockeySchedule{
+			Valid: false,
+		}, res.Error
+	}
+
+	hd := models.HockeySchedule{}
+
+	if res.RowsAffected != 0 {
+		hd = hockey[0]
+	} else {
+		// log.Error().Msgf(" ** More than 1 date matching hockey schedule [{}]**", date)
+		// return models.HockeySchedule{Valid: false}, res.Error
+		// no data found for this day
+		return models.HockeySchedule{Valid: false}, nil
+	}
+
+	hd.Away = getTeamName(hd.Away)
+	hd.Home = getTeamName(hd.Home)
+	hd.Valid = true
+
+	// if hd.Home == api.HomeTeamName{
+	// 	hd.HomeGame=true
+	// }
+	hd.HomeGame = hd.Home == HomeTeamName
+
+	return hd, nil
 }

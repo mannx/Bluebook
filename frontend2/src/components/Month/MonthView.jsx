@@ -66,6 +66,7 @@ export default function MonthView() {
                     <th className="Month no-print">% 3rd Party</th>
                     <th className="blank"></th>
 
+                    <th className="Month"></th>
                     <th className="Month">Comments</th>
                     <th className="Month no-print">Tags</th>
                     <th className="Month no-print">Edit</th>
@@ -117,7 +118,16 @@ function Zero(obj) {
 }
 
 function Row(data) {
-    var cls = "";
+    let cls = "";
+    let hcss = "";
+
+    if(data.Hockey.HomeGame === true) {
+        hcss="HockeyHome";
+    }else{
+        hcss="hidden";
+    }
+
+    let hock=<span class={hcss}>{data.Hockey.Away}</span>;
 
     switch(data.SalesLastWeek) {
         case 1: cls="NetSalesUp"; break;
@@ -155,7 +165,9 @@ function Row(data) {
         <td className="Month">{O(data.CustomerCount)}</td>
         <td className="Month no-print">{Dol(data.ThirdPartyDollar)}</td>
         <td className="Month no-print">{P(data.ThirdPartyPercent)}</td>
+
         <td className="blank"></td>
+        <td className="Month">{hock}</td>
         <td className="Month">{data.Comment}</td>
         <td className="Month no-print">{Tag(data.Tags, data.TagID)}</td>
         <td className="Month no-print">

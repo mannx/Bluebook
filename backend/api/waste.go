@@ -82,7 +82,7 @@ func UpdateWasteSettingHandler(c echo.Context, db *gorm.DB) error {
 	data.UnitMeasure = update.Unit
 	data.CustomConversion = update.HasCustom
 
-	if data.CustomConversion == true {
+	if data.CustomConversion {
 		data.UnitWeight = update.Conversion
 	}
 
@@ -107,9 +107,9 @@ type WasteViewItem struct {
 
 // GetWasteViewHandler handls the waste report generation
 func GetWasteViewHandler(c echo.Context, db *gorm.DB) error {
-	type wasteError struct {
-		Message string `json:"Message"`
-	}
+	// type wasteError struct {
+	// 	Message string `json:"Message"`
+	// }
 
 	// WasteView for returning to the client
 	type WasteView struct {

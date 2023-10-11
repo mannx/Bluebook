@@ -83,3 +83,11 @@ th.blank, td.blank
 {
 	background-color: black;
 }
+
+td.HockeyValid {
+	background-color: darkslateblue;
+}
+
+td.HockeyHome {
+	background-color: cornflowerblue;
+}

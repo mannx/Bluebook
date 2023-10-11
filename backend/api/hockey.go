@@ -77,10 +77,11 @@ func ImportHockeyScheduleHandler(c echo.Context, db *gorm.DB) error {
 }
 
 var teamNameData map[string]string
+var HomeTeamName string // todo: have this configured by user and stored in db
 
 func getTeamName(name string) string {
 	n, ok := teamNameData[name]
-	if ok == false {
+	if !ok {
 		// team not found, log and return
 		log.Info().Msgf("Hockey Team [%v] Not Found In Substitution Table", name)
 		return name
@@ -90,6 +91,7 @@ func getTeamName(name string) string {
 }
 
 func readHockeyConfig() ([]byte, error) {
+	HomeTeamName = "Saint John"
 	// try and read the user supplied config file
 	fname := filepath.Join(env.Environment.DataPath, "hockey.json")
 	f, err := os.ReadFile(fname)
