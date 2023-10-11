@@ -84,10 +84,16 @@ th.blank, td.blank
 	background-color: black;
 }
 
-td.HockeyValid {
-	background-color: darkslateblue;
+td.HockeyWin {
+	background-color: cornflowerblue;
 }
 
-td.HockeyHome {
-	background-color: cornflowerblue;
+td.HockeyLoss {
+    background-color: firebrick;
+}
+
+img.team-logo {
+    height: auto;
+    padding-right: .25rem;
+    width: 30px;
 }

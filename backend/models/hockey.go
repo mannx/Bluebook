@@ -18,5 +18,7 @@ type HockeySchedule struct {
 
 	Valid bool `gorm:"-"` // true if we have an entry, false if no data was found for this day.  not stored in db.
 	// find better option than checking for zero'd struct?
-	HomeGame bool `gorm:"-"` // true if this is a home game for a set home team (used to simplify frontend logic)
+	HomeGame  bool   `gorm:"-"` // true if this is a home game for a set home team (used to simplify frontend logic)
+	HomeImage string `gorm:"-"` // url of image to use for this team
+	AwayImage string `gorm:"-"` // url of image to use for this team
 }

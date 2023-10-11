@@ -119,15 +119,24 @@ function Zero(obj) {
 
 function Row(data) {
     let cls = "";
-    let hcss = "";
+    let url = "/" + data.Hockey.AwayImage;
+    let img = <img className="team-logo" src={url} />;
+    let hock = data.Hockey.HomeGame === true ? img : <></>;
+    
+    let hcls = "";
+    let htip = "";
 
     if(data.Hockey.HomeGame === true) {
-        hcss="HockeyHome";
-    }else{
-        hcss="hidden";
-    }
+        if(data.Hockey.GFHome === 0 && data.Hockey.GFAway === 0) {
+            // game not yet played, skip
+        }else if(data.Hockey.GFHome > data.Hockey.GFAway) {
+            hcls = "HockeyWin";
+        }else{
+            hcls = "HockeyLoss";
+        }
 
-    let hock=<span class={hcss}>{data.Hockey.Away}</span>;
+        htip = "Home: " + data.Hockey.GFHome + " Away: " + data.Hockey.GFAway;
+    }
 
     switch(data.SalesLastWeek) {
         case 1: cls="NetSalesUp"; break;
@@ -167,7 +176,13 @@ function Row(data) {
         <td className="Month no-print">{P(data.ThirdPartyPercent)}</td>
 
         <td className="blank"></td>
-        <td className="Month">{hock}</td>
+        {/*<td className={`${hcls} ${"Month"}`}>{hock}</td>*/}
+        <td className={`${hcls} ${"Month"}`}>
+            <div className="tooltip-month">
+                {hock}
+                <span className="tooltiptext-month">{htip}</span>
+            </div>
+        </td>
         <td className="Month">{data.Comment}</td>
         <td className="Month no-print">{Tag(data.Tags, data.TagID)}</td>
         <td className="Month no-print">

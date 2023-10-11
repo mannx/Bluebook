@@ -363,20 +363,14 @@ func genHockeyData(db *gorm.DB, date time.Time) (models.HockeySchedule, error) {
 	if res.RowsAffected != 0 {
 		hd = hockey[0]
 	} else {
-		// log.Error().Msgf(" ** More than 1 date matching hockey schedule [{}]**", date)
-		// return models.HockeySchedule{Valid: false}, res.Error
 		// no data found for this day
 		return models.HockeySchedule{Valid: false}, nil
 	}
 
-	hd.Away = getTeamName(hd.Away)
-	hd.Home = getTeamName(hd.Home)
 	hd.Valid = true
-
-	// if hd.Home == api.HomeTeamName{
-	// 	hd.HomeGame=true
-	// }
 	hd.HomeGame = hd.Home == HomeTeamName
+	hd.HomeImage = getTeamImage(hd.Home)
+	hd.AwayImage = getTeamImage(hd.Away)
 
 	return hd, nil
 }
