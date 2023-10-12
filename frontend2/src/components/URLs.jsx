@@ -1,5 +1,6 @@
 
 // development, set to http://localhost:8080, for production, leave empty
+//  need to use to redirect to port 8080 since dev server runs on 5173 and cant bind to both during dev
 const production = false;
 const baseURL = "http://localhost:8080";
 
@@ -11,6 +12,7 @@ export const UrlApiMonth = "/api/month";
 export const UrlApiImportDaily = "/api/import/daily";
 export const UrlApiImportControl = "/api/import/control";
 export const UrlApiImportWISR = "/api/import/wisr";
+export const UrlApiImportHockeySchedule = "/api/import/hockey";
 
 export const UrlApi2DayEdit = "/api2/day/edit";
 export const UrlApi2DayUpdate = "/api2/day/update";
@@ -48,6 +50,8 @@ export const UrlApiTop5Data = "/api/top5/data";
 export const UrlApiGetBackupTable = "/api/backup/get";
 export const UrlApiDailyUndo = "/api/backup/undo";          // undo 
 export const UrlApiDailyRevert = "/api/backup/revert";          // retrieve the daily data undo list
+
+export const UrlApiCommentSearch = "/api/comment/search"; 		// search for all comments containing the search term
 
 export function UrlGet(name) {
 	var base = "";

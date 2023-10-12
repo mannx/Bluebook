@@ -1,0 +1,92 @@
+{"Data": [
+{
+	"Raw": "Acadie-BathurstAcadie-Bathurst",
+	"Correct":"Acadie-Bathurst",
+    "Image": "2.png"
+},
+{
+	"Raw": "MonctonMoncton",
+	"Correct":"Moncton",
+    "Image": "1.png"
+},
+{
+	"Raw": "DrummondvilleDrummondville",
+	"Correct":"Drummondville",
+    "Image": "14.jpg"
+},
+{
+	"Raw": "ChicoutimiChicoutimi",
+	"Correct":"Chicoutimi",
+    "Image": "10.png"
+},
+{
+	"Raw": "Blainville-BoisbriandBlainville-Boisbriand",
+	"Correct":"Blainville-Boisbriand",
+    "Image": "19.png"
+},
+{
+	"Raw": "HalifaxHalifax",
+	"Correct":"Halifax",
+    "Image": "5_205.png"
+},
+{
+	"Raw": "ShawiniganShawinigan",
+	"Correct":"Shawnigan",
+    "Image": "13.png"
+},
+{
+	"Raw": "Baie-ComeauBaie-Comeau",
+	"Correct":"Baie-Comeau",
+    "Image": "16.png"
+},
+{
+	"Raw": "SherbrookeSherbrooke",
+	"Correct":"Sherbroke",
+    "Image": "60_205.png"
+},
+{
+	"Raw": "Rouyn-NorandaRouyn-Noranda",
+	"Correct":"Rouyn-Noranda",
+    "Image": "11.png"
+},
+{
+	"Raw": "RimouskiRimouski",
+	"Correct":"Rimouski",
+    "Image": "18.png"
+},
+{
+	"Raw": "GatineauGatineau",
+	"Correct":"Gatineau",
+    "Image": "12.png"
+},
+{
+	"Raw": "Val-d'OrVal-d'Or",
+	"Correct":"Val-d'Or",
+    "Image": "15.png"
+},
+{
+	"Raw": "QuébecQuébec",
+	"Correct":"Québec",
+    "Image": "9.png"
+},
+{
+	"Raw": "Cape BretonCape Breton",
+	"Correct":"Cape Breton",
+    "Image": "3.png"
+},
+{
+	"Raw": "CharlottetownCharlottetown",
+	"Correct":"Charlottetown",
+    "Image": "7.png"
+},
+{
+	"Raw": "VictoriavilleVictoriaville",
+	"Correct":"Victoriaville",
+    "Image": "17.png"
+},
+{
+	"Raw": "Saint JohnSaint John",
+	"Correct":"Saint John",
+    "Image": "8.png"
+}
+]}

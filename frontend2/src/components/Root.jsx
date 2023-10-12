@@ -67,6 +67,14 @@ function navHeader2() {
             Title: "Waste Settings",
             Url: "/waste/settings",
         },
+        {
+            Title: "Comment Search",
+            Url: "/search",
+        },
+        {
+            Title: "Hockey Schedule",
+            Url: "/hockey",
+        },
     ];
 
     const [anchorE1user, setAnchorE1user] = React.useState(null);
@@ -81,6 +89,7 @@ function navHeader2() {
         setAnchorE1user(null);
     }
 
+    
     return (
         <Box sx={{flexGrow:1}} className="no-print" >
         <AppBar position="static">
@@ -89,12 +98,13 @@ function navHeader2() {
         <Box sx={{flexGrow: 1, display: {xs:'none',md: 'flex'} }}>
         {pages.map( (p) => (
             <NavLink key={p.Title} to={p.Url} className={({isActive, isPending}) => isPending ? "pending" : isActive ? "active" : ""}>
-            <Button key={p.Title} sx={{my:2,color:'white',display: 'block' }}>{p.Title}</Button>
+            <Button key={p.Title} sx={{my:2,color:'white',display: 'block', "text-decoration": "none" }}>{p.Title}</Button>
             </NavLink>
         ))}
         </Box>
 
         <Box sx={{ flexGrow: 0}}>
+
             <Tooltip title="Settings">
                 <IconButton onClick={settingsHandler} sx={{p:0}}>
                     <SettingsIcon />

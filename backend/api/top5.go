@@ -3,8 +3,8 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
+	"os"
 	"path/filepath"
 	"sort"
 	"time"
@@ -28,13 +28,13 @@ var top5Table []top5Data
 func readConfig() ([]byte, error) {
 	// try and read the user supplied config file
 	fname := filepath.Join(env.Environment.DataPath, "top5.json")
-	f, err := ioutil.ReadFile(fname)
+	f, err := os.ReadFile(fname)
 	if err == nil {
 		return f, nil // read success
 	}
 
 	// otherwise try and built in config found at /data.json
-	f, err = ioutil.ReadFile("/top5.json")
+	f, err = os.ReadFile("/top5.json")
 	if err == nil {
 		return f, nil
 	}

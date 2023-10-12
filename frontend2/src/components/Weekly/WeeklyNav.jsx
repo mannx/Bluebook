@@ -29,6 +29,8 @@ export default function WeeklyNav() {
 
     return (<>
         <Container maxWidth="sm">
+        <h2>Weekly</h2>
+
         <DatePicker value={date} onChange={(e) => setDate(e)} shouldDisableDate={notTuesday}/>
         {url !== null ?
             <><br/><Link to={url}><Button variant="contained">Load</Button></Link></>

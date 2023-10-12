@@ -31,6 +31,7 @@ func initServer() *echo.Echo {
 	e.POST("/api/import/daily", importPostDaily)
 	e.POST("/api/import/control", importPostControl)
 	e.POST("/api/import/wisr", importPostWISR)
+	e.POST("/api/import/hockey", func(c echo.Context) error { return api.ImportHockeyScheduleHandler(c, DB) })
 
 	// Waste handling
 	e.GET("/api/waste/view", func(c echo.Context) error { return api.GetWasteViewHandler(c, DB) })
@@ -80,5 +81,6 @@ func initServer() *echo.Echo {
 	e.GET("/api2/auv/view", func(c echo.Context) error { return api2.GetAUVViewHandler(c, DB) })
 	e.POST("/api2/auv/update", func(c echo.Context) error { return api2.UpdateAUVHandler(c, DB) })
 
+	e.GET("/api/comment/search", func(c echo.Context) error { return api.CommentSearchHandler(c, DB) })
 	return e
 }

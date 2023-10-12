@@ -2,6 +2,9 @@ package main
 
 import (
 	"context"
+	"fmt"
+
+	// "fmt"
 	"net/http"
 	"os"
 	"os/signal"
@@ -36,14 +39,9 @@ func main() {
 
 	log.Info().Msg("Initializing top5 list...")
 	api.InitTop5()
+	api.InitHockeySchedule()
 
 	dbName = filepath.Join(env.Environment.DataPath, "db.db")
-
-	// log.Info().Msg("Initializing database backup list...")
-	// err := api.InitializeDBListing()
-	// if err != nil {
-	// 	log.Error().Err(err).Msgf("Unable to generate listing of backed up database files...")
-	// }
 
 	log.Info().Msg("Initializing database...")
 	dbo, err := gorm.Open(sqlite.Open(dbName), &gorm.Config{})
@@ -68,7 +66,11 @@ func main() {
 
 	log.Info().Msg("Starting server...")
 	go func() {
-		if err := e.Start(":8080"); err != nil && err != http.ErrServerClosed {
+		port := fmt.Sprintf(":%v", env.Environment.Port)
+
+		// if err := e.Start(":8080"); err != nil && err != http.ErrServerClosed {
+		if err := e.Start(port); err != nil && err != http.ErrServerClosed {
+			log.Error().Err(err).Msg("Unable to start server!")
 			e.Logger.Fatal("shutting server down")
 		}
 	}()
@@ -85,9 +87,6 @@ func main() {
 
 func migrateDB() {
 	DB.AutoMigrate(&models.DayData{})
-	// DB.AutoMigrate(&models.DayDataBackup{})
-	// DB.AutoMigrate(&models.DayDataImportList{})
-
 	DB.AutoMigrate(&models.WeeklyInfo{})
 	DB.AutoMigrate(&models.WastageItem{})
 	DB.AutoMigrate(&models.WastageEntry{})
@@ -99,6 +98,7 @@ func migrateDB() {
 	DB.AutoMigrate(&models.TagData{})
 
 	DB.AutoMigrate(&models.BackupEntry{})
+	DB.AutoMigrate(&models.HockeySchedule{})
 }
 
 // check to see if we have any duplicated day_data entries
