@@ -1,7 +1,6 @@
 package main
 
 import (
-	"io/ioutil"
 	"net/http"
 	"path/filepath"
 
@@ -16,32 +15,35 @@ import (
 // File contains all functions related to importing data
 //
 
+// NOTE
+//  THIS FUNCTION IS NOW FOUND IN api2/import.go
+
 // This function returns the list of files that can be imported
 // uses fileMask to only return files types that match
-func importFileHandler(c echo.Context, fileMask string) error {
-	files, err := ioutil.ReadDir(env.Environment.ImportPath)
-	if err != nil {
-		log.Error().Err(err).Msg("Unable to read directory provided by BLUEBOOK_IMPORT_PATH")
-		return c.String(http.StatusInternalServerError, "Unable to retrieve import directory")
-	}
+// func importFileHandler(c echo.Context, fileMask string) error {
+// 	files, err := ioutil.ReadDir(env.Environment.ImportPath)
+// 	if err != nil {
+// 		log.Error().Err(err).Msg("Unable to read directory provided by BLUEBOOK_IMPORT_PATH")
+// 		return c.String(http.StatusInternalServerError, "Unable to retrieve import directory")
+// 	}
 
-	output := make([]string, 0)
-	for _, f := range files {
-		// check if file matches our file mask
-		match, err := filepath.Match(fileMask, f.Name())
-		if err != nil {
-			log.Error().Err(err).Msg("Bad file mask detected") // only possible error, stop after first encounter
-			break
-		}
+// 	output := make([]string, 0)
+// 	for _, f := range files {
+// 		// check if file matches our file mask
+// 		match, err := filepath.Match(fileMask, f.Name())
+// 		if err != nil {
+// 			log.Error().Err(err).Msg("Bad file mask detected") // only possible error, stop after first encounter
+// 			break
+// 		}
 
-		if match {
-			// match, save it, otherwise ignore
-			output = append(output, f.Name())
-		}
-	}
+// 		if match {
+// 			// match, save it, otherwise ignore
+// 			output = append(output, f.Name())
+// 		}
+// 	}
 
-	return c.JSON(http.StatusOK, &output)
-}
+// 	return c.JSON(http.StatusOK, &output)
+// }
 
 func importPostHandler(c echo.Context, handler func(string, *gorm.DB) error) error {
 	arr := make([]string, 0)

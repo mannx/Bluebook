@@ -27,6 +27,8 @@ type EnvironmentDefinition struct {
 	LogLevel       zerolog.Level // set the log level for zerolog once parsed from the env variable
 
 	Port int `envconfig:"BLUEBOOK_PORT"` // port to run the server to listen on
+
+	IgnoreChecks bool `envconfig:"BLUEBOOK_IGNORE"` // ignore some startup checks to speed up testing
 }
 
 var Environment = EnvironmentDefinition{}
@@ -52,6 +54,7 @@ func (e *EnvironmentDefinition) Default() {
 	e.BackupPath = "/backup"
 	e.LogLevelString = "Info"
 	e.Port = 8080
+	e.IgnoreChecks = false
 }
 
 // parse the log level string.  Default to INFO if unable to parse

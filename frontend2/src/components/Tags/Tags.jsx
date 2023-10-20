@@ -104,7 +104,7 @@ function tagList(obj) {
 }
 
 // create a link to the month for this day
-function dayLink(obj) {
+export function dayLink(obj) {
     const date = new Date(obj);
     return <Link to={"/"+(date.getMonth()+1)+"/"+date.getFullYear()}>{obj}</Link>;
 }

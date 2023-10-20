@@ -3,6 +3,7 @@ package api
 import (
 	"bufio"
 	"encoding/json"
+	"net/http"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -202,4 +203,62 @@ func InitHockeySchedule() {
 	for _, i := range data.Data {
 		teamNameData[i.Raw] = i
 	}
+}
+
+func HockeyDataHandler(c echo.Context, db *gorm.DB) error {
+
+	type hockeyData struct {
+		Date     time.Time // date of the game
+		HomeWin  bool      // did the home team win this game?
+		NetSales float64   // net sales for the day
+		Average  float64   // average sales for the given week day
+		AwayTeam string    // name of the away team
+		GFHome   uint
+		GFAway   uint
+	}
+
+	// 1) get the list of hockey games for the date range provided
+	// 2) for each game, get the day sales, compute the weekly average of that day
+
+	// TODO:
+	//	have frontend provide a date range to retrieve data for
+	//	for now, we simply return all hockey data we have
+
+	var hschedule []models.HockeySchedule
+	res := db.Where("Home = ?", HomeTeamName).Find(&hschedule)
+	if res.Error != nil {
+		return LogAndReturnError(c, "Unable to retrieve hockey data", res.Error)
+	}
+
+	hdata := make([]hockeyData, 0)
+
+	for _, i := range hschedule {
+		var dd models.DayData
+		res = db.Where("Date = ?", i.Date).Find(&dd)
+		if res.Error != nil {
+			log.Error().Err(res.Error).Msgf("Unable to retrieve day data for hockey date: [%v] in /hockey/data, skipping", i.Date)
+			continue
+		}
+
+		if res.RowsAffected == 0 {
+			// no data found, skip
+			continue
+		}
+
+		// compute the weekly average
+		avg := calculateWeeklyAverage(time.Time(i.Date), 4, db)
+
+		hdata = append(hdata, hockeyData{
+			Date:     time.Time(i.Date),
+			HomeWin:  i.GFHome > i.GFAway,
+			NetSales: dd.NetSales,
+			Average:  avg,
+			AwayTeam: i.Away,
+			GFAway:   i.GFHome,
+			GFHome:   i.GFHome,
+		})
+
+	}
+
+	return c.JSON(http.StatusOK, &hdata)
 }

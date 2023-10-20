@@ -368,7 +368,7 @@ func AddWasteHoldingHandler(c echo.Context, db *gorm.DB) error {
 		return LogAndReturnError(c, fmt.Sprintf("Unable to parse input time [%v]", data.Date), err)
 	}
 
-	log.Debug().Msgf("Adding item [%] for date of [%v/%v/%v] [%v]", data.Name, date.Month(), date.Day(), date.Year(), data.Date)
+	log.Debug().Msgf("Adding item [%v] for date of [%v/%v/%v] [%v]", data.Name, date.Month(), date.Day(), date.Year(), data.Date)
 
 	// get the item we are adding to the hold
 	// if we dont have it, add it to the db and returns its id

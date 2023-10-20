@@ -55,9 +55,11 @@ func main() {
 	migrateDB()
 
 	// check for any duplicate day entries
-	err = checkDuplicateEntries()
-	if err != nil {
-		log.Error().Err(err).Msg("Error checking for duplicate days")
+	if !env.Environment.IgnoreChecks {
+		err = checkDuplicateEntries()
+		if err != nil {
+			log.Error().Err(err).Msg("Error checking for duplicate days")
+		}
 	}
 
 	log.Info().Msg("Initialiing server and middleware")
