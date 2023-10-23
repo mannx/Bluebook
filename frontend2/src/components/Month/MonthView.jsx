@@ -99,8 +99,12 @@ function NF(obj, prefix="", suffix="") {
         suffix={suffix}
         decimalScale={2}
         fixedDecimalScale={true}
-        / >
+        />
     );
+}
+
+export function NumberFormat(obj, prefix="", suffix="") {
+    return NF(obj,prefix,suffix);
 }
 
 // output a general number

@@ -224,7 +224,7 @@ const router = createBrowserRouter([
                 action: hockeyAction,
             },
             {
-                path: "/hockey/data",
+                path: "/hockey/data/:year?",
                 element: <HockeyData />,
                 loader: hockeyDataLoader, 
             },

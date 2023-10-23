@@ -208,11 +208,11 @@ func InitHockeySchedule() {
 func HockeyDataHandler(c echo.Context, db *gorm.DB) error {
 
 	type hockeyData struct {
-		Date     time.Time // date of the game
-		HomeWin  bool      // did the home team win this game?
-		NetSales float64   // net sales for the day
-		Average  float64   // average sales for the given week day
-		AwayTeam string    // name of the away team
+		Date     string  // date of the game
+		HomeWin  bool    // did the home team win this game?
+		NetSales float64 // net sales for the day
+		Average  float64 // average sales for the given week day
+		AwayTeam string  // name of the away team
 		GFHome   uint
 		GFAway   uint
 	}
@@ -220,9 +220,13 @@ func HockeyDataHandler(c echo.Context, db *gorm.DB) error {
 	// 1) get the list of hockey games for the date range provided
 	// 2) for each game, get the day sales, compute the weekly average of that day
 
-	// TODO:
-	//	have frontend provide a date range to retrieve data for
-	//	for now, we simply return all hockey data we have
+	// we might be given a year, if so, return all games for that given year
+	var year int
+	err := echo.QueryParamsBinder(c).
+		Int("year", &year).BindError()
+	if err != nil {
+		return LogAndReturnError(c, "Unable to bind to year parameter", err)
+	}
 
 	var hschedule []models.HockeySchedule
 	res := db.Where("Home = ?", HomeTeamName).Find(&hschedule)
@@ -249,7 +253,7 @@ func HockeyDataHandler(c echo.Context, db *gorm.DB) error {
 		avg := calculateWeeklyAverage(time.Time(i.Date), 4, db)
 
 		hdata = append(hdata, hockeyData{
-			Date:     time.Time(i.Date),
+			Date:     (time.Time(i.Date)).Format("Mon Jan _2 2006"),
 			HomeWin:  i.GFHome > i.GFAway,
 			NetSales: dd.NetSales,
 			Average:  avg,
