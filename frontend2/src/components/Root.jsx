@@ -79,6 +79,10 @@ function navHeader2() {
             Title: "Hockey Data",
             Url: "/hockey/data",
         },
+        {
+            Title: "Simple Stats",
+            Url: "/stats/simple",
+        }
     ];
 
     const [anchorE1user, setAnchorE1user] = React.useState(null);

@@ -54,6 +54,7 @@ export const UrlApiDailyRevert = "/api/backup/revert";          // retrieve the 
 export const UrlApiCommentSearch = "/api/comment/search"; 		// search for all comments containing the search term
 
 export const UrlApiHockeyData = "/api/hockey/data";
+export const UrlApi2AverageStats = "/api/stats/average";
 
 export function UrlGet(name) {
 	var base = "";

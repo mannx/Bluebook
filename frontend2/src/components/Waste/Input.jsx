@@ -124,18 +124,6 @@ export default function WasteInput() {
         </TableHead>
 
         <TableBody>
-        {data.Holding !== null && data.Holding.map( (obj) => {
-            return (<TableRow>
-                <TableCell>{obj.Month}/{obj.Day}/{obj.Year}</TableCell>
-                <TableCell>{obj.Name}</TableCell>
-                <TableCell>{obj.Quantity}</TableCell>
-                <TableCell>{obj.Reason}</TableCell>
-                <TableCell><Button onClick={ () => {
-                    deleteItem(obj.ID);
-                    navigate("/waste/input");
-                }}>Delete</Button></TableCell>
-                </TableRow>);
-        })}
 
         <TableRow>
             <TableCell>
@@ -158,6 +146,20 @@ export default function WasteInput() {
                 <Button type="submit">Add</Button>
             </TableCell>
         </TableRow>
+
+        {data.Holding !== null && data.Holding.map( (obj) => {
+            return (<TableRow>
+                <TableCell>{obj.Month}/{obj.Day}/{obj.Year}</TableCell>
+                <TableCell>{obj.Name}</TableCell>
+                <TableCell>{obj.Quantity}</TableCell>
+                <TableCell>{obj.Reason}</TableCell>
+                <TableCell><Button onClick={ () => {
+                    deleteItem(obj.ID);
+                    navigate("/waste/input");
+                }}>Delete</Button></TableCell>
+                </TableRow>);
+        })}
+
 
         </TableBody>
         </Table>

@@ -54,8 +54,6 @@ export async function loader({params}) {
     const resp = await fetch(url);
     const data = await resp.json();
 
-    console.log(`loader: month: ${month} year: ${year}`);
-    console.log(data);
     return {data};
 }
 
@@ -151,7 +149,7 @@ function AUVData(data, index) {
                 <DatePicker value={date} disabled tabIndex={-1}/>
             </TableCell>
             <TableCell>
-        <TextField name={"auv"+index} id={"auv"+index} type="number" label="AUV" defaultValue={data.AUV[index]}/>
+                <TextField name={"auv"+index} id={"auv"+index} type="number" label="AUV" defaultValue={data.AUV[index]}/>
             </TableCell>
             <TableCell>
                 <TextField name={"hours"+index} id={"hours"+index} type="number" label="Hours" defaultValue={data.Hours[index]}/>
