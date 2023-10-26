@@ -64,6 +64,7 @@ func initServer() *echo.Echo {
 	e.GET("/api/top5/data", func(c echo.Context) error { return api.GetTop5ViewHandler(c, DB) })
 
 	// Backup
+	e.GET("/api/backup/daydata/get", func(c echo.Context) error { return api.BackupViewHandler(c, DB) })
 
 	//
 	// VERSION 2

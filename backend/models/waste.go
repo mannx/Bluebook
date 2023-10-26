@@ -151,7 +151,7 @@ func GetWasteLocationMapping() map[int]string {
 
 // Convert the weight to custom weight type or conversion factor
 func (wi *WastageItem) Convert(n float64) float64 {
-	if wi.CustomConversion == true {
+	if wi.CustomConversion {
 		return n * wi.UnitWeight
 	}
 

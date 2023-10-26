@@ -56,7 +56,7 @@ func ImportControl(fileName string, db *gorm.DB) error {
 	weekEnding := reWeekEnding.FindStringSubmatch(cstr)
 	if weekEnding == nil {
 		log.Error().Msgf("Unable to find week ending date in file: %v", fileName)
-		return errors.New("Unable to find week ending date")
+		return errors.New("unable to find week ending date")
 	}
 
 	month, _ := strconv.Atoi(weekEnding[1])

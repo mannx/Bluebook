@@ -16,13 +16,14 @@ export default function SimpleStats() {
     return (<>
     <Container>
         <h3>Simple Stats</h3>
+        <h3>Work In Progress</h3>
         <Container>
             <h3>Average Sale by day</h3>
             {data.map( (o) => {
                 return (<>
                     <div>
                         <ul>Day Index: {o.Day}</ul>
-                        <ul>Average: {o.Average}</ul>
+                        <ul>Average: {o.NetSales}</ul>
                     </div>
                 </>);
             })}

@@ -15,11 +15,11 @@ import (
 	"gorm.io/gorm"
 )
 
-type wasteData struct {
-	date   time.Time
-	item   int
-	amount float64
-}
+// type wasteData struct {
+// 	date   time.Time
+// 	item   int
+// 	amount float64
+// }
 
 // needs fixing
 func getCell(row int, col int) string {

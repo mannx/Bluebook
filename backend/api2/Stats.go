@@ -22,6 +22,7 @@ func StatsAverageSalesByDayHandler(c echo.Context, db *gorm.DB) error {
 	start := time.Date(2023, time.January, 4, 0, 0, 0, 0, time.UTC)
 
 	// should be a better/faster way of calculating data required?
+	data := make([]statsData, 0)
 
 	// retrieve a week at a time
 	for i := 0; i < 52; i++ {
@@ -43,12 +44,28 @@ func StatsAverageSalesByDayHandler(c echo.Context, db *gorm.DB) error {
 		// TODO:
 		//	find highest net sales from week just selected (do this with a sql statement instead?)
 		//  add to statsData array and keep going
+		day := 0
+		var max float64
+
+		for index, d := range dd {
+			if d.NetSales > max {
+				max = d.NetSales
+				day = index
+			}
+		}
+
+		data = append(data, statsData{
+			WeekEnding: end,
+			Day:        time.Weekday(day),
+			NetSales:   max,
+		})
+
+		break
 	}
 
-	data := make([]statsData, 0)
-	for i := 0; i < 7; i++ {
-		data = append(data, statsData{})
-	}
+	// for i := 0; i < 7; i++ {
+	// 	data = append(data, statsData{})
+	// }
 
 	return c.JSON(http.StatusOK, &data)
 }

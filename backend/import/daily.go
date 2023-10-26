@@ -93,6 +93,13 @@ func ImportDaily(fileName string, db *gorm.DB) error {
 
 		dd, _ := extractData(f, i, d, version, db)
 
+		// add a new entry to the backup table before creating or updating this record
+		backup := models.DayDataBackup{
+			DayData: dd,
+		}
+
+		db.Save(&backup)
+
 		// save to database
 		db.Save(&dd)
 
