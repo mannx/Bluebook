@@ -64,11 +64,6 @@ func ImportWISR(fileName string, db *gorm.DB) error {
 		return reFail("wisr.go", "food")
 	}
 
-	// netSales := reNetSales.FindStringSubmatch(cstr)
-	// if netSales == nil {
-	// 	return reFail("wisr.go", "netSales")
-	// }
-
 	lstr := strings.ReplaceAll(labour[1], ",", "")
 	labourCost, _ := strconv.ParseFloat(lstr, 64)
 	labourPerc, _ := strconv.ParseFloat(labour[2], 64)
@@ -77,11 +72,6 @@ func ImportWISR(fileName string, db *gorm.DB) error {
 	foodPerc, _ := strconv.ParseFloat(food[2], 64)
 
 	// convert net sales to a float, remove all , to get a 1000+ value as just digits
-	// ns, err := strconv.ParseFloat(strings.ReplaceAll(strings.TrimSpace(netSales[1]), ",", ""), 64)
-	// if err != nil {
-	// 	return reFail("wisr.go", "netSales parse")
-	// }
-
 	party, err := strconv.ParseFloat(strings.ReplaceAll(strings.TrimSpace(catering[1]), ",", ""), 64)
 	if err != nil {
 		return reFail("wisr.go", "catering parse")
@@ -93,14 +83,7 @@ func ImportWISR(fileName string, db *gorm.DB) error {
 	wi.FoodCostPercent = foodPerc
 	wi.LabourCostAmount = labourCost
 	wi.LabourCostPercent = labourPerc
-	// wi.NetSales = ns
 	wi.PartySales = party
-	// wi.PartySales, err = strconv.ParseFloat(strings.ReplaceAll(strings.TrimSpace(catering[1]), ",", ""), 64)
-
-	// if err != nil {
-	// 	log.Error().Err(err).Msgf("Unable to convert catering sales value: %v", catering[1])
-
-	// }
 
 	db.Save(&wi)
 

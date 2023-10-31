@@ -63,9 +63,5 @@ func StatsAverageSalesByDayHandler(c echo.Context, db *gorm.DB) error {
 		break
 	}
 
-	// for i := 0; i < 7; i++ {
-	// 	data = append(data, statsData{})
-	// }
-
 	return c.JSON(http.StatusOK, &data)
 }

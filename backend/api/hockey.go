@@ -47,8 +47,6 @@ var reExtraData = regexp.MustCompile(`((Final(\s[SOT]{2})?)|(\d:\d\d pm \w{3}))\
 
 // receive the import data via post. process and add to db
 func ImportHockeyScheduleHandler(c echo.Context, db *gorm.DB) error {
-	log.Debug().Msgf("Import Hockey Schedule")
-
 	type Body struct {
 		Data string `form:"Data"`
 	}
@@ -143,7 +141,6 @@ type TeamNameData struct {
 	Image   string // image name in /public to display for this team
 }
 
-// var teamNameData map[string]string
 var teamNameData map[string]TeamNameData
 var HomeTeamName string // todo: have this configured by user and stored in db
 

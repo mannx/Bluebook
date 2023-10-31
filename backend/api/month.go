@@ -154,8 +154,6 @@ func GetMonthViewHandler(c echo.Context, db *gorm.DB) error {
 			// reset day count and holding data
 			dayCount = 0
 			dayList = make([]models.DayData, 0)
-
-			log.Debug().Msgf("Week Ending found: [%v]", d)
 		} else {
 			// increment day count and store the current day value
 			dayCount += 1

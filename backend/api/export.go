@@ -90,7 +90,6 @@ func ExportWeeklyHandler(c echo.Context, db *gorm.DB) error {
 		return LogAndReturnError(c, "Unable to parse [sysco]", err)
 	}
 
-	// err, weekly := getWeeklyData(month, day, year, c, db)
 	weekly, err := getWeeklyData(month, day, year, c, db)
 	if err != nil {
 		return LogAndReturnError(c, "unable to retrieve weekly data", err)

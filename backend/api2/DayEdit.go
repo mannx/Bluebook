@@ -33,10 +33,6 @@ func DayDataEdit(c echo.Context, db *gorm.DB) error {
 		return err
 	}
 
-	if len(date) != 0 {
-		log.Debug().Msgf("[DayDataEdit] Date: %v", date)
-	}
-
 	// get the day data object
 	var obj models.DayData
 	var tags []string
@@ -58,7 +54,6 @@ func DayDataEdit(c echo.Context, db *gorm.DB) error {
 		}
 
 		tags, _ = api.GetTags(id, db)
-		log.Debug().Msgf("Got tags for day id: %v  count: %v", id, len(tags))
 	}
 
 	ret := dayData{
@@ -96,8 +91,6 @@ func DayDataUpdate(c echo.Context, db *gorm.DB) error {
 		return api.LogAndReturnError(c, "Unable to bind from POST", err)
 	}
 
-	log.Debug().Msgf("[DayDataUpdate] Date: %v", update.Date)
-
 	// retrieve the daydata if we have a valid id
 	dd := models.DayData{}
 	id := update.ID
@@ -113,7 +106,6 @@ func DayDataUpdate(c echo.Context, db *gorm.DB) error {
 		}
 	} else {
 		// no data yet, generate and save a new day and grab its id
-		log.Debug().Msgf("Generate new day and saving comment/tags")
 		date, err := extractDate(update.Date)
 		if err != nil {
 			return api.LogAndReturnError(c, "Unable to parse date", err)

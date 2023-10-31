@@ -49,13 +49,6 @@ func getDataOrNew(date time.Time, db *gorm.DB) (models.DayData, bool) {
 		return n, true
 	}
 
-	// non empty entry, create a backup if not present already
-	// backup := models.DayDataBackup{}
-
-	// // create a copy of the data and save it
-	// backup.DayData = n
-	// db.Save(&backup)
-
 	return n, false
 }
 
@@ -74,6 +67,5 @@ func getWeeklyInfoOrNew(date time.Time, db *gorm.DB) models.WeeklyInfo {
 // reFail will display an error message noting the function and which item failed its regex check
 func reFail(from string, item string) error {
 	log.Error().Msgf("[%v]{reFail} Unable to parse data for: %v", from, item)
-	// return errors.New(fmt.Sprintf("Unable to parse data for: %v", item))
 	return fmt.Errorf("unable to parse data for: %v", item)
 }

@@ -58,14 +58,12 @@ func getWeeklyData(month int, day int, year int, c echo.Context, db *gorm.DB) (w
 
 	// make sure a tuesday
 	if weekEnding.Weekday() != time.Tuesday {
-		// return c.JSON(http.StatusOK, "Can only view from a tuesday"), weeklyInfo{}
 		return weeklyInfo{}, c.JSON(http.StatusOK, "Can only view from a tuesday")
 	}
 
 	weekly := weeklyInfo{}
 	err := getAuvData(weekEnding, &weekly, db)
 	if err != nil {
-		// return err, weeklyInfo{}
 		return weeklyInfo{}, err
 	}
 
@@ -73,7 +71,6 @@ func getWeeklyData(month int, day int, year int, c echo.Context, db *gorm.DB) (w
 	data := make([]models.DayData, 9)
 	res := db.Find(&data, "Date >= ? AND Date <= ?", weekStart, weekEnding)
 	if res.Error != nil {
-		// return res.Error, weeklyInfo{}
 		return weeklyInfo{}, res.Error
 
 	}
@@ -107,7 +104,6 @@ func getWeeklyData(month int, day int, year int, c echo.Context, db *gorm.DB) (w
 	lys := lastYear.AddDate(0, 0, -6)
 	res = db.Find(&data, "Date >= ? AND Date <= ?", lys, lastYear)
 	if res.Error != nil {
-		// return res.Error, weeklyInfo{}
 		return weeklyInfo{}, res.Error
 
 	}
@@ -122,7 +118,6 @@ func getWeeklyData(month int, day int, year int, c echo.Context, db *gorm.DB) (w
 
 	res = db.Find(&data, "Date >= ? AND Date <= ?", lastYear.AddDate(0, 0, 1), up)
 	if res.Error != nil {
-		// return res.Error, weeklyInfo{}
 		return weeklyInfo{}, res.Error
 
 	}
@@ -131,7 +126,6 @@ func getWeeklyData(month int, day int, year int, c echo.Context, db *gorm.DB) (w
 		weekly.UpcomingSales += n.NetSales
 	}
 
-	// return nil, weekly
 	return weekly, nil
 }
 

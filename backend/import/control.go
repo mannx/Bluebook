@@ -148,7 +148,6 @@ func ImportControl(fileName string, db *gorm.DB) error {
 	// save the netsales in the weeklyinfo table
 	// check if we have a current entry
 	wi := models.WeeklyInfo{}
-	log.Debug().Msgf("Retrieve weekly info for date: %v", time.Time(endDate).Format("2006-01-02"))
 
 	// get the weekly info table entry, or create a new one if not already in db
 	res := db.Where("Date = ?", endDate).Find(&wi)
@@ -160,14 +159,11 @@ func ImportControl(fileName string, db *gorm.DB) error {
 	if res.RowsAffected == 0 {
 		// nothing found, make sure we set the date
 		wi.Date = datatypes.Date(endDate)
-	} else {
-		log.Debug().Msgf("found weekly info. Date: %v", time.Time(wi.Date).Format("2006-01-02"))
 	}
 
 	// update the netsales value and save
 	ns, err := strconv.ParseFloat(strings.ReplaceAll(netSales[1], ",", ""), 64)
 	if err != nil {
-		log.Debug().Msgf("[control.go] net sales failed parse: [%v]", netSales[1])
 		return reFail("control.go", "Unable to convert net sales to float")
 	}
 
