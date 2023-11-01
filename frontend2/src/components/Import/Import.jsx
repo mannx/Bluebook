@@ -134,7 +134,7 @@ function createForm(id, entries) {
             <Button variant="contained" type="submit">Import</Button>
         </Stack>
 
-        {(entries !== undefined || entries !== null) && entries.map( (e, i) => {
+        {(entries !== undefined && entries !== null) && entries.map( (e, i) => {
             return (<>
                 <input type="checkbox" id={e} name={i} value={e} />
                 <label for={e}>{e}</label><br/>

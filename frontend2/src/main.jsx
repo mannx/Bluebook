@@ -73,7 +73,7 @@ import Top5, {
 
 import Settings, {
     loader as settingsLoader,
-    // action as settingsAction,
+    action as settingsAction,
 } from "./components/Settings/Settings";
 
 import DebugSettings from "./components/Settings/Debug";
@@ -211,7 +211,7 @@ const router = createBrowserRouter([
                 path: "/settings",
                 element: <Settings />,
                 loader: settingsLoader,
-                // action: settingsAction,
+                action: settingsAction,
             },
             {
                 path: "/debug",
