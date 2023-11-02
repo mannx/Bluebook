@@ -65,6 +65,7 @@ func initServer() *echo.Echo {
 
 	// Backup
 	e.GET("/api/backup/daydata/get", func(c echo.Context) error { return api.BackupViewHandler(c, DB) })
+	e.POST("/api/backup/daydata/action", func(c echo.Context) error { return api.BackupUndoHandler(c, DB) })
 
 	//
 	// VERSION 2
