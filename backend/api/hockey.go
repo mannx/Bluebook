@@ -3,6 +3,7 @@ package api
 import (
 	"bufio"
 	"encoding/json"
+	"net/http"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -46,8 +47,6 @@ var reExtraData = regexp.MustCompile(`((Final(\s[SOT]{2})?)|(\d:\d\d pm \w{3}))\
 
 // receive the import data via post. process and add to db
 func ImportHockeyScheduleHandler(c echo.Context, db *gorm.DB) error {
-	log.Debug().Msgf("Import Hockey Schedule")
-
 	type Body struct {
 		Data string `form:"Data"`
 	}
@@ -142,7 +141,6 @@ type TeamNameData struct {
 	Image   string // image name in /public to display for this team
 }
 
-// var teamNameData map[string]string
 var teamNameData map[string]TeamNameData
 var HomeTeamName string // todo: have this configured by user and stored in db
 
@@ -202,4 +200,66 @@ func InitHockeySchedule() {
 	for _, i := range data.Data {
 		teamNameData[i.Raw] = i
 	}
+}
+
+func HockeyDataHandler(c echo.Context, db *gorm.DB) error {
+
+	type hockeyData struct {
+		Date     string  // date of the game
+		HomeWin  bool    // did the home team win this game?
+		NetSales float64 // net sales for the day
+		Average  float64 // average sales for the given week day
+		AwayTeam string  // name of the away team
+		GFHome   uint
+		GFAway   uint
+	}
+
+	// 1) get the list of hockey games for the date range provided
+	// 2) for each game, get the day sales, compute the weekly average of that day
+
+	// we might be given a year, if so, return all games for that given year
+	var year int
+	err := echo.QueryParamsBinder(c).
+		Int("year", &year).BindError()
+	if err != nil {
+		return LogAndReturnError(c, "Unable to bind to year parameter", err)
+	}
+
+	var hschedule []models.HockeySchedule
+	res := db.Where("Home = ?", HomeTeamName).Find(&hschedule)
+	if res.Error != nil {
+		return LogAndReturnError(c, "Unable to retrieve hockey data", res.Error)
+	}
+
+	hdata := make([]hockeyData, 0)
+
+	for _, i := range hschedule {
+		var dd models.DayData
+		res = db.Where("Date = ?", i.Date).Find(&dd)
+		if res.Error != nil {
+			log.Error().Err(res.Error).Msgf("Unable to retrieve day data for hockey date: [%v] in /hockey/data, skipping", i.Date)
+			continue
+		}
+
+		if res.RowsAffected == 0 {
+			// no data found, skip
+			continue
+		}
+
+		// compute the weekly average
+		avg := calculateWeeklyAverage(time.Time(i.Date), 4, db)
+
+		hdata = append(hdata, hockeyData{
+			Date:     (time.Time(i.Date)).Format("Mon Jan _2 2006"),
+			HomeWin:  i.GFHome > i.GFAway,
+			NetSales: dd.NetSales,
+			Average:  avg,
+			AwayTeam: i.Away,
+			GFAway:   i.GFHome,
+			GFHome:   i.GFHome,
+		})
+
+	}
+
+	return c.JSON(http.StatusOK, &hdata)
 }

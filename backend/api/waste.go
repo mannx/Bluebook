@@ -86,7 +86,6 @@ func UpdateWasteSettingHandler(c echo.Context, db *gorm.DB) error {
 		data.UnitWeight = update.Conversion
 	}
 
-	log.Debug().Msgf("Updating record for item: [%v] %v", data.ID, update.Name)
 	db.Save(&data)
 
 	return ReturnServerMessage(c, "Success", false)
@@ -107,10 +106,6 @@ type WasteViewItem struct {
 
 // GetWasteViewHandler handls the waste report generation
 func GetWasteViewHandler(c echo.Context, db *gorm.DB) error {
-	// type wasteError struct {
-	// 	Message string `json:"Message"`
-	// }
-
 	// WasteView for returning to the client
 	type WasteView struct {
 		WeekEnding time.Time `json:"WeekEnding"`
@@ -232,8 +227,6 @@ func DeleteWasteItemHandler(c echo.Context, db *gorm.DB) error {
 func AddNewWasteItemHandler(c echo.Context, db *gorm.DB) error {
 	item := models.WastageItem{}
 	db.Save(&item)
-
-	log.Debug().Msgf("Add new item: id %v", item.ID)
 
 	type returnData struct {
 		ID uint
@@ -367,8 +360,6 @@ func AddWasteHoldingHandler(c echo.Context, db *gorm.DB) error {
 	if err != nil {
 		return LogAndReturnError(c, fmt.Sprintf("Unable to parse input time [%v]", data.Date), err)
 	}
-
-	log.Debug().Msgf("Adding item [%] for date of [%v/%v/%v] [%v]", data.Name, date.Month(), date.Day(), date.Year(), data.Date)
 
 	// get the item we are adding to the hold
 	// if we dont have it, add it to the db and returns its id

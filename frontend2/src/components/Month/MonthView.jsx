@@ -99,8 +99,12 @@ function NF(obj, prefix="", suffix="") {
         suffix={suffix}
         decimalScale={2}
         fixedDecimalScale={true}
-        / >
+        />
     );
+}
+
+export function NumberFormat(obj, prefix="", suffix="") {
+    return NF(obj,prefix,suffix);
 }
 
 // output a general number
@@ -135,7 +139,8 @@ function Row(data) {
             hcls = "HockeyLoss";
         }
 
-        htip = "Home: " + data.Hockey.GFHome + " Away: " + data.Hockey.GFAway;
+        // htip = <><span>data.Hockey.Away</span>Home: " + data.Hockey.GFHome + " Away: " + data.Hockey.GFAway;
+        htip = <><span>{data.Hockey.Away}<br/></span><span>Home: {data.Hockey.GFHome}  Away: {data.Hockey.GFAway}</span></>
     }
 
     switch(data.SalesLastWeek) {
@@ -176,11 +181,10 @@ function Row(data) {
         <td className="Month no-print">{P(data.ThirdPartyPercent)}</td>
 
         <td className="blank"></td>
-        {/*<td className={`${hcls} ${"Month"}`}>{hock}</td>*/}
-        <td className={`${hcls} ${"Month"}`}>
+        <td className={`${hcls} ${"Month"} ${"no-print"}`}>
             <div className="tooltip-month">
                 {hock}
-                <span className="tooltiptext-month">{htip}</span>
+                <div className="tooltiptext-month">{htip}</div>
             </div>
         </td>
         <td className="Month">{data.Comment}</td>

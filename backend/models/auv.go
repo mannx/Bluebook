@@ -3,36 +3,8 @@ package models
 import (
 	"time"
 
-	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
-
-// AUVEntry holds data for a given month for auv and hours
-// still in use for migrating old data into new table
-type _AUVEntry struct {
-	gorm.Model
-
-	Week1Date  datatypes.Date
-	Week1AUV   int
-	Week1Hours int
-
-	Week2Date  datatypes.Date
-	Week2AUV   int
-	Week2Hours int
-
-	Week3Date  datatypes.Date
-	Week3AUV   int
-	Week3Hours int
-
-	Week4Date  datatypes.Date
-	Week4AUV   int
-	Week4Hours int
-
-	Week5Date     datatypes.Date
-	Week5AUV      int
-	Week5Hours    int
-	Week5Required bool // true if this month has 5 weeks of data
-}
 
 // version2 of the auv data
 // week ending dates are generated and not stored in the db
@@ -113,14 +85,11 @@ func daysInMonth(month time.Month, year int) []time.Time {
 	t := time.Date(year, month, 32, 0, 0, 0, 0, time.UTC)
 	total := 32 - t.Day()
 	days := make([]time.Time, 0)
-	// index := 0
 
 	// check each day
 	for i := 1; i <= total; i++ {
 		d := time.Date(year, month, i, 0, 0, 0, 0, time.UTC)
 		if d.Weekday() == time.Tuesday {
-			// days[index] = d
-			// index += 1
 			days = append(days, d)
 		}
 	}

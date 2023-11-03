@@ -55,9 +55,11 @@ func main() {
 	migrateDB()
 
 	// check for any duplicate day entries
-	err = checkDuplicateEntries()
-	if err != nil {
-		log.Error().Err(err).Msg("Error checking for duplicate days")
+	if !env.Environment.IgnoreChecks {
+		err = checkDuplicateEntries()
+		if err != nil {
+			log.Error().Err(err).Msg("Error checking for duplicate days")
+		}
 	}
 
 	log.Info().Msg("Initialiing server and middleware")
@@ -68,7 +70,6 @@ func main() {
 	go func() {
 		port := fmt.Sprintf(":%v", env.Environment.Port)
 
-		// if err := e.Start(":8080"); err != nil && err != http.ErrServerClosed {
 		if err := e.Start(port); err != nil && err != http.ErrServerClosed {
 			log.Error().Err(err).Msg("Unable to start server!")
 			e.Logger.Fatal("shutting server down")
@@ -99,6 +100,7 @@ func migrateDB() {
 
 	DB.AutoMigrate(&models.BackupEntry{})
 	DB.AutoMigrate(&models.HockeySchedule{})
+	DB.AutoMigrate(&models.DayDataBackup{})
 }
 
 // check to see if we have any duplicated day_data entries

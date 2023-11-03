@@ -43,7 +43,7 @@ func GetWeeklyViewHandler(c echo.Context, db *gorm.DB) error {
 		return err
 	}
 
-	err, weekly := getWeeklyData(month, day, year, c, db)
+	weekly, err := getWeeklyData(month, day, year, c, db)
 	if err != nil {
 		return err
 	}
@@ -51,26 +51,26 @@ func GetWeeklyViewHandler(c echo.Context, db *gorm.DB) error {
 	return c.JSON(http.StatusOK, &weekly)
 }
 
-func getWeeklyData(month int, day int, year int, c echo.Context, db *gorm.DB) (error, weeklyInfo) {
+func getWeeklyData(month int, day int, year int, c echo.Context, db *gorm.DB) (weeklyInfo, error) {
 	weekEnding := time.Date(year, time.Month(month), day, 0, 0, 0, 0, time.UTC)
 	weekStart := weekEnding.AddDate(0, 0, -6)
 
 	// make sure a tuesday
 	if weekEnding.Weekday() != time.Tuesday {
-		return c.JSON(http.StatusOK, "Can only view from a tuesday"), weeklyInfo{}
+		return weeklyInfo{}, c.JSON(http.StatusOK, "Can only view from a tuesday")
 	}
 
 	weekly := weeklyInfo{}
 	err := getAuvData(weekEnding, &weekly, db)
 	if err != nil {
-		return err, weeklyInfo{}
+		return weeklyInfo{}, err
 	}
 
 	// retrieve the data for the week
 	data := make([]models.DayData, 9)
 	res := db.Find(&data, "Date >= ? AND Date <= ?", weekStart, weekEnding)
 	if res.Error != nil {
-		return res.Error, weeklyInfo{}
+		return weeklyInfo{}, res.Error
 
 	}
 
@@ -103,7 +103,7 @@ func getWeeklyData(month int, day int, year int, c echo.Context, db *gorm.DB) (e
 	lys := lastYear.AddDate(0, 0, -6)
 	res = db.Find(&data, "Date >= ? AND Date <= ?", lys, lastYear)
 	if res.Error != nil {
-		return res.Error, weeklyInfo{}
+		return weeklyInfo{}, res.Error
 
 	}
 
@@ -117,7 +117,7 @@ func getWeeklyData(month int, day int, year int, c echo.Context, db *gorm.DB) (e
 
 	res = db.Find(&data, "Date >= ? AND Date <= ?", lastYear.AddDate(0, 0, 1), up)
 	if res.Error != nil {
-		return res.Error, weeklyInfo{}
+		return weeklyInfo{}, res.Error
 
 	}
 
@@ -125,8 +125,7 @@ func getWeeklyData(month int, day int, year int, c echo.Context, db *gorm.DB) (e
 		weekly.UpcomingSales += n.NetSales
 	}
 
-	return nil, weekly
-
+	return weekly, nil
 }
 
 func calculateWeekly(data []models.DayData, wi *weeklyInfo) {

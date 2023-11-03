@@ -45,8 +45,6 @@ export async function action({request}) {
     const formData = await request.formData();
     const updates = Object.fromEntries(formData);
 
-    console.log(updates);
-
     return null;
 }
 
@@ -191,8 +189,6 @@ export async function EditAction({request, params}) {
         Name: updates.Name,
         Location: parseInt(updates.Location)
     };
-
-    console.log(body);
 
     const opt = GetPostOptions(JSON.stringify(body));
     await fetch(UrlGet(UrlApiWasteItemUpdate), opt);

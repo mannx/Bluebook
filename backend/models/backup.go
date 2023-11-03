@@ -13,3 +13,11 @@ type BackupEntry struct {
 	FileName string         //`gorm:"column:FileName"` // name of the file in the /backups dir
 	Uploaded bool           // has this db been upload to the cloud?
 }
+
+// When a DayData entry is created or modified a copy is stored here
+type DayDataBackup struct {
+	gorm.Model
+
+	DayData
+	DayID uint // id of the original DayData structure
+}

@@ -32,7 +32,6 @@ export async function loader({request}) {
 
 export default function CommentSearch(){
     const {data} = useLoaderData();
-    console.log(data);
 
     let table = <></>;
     if(data !== null && data !== undefined){

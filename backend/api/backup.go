@@ -1,220 +1,63 @@
 package api
 
-//import (
-//	"net/http"
-//	"time"
+import (
+	"net/http"
+	"time"
 
-//	"github.com/labstack/echo/v4"
-//	"github.com/rs/zerolog/log"
-//	"gorm.io/gorm"
+	"github.com/labstack/echo/v4"
+	"github.com/mannx/Bluebook/models"
+	"github.com/rs/zerolog/log"
+	"gorm.io/gorm"
+)
 
-//	models "github.com/mannx/Bluebook/models"
-//)
+func BackupViewHandler(c echo.Context, db *gorm.DB) error {
+	var data []models.DayDataBackup
 
-//func BackupHandler(c echo.Context, db *gorm.DB) error {
-//	var backup []models.DayDataBackup
-//	var list []models.DayDataImportList
+	res := db.Order("Date").Find(&data)
+	if res.Error != nil {
+		return LogAndReturnError(c, "Unable to retrieve day data backup data", res.Error)
+	}
 
-//	// read all backup data
-//	res := db.Find(&backup)
-//	if res.Error != nil {
-//		log.Error().Err(res.Error).Msg("Unable to retrieve backup data, skipping...")
-//	}
+	return c.JSON(http.StatusOK, &data)
+}
 
-//	res = db.Find(&list)
-//	if res.Error != nil {
-//		log.Error().Err(res.Error).Msg("Unable to retrieve backup import listdata, skipping...")
-//	}
+func BackupUndoHandler(c echo.Context, db *gorm.DB) error {
+	// recieve post'd list of id's to revert
+	ids := make([]string, 0)
 
-//	type importList struct {
-//		EntryID uint // id of the item
-//		Item    models.DayData
-//	}
+	if err := c.Bind(&ids); err != nil {
+		return LogAndReturnError(c, "Unable to bind list of ints to BackupUndoHandler", err)
+	}
 
-//	type data struct {
-//		Backup []models.DayDataBackup
-//		List   []importList
-//	}
+	for _, id := range ids {
+		data := models.DayDataBackup{}
 
-//	lst := make([]importList, 0)
-//	for _, i := range list {
-//		// get the data that was imported
-//		var dd models.DayData
+		res := db.Where("ID = ?", id).First(&data)
+		if res.Error != nil {
+			return LogAndReturnError(c, "Unable to find id", res.Error)
+		}
 
-//		res = db.Find(&dd, "ID = ?", i.EntryID)
-//		if res.Error != nil {
-//			log.Error().Err(res.Error).Msgf("Unable to retrieve DayData object with ID %v found in DayDataImportList", i.EntryID)
-//			continue
-//		}
+		dd := data.DayData
+		dd.ID = data.DayID
 
-//		dd.DateString = dd.GetDate()
+		// save it overwritting whats in the daydata table
+		db.Save(&dd)
 
-//		lst = append(lst, importList{
-//			EntryID: i.EntryID,
-//			Item:    dd,
-//		})
-//	}
+		// remove from the undo table
+		db.Delete(&data)
 
-//	bkp := make([]models.DayDataBackup, len(backup))
+		log.Info().Msgf(" ==> Undid day id [%v] for date [%v]", dd.ID, time.Time(data.Date).Format("01-02-2006"))
+	}
 
-//	// update the date string for each backup data item
-//	for i, obj := range backup {
-//		obj.DateString = time.Time(obj.Date).Format("Jan 02, 2006")
-//		bkp[i] = obj
-//	}
+	return ReturnServerMessage(c, "Not Yet Implemented", true)
+}
 
-//	return c.JSON(http.StatusOK, &data{
-//		Backup: bkp,
-//		List:   lst,
-//	})
-//}
+// Clear out the daily backup table
+func DailyBackupClearHandler(c echo.Context, db *gorm.DB) error {
+	res := db.Where("1 = 1").Delete(&models.DayDataBackup{})
+	if res.Error != nil {
+		return LogAndReturnError(c, "Unable to delete day data backup table", res.Error)
+	}
 
-//func BackupRevertHandler(c echo.Context, db *gorm.DB) error {
-//	var idList []uint // list of id's to copy back
-
-//	if err := c.Bind(&idList); err != nil {
-//		return LogAndReturnError(c, "Unable to retrieve id list for [BackupRevertHandler]", err)
-//	}
-
-//	for _, id := range idList {
-//		var dd models.DayDataBackup
-
-//		res := db.Find(&dd, "id = ?", id)
-//		if res.Error != nil {
-//			return LogAndReturnError(c, "Unable to retrieve ID from db for pBackupRevertHandler]", res.Error)
-//		}
-
-//		if res.RowsAffected == 0 {
-//			log.Warn().Msgf("Unable to find record to revert for [BackupRevertHandler] ID = %v", id)
-//			continue
-//		}
-
-//		// get the original data
-//		data := dd.DayData
-
-//		db.Save(&data) // update it
-//	}
-
-//	return ReturnServerMessage(c, "Success", false)
-//}
-
-//func BackupUndoHandler(c echo.Context, db *gorm.DB) error {
-//	var idList []uint // list of id's to copy back
-
-//	if err := c.Bind(&idList); err != nil {
-//		return LogAndReturnError(c, "Unable to retrieve id list for [BackupUndoHandler]", err)
-//	}
-
-//	// list of id's points to DayData objects
-//	res := db.Delete(&models.DayData{}, idList)
-//	if res.Error != nil {
-//		return LogAndReturnError(c, "Unable to delete records for [BackupUndoHandler]", res.Error)
-//	}
-
-//	return ReturnServerMessage(c, "Success", false)
-//}
-
-//// BackupEmptyTables is used to clear out both undo tables
-//func BackupEmptyHandler(c echo.Context, db *gorm.DB) error {
-//	// 1 = 1 is used since a condition is required
-//	db.Where("1 = 1").Delete(&models.DayDataBackup{})
-//	db.Where("1 = 1").Delete(&models.DayDataImportList{})
-
-//	return ReturnServerMessage(c, "Success", false)
-//}
-
-//// FileInfo is used to store the information about a given db file
-//// type FileInfo struct {
-//// 	ID       int
-//// 	FileName string
-//// 	Month    int
-//// 	Day      int
-//// 	Year     int
-//// }
-
-////var dbListing []FileInfo
-
-////func InitializeDBListing() error {
-////	dir, err := os.ReadDir(env.Environment.BackupPath)
-////	if err != nil {
-////		return err
-////	}
-
-////	dbListing = make([]FileInfo, 0)
-////	re := regexp.MustCompile(`db-(\d\d)-(\d\d)-(\d\d\d\d).db`)
-
-////	for i, f := range dir {
-////		// do we have a backup file?
-////		match := re.FindStringSubmatch(f.Name())
-////		if len(match) == 0 {
-////			// no matches found, skip file
-////			continue
-////		}
-
-////		// extract the date information
-////		month, _ := strconv.Atoi(match[1])
-////		day, _ := strconv.Atoi(match[2])
-////		year, _ := strconv.Atoi(match[3])
-
-////		dbListing = append(dbListing, FileInfo{
-////			ID:       i - 1,
-////			FileName: f.Name(),
-////			Month:    month,
-////			Day:      day,
-////			Year:     year,
-////		})
-////	}
-
-////	return nil
-////}
-
-////// Return list of databases to revert to or remove
-////func BackupDBView(c echo.Context, db *gorm.DB) error {
-////	return c.JSON(http.StatusOK, &dbListing)
-////}
-
-////func BackupDBRemove(c echo.Context, db *gorm.DB) error {
-////	type inputData struct {
-////		ID     int
-////		Remove bool
-////	}
-
-////	var input inputData
-////	if err := c.Bind(&input); err != nil {
-////		return LogAndReturnError(c, "Failed to bind data for BackupDBRemove", err)
-////	}
-
-////	// get the file name we are removing
-////	fname := dbListing[input.ID].FileName
-////	path := fmt.Sprintf("%v/%v", env.Environment.BackupPath, fname)
-
-////	// remove the file
-////	err := os.Remove(path)
-////	if err != nil {
-////		return LogAndReturnError(c, fmt.Sprintf("Unable to remove file: %v", path), err)
-////	}
-
-////	return ReturnServerOK(c)
-////}
-
-////func BackupDBRestore(c echo.Context, db *gorm.DB) error {
-////	type inputData struct {
-////		ID int
-////	}
-
-////	var input inputData
-////	if err := c.Bind(&input); err != nil {
-////		return LogAndReturnError(c, "Unable to bind data for BackupDBRestore", err)
-////	}
-
-////	// get the file name
-////	// fname := dbListing[input.ID].FileName
-////	// path := fmt.Sprintf("%v/%v", env.Environment.BackupPath, fname)
-
-////	// todo:
-////	//	setup script/timer to copy db to correct location once exited
-////	//	exit program
-////	//	once script is run, restart app
-
-////	return ReturnServerOK(c)
-////}
+	return ReturnServerMessage(c, "Day Data Backup Table Cleared", false)
+}

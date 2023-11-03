@@ -85,6 +85,14 @@ import HockeySchedule, {
     action as hockeyAction,
 } from "./components/Import/HockeySchedule";
 
+import HockeyData, {
+    loader as hockeyDataLoader,
+} from "./components/Hockey/HockeyData";
+
+import SimpleStats, {
+    loader as statsAverageLoader,
+} from './components/Stats/Stats';
+
 import './index.css'
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
@@ -218,6 +226,16 @@ const router = createBrowserRouter([
                 path: "/hockey",
                 element: <HockeySchedule />,
                 action: hockeyAction,
+            },
+            {
+                path: "/hockey/data/:year?",
+                element: <HockeyData />,
+                loader: hockeyDataLoader, 
+            },
+            {
+                path: "/stats/simple",
+                element: <SimpleStats />,
+                loader: statsAverageLoader,
             },
         ],
     },

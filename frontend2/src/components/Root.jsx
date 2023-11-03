@@ -60,7 +60,7 @@ function navHeader2() {
 
     const settingsMenu = [
         {
-            Title: "DB Settings",
+            Title: "Backups",
             Url: "/settings",
         },
         {
@@ -75,6 +75,14 @@ function navHeader2() {
             Title: "Hockey Schedule",
             Url: "/hockey",
         },
+        {
+            Title: "Hockey Data",
+            Url: "/hockey/data",
+        },
+        {
+            Title: "Simple Stats",
+            Url: "/stats/simple",
+        }
     ];
 
     const [anchorE1user, setAnchorE1user] = React.useState(null);

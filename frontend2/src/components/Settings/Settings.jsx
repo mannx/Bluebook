@@ -1,79 +1,81 @@
-import * as react from 'react';
-import {Form, useLoaderData} from "react-router-dom";
-
+import * as React from 'react';
+import {useNavigate, Form, Link, useLoaderData} from "react-router-dom";
 import Button from '@mui/material/Button';
 
-import {UrlGet, UrlApiDailyUndo, UrlApiDailyRevert, UrlApiGetBackupTable} from "../URLs";
+import {UrlGet, UrlApiDailyUndoList, UrlApiDailyUndoAction, GetPostOptions, UrlApiDailyUndoClear} from "../URLs";
 
 // retrieve the list of backup days we have available
-export async function loader() {
-    const url = UrlGet(UrlApiDailyUndo);
+export async function loader(){
+    const url = UrlGet(UrlApiDailyUndoList);
     const resp = await fetch(url);
     const data = await resp.json();
 
     return {data};
 }
 
-export async function action({request, params}) {
+export async function action({request}){
     const formData = await request.formData();
     const updates = Object.fromEntries(formData);
-    const table = updates.table;
 
-    let url = "";
-    if(table === "undo") {
-        url = UrlGet(UrlApiDailyUndo);
-    }else{
-        url = UrlGet(UrlApiDailyRevert);
-    }
+    // flatten the object into an array of file names
+    // each file name has a numeric key starting at 0
+    const ids = Object.keys(updates).map( (o) => {
+        return updates[o];
+    }).filter( (o) => o !== undefined);
 
-    console.log(url);
+    const url = UrlGet(UrlApiDailyUndoAction);
+    const opt = GetPostOptions(JSON.stringify(ids));
+
+    await fetch(url, opt);
+
     return null;
 }
 
 export default function Settings() {
     const {data}=useLoaderData();
+    const [errMsg, setErrMsg] = React.useState("");
+    const nav = useNavigate();
+
+    const clearBackupTable = async () => {
+        setErrMsg("Clearing backup table...");
+
+        const url = UrlGet(UrlApiDailyUndoClear);
+        const resp = await fetch(url);
+        const json = await resp.json();
+
+        setErrMsg(json.Message);   
+        nav(0);
+    }
 
     return (<>
-        <h3>Daily Data Undo</h3>
-        <Button variant="contained" type="submit">Undo</Button>
-        <Imports title="Import Revert List" prefix="revert" data={data.List} />
-        <Imports title="Daily Data Undo List" prefix="undo" data={data.Backup} />
-        </>);
-}
-
-// <Imports title="Title" data={data[]} callback=() />
-function Imports(props) {
-    const id = (i) => {
-        return i.EntryID === undefined ? i.ID : i.EntryID;
-    }
-
-    const item = (i) => {
-        return i.Item === undefined ? i : i.Item;
-    }
-
-    return (
+        <h3>Daily Import Backups</h3>
+        <Button variant="contained" onClick={clearBackupTable}>Clear Backup Table</Button>
+        <span>{errMsg}</span>
         <Form method="post">
-        <input type="hidden" name="table" value={props.prefix} />
-        <table className="Month">
-        <caption><h4>{props.title}<Button variant="contained" type="submit">Revert</Button></h4></caption>
-        <thead>
-        <tr >
-        <th></th>
-        <th>ID</th>
-        <th>Date</th>
-        </tr>
-        </thead>
+        <table className="month">
+            <caption><h4>Daily Undo <Button variant="contained" type="submit">Undo</Button></h4></caption>
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Date</th>
+                    <th>Net Sales</th>
+                </tr>
+            </thead>
 
-        <tbody>
-        {props.data.map( (obj) => {
-            return <tr>
-                <td><input type="checkbox" name={id(obj)} /></td>
-                <td>{id(obj)}</td>
-                <td>{item(obj).DateString}</td>
-                </tr>;
-        })}
-        </tbody>
+            <tbody>
+                {data.map( (o) => {
+                    // remove timezone info to prevent showing a previous day
+                    //  (date has UTC timezone and dayjs will shift that to local time)
+                    const dateStr = o.Date.slice(0,o.Date.length-10);
+
+                    return (<tr>
+                        <td><input type="checkbox" name={"id-" + o.ID} value={o.ID}/></td>
+                        <td>{dateStr}</td>
+                        <td>{o.NetSales}</td>
+                    </tr>);
+                })}
+            </tbody>
         </table>
         </Form>
-    );
+        </>);
 }

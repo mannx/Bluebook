@@ -8,7 +8,6 @@ import (
 	"github.com/labstack/echo/v4"
 	api "github.com/mannx/Bluebook/api"
 	models "github.com/mannx/Bluebook/models"
-	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
 )
 
@@ -44,15 +43,12 @@ func GetAUVViewHandler(c echo.Context, db *gorm.DB) error {
 		auv := models.AUVEntryArray{}
 		auv.Blank(time.Month(month), year)
 
-		log.Debug().Msgf("Returing blank entry for %v/%v", month, year)
-
 		return c.JSON(http.StatusOK, &auv)
 	}
 }
 
 // get data POST'd to us and save to the db
 func UpdateAUVHandler(c echo.Context, db *gorm.DB) error {
-	log.Debug().Msgf("{UpdateAUVHandler]")
 	var data models.AUVEntryArray
 
 	if err := c.Bind(&data); err != nil {

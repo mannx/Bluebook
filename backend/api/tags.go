@@ -98,17 +98,10 @@ func TagDataViewHandler(c echo.Context, db *gorm.DB) error {
 		//		currently this requires manual clean up of the db.
 		//		ideally the data should be linked and deleted the day should delete the tag data also
 		if err.RowsAffected == 0 {
-			log.Debug().Msgf("  DayID (%v) for tag (%v) not found in day_data", i.DayID, i.ID)
+			log.Info().Msgf("  DayID (%v) for tag (%v) not found in day_data", i.DayID, i.ID)
 		}
 
 		tstr, tids := GetTags(d.ID, db)
-
-		log.Debug().Msgf("[TAG] Day Id: %v", d.ID)
-		if d.ID == 0 {
-			log.Debug().Msgf("  => d.ID == 0")
-			log.Debug().Msgf("  => i.DayID = %v", i.DayID)
-		}
-
 		tl := TagList{
 			Day:    d,
 			Date:   (time.Time(d.Date)).Format("Mon Jan _2 2006"),

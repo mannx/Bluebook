@@ -26,6 +26,7 @@ func initServer() *echo.Echo {
 
 	// routes
 	e.GET("/api/month", func(c echo.Context) error { return api.GetMonthViewHandler(c, DB) })
+	e.GET("/api/hockey/data", func(c echo.Context) error { return api.HockeyDataHandler(c, DB) })
 
 	// import GET and POST handlers
 	e.POST("/api/import/daily", importPostDaily)
@@ -63,6 +64,9 @@ func initServer() *echo.Echo {
 	e.GET("/api/top5/data", func(c echo.Context) error { return api.GetTop5ViewHandler(c, DB) })
 
 	// Backup
+	e.GET("/api/backup/daydata/get", func(c echo.Context) error { return api.BackupViewHandler(c, DB) })
+	e.POST("/api/backup/daydata/action", func(c echo.Context) error { return api.BackupUndoHandler(c, DB) })
+	e.GET("/api/backup/daydata/clear", func(c echo.Context) error { return api.DailyBackupClearHandler(c, DB) })
 
 	//
 	// VERSION 2
@@ -82,5 +86,7 @@ func initServer() *echo.Echo {
 	e.POST("/api2/auv/update", func(c echo.Context) error { return api2.UpdateAUVHandler(c, DB) })
 
 	e.GET("/api/comment/search", func(c echo.Context) error { return api.CommentSearchHandler(c, DB) })
+
+	e.GET("/api/stats/average", func(c echo.Context) error { return api2.StatsAverageSalesByDayHandler(c, DB) })
 	return e
 }
