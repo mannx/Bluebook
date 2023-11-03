@@ -6,6 +6,7 @@ ImportDaily(file string) -> imports a daily sheet from the provided file name
 
 import (
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/rs/zerolog/log"
@@ -96,12 +97,25 @@ func ImportDaily(fileName string, db *gorm.DB) error {
 		// add a new entry to the backup table before creating or updating this record
 		backup := models.DayDataBackup{
 			DayData: dd,
+			DayID:   dd.ID,
 		}
 
-		db.Save(&backup)
+		// if dd.ID == 0, then we have a fresh entry
+		if dd.ID == 0 {
+			backup.DayData = models.DayData{
+				Date: dd.Date,
+			}
+		}
+
+		log.Debug().Msgf(" == Backup original ID: %v", dd.ID)
 
 		// save to database
 		db.Save(&dd)
+
+		// save the new id to the original id for the backup
+		backup.DayID = dd.ID
+		db.Save(&backup)
+
 	}
 
 	return nil
@@ -121,7 +135,9 @@ func getFloat(file *excelize.File, sheet string, cell string) float64 {
 		return 0.0
 	}
 
-	n, err := strconv.ParseFloat(v, 64)
+	// strip away any $ in the front
+	str := strings.ReplaceAll(strings.Trim(v, "$"), ",", "")
+	n, err := strconv.ParseFloat(str, 64)
 	if err != nil {
 		log.Error().Err(err).Msgf("unable to get float from %v [%v]", cell, v)
 		return 0.0

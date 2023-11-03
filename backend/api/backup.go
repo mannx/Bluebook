@@ -38,12 +38,26 @@ func BackupUndoHandler(c echo.Context, db *gorm.DB) error {
 		}
 
 		dd := data.DayData
+		dd.ID = data.DayID
 
 		// save it overwritting whats in the daydata table
 		db.Save(&dd)
+
+		// remove from the undo table
+		db.Delete(&data)
 
 		log.Info().Msgf(" ==> Undid day id [%v] for date [%v]", dd.ID, time.Time(data.Date).Format("01-02-2006"))
 	}
 
 	return ReturnServerMessage(c, "Not Yet Implemented", true)
+}
+
+// Clear out the daily backup table
+func DailyBackupClearHandler(c echo.Context, db *gorm.DB) error {
+	res := db.Where("1 = 1").Delete(&models.DayDataBackup{})
+	if res.Error != nil {
+		return LogAndReturnError(c, "Unable to delete day data backup table", res.Error)
+	}
+
+	return ReturnServerMessage(c, "Day Data Backup Table Cleared", false)
 }

@@ -19,4 +19,5 @@ type DayDataBackup struct {
 	gorm.Model
 
 	DayData
+	DayID uint // id of the original DayData structure
 }

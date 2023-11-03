@@ -60,7 +60,7 @@ function navHeader2() {
 
     const settingsMenu = [
         {
-            Title: "DB Settings",
+            Title: "Backups",
             Url: "/settings",
         },
         {

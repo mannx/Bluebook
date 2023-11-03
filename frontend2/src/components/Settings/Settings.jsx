@@ -1,8 +1,8 @@
-import * as react from 'react';
-import {Form, useLoaderData} from "react-router-dom";
+import * as React from 'react';
+import {useNavigate, Form, Link, useLoaderData} from "react-router-dom";
 import Button from '@mui/material/Button';
 
-import {UrlGet, UrlApiDailyUndoList, UrlApiDailyUndoAction, GetPostOptions} from "../URLs";
+import {UrlGet, UrlApiDailyUndoList, UrlApiDailyUndoAction, GetPostOptions, UrlApiDailyUndoClear} from "../URLs";
 
 // retrieve the list of backup days we have available
 export async function loader(){
@@ -33,9 +33,24 @@ export async function action({request}){
 
 export default function Settings() {
     const {data}=useLoaderData();
+    const [errMsg, setErrMsg] = React.useState("");
+    const nav = useNavigate();
+
+    const clearBackupTable = async () => {
+        setErrMsg("Clearing backup table...");
+
+        const url = UrlGet(UrlApiDailyUndoClear);
+        const resp = await fetch(url);
+        const json = await resp.json();
+
+        setErrMsg(json.Message);   
+        nav(0);
+    }
 
     return (<>
-        <h3 style={{color: "red"}}>CAUTION: Not fully tested</h3>
+        <h3>Daily Import Backups</h3>
+        <Button variant="contained" onClick={clearBackupTable}>Clear Backup Table</Button>
+        <span>{errMsg}</span>
         <Form method="post">
         <table className="month">
             <caption><h4>Daily Undo <Button variant="contained" type="submit">Undo</Button></h4></caption>
@@ -43,6 +58,7 @@ export default function Settings() {
                 <tr>
                     <th></th>
                     <th>Date</th>
+                    <th>Net Sales</th>
                 </tr>
             </thead>
 
@@ -55,6 +71,7 @@ export default function Settings() {
                     return (<tr>
                         <td><input type="checkbox" name={"id-" + o.ID} value={o.ID}/></td>
                         <td>{dateStr}</td>
+                        <td>{o.NetSales}</td>
                     </tr>);
                 })}
             </tbody>

@@ -52,6 +52,7 @@ export const UrlApiTop5Data = "/api/top5/data";
 // export const UrlApiDailyRevert = "/api/backup/revert";          // retrieve the daily data undo list
 export const UrlApiDailyUndoList = "/api/backup/daydata/get";
 export const UrlApiDailyUndoAction = "/api/backup/daydata/action";
+export const UrlApiDailyUndoClear = "/api/backup/daydata/clear";
 
 export const UrlApiCommentSearch = "/api/comment/search"; 		// search for all comments containing the search term
 

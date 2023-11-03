@@ -105,22 +105,22 @@ export default function Import() {
 
     return (
         <Box sx={{ width: '100%' }}>
-        <Box sx={{ borderBottom: 1, borderColor: 'divider'}}>
-        <Tabs value={value} onChange={handleChange}>
-        <Tab label="Dailies" {...a11yProps(0)} />
-        <Tab label="Control Sheet" {...a11yProps(1)} />
-        <Tab label="WISR Sheet" {...a11yProps(2)} />
-        </Tabs>
-        </Box>
-        <TabPanel value={value} index={0}>
-        {createForm("daily", data.Daily)}
-        </TabPanel>
-        <TabPanel value={value} index={1}>
-        {createForm("control", data.Control)}
-        </TabPanel>
-        <TabPanel value={value} index={2}>
-        {createForm("wisr", data.WISR)}
-        </TabPanel>
+            <Box sx={{ borderBottom: 1, borderColor: 'divider'}}>
+                <Tabs value={value} onChange={handleChange}>
+                    <Tab label="Dailies" {...a11yProps(0)} />
+                    <Tab label="Control Sheet" {...a11yProps(1)} />
+                    <Tab label="WISR Sheet" {...a11yProps(2)} />
+                </Tabs>
+            </Box>
+            <TabPanel value={value} index={0}>
+                {createForm("daily", data.Daily)}
+            </TabPanel>
+            <TabPanel value={value} index={1}>
+                {createForm("control", data.Control)}
+            </TabPanel>
+            <TabPanel value={value} index={2}>
+                {createForm("wisr", data.WISR)}
+            </TabPanel>
         </Box>
     );
 }
