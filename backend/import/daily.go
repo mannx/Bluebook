@@ -5,6 +5,7 @@ ImportDaily(file string) -> imports a daily sheet from the provided file name
 */
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -117,6 +118,9 @@ func ImportDaily(fileName string, db *gorm.DB) error {
 		db.Save(&backup)
 
 	}
+
+	// create a notification to inform the user it has been imported
+	models.NewNotification(fmt.Sprintf("Successfully import %v days from daily.", numDays), true, db)
 
 	return nil
 }
