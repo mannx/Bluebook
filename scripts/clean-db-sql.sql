@@ -12,3 +12,6 @@ DELETE FROM wastage_entry_holdings WHERE deleted_at IS NOT NULL;
 DELETE FROM wastage_items WHERE deleted_at IS NOT NULL;
 DELETE FROM weekly_infos WHERE deleted_at IS NOT NULL;
 
+-- remove all notifcations that have either been deleted or already shown
+DELETE FROM notifcations WHERE deleted_at IS NOT NULL;
+DELETE FROM notifcations WHERE shown IS TRUE;
