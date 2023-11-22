@@ -17,7 +17,6 @@ import Typography from '@mui/material/Typography';
 
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import Badge from '@mui/material/Badge';
-// import IconButton from '@mui/material/IconButton';
 
 export default function Root() {
     const {data} = useLoaderData();
@@ -113,9 +112,10 @@ function navHeader2(notif) {
         setAnchorE1user(null);
     }
 
-    // console.log("notifcations: ");
-    // console.log(notif);
-    
+    const numNotifs = (notif !== undefined && notif !== null) ? notif.length : 0;
+
+    console.log(numNotifs);
+
     return (
         <Box sx={{flexGrow:1}} className="no-print" >
         <AppBar position="static">
@@ -138,7 +138,7 @@ function navHeader2(notif) {
             </Tooltip>
 
             <IconButton size="large" color="inherit">
-                <Badge badgeContent={1} color="error">
+                <Badge badgeContent={numNotifs} color="error">
                     <NotificationsIcon/>
                 </Badge>
             </IconButton>

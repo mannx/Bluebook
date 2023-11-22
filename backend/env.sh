@@ -6,3 +6,4 @@ export BLUEBOOK_DATA_PATH=./data
 export BLUEBOOK_BACKUP_PATH=./data
 export BLUEBOOK_LOG_LEVEL=Debug
 export BLUEBOOK_PORT=8080
+export BLUEBOOK_IGNORE=True
