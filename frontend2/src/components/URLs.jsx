@@ -59,6 +59,7 @@ export const UrlApiCommentSearch = "/api/comment/search"; 		// search for all co
 export const UrlApiHockeyData = "/api/hockey/data";
 export const UrlApi2AverageStats = "/api/stats/average";
 
+export const UrlApiGetNotifications = "/api/notifications/get";
 export function UrlGet(name) {
 	var base = "";
 	if(production === false) {

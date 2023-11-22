@@ -1,6 +1,8 @@
 import * as React from 'react';
-import {Outlet, NavLink, useNavigate} from "react-router-dom";
+import {Outlet, NavLink, useNavigate, useLoaderData} from "react-router-dom";
 import "./header.css";
+
+import {UrlGet, UrlApiGetNotifications} from "./URLs";
 
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -13,16 +15,30 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
 
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import Badge from '@mui/material/Badge';
+// import IconButton from '@mui/material/IconButton';
+
 export default function Root() {
+    const {data} = useLoaderData();
+
     return (
         <>
-        {navHeader2()}
+        {navHeader2(data)}
         <div><Outlet /></div>
         </>
     );
 }
 
-function navHeader2() {
+export async function loader(){
+    const url = UrlGet(UrlApiGetNotifications);
+    const resp = await fetch(url);
+    const data = await resp.json();
+
+    return {data};
+}
+
+function navHeader2(notif) {
     const pages = [
         {
             Title: "Today",
@@ -97,6 +113,8 @@ function navHeader2() {
         setAnchorE1user(null);
     }
 
+    // console.log("notifcations: ");
+    // console.log(notif);
     
     return (
         <Box sx={{flexGrow:1}} className="no-print" >
@@ -118,6 +136,12 @@ function navHeader2() {
                     <SettingsIcon />
                 </IconButton>
             </Tooltip>
+
+            <IconButton size="large" color="inherit">
+                <Badge badgeContent={1} color="error">
+                    <NotificationsIcon/>
+                </Badge>
+            </IconButton>
 
             <Menu sx={{mt:'45px'}} id='menu-appbar' anchorEl={anchorE1user} anchorOrigin={{vertical: 'top', horizontal: 'right',}} keepMounted transformOrigin={{vertical: 'top', horizontal: 'right',}} open={Boolean(anchorE1user)} onClose={handleCloseUserMenu}>
                 {settingsMenu.map( (item, i) => {
