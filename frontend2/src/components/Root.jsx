@@ -101,6 +101,7 @@ function navHeader2(notif) {
     ];
 
     const [anchorE1user, setAnchorE1user] = React.useState(null);
+    const [notifVisible, setNotifVisible] = React.useState(null);
 
     const navigate = useNavigate();
 
@@ -110,6 +111,14 @@ function navHeader2(notif) {
 
     const handleCloseUserMenu = () => {
         setAnchorE1user(null);
+    }
+
+    const showNotif = (e) => {
+        setNotifVisible(e.currentTarget);
+    }
+
+    const handleCloseNotif = () => {
+        setNotifVisible(null);
     }
 
     const numNotifs = (notif !== undefined && notif !== null) ? notif.length : 0;
@@ -137,11 +146,21 @@ function navHeader2(notif) {
                 </IconButton>
             </Tooltip>
 
-            <IconButton size="large" color="inherit">
-                <Badge badgeContent={numNotifs} color="error">
-                    <NotificationsIcon/>
-                </Badge>
-            </IconButton>
+            {/* <Menu id='menu-notif' anchorOrigin={{vertical: 'top', horizontal: 'right',}} keepMounted transformOrigin={{vertical: 'top', horizontal: 'right'}}  open={Boolean(showNotif)} onClose={handleCloseNotif}>
+                <MenuItem> */}
+                    <IconButton size="large" color="inherit" onClick={showNotif}>
+                        <Badge badgeContent={numNotifs} color="error">
+                            <NotificationsIcon/>
+                        </Badge>
+                    </IconButton>
+                {/* </MenuItem>
+            </Menu> */}
+
+            <Menu sx={{mt: '45px'}} id='menu-notif' anchorEl={notifVisible} anchorOrigin={{vertical: 'top', horizontal: 'right',}} keepMounted transformOrigin={{vertical: 'top', horizontal: 'right'}}  open={Boolean(showNotif)} onClose={handleCloseNotif}>
+                <MenuItem>
+                    <Typography textAlign="center">Notification data here</Typography>
+                </MenuItem>
+            </Menu>
 
             <Menu sx={{mt:'45px'}} id='menu-appbar' anchorEl={anchorE1user} anchorOrigin={{vertical: 'top', horizontal: 'right',}} keepMounted transformOrigin={{vertical: 'top', horizontal: 'right',}} open={Boolean(anchorE1user)} onClose={handleCloseUserMenu}>
                 {settingsMenu.map( (item, i) => {
