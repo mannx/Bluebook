@@ -72,6 +72,7 @@ func initServer() *echo.Echo {
 	//  TODO:
 	//		- Update this to a push notification system instead of having to poll each page refresh
 	e.GET("/api/notifications/get", func(c echo.Context) error { return api.HandleGetNotification(c, DB) })
+	e.POST("/api/notifications/clear", func(c echo.Context) error { return api.HandleClearNotifications(c, DB) })
 
 	//
 	// VERSION 2

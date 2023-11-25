@@ -2,7 +2,7 @@ import * as React from 'react';
 import {Outlet, NavLink, useNavigate, useLoaderData} from "react-router-dom";
 import "./header.css";
 
-import {UrlGet, UrlApiGetNotifications} from "./URLs";
+import {UrlGet, UrlApiGetNotifications, UrlApiClearNotifications, GetPostOptions} from "./URLs";
 
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -37,7 +37,7 @@ export async function loader(){
     return {data};
 }
 
-function navHeader2(notif) {
+function navHeader2(data) {
     const pages = [
         {
             Title: "Today",
@@ -104,6 +104,7 @@ function navHeader2(notif) {
     const [notifVisible, setNotifVisible] = React.useState(null);
 
     const navigate = useNavigate();
+    let numNotifs = (data !== undefined && data !== null) ? data.length : 0;
 
     const settingsHandler = (e) => {
         setAnchorE1user(e.currentTarget);
@@ -117,13 +118,25 @@ function navHeader2(notif) {
         setNotifVisible(e.currentTarget);
     }
 
-    const handleCloseNotif = () => {
+    const handleCloseNotif = async () => {
+        // clear the notification counter once we close the window
+        numNotifs = 0;
+
         setNotifVisible(null);
+
+        // let the backend know we have shown the notifications that we were shown
+        const url = UrlGet(UrlApiClearNotifications);
+
+        // we need to send id's of each notification we were shown
+        let body = [];
+        for(let i = 0; i < numNotifs; i++){
+            body.push(data[i].ID);
+        }
+
+        const opt = GetPostOptions(JSON.stringify(body));
+        await fetch(url, opt); // we don't care about any return data
     }
 
-    const numNotifs = (notif !== undefined && notif !== null) ? notif.length : 0;
-
-    console.log(numNotifs);
 
     return (
         <Box sx={{flexGrow:1}} className="no-print" >
@@ -146,20 +159,18 @@ function navHeader2(notif) {
                 </IconButton>
             </Tooltip>
 
-            {/* <Menu id='menu-notif' anchorOrigin={{vertical: 'top', horizontal: 'right',}} keepMounted transformOrigin={{vertical: 'top', horizontal: 'right'}}  open={Boolean(showNotif)} onClose={handleCloseNotif}>
-                <MenuItem> */}
-                    <IconButton size="large" color="inherit" onClick={showNotif}>
-                        <Badge badgeContent={numNotifs} color="error">
-                            <NotificationsIcon/>
-                        </Badge>
-                    </IconButton>
-                {/* </MenuItem>
-            </Menu> */}
+            <IconButton size="large" color="inherit" onClick={showNotif}>
+                <Badge badgeContent={numNotifs} color="error">
+                    <NotificationsIcon/>
+                </Badge>
+            </IconButton>
 
-            <Menu sx={{mt: '45px'}} id='menu-notif' anchorEl={notifVisible} anchorOrigin={{vertical: 'top', horizontal: 'right',}} keepMounted transformOrigin={{vertical: 'top', horizontal: 'right'}}  open={Boolean(showNotif)} onClose={handleCloseNotif}>
-                <MenuItem>
-                    <Typography textAlign="center">Notification data here</Typography>
-                </MenuItem>
+            <Menu sx={{mt:'45px'}} id='menu-appbar' anchorEl={notifVisible} anchorOrigin={{vertical: 'top', horizontal: 'right',}} keepMounted transformOrigin={{vertical: 'top', horizontal: 'right',}} open={Boolean(notifVisible)} onClose={handleCloseNotif}>
+                {data.map( (item, i) => {
+                    return <MenuItem key={i}>
+                        <Typography>{item.Message}</Typography>
+                    </MenuItem>;
+                })}
             </Menu>
 
             <Menu sx={{mt:'45px'}} id='menu-appbar' anchorEl={anchorE1user} anchorOrigin={{vertical: 'top', horizontal: 'right',}} keepMounted transformOrigin={{vertical: 'top', horizontal: 'right',}} open={Boolean(anchorE1user)} onClose={handleCloseUserMenu}>
