@@ -159,7 +159,7 @@ function navHeader2(data) {
                 </IconButton>
             </Tooltip>
 
-            <IconButton size="large" color="inherit" onClick={showNotif}>
+            {/* <IconButton size="large" color="inherit" onClick={showNotif}>
                 <Badge badgeContent={numNotifs} color="error">
                     <NotificationsIcon/>
                 </Badge>
@@ -171,7 +171,7 @@ function navHeader2(data) {
                         <Typography>{item.Message}</Typography>
                     </MenuItem>;
                 })}
-            </Menu>
+            </Menu> */}
 
             <Menu sx={{mt:'45px'}} id='menu-appbar' anchorEl={anchorE1user} anchorOrigin={{vertical: 'top', horizontal: 'right',}} keepMounted transformOrigin={{vertical: 'top', horizontal: 'right',}} open={Boolean(anchorE1user)} onClose={handleCloseUserMenu}>
                 {settingsMenu.map( (item, i) => {
