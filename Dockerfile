@@ -36,12 +36,15 @@ RUN npm run build
 # Deploy Stage
 #
 
-FROM alpine
+# FROM alpine
+FROM debian:bookworm
 
 # make sure required packages are installed
 # poppler-utils required for pdf parsing 
-RUN apk update
-RUN apk add tzdata poppler-utils sqlite
+# RUN apk update
+# RUN apk add tzdata poppler-utils sqlite
+RUN apt update
+RUN apt install poppler-utils sqlite3
 
 WORKDIR /
 

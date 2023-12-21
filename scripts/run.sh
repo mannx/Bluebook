@@ -4,7 +4,7 @@
 /scripts/backup.sh
 
 # cleanup any deleted entries
-/scripts/clean-db.sh
+#/scripts/clean-db.sh
 
 # check if /data/hockey.json exists
 # if not, copy out team-names.json
