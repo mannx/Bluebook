@@ -2,7 +2,6 @@
 # Bluebook Helper 
 
 - Known Issues
-	* Tags when edited don't reflect new changes until refresh
 
 - Notes:
 	* Top5 is generated for a config file found the the BLUEBOOK\_DATA\_PATH directory (see below)
