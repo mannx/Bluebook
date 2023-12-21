@@ -44,7 +44,7 @@ FROM debian:bookworm
 # RUN apk update
 # RUN apk add tzdata poppler-utils sqlite
 RUN apt update
-RUN apt install poppler-utils sqlite3
+RUN apt install -y poppler-utils sqlite3
 
 WORKDIR /
 
