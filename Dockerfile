@@ -4,10 +4,11 @@
 # Go Build Stage
 #
 
-FROM golang:alpine AS build
+# FROM golang:alpine AS build
+FROM golang:bookworm AS build
 
 # require gcc for some of the modules
-RUN apk add build-base
+# RUN apk add build-base
 
 ENV GOPATH /go/src
 WORKDIR /go/src/github.com/mannx/Bluebook
