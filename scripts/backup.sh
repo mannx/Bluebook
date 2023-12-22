@@ -4,7 +4,6 @@
 PREFIX="db"
 EXT=".db"
 INPUT="$PREFIX$EXT"
-#OUTPUT="$PREFIX-$(date +%m-%d-%Y)$EXT"
 OUTPUT="$PREFIX$EXT.bak"
 
 #set path to /data unless BLUEBOOK_BACKUP_PATH is set

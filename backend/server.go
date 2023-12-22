@@ -68,6 +68,12 @@ func initServer() *echo.Echo {
 	e.POST("/api/backup/daydata/action", func(c echo.Context) error { return api.BackupUndoHandler(c, DB) })
 	e.GET("/api/backup/daydata/clear", func(c echo.Context) error { return api.DailyBackupClearHandler(c, DB) })
 
+	// Notifications
+	//  TODO:
+	//		- Update this to a push notification system instead of having to poll each page refresh
+	e.GET("/api/notifications/get", func(c echo.Context) error { return api.HandleGetNotification(c, DB) })
+	e.POST("/api/notifications/clear", func(c echo.Context) error { return api.HandleClearNotifications(c, DB) })
+
 	//
 	// VERSION 2
 	//

@@ -101,6 +101,8 @@ func migrateDB() {
 	DB.AutoMigrate(&models.BackupEntry{})
 	DB.AutoMigrate(&models.HockeySchedule{})
 	DB.AutoMigrate(&models.DayDataBackup{})
+
+	DB.AutoMigrate(&models.NotificationData{})
 }
 
 // check to see if we have any duplicated day_data entries

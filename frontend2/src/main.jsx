@@ -11,6 +11,10 @@ import {
 
 import ErrorPage from "./components/ErrorPage";
 
+// import Root, {
+//     loader as rootLoader,
+// } from "./components/Root";
+
 import Root from "./components/Root";
 
 import MonthView, {
@@ -103,6 +107,7 @@ const router = createBrowserRouter([
     {
         path: "/",
         element: <Root />,
+        // loader: rootLoader,
         errorElement: <ErrorPage />,
         children: [
             {

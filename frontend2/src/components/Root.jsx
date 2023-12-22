@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Outlet, NavLink, useNavigate} from "react-router-dom";
+import {Outlet, NavLink, useNavigate, useLoaderData} from "react-router-dom";
 import "./header.css";
 
 import AppBar from '@mui/material/AppBar';
@@ -97,7 +97,6 @@ function navHeader2() {
         setAnchorE1user(null);
     }
 
-    
     return (
         <Box sx={{flexGrow:1}} className="no-print" >
         <AppBar position="static">

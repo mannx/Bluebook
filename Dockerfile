@@ -4,10 +4,7 @@
 # Go Build Stage
 #
 
-FROM golang:alpine AS build
-
-# require gcc for some of the modules
-RUN apk add build-base
+FROM golang:bookworm AS build
 
 ENV GOPATH /go/src
 WORKDIR /go/src/github.com/mannx/Bluebook
@@ -35,12 +32,12 @@ RUN npm run build
 # Deploy Stage
 #
 
-FROM alpine
+FROM debian:bookworm
 
 # make sure required packages are installed
 # poppler-utils required for pdf parsing 
-RUN apk update
-RUN apk add tzdata poppler-utils sqlite
+RUN apt update
+RUN apt install -y poppler-utils sqlite3
 
 WORKDIR /
 
