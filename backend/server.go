@@ -27,6 +27,7 @@ func initServer() *echo.Echo {
 	// routes
 	e.GET("/api/month", func(c echo.Context) error { return api.GetMonthViewHandler(c, DB) })
 	e.GET("/api/hockey/data", func(c echo.Context) error { return api.HockeyDataHandler(c, DB) })
+	e.GET("/api/hockey/data/years", func(c echo.Context) error { return api.HockeyDataYearsHandler(c, DB) })
 
 	// import GET and POST handlers
 	e.POST("/api/import/daily", importPostDaily)

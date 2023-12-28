@@ -91,6 +91,8 @@ import HockeySchedule, {
 
 import HockeyData, {
     loader as hockeyDataLoader,
+    HockeyDataView,
+    viewLoader as hockeyDataViewLoader,
 } from "./components/Hockey/HockeyData";
 
 import SimpleStats, {
@@ -233,9 +235,16 @@ const router = createBrowserRouter([
                 action: hockeyAction,
             },
             {
-                path: "/hockey/data/:year?",
+                path: "/hockey/data/",
                 element: <HockeyData />,
                 loader: hockeyDataLoader, 
+                children: [
+                    {
+                        path: "/hockey/data/:year",
+                        element: <HockeyDataView />,
+                        loader: hockeyDataViewLoader,
+                    }
+                ]
             },
             {
                 path: "/stats/simple",

@@ -44,13 +44,14 @@ func StatsAverageSalesByDayHandler(c echo.Context, db *gorm.DB) error {
 		// TODO:
 		//	find highest net sales from week just selected (do this with a sql statement instead?)
 		//  add to statsData array and keep going
-		day := 0
+		// day := time.Wednesday
+		var day time.Weekday
 		var max float64
 
-		for index, d := range dd {
+		for _, d := range dd {
 			if d.NetSales > max {
 				max = d.NetSales
-				day = index
+				day = time.Time(d.Date).Weekday()
 			}
 		}
 
@@ -60,7 +61,8 @@ func StatsAverageSalesByDayHandler(c echo.Context, db *gorm.DB) error {
 			NetSales:   max,
 		})
 
-		break
+		// move the starting day to the next week
+		start = start.AddDate(0, 0, 7)
 	}
 
 	return c.JSON(http.StatusOK, &data)

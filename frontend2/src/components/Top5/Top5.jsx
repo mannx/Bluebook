@@ -101,7 +101,7 @@ export function Top5Data() {
             prefix={"$"}
             decimalScale={2}
             fixedDecimalScale={true}
-        / >;
+        />;
     }
 
     return data.Data.map( (n) => {

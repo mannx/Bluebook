@@ -202,6 +202,32 @@ func InitHockeySchedule() {
 	}
 }
 
+func HockeyDataYearsHandler(c echo.Context, db *gorm.DB) error {
+	var data models.HockeySchedule
+	res := db.Order("date").First(&data)
+	if res.Error != nil {
+		return LogAndReturnError(c, "Unable to retrieve hockey data years", res.Error)
+	}
+
+	start := time.Time(data.Date).Year()
+
+	var d2 models.HockeySchedule
+	res = db.Order("date desc").Take(&d2)
+	if res.Error != nil {
+		return LogAndReturnError(c, "Unable to retrieve hockey data years", res.Error)
+	}
+
+	end := time.Time(d2.Date).Year()
+
+	// generate list of years between max & min
+	lst := make([]int, 0)
+	for i := start; i <= end; i++ {
+		lst = append(lst, i)
+	}
+
+	return c.JSON(http.StatusOK, &lst)
+}
+
 func HockeyDataHandler(c echo.Context, db *gorm.DB) error {
 
 	type hockeyData struct {
@@ -225,8 +251,20 @@ func HockeyDataHandler(c echo.Context, db *gorm.DB) error {
 		return LogAndReturnError(c, "Unable to bind to year parameter", err)
 	}
 
+	log.Debug().Msgf("[hockey data] year: %v", year)
+
 	var hschedule []models.HockeySchedule
-	res := db.Where("Home = ?", HomeTeamName).Find(&hschedule)
+	// res := db.Where("Home = ?", HomeTeamName).Find(&hschedule)
+	op := db.Where("Home = ?", HomeTeamName)
+
+	// if year!=0, add in a year filter
+	if year != 0 {
+		start := time.Date(year, time.January, 1, 0, 0, 0, 0, time.UTC)
+		end := time.Date(year, time.December, 31, 0, 0, 0, 0, time.UTC)
+		op = op.Where("Date >= ? AND Date < ?", start, end)
+	}
+
+	res := op.Find(&hschedule)
 	if res.Error != nil {
 		return LogAndReturnError(c, "Unable to retrieve hockey data", res.Error)
 	}
@@ -255,7 +293,7 @@ func HockeyDataHandler(c echo.Context, db *gorm.DB) error {
 			NetSales: dd.NetSales,
 			Average:  avg,
 			AwayTeam: i.Away,
-			GFAway:   i.GFHome,
+			GFAway:   i.GFAway,
 			GFHome:   i.GFHome,
 		})
 
