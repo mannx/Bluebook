@@ -1,46 +1,70 @@
-import Container from '@mui/material/Container';
-import { useLoaderData } from 'react-router-dom';
-import {UrlGet, UrlApi2AverageStats} from '../URLs';
+import * as React from 'react';
+import { useLoaderData, Outlet, Link} from 'react-router-dom';
+import {UrlGet, UrlApi2AverageStats, UrlApiTop5} from '../URLs';
 
-export async function loader({params}){
-    const url = UrlGet(UrlApi2AverageStats);
+import Stack from '@mui/material/Stack';
+import Container from '@mui/material/Container';
+import InputLabel from '@mui/material/InputLabel';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import Button from '@mui/material/Button';
+
+export async function dataLoader({params}){
+    const url = UrlGet(UrlApi2AverageStats) + "?year=" + params.year;
     const resp = await fetch(url);
     const data = await resp.json();
 
     return {data};
 }
-// display several different stats to start with
+
+export async function loader() {
+    // cheat and use the top5 endpoint to get hte list of years we have data for
+    const url = UrlGet(UrlApiTop5);
+    const resp = await fetch(url);
+    const data = await resp.json();
+
+    return {data};
+}
+
 export default function SimpleStats() {
     const {data} = useLoaderData();
+    const [year, setYear] = React.useState("0");
+    const updateYear = (e) => {setYear(e.target.value);}
 
+    return (<>
+        <Container>
+            <Stack>
+                <InputLabel id='year'>Year</InputLabel>
+                <Select labelId='year' value={year} onChange={updateYear}>
+                    {data.map( (n) => {
+                        return <MenuItem key={n} value={n}>{n}</MenuItem>;
+                    })}
+                </Select>
+
+                <Link to={`/stats/simple/${year}`}>
+                    <Button variant="contained" >View</Button>
+                </Link>
+            </Stack>
+
+            <Outlet/>
+        </Container>
+    </>)
+}
+// display several different stats to start with
+export function SimpleStatsYear() {
+    const {data} = useLoaderData();
     const dayNames = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
 
     return (<>
     <Container>
-        <h3>Simple Stats</h3>
-        <h3>Work In Progress</h3>
+        <h3>Top Day per week</h3>
         <Container>
-            <h3>Average Sale by day</h3>
-            <table>
-                <tr>
-                    <th></th>
-                    <th>Day</th>
-                    <th>Average</th>
-                </tr>
-            {data.map( (o, i) => {
-                return (<tr>
-                    <td>{i}</td>
-                    <td>{dayNames[o.Day]}</td>
-                    <td>{o.NetSales}</td>
-                </tr>);
-                // return (<>
-                //     <div>
-                //         <ul>Day Index: {o.Day}</ul>
-                //         <ul>Average: {o.NetSales}</ul>
-                //     </div>
-                // </>);
+            <h3>Counts</h3>
+            <span>Total: {data.Total}</span><hr/>
+            {dayNames.map( (n,i) => {
+                const out = data.Counts[i] || 0;
+                return <div>{n}: {out}</div>
             })}
-            </table>
         </Container>
     </Container>
     </>);

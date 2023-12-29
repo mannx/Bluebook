@@ -50,26 +50,24 @@ export default function Top5() {
         <h3>Top 5</h3>
 
         <Stack spacing={2}>
+            <InputLabel id='month'>Month</InputLabel>
+            <Select labelId='month' id='month-select' value={month} label='MonthL' onChange={updateMonth}>
+                {monthNames.map( (n, i) => { 
+                    return <MenuItem key={i} value={i}>{n}</MenuItem>;
+                })}
+            </Select>
 
-        <InputLabel id='month'>Month</InputLabel>
-        <Select labelId='month' id='month-select' value={month} label='MonthL' onChange={updateMonth}>
-        {monthNames.map( (n, i) => { 
-            return <MenuItem key={i} value={i}>{n}</MenuItem>;
-        })}
-        </Select>
+            <InputLabel id='year'>Year</InputLabel>
+            <Select labelId='year' value={year} onChange={updateYear}>
+                <MenuItem key={-1} value="0">Any</MenuItem>
+                {data.map( (n) => {
+                    return <MenuItem key={n} value={n}>{n}</MenuItem>;
+                })}
+            </Select>
 
-
-        <InputLabel id='year'>Year</InputLabel>
-        <Select labelId='year' value={year} onChange={updateYear}>
-        <MenuItem key={-1} value="0">Any</MenuItem>
-        {data.map( (n) => {
-            return <MenuItem key={n} value={n}>{n}</MenuItem>;
-        })}
-        </Select>
-
-        <Link to={`/top5/${month}/${year}`}>
-        <Button variant="contained" >View</Button>
-        </Link>
+            <Link to={`/top5/${month}/${year}`}>
+                <Button variant="contained" >View</Button>
+            </Link>
         </Stack>
 
         </Container>

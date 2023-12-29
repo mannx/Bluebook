@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/labstack/echo/v4"
+	api "github.com/mannx/Bluebook/api"
 	models "github.com/mannx/Bluebook/models"
 	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
@@ -18,8 +19,24 @@ func StatsAverageSalesByDayHandler(c echo.Context, db *gorm.DB) error {
 	}
 
 	// use supplied date range for generating this data
+	var year int
+	err := echo.QueryParamsBinder(c).Int("year", &year).BindError()
+	if err != nil {
+		return api.LogAndReturnError(c, "Unable to bind year", err)
+	}
+
+	// if year is 0, return an error, otherwise find the first wednesday of the provided year
+	if year == 0 {
+		return api.ReturnServerMessage(c, "Year must be provided to /api/stats", true)
+	}
+
+	wed := 1
+	for time.Date(year, time.January, wed, 0, 0, 0, 0, time.UTC).Weekday() != time.Wednesday {
+		wed++
+	}
+
 	// for now we use the current year and first wednesday (currently hardcoded, TODO)
-	start := time.Date(2023, time.January, 4, 0, 0, 0, 0, time.UTC)
+	start := time.Date(year, time.January, wed, 0, 0, 0, 0, time.UTC)
 
 	// should be a better/faster way of calculating data required?
 	data := make([]statsData, 0)
@@ -37,14 +54,12 @@ func StatsAverageSalesByDayHandler(c echo.Context, db *gorm.DB) error {
 		}
 
 		if res.RowsAffected == 0 {
-			log.Debug().Msgf(" -- SASBDH -- RowsAffected == 0 [%v] - [%v]", start, end)
 			break
 		}
 
 		// TODO:
 		//	find highest net sales from week just selected (do this with a sql statement instead?)
 		//  add to statsData array and keep going
-		// day := time.Wednesday
 		var day time.Weekday
 		var max float64
 
@@ -65,5 +80,27 @@ func StatsAverageSalesByDayHandler(c echo.Context, db *gorm.DB) error {
 		start = start.AddDate(0, 0, 7)
 	}
 
-	return c.JSON(http.StatusOK, &data)
+	// compute stats about generated data
+	// count how many of each day was the highest day
+	counts := make(map[time.Weekday]int)
+	totalCounts := 0
+
+	for _, d := range data {
+		counts[d.Day]++
+		totalCounts++
+	}
+
+	type returnData struct {
+		Data   []statsData
+		Counts map[time.Weekday]int
+		Total  int
+	}
+
+	rd := returnData{
+		Data:   data,
+		Counts: counts,
+		Total:  totalCounts,
+	}
+
+	return c.JSON(http.StatusOK, &rd)
 }

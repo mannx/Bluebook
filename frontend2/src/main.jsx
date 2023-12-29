@@ -80,7 +80,7 @@ import Settings, {
     action as settingsAction,
 } from "./components/Settings/Settings";
 
-import DebugSettings from "./components/Settings/Debug";
+// import DebugSettings from "./components/Settings/Debug";
 import CommentSearch, {
     loader as commentSearchLoader,
 } from "./components/Search/CommentSearch";
@@ -97,6 +97,8 @@ import HockeyData, {
 
 import SimpleStats, {
     loader as statsAverageLoader,
+    dataLoader as simpleStatsYearLoader,
+    SimpleStatsYear,
 } from './components/Stats/Stats';
 
 import './index.css'
@@ -220,10 +222,10 @@ const router = createBrowserRouter([
                 loader: settingsLoader,
                 action: settingsAction,
             },
-            {
-                path: "/debug",
-                element: <DebugSettings />,
-            },
+            // {
+            //     path: "/debug",
+            //     element: <DebugSettings />,
+            // },
             {
                 path: "/search",
                 element: <CommentSearch />,
@@ -250,6 +252,13 @@ const router = createBrowserRouter([
                 path: "/stats/simple",
                 element: <SimpleStats />,
                 loader: statsAverageLoader,
+                children: [
+                    {
+                        path: "/stats/simple/:year",
+                        element: <SimpleStatsYear />,
+                        loader: simpleStatsYearLoader,
+                    }
+                ]
             },
         ],
     },

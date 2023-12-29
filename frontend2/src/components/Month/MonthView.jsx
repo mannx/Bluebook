@@ -139,7 +139,6 @@ function Row(data) {
             hcls = "HockeyLoss";
         }
 
-        // htip = <><span>data.Hockey.Away</span>Home: " + data.Hockey.GFHome + " Away: " + data.Hockey.GFAway;
         htip = <><span>{data.Hockey.Away}<br/></span><span>Home: {data.Hockey.GFHome}  Away: {data.Hockey.GFAway}</span></>
     }
 
