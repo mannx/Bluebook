@@ -145,7 +145,11 @@ func exportWeekly(weekly weeklyInfo, weekEnding time.Time, hours float64, manage
 	// generate our output file name and save
 	fname := fmt.Sprintf("%v.xlsx", weekEnding.Format("01-02-06"))
 	outPath := filepath.Join(env.Environment.OutputPath, fname)
-	f.SaveAs(outPath)
+	err = f.SaveAs(outPath)
+	if err != nil {
+		log.Error().Err(err).Msgf("Unable to save weekly to file: %v", outPath)
+		return err
+	}
 
 	// adjust ownership to PUID/PGID (container runs as root?)
 	os.Chown(outPath, env.Environment.GroupID, env.Environment.UserID)

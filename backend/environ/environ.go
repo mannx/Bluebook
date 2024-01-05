@@ -42,6 +42,8 @@ func (e *EnvironmentDefinition) Init() {
 		return
 	}
 
+	log.Debug().Msgf("Import Path: %v", e.OutputPath)
+
 	// parse the log level
 	e.LogLevel = e.parseLogLevel()
 }
