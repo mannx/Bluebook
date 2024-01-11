@@ -80,7 +80,7 @@ import Settings, {
     action as settingsAction,
 } from "./components/Settings/Settings";
 
-import DebugSettings from "./components/Settings/Debug";
+// import DebugSettings from "./components/Settings/Debug";
 import CommentSearch, {
     loader as commentSearchLoader,
 } from "./components/Search/CommentSearch";
@@ -91,10 +91,14 @@ import HockeySchedule, {
 
 import HockeyData, {
     loader as hockeyDataLoader,
+    HockeyDataView,
+    viewLoader as hockeyDataViewLoader,
 } from "./components/Hockey/HockeyData";
 
 import SimpleStats, {
     loader as statsAverageLoader,
+    dataLoader as simpleStatsYearLoader,
+    SimpleStatsYear,
 } from './components/Stats/Stats';
 
 import './index.css'
@@ -218,10 +222,10 @@ const router = createBrowserRouter([
                 loader: settingsLoader,
                 action: settingsAction,
             },
-            {
-                path: "/debug",
-                element: <DebugSettings />,
-            },
+            // {
+            //     path: "/debug",
+            //     element: <DebugSettings />,
+            // },
             {
                 path: "/search",
                 element: <CommentSearch />,
@@ -233,14 +237,28 @@ const router = createBrowserRouter([
                 action: hockeyAction,
             },
             {
-                path: "/hockey/data/:year?",
+                path: "/hockey/data/",
                 element: <HockeyData />,
                 loader: hockeyDataLoader, 
+                children: [
+                    {
+                        path: "/hockey/data/:year",
+                        element: <HockeyDataView />,
+                        loader: hockeyDataViewLoader,
+                    }
+                ]
             },
             {
                 path: "/stats/simple",
                 element: <SimpleStats />,
                 loader: statsAverageLoader,
+                children: [
+                    {
+                        path: "/stats/simple/:year",
+                        element: <SimpleStatsYear />,
+                        loader: simpleStatsYearLoader,
+                    }
+                ]
             },
         ],
     },

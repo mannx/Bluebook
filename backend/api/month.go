@@ -1,6 +1,7 @@
 package api
 
 import (
+	"math"
 	"net/http"
 	"time"
 
@@ -81,6 +82,10 @@ func calcWeekEnding(d time.Time, db *gorm.DB, eow *endOfWeek) {
 
 		if gsw > 0 {
 			eow.ThirdPartyPercent = (tps / gsw) * 100.0
+			if math.IsNaN(eow.ThirdPartyPercent) {
+				log.Warn().Msg("[month.go] 3rd party % is NaN, returning 0")
+				eow.ThirdPartyPercent = 0.
+			}
 		}
 	}
 }
@@ -172,6 +177,10 @@ func GetMonthViewHandler(c echo.Context, db *gorm.DB) error {
 
 		if gs > 0.0 {
 			tpp = (tp / gs) * 100.0
+			if math.IsNaN(tpp) {
+				log.Warn().Msg("[month.go] tpp is NaN, changing to 0")
+				tpp = 0.0
+			}
 		}
 
 		slw := 0
@@ -313,7 +322,14 @@ func calculateWeeklyAverage(date time.Time, numWeeks int, db *gorm.DB) float64 {
 		total = total + obj.NetSales
 	}
 
-	return total / float64(numWeeks)
+	// return total / float64(numWeeks)
+	n := total / float64(numWeeks)
+	if math.IsNaN(n) {
+		log.Warn().Msg("[month.go] weekly avarage is NaN, returning 0")
+		return 0.0
+	}
+
+	return n
 }
 
 func genEmptyMonth(data *[]dayViewData, start time.Time, numDays int) {

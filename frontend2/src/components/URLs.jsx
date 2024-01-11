@@ -57,6 +57,8 @@ export const UrlApiDailyUndoClear = "/api/backup/daydata/clear";
 export const UrlApiCommentSearch = "/api/comment/search"; 		// search for all comments containing the search term
 
 export const UrlApiHockeyData = "/api/hockey/data";
+export const UrlApiHockeyDataYear = "/api/hockey/data/years";	// used to get range of years we have data for
+
 export const UrlApi2AverageStats = "/api/stats/average";
 
 export const UrlApiGetNotifications = "/api/notifications/get";

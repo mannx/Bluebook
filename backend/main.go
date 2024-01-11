@@ -60,6 +60,8 @@ func main() {
 		if err != nil {
 			log.Error().Err(err).Msg("Error checking for duplicate days")
 		}
+	} else {
+		log.Info().Msg("Skipping duplicate day check...")
 	}
 
 	log.Info().Msg("Initialiing server and middleware")
