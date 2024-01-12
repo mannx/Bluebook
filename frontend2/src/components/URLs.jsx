@@ -64,6 +64,8 @@ export const UrlApi2AverageStats = "/api/stats/average";
 export const UrlApiGetNotifications = "/api/notifications/get";
 export const UrlApiClearNotifications = "/api/notifications/clear";
 
+export const UrlApiTestFunction = "/api/test";
+
 export function UrlGet(name) {
 	var base = "";
 	if(production === false) {

@@ -101,9 +101,10 @@ func migrateDB() {
 	DB.AutoMigrate(&models.TagData{})
 
 	DB.AutoMigrate(&models.BackupEntry{})
-	DB.AutoMigrate(&models.HockeySchedule{})
 	DB.AutoMigrate(&models.DayDataBackup{})
 
+	DB.AutoMigrate(&models.HockeySchedule{})
+	DB.AutoMigrate(&models.HockeyScheduleImport{})
 	DB.AutoMigrate(&models.NotificationData{})
 }
 

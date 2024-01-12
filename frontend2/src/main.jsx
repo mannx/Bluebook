@@ -101,6 +101,8 @@ import SimpleStats, {
     SimpleStatsYear,
 } from './components/Stats/Stats';
 
+import DebugPage from "./components/Debug/Debug";
+
 import './index.css'
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
@@ -260,6 +262,10 @@ const router = createBrowserRouter([
                     }
                 ]
             },
+            {
+                path: "/debug",
+                element: <DebugPage />,
+            }
         ],
     },
 ]);

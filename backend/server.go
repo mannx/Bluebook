@@ -95,5 +95,7 @@ func initServer() *echo.Echo {
 	e.GET("/api/comment/search", func(c echo.Context) error { return api.CommentSearchHandler(c, DB) })
 
 	e.GET("/api/stats/average", func(c echo.Context) error { return api2.StatsAverageSalesByDayHandler(c, DB) })
+
+	e.GET("/api/test", func(c echo.Context) error { return api.HockeyAutoImportHandler(c, DB) })
 	return e
 }

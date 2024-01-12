@@ -13,11 +13,12 @@ import (
 //	and other data to prevent hard coding in multiple places
 
 type EnvironmentDefinition struct {
-	ImportPath string `envconfig:"BLUEBOOK_IMPORT_PATH"`
-	OutputPath string `envconfig:"BLUEBOOK_OUTPUT_PATH"` // used when exporting weekly sheets
-	TempPath   string `envconfig:"BLUEBOOK_TEMP_PATH"`
-	DataPath   string `envconfig:"BLUEBOOK_DATA_PATH"`
-	BackupPath string `envconfig:"BLUEBOOK_BACKUP_PATH"` // where to make the db backup on startup
+	ImportPath  string `envconfig:"BLUEBOOK_IMPORT_PATH"`
+	OutputPath  string `envconfig:"BLUEBOOK_OUTPUT_PATH"` // used when exporting weekly sheets
+	TempPath    string `envconfig:"BLUEBOOK_TEMP_PATH"`
+	DataPath    string `envconfig:"BLUEBOOK_DATA_PATH"`
+	BackupPath  string `envconfig:"BLUEBOOK_BACKUP_PATH"`  // where to make the db backup on startup
+	ScriptsPath string `envconfig:"BLUEBOOK_SCRIPTS_PATH"` // path to the scripts directory.
 
 	// UserID and GroupID are used to set the file permissions for all exported files
 	UserID  int `envconfig:"PUID"` // userid the container should be running under
@@ -54,6 +55,7 @@ func (e *EnvironmentDefinition) Default() {
 	e.TempPath = "/tmp"
 	e.DataPath = "/data"
 	e.BackupPath = "/backup"
+	e.ScriptsPath = "/scripts"
 	e.LogLevelString = "Info"
 	e.Port = 8080
 	e.IgnoreChecks = false

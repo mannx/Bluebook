@@ -301,3 +301,8 @@ func HockeyDataHandler(c echo.Context, db *gorm.DB) error {
 
 	return c.JSON(http.StatusOK, &hdata)
 }
+
+// automatically fetch, parse, and import the hockey data direct from the hockey site
+func HockeyAutoImportHandler(c echo.Context, db *gorm.DB) error {
+	return ReturnServerMessage(c, "Not Yet Implemented", false)
+}

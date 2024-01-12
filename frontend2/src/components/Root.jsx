@@ -82,6 +82,10 @@ function navHeader2() {
         {
             Title: "Simple Stats",
             Url: "/stats/simple",
+        },
+        {
+            Title: "Debug",
+            Url: "/debug",
         }
     ];
 
