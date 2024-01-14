@@ -16,6 +16,8 @@ import (
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 
+	"github.com/robfig/cron/v3"
+
 	api "github.com/mannx/Bluebook/api"
 	env "github.com/mannx/Bluebook/environ"
 	models "github.com/mannx/Bluebook/models"
@@ -64,6 +66,9 @@ func main() {
 		log.Info().Msg("Skipping duplicate day check...")
 	}
 
+	log.Info().Msg("Starting cron jobs...")
+	startJobs()
+
 	log.Info().Msg("Initialiing server and middleware")
 
 	e := initServer()
@@ -105,7 +110,9 @@ func migrateDB() {
 
 	DB.AutoMigrate(&models.HockeySchedule{})
 	DB.AutoMigrate(&models.HockeyScheduleImport{})
+
 	DB.AutoMigrate(&models.NotificationData{})
+	DB.AutoMigrate(&models.BluebookSettings{})
 }
 
 // check to see if we have any duplicated day_data entries
@@ -156,4 +163,13 @@ func checkDuplicateEntries() error {
 	}
 
 	return nil
+}
+
+func startJobs() {
+	c := cron.New()
+
+	c.AddFunc("@daily", func() { api.HockeyImportCronJob(DB) })
+
+	// run any jobs that we need at startup
+	api.HockeyImportCronJob(DB)
 }

@@ -25,14 +25,23 @@ type HockeySchedule struct {
 
 // This table is used by the fetch script to add everything in
 // after its updated, we merge into the main HockeySchedule table
+// everything is stored as strings since this table is filled out by the python script
+// and currently will insert an empty string instead of a 0 for score/attendance
 type HockeyScheduleImport struct {
 	gorm.Model
 
 	Date       datatypes.Date
 	Away       string
 	Home       string
-	GFAway     uint
-	GFHome     uint
-	Attendance uint
+	GFAway     string
+	GFHome     string
+	Attendance string
 	Arena      string
 }
+
+// This table should only contain 1 entry which is the URL to fetch data from
+// type HockeyFetchURL struct {
+// 	gorm.Model
+//
+// 	URL string
+// }
