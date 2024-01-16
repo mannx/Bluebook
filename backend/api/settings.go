@@ -14,7 +14,6 @@ func HandleSettingsGet(c echo.Context, db *gorm.DB) error {
 
 	res := db.First(&set)
 	if res.Error != nil {
-		// return LogAndReturnError(c, "Unable to retrieve user settings", res.Error)
 		log.Error().Err(res.Error).Msg("Unable to retreive user settings.  Returning fresh settings")
 		return c.JSON(http.StatusOK, &models.BluebookSettings{})
 	}
@@ -33,6 +32,8 @@ func HandleSettingsSet(c echo.Context, db *gorm.DB) error {
 	// TODO: validate options before saving?
 	db.Where("1=1").Delete(&models.BluebookSettings{})
 	db.Save(&data)
+
+	log.Debug().Msgf("display: %v", data.DisplayHockeyWeekly)
 
 	return ReturnServerMessage(c, "Success", false)
 }

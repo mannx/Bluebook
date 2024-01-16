@@ -33,7 +33,6 @@ func initServer() *echo.Echo {
 	e.POST("/api/import/daily", importPostDaily)
 	e.POST("/api/import/control", importPostControl)
 	e.POST("/api/import/wisr", importPostWISR)
-	// e.POST("/api/import/hockey", func(c echo.Context) error { return api.ImportHockeyScheduleHandler(c, DB) })
 
 	// Waste handling
 	e.GET("/api/waste/view", func(c echo.Context) error { return api.GetWasteViewHandler(c, DB) })

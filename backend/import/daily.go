@@ -18,8 +18,10 @@ import (
 	models "github.com/mannx/Bluebook/models"
 )
 
-const dateFormat = "_2-Jan-06"      // format used when parsing time from sheets
-const altDateFormat = "_2-Jan-2006" // possible other variation of the time format
+const (
+	dateFormat    = "_2-Jan-06"   // format used when parsing time from sheets
+	altDateFormat = "_2-Jan-2006" // possible other variation of the time format
+)
 
 // ImportDaily is used to import a single sheet into the database
 func ImportDaily(fileName string, db *gorm.DB) error {
@@ -177,6 +179,22 @@ func extractData(sheet *excelize.File, index int, date time.Time, ver int, db *g
 	dd.SkipTheDishes = getFloat(sheet, "Sheet1", SkipTheDishes[ver][index])
 	dd.DoorDash = getFloat(sheet, "Sheet1", DoorDash[ver][index])
 	dd.PettyCash = getFloat(sheet, "Sheet1", PettyCash[ver][index])
+
+	// check for us cash or uber
+	us := getFloat(sheet, "Sheet1", USCash[ver][index])
+	isUber := false
+	uber, err := sheet.GetCellValue("Sheet1", UberEats[ver][index])
+	if err != nil {
+		log.Error().Err(err).Msgf("Unable to parse ubereats check from %v", UberEats[ver][index])
+	} else {
+		isUber = strings.ToLower(uber) == "uber"
+	}
+
+	if isUber {
+		dd.USFunds = us
+	} else {
+		dd.UberEats = us
+	}
 
 	// credit side
 

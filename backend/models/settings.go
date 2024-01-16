@@ -6,5 +6,7 @@ import "gorm.io/gorm"
 type BluebookSettings struct {
 	gorm.Model
 
-	HockeyURL string // url used to fetch the hockey schedule
+	HockeyURL           string // url used to fetch the hockey schedule
+	DisplayHockeyWeekly bool   `json:"DisplayHockey"` // do we display hockey information on the /today view?
+	PrintHockeyWeekly   bool   `json:"PrintHockey"`   // do we print the hockey info on the /today view?
 }

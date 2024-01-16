@@ -1,6 +1,6 @@
 // development, set to http://localhost:8080, for production, leave empty
 //  need to use to redirect to port 8080 since dev server runs on 5173 and cant bind to both during dev
-const production = true;
+const production = false;
 const baseURL = "http://localhost:8080";
 
 // urls for all our api endpoints

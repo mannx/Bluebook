@@ -7,11 +7,6 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import ErrorPage from "./components/ErrorPage";
-
-// import Root, {
-//     loader as rootLoader,
-// } from "./components/Root";
-
 import Root from "./components/Root";
 
 import MonthView, {
@@ -102,7 +97,7 @@ import Settings, {
   action as settingsAction,
 } from "./components/Settings/Settings";
 
-import DebugPage from "./components/Debug/Debug";
+// import DebugPage from "./components/Debug/Debug";
 
 import "./index.css";
 import "@fontsource/roboto/300.css";
@@ -259,10 +254,10 @@ const router = createBrowserRouter([
           },
         ],
       },
-      {
-        path: "/debug",
-        element: <DebugPage />,
-      },
+      // {
+      //   path: "/debug",
+      //   element: <DebugPage />,
+      // },
       {
         path: "/settings",
         element: <Settings />,
@@ -280,4 +275,3 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     </LocalizationProvider>
   </React.StrictMode>,
 );
-
