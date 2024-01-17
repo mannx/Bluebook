@@ -14,10 +14,9 @@ if [ ! -f $OUTPUT ]; then
 fi
 
 # get the path to the scripts directory (either /scripts or BLUEBOOK_SCRIPTS_PATH)
-if [[ ! -z BLUEBOOK_SCRIPTS_PATH ]]; then
+SP="/scripts"
+if [[ -z BLUEBOOK_SCRIPTS_PATH ]]; then
 	SP=$BLUEBOOK_SCRIPTS_PATH
-else
-	SP="/scripts"
 fi
 
 python3 $SP/get-hockey-data.py $2

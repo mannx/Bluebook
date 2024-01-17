@@ -41,8 +41,9 @@ FROM alpine:3.17
 
 # make sure required packages are installed
 # poppler-utils required for pdf parsing 
+# python3 required for some python scripts found in /scripts
 RUN apk update
-RUN apk add tzdata poppler-utils sqlite
+RUN apk add tzdata poppler-utils sqlite python3
 
 WORKDIR /
 
