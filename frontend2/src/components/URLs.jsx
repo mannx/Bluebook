@@ -66,6 +66,9 @@ export const UrlApiSettingsSet = "/api/settings/set"; // update the global setti
 
 export const UrlApiTestFunction = "/api/test";
 
+// export const UrlApi2RawSql = "/api/sql/raw";
+// export const UrlApi2RawSqlResult = "/api/sql/result";
+
 export function UrlGet(name) {
   var base = "";
   if (production === false) {

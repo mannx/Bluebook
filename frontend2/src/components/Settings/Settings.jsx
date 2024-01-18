@@ -5,12 +5,12 @@ import {
   GetPostOptions,
   UrlApiSettingsGet,
   UrlApiSettingsSet,
+  UrlApiHockeyImportUrl,
 } from "../URLs.jsx";
 
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
-import Box from "@mui/material/Box";
 
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
@@ -33,7 +33,7 @@ export async function action({ request, params }) {
   };
 
   const opt = GetPostOptions(JSON.stringify(body));
-  const resp = await fetch(UrlGet(UrlApiSettingsSet), opt);
+  await fetch(UrlGet(UrlApiSettingsSet), opt);
 
   return null;
 }
@@ -44,14 +44,24 @@ export default function Settings() {
   const [state, setState] = React.useState({
     display: data.DisplayHockey,
     print: data.PrintHockey,
+    hockey_url: data.HockeyURL,
   });
 
   const handleChange = (e) => {
     setState({
       ...state,
-      [event.target.name]: event.target.checked,
+      [e.target.name]: e.target.checked,
     });
   };
+
+  const fetchHockey = async () => {
+    const body = {
+      Data: data.hockey_url,
+    };
+
+    const opts = GetPostOptions(JSON.stringify(body));
+    await fetch(UrlGet(UrlApiHockeyImportUrl), opts);
+  }
 
   return (
     <>
@@ -63,12 +73,18 @@ export default function Settings() {
           </Button>
         </Stack>
         <br />
+
         <Stack>
+          <Stack direction="row" spacing={2}>
           <TextField
             label="Hockey Schedule URL"
             name="hockey_url"
-            defaultValue={data.HockeyURL}
+            value={state.hockey_url}
+            onChange={(e) => {setState({...state, hockey_url: e.target.value})}}
           />
+          <Button onClick={fetchHockey}>Fetch</Button>
+          </Stack>
+
           <FormControlLabel
             control={
               <Switch
