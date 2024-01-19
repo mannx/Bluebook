@@ -97,7 +97,14 @@ import Settings, {
   action as settingsAction,
 } from "./components/Settings/Settings";
 
-import DebugPage from "./components/Debug/Debug";
+// import DebugPage, {
+//   loader as debugLoader,
+//   action as debugAction,
+// } from "./components/Debug/Debug";
+
+import DayDataViewer, {
+  loader as ddViewerLoader,
+} from "./components/Stats/DayDataViewer.jsx";
 
 import "./index.css";
 import "@fontsource/roboto/300.css";
@@ -255,9 +262,16 @@ const router = createBrowserRouter([
         ],
       },
       {
-        path: "/debug",
-        element: <DebugPage />,
+        path: "/ddviewer/:minYear?/:maxYear?",
+        element: <DayDataViewer />,
+        loader: ddViewerLoader,
       },
+      // {
+      //   path: "/debug",
+      //   element: <DebugPage />,
+      //   loader: debugLoader,
+      //   action: debugAction,
+      // },
       {
         path: "/settings",
         element: <Settings />,

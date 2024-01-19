@@ -68,6 +68,7 @@ export const UrlApiTestFunction = "/api/test";
 
 // export const UrlApi2RawSql = "/api/sql/raw";
 // export const UrlApi2RawSqlResult = "/api/sql/result";
+export const UrlApi2RawDayData = "/api/raw/daydata";
 
 export function UrlGet(name) {
   var base = "";

@@ -113,6 +113,8 @@ func migrateDB() {
 
 	DB.AutoMigrate(&models.NotificationData{})
 	DB.AutoMigrate(&models.BluebookSettings{})
+
+	DB.AutoMigrate(&models.RawSqlResult{})
 }
 
 // check to see if we have any duplicated day_data entries

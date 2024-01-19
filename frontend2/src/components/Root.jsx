@@ -89,10 +89,14 @@ function navHeader2() {
       Title: "Simple Stats",
       Url: "/stats/simple",
     },
+    // {
+    //   Title: "Debug",
+    //   Url: "/debug",
+    // },
     {
-      Title: "Debug",
-      Url: "/debug",
-    },
+      Title: "Day Data Viewer",
+      Url: "/ddviewer",
+    }
   ];
 
   const [anchorE1user, setAnchorE1user] = React.useState(null);
