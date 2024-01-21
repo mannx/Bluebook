@@ -7,7 +7,6 @@
 FROM golang:1.21-alpine3.17 as Build
 
 ENV GOPATH /go/src
-
 WORKDIR /go/src/github.com/mannx/Bluebook
 
 # need CGO_ENABLED and build-base for sqlite to compile
@@ -58,5 +57,4 @@ COPY ./backend/team-names.json /team-names.json
 COPY ./scripts /scripts
 
 EXPOSE 8080
-
 ENTRYPOINT ["/scripts/run.sh"]

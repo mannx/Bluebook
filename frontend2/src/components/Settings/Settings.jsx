@@ -14,6 +14,8 @@ import TextField from "@mui/material/TextField";
 
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
+import Box from "@mui/material/Box";
+import Divider from "@mui/material/Divider";
 
 export async function loader() {
   const resp = await fetch(UrlGet(UrlApiSettingsGet));
@@ -47,6 +49,8 @@ export default function Settings() {
     hockey_url: data.HockeyURL,
   });
 
+  const [manualURL, setManualURL] = React.useState("");
+
   const handleChange = (e) => {
     setState({
       ...state,
@@ -54,18 +58,35 @@ export default function Settings() {
     });
   };
 
-  const fetchHockey = async () => {
+  const manualFetch = async (url) => {
     const body = {
-      Data: data.hockey_url,
+      Data: url,
     };
 
     const opts = GetPostOptions(JSON.stringify(body));
     await fetch(UrlGet(UrlApiHockeyImportUrl), opts);
-  }
+  };
 
   return (
     <>
       <h3>Settings</h3>
+
+      <Box>
+        <TextField
+          label="Manual Hockey Fetch URL"
+          onChange={(e) => setManualURL(e.target.value)}
+          value={manualURL}
+        />
+        <Button
+          onClick={() => {
+            manualFetch(manualURL);
+          }}
+        >
+          Manual Fetch
+        </Button>
+      </Box>
+      <Divider />
+
       <Form method="post">
         <Stack direction="row" spacing={2}>
           <Button variant="contained" type="submit">
@@ -76,13 +97,22 @@ export default function Settings() {
 
         <Stack>
           <Stack direction="row" spacing={2}>
-          <TextField
-            label="Hockey Schedule URL"
-            name="hockey_url"
-            value={state.hockey_url}
-            onChange={(e) => {setState({...state, hockey_url: e.target.value})}}
-          />
-          <Button onClick={fetchHockey}>Fetch</Button>
+            <TextField
+              label="Hockey Schedule URL"
+              name="hockey_url"
+              value={state.hockey_url}
+              onChange={(e) => {
+                setState({ ...state, hockey_url: e.target.value });
+              }}
+            />
+            {/* <Button onClick={fetchHockey}>Fetch</Button> */}
+            <Button
+              onClick={() => {
+                manualFetch(state.hockey_url);
+              }}
+            >
+              Fetch
+            </Button>
           </Stack>
 
           <FormControlLabel

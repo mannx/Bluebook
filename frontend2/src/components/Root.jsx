@@ -78,10 +78,6 @@ function navHeader2() {
       Url: "/search",
     },
     {
-      Title: "Hockey Schedule",
-      Url: "/hockey",
-    },
-    {
       Title: "Hockey Data",
       Url: "/hockey/data",
     },
@@ -89,14 +85,10 @@ function navHeader2() {
       Title: "Simple Stats",
       Url: "/stats/simple",
     },
-    // {
-    //   Title: "Debug",
-    //   Url: "/debug",
-    // },
     {
       Title: "Day Data Viewer",
       Url: "/ddviewer",
-    }
+    },
   ];
 
   const [anchorE1user, setAnchorE1user] = React.useState(null);

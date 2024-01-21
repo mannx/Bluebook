@@ -7,7 +7,6 @@ import "./month.css";
 
 // retrieve the month/year we want to see
 export async function loader({ params }) {
-  // get the api url to get the data
   const url =
     UrlGet(UrlApiMonth) + "?month=" + params.month + "&year=" + params.year;
   const resp = await fetch(url);

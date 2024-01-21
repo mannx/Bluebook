@@ -11,7 +11,6 @@ export const UrlApiMonth = "/api/month";
 export const UrlApiImportDaily = "/api/import/daily";
 export const UrlApiImportControl = "/api/import/control";
 export const UrlApiImportWISR = "/api/import/wisr";
-// export const UrlApiImportHockeySchedule = "/api/import/hockey";
 
 export const UrlApi2DayEdit = "/api2/day/edit";
 export const UrlApi2DayUpdate = "/api2/day/update";
@@ -64,13 +63,9 @@ export const UrlApiClearNotifications = "/api/notifications/clear";
 export const UrlApiSettingsGet = "/api/settings/get"; // get the global settings
 export const UrlApiSettingsSet = "/api/settings/set"; // update the global settings
 
-export const UrlApiTestFunction = "/api/test";
-
-// export const UrlApi2RawSql = "/api/sql/raw";
-// export const UrlApi2RawSqlResult = "/api/sql/result";
 export const UrlApi2RawDayData = "/api/raw/daydata";
 
-export function UrlGet(name) {
+export default function UrlGet(name) {
   var base = "";
   if (production === false) {
     base = baseURL;
@@ -93,5 +88,3 @@ export function GetPostOptions(body) {
     body: body,
   };
 }
-
-export default UrlGet;

@@ -76,10 +76,6 @@ import CommentSearch, {
   loader as commentSearchLoader,
 } from "./components/Search/CommentSearch";
 
-import HockeySchedule, {
-  action as hockeyAction,
-} from "./components/Import/HockeySchedule";
-
 import HockeyData, {
   loader as hockeyDataLoader,
   HockeyDataView,
@@ -97,11 +93,6 @@ import Settings, {
   action as settingsAction,
 } from "./components/Settings/Settings";
 
-// import DebugPage, {
-//   loader as debugLoader,
-//   action as debugAction,
-// } from "./components/Debug/Debug";
-
 import DayDataViewer, {
   loader as ddViewerLoader,
 } from "./components/Stats/DayDataViewer.jsx";
@@ -116,7 +107,6 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <Root />,
-    // loader: rootLoader,
     errorElement: <ErrorPage />,
     children: [
       {
@@ -233,11 +223,6 @@ const router = createBrowserRouter([
         loader: commentSearchLoader,
       },
       {
-        path: "/hockey",
-        element: <HockeySchedule />,
-        action: hockeyAction,
-      },
-      {
         path: "/hockey/data/",
         element: <HockeyData />,
         loader: hockeyDataLoader,
@@ -262,16 +247,10 @@ const router = createBrowserRouter([
         ],
       },
       {
-        path: "/ddviewer/:minYear?/:maxYear?",
+        path: "/ddviewer/:minYear?/:maxYear?/:limit?",
         element: <DayDataViewer />,
         loader: ddViewerLoader,
       },
-      // {
-      //   path: "/debug",
-      //   element: <DebugPage />,
-      //   loader: debugLoader,
-      //   action: debugAction,
-      // },
       {
         path: "/settings",
         element: <Settings />,

@@ -66,8 +66,8 @@ func calcWeekEnding(d time.Time, db *gorm.DB, eow *endOfWeek) {
 	} else {
 		net := 0.0
 		cc := 0
-		tps := 0.0 //3rd party sales
-		gsw := 0.0 //gross sales for hte week
+		tps := 0.0 // 3rd party sales
+		gsw := 0.0 // gross sales for hte week
 
 		for _, n := range dat {
 			net += n.NetSales
@@ -92,7 +92,6 @@ func calcWeekEnding(d time.Time, db *gorm.DB, eow *endOfWeek) {
 
 // GetMonthViewHandler handles returning data for viewing a given month
 func GetMonthViewHandler(c echo.Context, db *gorm.DB) error {
-
 	// monthlyView holds the monthly day data along with several other bits of info
 	type monthlyView struct {
 		Data      []dayViewData
@@ -340,19 +339,20 @@ func genEmptyMonth(data *[]dayViewData, start time.Time, numDays int) {
 }
 
 func genEmptyDVD(date time.Time) dayViewData {
-	eow := false
-
-	if date.Weekday() == 2 {
-		eow = true
-	}
+	// eow := false
+	//
+	// if date.Weekday() == 2 {
+	// 	eow = true
+	// }
 
 	dvd := dayViewData{
 		DayData: models.DayData{
 			Date: datatypes.Date(date),
 		},
-		DayOfWeek:   date.Weekday().String(),
-		DayOfMonth:  date.Day(),
-		IsEndOfWeek: eow,
+		DayOfWeek:  date.Weekday().String(),
+		DayOfMonth: date.Day(),
+		// IsEndOfWeek: eow,
+		IsEndOfWeek: date.Weekday() == 2,
 		Day:         date.Day(),
 		Month:       date.Month(),
 		Year:        date.Year(),

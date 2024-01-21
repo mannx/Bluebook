@@ -24,14 +24,17 @@ inputFile = "/tmp/index.html"
 #   1: Url of arena
 #   2: "Final" or game start time
 
+
 # replace any ' with escape characters
 def safe(s):
-    return s.replace('\'', '\\\'')
+    return s.replace("'", "\\'")
 
 
 def output(e, cur):
     # insert the entries into the table
-    sql = 'INSERT INTO hockey_schedule_imports (date, home, away, gf_home, gf_away, attendance, arena) VALUES ("{}", "{}", "{}","{}","{}", "{}", "{}")'.format(e[1], safe(e[2][1]), safe(e[4][1]), e[3], e[5], e[7], safe(e[9]))
+    sql = 'INSERT INTO hockey_schedule_imports (date, home, away, gf_home, gf_away, attendance, arena) VALUES ("{}", "{}", "{}","{}","{}", "{}", "{}")'.format(
+        e[1], safe(e[2][1]), safe(e[4][1]), e[3], e[5], e[7], safe(e[9])
+    )
     cur.execute(sql)
 
 
@@ -46,14 +49,14 @@ cur = db.cursor()
 
 # clear out the import table first
 # the backend will copy over and update entries from there
-sql = 'DELETE FROM hockey_schedule_imports';
+sql = "DELETE FROM hockey_schedule_imports"
 cur.execute(sql)
 
-with open(inputFile,"r") as f:
+with open(inputFile, "r") as f:
     rawdata = f.read()
 
-    for lines in rawdata.split('\n'):
-        data = lines.find("data:") 
+    for lines in rawdata.split("\n"):
+        data = lines.find("data:")
 
         if data != -1:
             tbl = json.loads(lines[10:-3])
