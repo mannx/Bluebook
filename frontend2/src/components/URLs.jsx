@@ -65,7 +65,7 @@ export const UrlApiSettingsSet = "/api/settings/set"; // update the global setti
 
 export const UrlApi2RawDayData = "/api/raw/daydata";
 
-export default function UrlGet(name) {
+export function UrlGet(name) {
   var base = "";
   if (production === false) {
     base = baseURL;
@@ -88,3 +88,5 @@ export function GetPostOptions(body) {
     body: body,
   };
 }
+
+export default UrlGet;
