@@ -14,6 +14,7 @@
 	* BLUEBOOK\_DATA\_PATH 		-> directory where the database is stored
 	* BLUEBOOK\_OUTPUT\_PATH	-> Directory for export files to go
 	* BLUEBOOK\_BACKUP\_PATH	-> Directory where the db is backed up upon startup
+	* BLUEBOOK\_CRON\_JOB		-> Cron tab string for when to run auto imports
 
 - Volume Binds/Mounts:
 	* /data	->	Where the database and other configuration files are found

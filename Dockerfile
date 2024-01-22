@@ -7,7 +7,6 @@
 FROM golang:1.21-alpine3.17 as Build
 
 ENV GOPATH /go/src
-
 WORKDIR /go/src/github.com/mannx/Bluebook
 
 # need CGO_ENABLED and build-base for sqlite to compile
@@ -41,8 +40,9 @@ FROM alpine:3.17
 
 # make sure required packages are installed
 # poppler-utils required for pdf parsing 
+# python3 required for some python scripts found in /scripts
 RUN apk update
-RUN apk add tzdata poppler-utils sqlite
+RUN apk add tzdata poppler-utils sqlite python3
 
 WORKDIR /
 
@@ -57,5 +57,4 @@ COPY ./backend/team-names.json /team-names.json
 COPY ./scripts /scripts
 
 EXPOSE 8080
-
 ENTRYPOINT ["/scripts/run.sh"]

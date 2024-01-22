@@ -71,7 +71,6 @@ func getWeeklyData(month int, day int, year int, c echo.Context, db *gorm.DB) (w
 	res := db.Find(&data, "Date >= ? AND Date <= ?", weekStart, weekEnding)
 	if res.Error != nil {
 		return weeklyInfo{}, res.Error
-
 	}
 
 	// calculate the data bits that we need
@@ -104,7 +103,6 @@ func getWeeklyData(month int, day int, year int, c echo.Context, db *gorm.DB) (w
 	res = db.Find(&data, "Date >= ? AND Date <= ?", lys, lastYear)
 	if res.Error != nil {
 		return weeklyInfo{}, res.Error
-
 	}
 
 	for _, n := range data {
@@ -118,7 +116,6 @@ func getWeeklyData(month int, day int, year int, c echo.Context, db *gorm.DB) (w
 	res = db.Find(&data, "Date >= ? AND Date <= ?", lastYear.AddDate(0, 0, 1), up)
 	if res.Error != nil {
 		return weeklyInfo{}, res.Error
-
 	}
 
 	for _, n := range data {
@@ -153,7 +150,7 @@ func getAuvData(weekEnding time.Time, wi *weeklyInfo, db *gorm.DB) error {
 
 	for i, d := range auvArr.Dates {
 		// did we find a matching week ending?
-		if d == weekEnding {
+		if d.Equal(weekEnding) {
 			wi.TargetHours = auvArr.Hours[i]
 			wi.TargetAUV = auvArr.AUV[i]
 			break

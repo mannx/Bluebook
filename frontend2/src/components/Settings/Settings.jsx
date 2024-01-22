@@ -1,81 +1,143 @@
-import * as React from 'react';
-import {useNavigate, Form, Link, useLoaderData} from "react-router-dom";
-import Button from '@mui/material/Button';
+import * as React from "react";
+import { useLoaderData, Form } from "react-router-dom";
+import {
+  UrlGet,
+  GetPostOptions,
+  UrlApiSettingsGet,
+  UrlApiSettingsSet,
+  UrlApiHockeyImportUrl,
+} from "../URLs.jsx";
 
-import {UrlGet, UrlApiDailyUndoList, UrlApiDailyUndoAction, GetPostOptions, UrlApiDailyUndoClear} from "../URLs";
+import Button from "@mui/material/Button";
+import Stack from "@mui/material/Stack";
+import TextField from "@mui/material/TextField";
 
-// retrieve the list of backup days we have available
-export async function loader(){
-    const url = UrlGet(UrlApiDailyUndoList);
-    const resp = await fetch(url);
-    const data = await resp.json();
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Switch from "@mui/material/Switch";
+import Box from "@mui/material/Box";
+import Divider from "@mui/material/Divider";
 
-    return {data};
+export async function loader() {
+  const resp = await fetch(UrlGet(UrlApiSettingsGet));
+  const data = await resp.json();
+
+  return { data };
 }
 
-export async function action({request}){
-    const formData = await request.formData();
-    const updates = Object.fromEntries(formData);
+export async function action({ request, params }) {
+  const formData = await request.formData(); // get the data from the form
+  const updates = Object.fromEntries(formData); // pull everything into an object (otherwise use formData.get(...))
 
-    // flatten the object into an array of file names
-    // each file name has a numeric key starting at 0
-    const ids = Object.keys(updates).map( (o) => {
-        return updates[o];
-    }).filter( (o) => o !== undefined);
+  const body = {
+    HockeyURL: updates.hockey_url,
+    DisplayHockey: updates.display === "on",
+    PrintHockey: updates.print === "on",
+  };
 
-    const url = UrlGet(UrlApiDailyUndoAction);
-    const opt = GetPostOptions(JSON.stringify(ids));
+  const opt = GetPostOptions(JSON.stringify(body));
+  await fetch(UrlGet(UrlApiSettingsSet), opt);
 
-    await fetch(url, opt);
-
-    return null;
+  return null;
 }
 
 export default function Settings() {
-    const {data}=useLoaderData();
-    const [errMsg, setErrMsg] = React.useState("");
-    const nav = useNavigate();
+  const { data } = useLoaderData();
 
-    const clearBackupTable = async () => {
-        setErrMsg("Clearing backup table...");
+  const [state, setState] = React.useState({
+    display: data.DisplayHockey,
+    print: data.PrintHockey,
+    hockey_url: data.HockeyURL,
+  });
 
-        const url = UrlGet(UrlApiDailyUndoClear);
-        const resp = await fetch(url);
-        const json = await resp.json();
+  const [manualURL, setManualURL] = React.useState("");
 
-        setErrMsg(json.Message);   
-        nav(0);
-    }
+  const handleChange = (e) => {
+    setState({
+      ...state,
+      [e.target.name]: e.target.checked,
+    });
+  };
 
-    return (<>
-        <h3>Daily Import Backups</h3>
-        <Button variant="contained" onClick={clearBackupTable}>Clear Backup Table</Button>
-        <span>{errMsg}</span>
-        <Form method="post">
-        <table className="month">
-            <caption><h4>Daily Undo <Button variant="contained" type="submit">Undo</Button></h4></caption>
-            <thead>
-                <tr>
-                    <th></th>
-                    <th>Date</th>
-                    <th>Net Sales</th>
-                </tr>
-            </thead>
+  const manualFetch = async (url) => {
+    const body = {
+      Data: url,
+    };
 
-            <tbody>
-                {data.map( (o) => {
-                    // remove timezone info to prevent showing a previous day
-                    //  (date has UTC timezone and dayjs will shift that to local time)
-                    const dateStr = o.Date.slice(0,o.Date.length-10);
+    const opts = GetPostOptions(JSON.stringify(body));
+    await fetch(UrlGet(UrlApiHockeyImportUrl), opts);
+  };
 
-                    return (<tr>
-                        <td><input type="checkbox" name={"id-" + o.ID} value={o.ID}/></td>
-                        <td>{dateStr}</td>
-                        <td>{o.NetSales}</td>
-                    </tr>);
-                })}
-            </tbody>
-        </table>
-        </Form>
-        </>);
+  return (
+    <>
+      <h3>Settings</h3>
+
+      <Box>
+        <TextField
+          label="Manual Hockey Fetch URL"
+          onChange={(e) => setManualURL(e.target.value)}
+          value={manualURL}
+        />
+        <Button
+          onClick={() => {
+            manualFetch(manualURL);
+          }}
+        >
+          Manual Fetch
+        </Button>
+      </Box>
+      <Divider />
+
+      <Form method="post">
+        <Stack direction="row" spacing={2}>
+          <Button variant="contained" type="submit">
+            Update
+          </Button>
+        </Stack>
+        <br />
+
+        <Stack>
+          <Stack direction="row" spacing={2}>
+            <TextField
+              label="Hockey Schedule URL"
+              name="hockey_url"
+              value={state.hockey_url}
+              onChange={(e) => {
+                setState({ ...state, hockey_url: e.target.value });
+              }}
+            />
+            {/* <Button onClick={fetchHockey}>Fetch</Button> */}
+            <Button
+              onClick={() => {
+                manualFetch(state.hockey_url);
+              }}
+            >
+              Fetch
+            </Button>
+          </Stack>
+
+          <FormControlLabel
+            control={
+              <Switch
+                checked={state.display}
+                onChange={handleChange}
+                name="display"
+              />
+            }
+            label="Display Hockey Data"
+          />
+
+          <FormControlLabel
+            control={
+              <Switch
+                checked={state.print}
+                onChange={handleChange}
+                name="print"
+              />
+            }
+            label="Print Hockey Data"
+          />
+        </Stack>
+      </Form>
+    </>
+  );
 }

@@ -33,7 +33,6 @@ func initServer() *echo.Echo {
 	e.POST("/api/import/daily", importPostDaily)
 	e.POST("/api/import/control", importPostControl)
 	e.POST("/api/import/wisr", importPostWISR)
-	e.POST("/api/import/hockey", func(c echo.Context) error { return api.ImportHockeyScheduleHandler(c, DB) })
 
 	// Waste handling
 	e.GET("/api/waste/view", func(c echo.Context) error { return api.GetWasteViewHandler(c, DB) })
@@ -69,12 +68,6 @@ func initServer() *echo.Echo {
 	e.POST("/api/backup/daydata/action", func(c echo.Context) error { return api.BackupUndoHandler(c, DB) })
 	e.GET("/api/backup/daydata/clear", func(c echo.Context) error { return api.DailyBackupClearHandler(c, DB) })
 
-	// Notifications
-	//  TODO:
-	//		- Update this to a push notification system instead of having to poll each page refresh
-	e.GET("/api/notifications/get", func(c echo.Context) error { return api.HandleGetNotification(c, DB) })
-	e.POST("/api/notifications/clear", func(c echo.Context) error { return api.HandleClearNotifications(c, DB) })
-
 	//
 	// VERSION 2
 	//
@@ -95,5 +88,12 @@ func initServer() *echo.Echo {
 	e.GET("/api/comment/search", func(c echo.Context) error { return api.CommentSearchHandler(c, DB) })
 
 	e.GET("/api/stats/average", func(c echo.Context) error { return api2.StatsAverageSalesByDayHandler(c, DB) })
+
+	e.POST("/api/hockey/import", func(c echo.Context) error { return api.HockeyManualImportHandler(c, DB) })
+
+	e.GET("/api/settings/get", func(c echo.Context) error { return api.HandleSettingsGet(c, DB) })
+	e.POST("/api/settings/set", func(c echo.Context) error { return api.HandleSettingsSet(c, DB) })
+
+	e.GET("/api/raw/daydata", func(c echo.Context) error { return api2.HandleRawDayData(c, DB) })
 	return e
 }

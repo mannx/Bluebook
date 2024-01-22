@@ -38,6 +38,8 @@ require (
 	gorm.io/driver/mysql v1.5.2 // indirect
 )
 
+require github.com/robfig/cron/v3 v3.0.1
+
 replace (
 	github.com/mannx/Bluebook/api => ../api
 	github.com/mannx/Bluebook/api2 => ../api2

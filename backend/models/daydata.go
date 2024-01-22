@@ -26,6 +26,7 @@ type DayData struct {
 	PayPal         float64 `gorm:"column:PayPal"`
 	SkipTheDishes  float64 `gorm:"column:SkipTheDishes"`
 	DoorDash       float64 `gorm:"column:DoorDash"`
+	UberEats       float64 `gorm:"column:UberEats"`
 	PettyCash      float64 `gorm:"column:PettyCash"`
 
 	Tips                 float64 `gorm:"column:Tips"`

@@ -15,9 +15,12 @@ import (
 
 var reWISRWeekEnd = regexp.MustCompile(`Week Ending:\s*(\d\d?)/(\d\d?)/(\d{4})`)
 
-var reCateringSales = regexp.MustCompile(`CATERING SALES\s+(\d+.?\d?)`)       // 1 group -> total catering sales
-var reLabourCost = regexp.MustCompile(`LABOR\s&\sTAXES\s+(\d+,?\d+)\s+(\d+)`) // 2 groups -> [0] dollar value [1] percent
-var reFoodCost = regexp.MustCompile(`COST OF GOODS\s+(\d+,?\d+)\s+(\d+)`)     // 2 groups -> [0] dollar value [1] percent
+var (
+	reCateringSales = regexp.MustCompile(`CATERING SALES\s+(\d+.?\d?)`)          // 1 group -> total catering sales
+	reLabourCost    = regexp.MustCompile(`LABOR\s&\sTAXES\s+(\d+,?\d+)\s+(\d+)`) // 2 groups -> [0] dollar value [1] percent
+	reFoodCost      = regexp.MustCompile(`COST OF GOODS\s+(\d+,?\d+)\s+(\d+)`)   // 2 groups -> [0] dollar value [1] percent
+)
+
 // var reNetSales = regexp.MustCompile(`NET SUBWAY SALES\s+(\d+,?\d+)`)          // 1 group -> weekly net sales
 
 func ImportWISR(fileName string, db *gorm.DB) error {
@@ -47,7 +50,6 @@ func ImportWISR(fileName string, db *gorm.DB) error {
 
 	// get the start and ending days of the week
 	endDate := time.Date(year, time.Month(month), day, 0, 0, 0, 0, time.UTC)
-	// startDate := endDate.Add(-time.Hour * 24 * 6) // remove 6 days to get the correct start of the week
 
 	catering := reCateringSales.FindStringSubmatch(cstr)
 	if catering == nil {
@@ -78,7 +80,7 @@ func ImportWISR(fileName string, db *gorm.DB) error {
 	}
 
 	wi := getWeeklyInfoOrNew(endDate, db)
-	wi.Date = datatypes.Date(endDate) //make sure the date is correct
+	wi.Date = datatypes.Date(endDate) // make sure the date is correct
 	wi.FoodCostAmount = foodCost
 	wi.FoodCostPercent = foodPerc
 	wi.LabourCostAmount = labourCost
@@ -88,5 +90,4 @@ func ImportWISR(fileName string, db *gorm.DB) error {
 	db.Save(&wi)
 
 	return nil
-
 }

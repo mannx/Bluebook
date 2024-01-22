@@ -16,6 +16,8 @@ import (
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 
+	"github.com/robfig/cron/v3"
+
 	api "github.com/mannx/Bluebook/api"
 	env "github.com/mannx/Bluebook/environ"
 	models "github.com/mannx/Bluebook/models"
@@ -64,6 +66,9 @@ func main() {
 		log.Info().Msg("Skipping duplicate day check...")
 	}
 
+	log.Info().Msg("Starting cron jobs...")
+	startJobs()
+
 	log.Info().Msg("Initialiing server and middleware")
 
 	e := initServer()
@@ -101,10 +106,12 @@ func migrateDB() {
 	DB.AutoMigrate(&models.TagData{})
 
 	DB.AutoMigrate(&models.BackupEntry{})
-	DB.AutoMigrate(&models.HockeySchedule{})
 	DB.AutoMigrate(&models.DayDataBackup{})
 
-	DB.AutoMigrate(&models.NotificationData{})
+	DB.AutoMigrate(&models.HockeySchedule{})
+	DB.AutoMigrate(&models.HockeyScheduleImport{})
+
+	DB.AutoMigrate(&models.BluebookSettings{})
 }
 
 // check to see if we have any duplicated day_data entries
@@ -155,4 +162,15 @@ func checkDuplicateEntries() error {
 	}
 
 	return nil
+}
+
+func startJobs() {
+	c := cron.New()
+
+	_, err := c.AddFunc(env.Environment.CronTime, func() { api.HockeyImportCronJob(DB) })
+	if err != nil {
+		log.Error().Err(err).Msgf("Unable to add cron job for hockey import.  cron string [%v]", env.Environment.CronTime)
+	}
+
+	c.Start()
 }

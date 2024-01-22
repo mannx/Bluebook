@@ -3,7 +3,7 @@ package daily
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -71,7 +71,7 @@ func ImportWaste(fileName string, db *gorm.DB) error {
 			break
 		}
 
-		item = strings.ToLower(item) //force lowercase to minimize having to combine later
+		item = strings.ToLower(item) // force lowercase to minimize having to combine later
 
 		quant, err := f.GetCellValue("Waste Sheet", getCell(row, 2))
 		if err != nil {
@@ -120,7 +120,8 @@ func ImportWaste(fileName string, db *gorm.DB) error {
 
 // ImportWasteDefinition imports waste entries give a simple JSON config
 func ImportWasteDefinition(fileName string, db *gorm.DB) error {
-	f, err := ioutil.ReadFile(fileName)
+	// f, err := ioutil.ReadFile(fileName)
+	f, err := os.ReadFile(fileName)
 	if err != nil {
 		log.Error().Err(err).Msgf("Unable to read file: %v", fileName)
 		return err
