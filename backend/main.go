@@ -167,8 +167,10 @@ func checkDuplicateEntries() error {
 func startJobs() {
 	c := cron.New()
 
-	c.AddFunc("@daily", func() { api.HockeyImportCronJob(DB) })
+	_, err := c.AddFunc(env.Environment.CronTime, func() { api.HockeyImportCronJob(DB) })
+	if err != nil {
+		log.Error().Err(err).Msgf("Unable to add cron job for hockey import.  cron string [%v]", env.Environment.CronTime)
+	}
 
-	// run any jobs that we need at startup
-	api.HockeyImportCronJob(DB)
+	c.Start()
 }
