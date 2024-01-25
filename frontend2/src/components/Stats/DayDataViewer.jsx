@@ -1,18 +1,10 @@
 import * as React from "react";
-import { UrlGet, UrlApi2RawDayData, GetPostOptions, UrlApiTop5 } from "../URLs";
-import { Form, redirect, useLoaderData, Link } from "react-router-dom";
+import { UrlGet, UrlApi2RawDayData, UrlApiTop5 } from "../URLs";
+import { Form, useLoaderData, Link } from "react-router-dom";
 
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
-
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
 
 import InputLabel from "@mui/material/InputLabel";
 import Select from "@mui/material/Select";
@@ -21,7 +13,7 @@ import Stack from "@mui/material/Stack";
 
 import { DataGrid } from "@mui/x-data-grid";
 
-import * as dayjs from "dayjs";
+import dayjs from "dayjs";
 
 export async function loader({ params }) {
   let query = [];
