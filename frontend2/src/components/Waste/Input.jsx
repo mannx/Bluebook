@@ -35,6 +35,8 @@ import {
   GetPostOptions,
 } from "../URLs";
 
+import ConversionCalculatorInput from "./ConversionCalculator";
+
 // load the current waste data in the holding table, the waste names for autocomplete
 export async function loader({ params }) {
   // retrieve all wastage item names
@@ -113,6 +115,8 @@ export default function WasteInput() {
           Submit
         </Button>
       </Container>
+
+      <ConversionCalculatorInput />
 
       <TableContainer component={Paper}>
         <Form method="post">
