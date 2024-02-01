@@ -75,10 +75,11 @@ export default function WasteInput() {
   const [wasteDate, setWasteDate] = React.useState(null);
   const [confirm, setConfirm] = React.useState(false);
 
+  const [textInput, setTextInput] = React.useState(0);
+  const handleTextInput = (e) => {setTextInput(e.target.value)}
+
   const navigate = useNavigate();
   const data = useLoaderData();
-
-  const names = data.Names;
 
   // button handler for removing an item
   const deleteItem = async (id) => {
@@ -107,6 +108,11 @@ export default function WasteInput() {
     handleConfirmClose();
   };
 
+  // when we click copy from the conversion calculator, copy this value into the current input field
+  const copyCallback = (n) => {
+    setTextInput(n);
+  }
+
   return (
     <>
       <Container>
@@ -116,7 +122,7 @@ export default function WasteInput() {
         </Button>
       </Container>
 
-      <ConversionCalculatorInput />
+      <ConversionCalculatorInput callback={copyCallback} useCallback />
 
       <TableContainer component={Paper}>
         <Form method="post">
@@ -151,7 +157,7 @@ export default function WasteInput() {
                     autoSelect
                     autoHighlight
                     id="freeSolo"
-                    options={names.map((n) => n)}
+                    options={data.Names.map((n) => n)}
                     renderInput={(params) => (
                       <TextField
                         autoFocus
@@ -172,11 +178,11 @@ export default function WasteInput() {
                       step: "any",
                       inputMode: "numeric",
                       pattern: "[0-9](.[0-9]*)?",
-                    }}
+                    }} value={textInput} onChange={handleTextInput} 
                   />
                 </TableCell>
                 <TableCell>
-                  <TextField label="Reason" variant="standard" name="Reason" />
+                  <TextField label="Reason" variant="standard" name="Reason"/>
                 </TableCell>
                 <TableCell>
                   <Button type="submit">Add</Button>
