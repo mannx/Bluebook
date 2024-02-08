@@ -17,6 +17,8 @@ else
 	OUTPATH="/backup"
 fi
 
+BACKUP_LIST="$OUTPATH/backup-list"
+
 # check to make sure input exists and output doesn't
 # if output already exists, log an error and return
 if [ ! -f "$OUTPATH/$INPUT" ]; then
@@ -41,10 +43,10 @@ echo "[INFO] Creating backup of database to: $OUTPATH/$OUTPUT"
 cp $INPATH/$INPUT $OUTPATH/$OUTPUT
 
 # append to the backup list file
-echo $OUTPUT >> backup-list
+echo $OUTPUT >> $BACKUP_LIST
 
 # get count of backup files
-BACKUP_COUNT=$(wc -l < backup-list)
+BACKUP_COUNT=$(wc -l < $BACKUP_LIST)
 echo "Backup count: $BACKUP_COUNT"
 
 # Clean up old back ups
@@ -54,10 +56,10 @@ if [ BACKUP_COUNT > BACKUP_LIMIT ]; then
 	echo "Cleaning up backup list"
 
 	# generate list of files to keep
-	tail -n 3 backup-list > bl.1
+	tail -n 3 $BACKUP_LIST > bl.1
 
 	# get extra files (should only be 1) into a seperate file and diff to get the list of files to remove
-	diff -d backup-list bl.1 | tail -n +2 > bl.2
+	diff -d $BACKUP_LIST bl.1 | tail -n +2 > bl.2
 
 	# remove the starting '> '
 	sed -i 's\< \\g' bl.2
@@ -70,7 +72,7 @@ if [ BACKUP_COUNT > BACKUP_LIMIT ]; then
 	done < bl.2
 
 	# trim the backup list and cleanup temp files
-	tail -n 3 backup-list > backup-list
+	tail -n 3 $BACKUP_LIST > $BACKUP_LIST
 	rm bl.1 bl.2
 fi
 
