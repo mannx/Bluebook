@@ -4,7 +4,6 @@
 PREFIX="db"
 EXT=".db"
 INPUT="$PREFIX$EXT"
-BACKUP_LIMIT=3
 
 TIMESTAMP=$(date +%F)
 OUTPUT="$PREFIX-$TIMESTAMP.bak"
@@ -47,12 +46,11 @@ echo $OUTPUT >> $BACKUP_LIST
 
 # get count of backup files
 BACKUP_COUNT=$(wc -l < $BACKUP_LIST)
-echo "Backup count: $BACKUP_COUNT"
 
 # Clean up old back ups
-# we keep up to $BACKUP_LIMIT number of backups
+# we keep up to 3 number of backups
 # TODO: find a better way to do this? kinda janky
-if [ BACKUP_COUNT > BACKUP_LIMIT ]; then
+if [ BACKUP_COUNT > 3 ]; then
 	echo "Cleaning up backup list"
 
 	# generate list of files to keep
