@@ -21,8 +21,6 @@ var (
 	reFoodCost      = regexp.MustCompile(`COST OF GOODS\s+(\d+,?\d+)\s+(\d+)`)   // 2 groups -> [0] dollar value [1] percent
 )
 
-// var reNetSales = regexp.MustCompile(`NET SUBWAY SALES\s+(\d+,?\d+)`)          // 1 group -> weekly net sales
-
 func ImportWISR(fileName string, db *gorm.DB) error {
 	txtFile, err := PDFToText(fileName)
 	if err != nil {

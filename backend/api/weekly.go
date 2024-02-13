@@ -1,6 +1,7 @@
 package api
 
 import (
+	"math"
 	"net/http"
 	"time"
 
@@ -19,7 +20,8 @@ type weeklyInfo struct {
 	PartySales       float64
 
 	NetSales         float64
-	NetSalesMismatch bool // true if net sales calculated from dailies differs from what was taken from wisr
+	NetSalesMismatch bool    // true if net sales calculated from dailies differs from what was taken from wisr
+	WisrNetSales     float64 // netsales from the control sheet.  debug for now
 	CustomerCount    int
 	GiftCardSold     float64
 	GiftCardRedeem   float64
@@ -88,6 +90,7 @@ func getWeeklyData(month int, day int, year int, c echo.Context, db *gorm.DB) (w
 	weekly.LabourCostAmount = wi.LabourCostAmount
 	weekly.PartySales = wi.PartySales
 	weekly.NetSalesMismatch = weekly.NetSales != wi.NetSales
+	weekly.WisrNetSales = wi.NetSales
 
 	// retrieve the last years data if available
 	lastYear := weekEnding.AddDate(-1, 0, 0)
@@ -134,6 +137,9 @@ func calculateWeekly(data []models.DayData, wi *weeklyInfo) {
 		wi.GiftCardRedeem += d.GiftCardRedeem
 		wi.BreadOverShort += d.BreadOverShort
 	}
+
+	// round weekly to nearest 2 decimal places
+	wi.NetSales = math.Round(wi.NetSales*100) / 100
 }
 
 func getAuvData(weekEnding time.Time, wi *weeklyInfo, db *gorm.DB) error {

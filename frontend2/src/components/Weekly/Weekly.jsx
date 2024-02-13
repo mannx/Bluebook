@@ -12,6 +12,7 @@ import {
   UrlApi2WeeklyExport,
   GetPostOptions,
 } from "../URLs";
+import { Typography } from "@mui/material";
 
 export async function loader({ params }) {
   const url =
@@ -62,9 +63,12 @@ function NF(obj) {
 export default function Weekly() {
   const data = useLoaderData();
 
+  const mismatch = data.NetSalesMismatch ? <Typography sx={{color: "red"}} variant="h4">Net Sales Mismatch</Typography> : <></>;
+
   return (
     <>
       <Container sx={{ margin: 2 }}>
+        {mismatch}
         <table>
           <caption>Weekly Report</caption>
           <thead>
