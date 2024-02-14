@@ -21,3 +21,5 @@ fi
 
 python3 $SP/get-hockey-data.py $2
 
+# cleanup
+rm $OUTPUT

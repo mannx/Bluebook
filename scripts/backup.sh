@@ -4,9 +4,7 @@
 PREFIX="db"
 EXT=".db"
 INPUT="$PREFIX$EXT"
-
-TIMESTAMP=$(date +%F)
-OUTPUT="$PREFIX-$TIMESTAMP.bak"
+OUTPUT="$PREFIX.bak"
 
 #set path to /data unless BLUEBOOK_BACKUP_PATH is set
 if [ ! -z "$BLUEBOOK_BACKUP_PATH" ] 
@@ -16,17 +14,10 @@ else
 	OUTPATH="/backup"
 fi
 
-BACKUP_LIST="$OUTPATH/backup-list"
-
 # check to make sure input exists and output doesn't
 # if output already exists, log an error and return
 if [ ! -f "$OUTPATH/$INPUT" ]; then
 	echo "[ERROR]: NO DB FOUND"
-	exit 1
-fi
-
-if [ -f "$OUTPATH/$OUTPUT" ]; then
-	echo "[WARN]: db already backed up for this day"
 	exit 1
 fi
 
@@ -40,38 +31,5 @@ fi
 # create the backup
 echo "[INFO] Creating backup of database to: $OUTPATH/$OUTPUT"
 cp $INPATH/$INPUT $OUTPATH/$OUTPUT
-
-# append to the backup list file
-echo $OUTPUT >> $BACKUP_LIST
-
-# get count of backup files
-BACKUP_COUNT=$(wc -l < $BACKUP_LIST)
-
-# Clean up old back ups
-# we keep up to 3 number of backups
-# TODO: find a better way to do this? kinda janky
-if [ BACKUP_COUNT > 3 ]; then
-	echo "Cleaning up backup list"
-
-	# generate list of files to keep
-	tail -n 3 $BACKUP_LIST > bl.1
-
-	# get extra files (should only be 1) into a seperate file and diff to get the list of files to remove
-	diff -d $BACKUP_LIST bl.1 | tail -n +2 > bl.2
-
-	# remove the starting '> '
-	sed -i 's\< \\g' bl.2
-
-	# iterate over each file
-	while IFS="" read -r p || [ -n "$p" ]
-	do
-		echo "Deleting backup file: $OUTPATH/$p"
-		rm $OUTPATH/$p
-	done < bl.2
-
-	# trim the backup list and cleanup temp files
-	tail -n 3 $BACKUP_LIST > $BACKUP_LIST
-	rm bl.1 bl.2
-fi
 
 exit 0
