@@ -15,16 +15,18 @@ import (
 	"gorm.io/gorm"
 )
 
-type TeamNameData struct {
-	Raw     string `json:"Raw"`
-	Correct string `json:"Correct"`
-	Image   string // image name in /public to display for this team
-}
+// type TeamNameData struct {
+// 	Raw     string `json:"Raw"`
+// 	Correct string `json:"Correct"`
+// 	Image   string // image name in /public to display for this team
+// }
 
-var (
-	// teamNameData map[string]TeamNameData
-	HomeTeamName string // todo: have this configured by user and stored in db
-)
+// var (
+// teamNameData map[string]TeamNameData
+// HomeTeamName string // todo: have this configured by user and stored in db
+// )
+
+var HomeTeamName string
 
 // return the image string for a given team. uses the Correct team name
 // func getTeamImage(name string) string {
@@ -49,30 +51,45 @@ var (
 // 	return nil, err
 // }
 
-func InitHockeySchedule() {
-	HomeTeamName = "Saint John"
-	// f, err := readHockeyConfig()
-	// if err != nil {
-	// 	log.Error().Err(err).Msg("Unable to read user config file for hockey team name substitution")
-	// 	return
-	// }
+// func InitHockeySchedule() {
+// HomeTeamName = "Saint John"
+// f, err := readHockeyConfig()
+// if err != nil {
+// 	log.Error().Err(err).Msg("Unable to read user config file for hockey team name substitution")
+// 	return
+// }
 
-	// type jsonData struct {
-	// 	Data []TeamNameData
-	// }
+// type jsonData struct {
+// 	Data []TeamNameData
+// }
 
-	// var data jsonData
-	// err = json.Unmarshal(f, &data)
-	// if err != nil {
-	// 	log.Error().Err(err).Msg("Unable to parse hockey team file")
-	// 	return
-	// }
+// var data jsonData
+// err = json.Unmarshal(f, &data)
+// if err != nil {
+// 	log.Error().Err(err).Msg("Unable to parse hockey team file")
+// 	return
+// }
 
-	// teamNameData = make(map[string]TeamNameData)
-	// for _, i := range data.Data {
-	// 	teamNameData[i.Raw] = i
-	// }
-}
+// teamNameData = make(map[string]TeamNameData)
+// for _, i := range data.Data {
+// 	teamNameData[i.Raw] = i
+// }
+// }
+
+// Returns the home team name from the settings table, returns an empty string on error or if not set
+// func GetHomeTeamName(db *gorm.DB) string {
+// 	log.Debug().Msgf("[GETHOMETEAMNAME()]")
+
+// 	settings := models.BluebookSettings{}
+// 	res := db.Find(&settings)
+// 	if res.Error != nil {
+// 		log.Debug().Msgf("[GETHOMETEAMNAME] settings error, empty team name")
+// 		return ""
+// 	}
+
+// 	log.Debug().Msgf("[GETHOMETEAMNAME] name: %v", settings.HockeyHomeTeam)
+// 	return settings.HockeyHomeTeam
+// }
 
 func HockeyDataYearsHandler(c echo.Context, db *gorm.DB) error {
 	var data models.HockeySchedule
@@ -125,7 +142,7 @@ func HockeyDataHandler(c echo.Context, db *gorm.DB) error {
 	log.Debug().Msgf("[hockey data] year: %v", year)
 
 	var hschedule []models.HockeySchedule
-	// res := db.Where("Home = ?", HomeTeamName).Find(&hschedule)
+	// op := db.Where("Home = ?", GetHomeTeamName(db))
 	op := db.Where("Home = ?", HomeTeamName)
 
 	// if year!=0, add in a year filter

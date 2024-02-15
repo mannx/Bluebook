@@ -43,7 +43,8 @@ func main() {
 
 	log.Info().Msg("Initializing top5 list...")
 	api.InitTop5()
-	api.InitHockeySchedule()
+	// api.InitHockeySchedule()
+	api.HomeTeamName = "Saint John"
 
 	dbName = filepath.Join(env.Environment.DataPath, "db.db")
 

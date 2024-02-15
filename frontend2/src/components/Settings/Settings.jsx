@@ -32,6 +32,7 @@ export async function action({ request, params }) {
     HockeyURL: updates.hockey_url,
     DisplayHockey: updates.display === "on",
     PrintHockey: updates.print === "on",
+    HockeyHomeTeam: updates.home_team,
   };
 
   const opt = GetPostOptions(JSON.stringify(body));
@@ -47,6 +48,7 @@ export default function Settings() {
     display: data.DisplayHockey,
     print: data.PrintHockey,
     hockey_url: data.HockeyURL,
+    home_team: data.HomeHockeyTeam,
   });
 
   const [manualURL, setManualURL] = React.useState("");
@@ -105,7 +107,6 @@ export default function Settings() {
                 setState({ ...state, hockey_url: e.target.value });
               }}
             />
-            {/* <Button onClick={fetchHockey}>Fetch</Button> */}
             <Button
               onClick={() => {
                 manualFetch(state.hockey_url);
@@ -114,6 +115,8 @@ export default function Settings() {
               Fetch
             </Button>
           </Stack>
+
+          <TextField label="Home Hockey Team" name="home_team" value={state.home_team} onChange={(e) => {setState({...state,home_team: e.target.value})}} />
 
           <FormControlLabel
             control={
