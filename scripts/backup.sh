@@ -1,35 +1,18 @@
 #!/bin/sh
 
-# variables
-PREFIX="db"
-EXT=".db"
-INPUT="$PREFIX$EXT"
-OUTPUT="$PREFIX.bak"
+# create a quick restore backup point in case automigration fails on startup
+INPUT="db.db"
+OUTPUT="db.bak"
 
-#set path to /data unless BLUEBOOK_BACKUP_PATH is set
-if [ ! -z "$BLUEBOOK_BACKUP_PATH" ] 
-then
-	OUTPATH="$BLUEBOOK_BACKUP_PATH"
+if [ ! -z "$BLUEBOOK_DATA_PATH" ]; then
+	OUTPATH="$BLUEBOOK_DATA_PATH"
 else
-	OUTPATH="/backup"
+	OUTPATH="/data"
 fi
 
-# check to make sure input exists and output doesn't
-# if output already exists, log an error and return
 if [ ! -f "$OUTPATH/$INPUT" ]; then
-	echo "[ERROR]: NO DB FOUND"
+	echo "[backup.sh] No database file found, skipping backup."
 	exit 1
 fi
 
-if [ ! -z "$BLUEBOOK_DATA_PATH" ]
-then
-	INPATH="$BLUEBOOK_DATA_PATH"
-else
-	INPATH="/data"
-fi
-
-# create the backup
-echo "[INFO] Creating backup of database to: $OUTPATH/$OUTPUT"
-cp $INPATH/$INPUT $OUTPATH/$OUTPUT
-
-exit 0
+cp $OUTPATH/$INPUT $OUTPATH/$OUTPUT

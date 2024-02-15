@@ -12,7 +12,7 @@ else
 fi
 
 if [ ! -z "$BLUEBOOK_DATA_PATH" ]; then
-    INPATH="$BLUEBOOK_BACKUP_PATH"
+    INPATH="$BLUEBOOK_DATA_PATH"
 else
     INPATH="/data"
 fi
@@ -26,4 +26,4 @@ if [ ! -f $INPUT_FILE ]; then
     exit 1
 fi
 
-tar -zxvf $DEST_FILE $INPUT_FILE
+tar -zcvf $DEST_FILE $INPUT_FILE

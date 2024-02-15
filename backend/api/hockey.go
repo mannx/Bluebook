@@ -1,9 +1,7 @@
 package api
 
 import (
-	"encoding/json"
 	"net/http"
-	"os"
 	"os/exec"
 	"path/filepath"
 	"strconv"
@@ -24,55 +22,56 @@ type TeamNameData struct {
 }
 
 var (
-	teamNameData map[string]TeamNameData
+	// teamNameData map[string]TeamNameData
 	HomeTeamName string // todo: have this configured by user and stored in db
 )
 
 // return the image string for a given team. uses the Correct team name
-func getTeamImage(name string) string {
-	for _, i := range teamNameData {
-		if i.Correct == name {
-			return i.Image
-		}
-	}
+// func getTeamImage(name string) string {
+// 	for _, i := range teamNameData {
+// 		if i.Correct == name {
+// 			return i.Image
+// 		}
+// 	}
 
-	return "error.png"
-}
+// 	return "error.png"
+// }
 
-func readHockeyConfig() ([]byte, error) {
-	HomeTeamName = "Saint John"
-	// try and read the user supplied config file
-	fname := filepath.Join(env.Environment.DataPath, "hockey.json")
-	f, err := os.ReadFile(fname)
-	if err == nil {
-		return f, nil // read success
-	}
+// func readHockeyConfig() ([]byte, error) {
+// 	HomeTeamName = "Saint John"
+// 	// try and read the user supplied config file
+// 	fname := filepath.Join(env.Environment.DataPath, "hockey.json")
+// 	f, err := os.ReadFile(fname)
+// 	if err == nil {
+// 		return f, nil // read success
+// 	}
 
-	return nil, err
-}
+// 	return nil, err
+// }
 
 func InitHockeySchedule() {
-	f, err := readHockeyConfig()
-	if err != nil {
-		log.Error().Err(err).Msg("Unable to read user config file for hockey team name substitution")
-		return
-	}
+	HomeTeamName = "Saint John"
+	// f, err := readHockeyConfig()
+	// if err != nil {
+	// 	log.Error().Err(err).Msg("Unable to read user config file for hockey team name substitution")
+	// 	return
+	// }
 
-	type jsonData struct {
-		Data []TeamNameData
-	}
+	// type jsonData struct {
+	// 	Data []TeamNameData
+	// }
 
-	var data jsonData
-	err = json.Unmarshal(f, &data)
-	if err != nil {
-		log.Error().Err(err).Msg("Unable to parse hockey team file")
-		return
-	}
+	// var data jsonData
+	// err = json.Unmarshal(f, &data)
+	// if err != nil {
+	// 	log.Error().Err(err).Msg("Unable to parse hockey team file")
+	// 	return
+	// }
 
-	teamNameData = make(map[string]TeamNameData)
-	for _, i := range data.Data {
-		teamNameData[i.Raw] = i
-	}
+	// teamNameData = make(map[string]TeamNameData)
+	// for _, i := range data.Data {
+	// 	teamNameData[i.Raw] = i
+	// }
 }
 
 func HockeyDataYearsHandler(c echo.Context, db *gorm.DB) error {
@@ -243,6 +242,8 @@ func mergeHockeyTables(db *gorm.DB) error {
 			obj.Away = e.Away
 			obj.Date = e.Date
 			obj.Arena = e.Arena
+			obj.HomeImage = e.HomeImage
+			obj.AwayImage = e.AwayImage
 		}
 
 		// convert since the python script might store them as a string instead of an integer

@@ -3,10 +3,12 @@ package main
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	// "fmt"
 	"net/http"
 	"os"
+	"os/exec"
 	"os/signal"
 	"path/filepath"
 	"time"
@@ -172,5 +174,29 @@ func startJobs() {
 		log.Error().Err(err).Msgf("Unable to add cron job for hockey import.  cron string [%v]", env.Environment.CronTime)
 	}
 
+	_, err = c.AddFunc(env.Environment.BackupTime, archiveCronJob)
+	if err != nil {
+		log.Error().Err(err).Msgf("Unable to add cron job for archive script. cron string [%v]", env.Environment.BackupTime)
+	}
+
 	c.Start()
+}
+
+func archiveCronJob() {
+	log.Debug().Msg("[CRON] Running archive backup script")
+
+	scriptPath := filepath.Join(env.Environment.ScriptsPath, "ar.sh")
+	cmd := exec.Command(scriptPath)
+
+	var out strings.Builder
+	cmd.Stdout = &out
+
+	err := cmd.Run()
+	if err != nil {
+		log.Error().Err(err).Msg("Unable to run archive script")
+	}
+
+	if len(out.String()) > 0 {
+		log.Info().Msg(out.String())
+	}
 }
