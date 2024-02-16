@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"strings"
 
-	// "fmt"
 	"net/http"
 	"os"
 	"os/exec"
@@ -43,8 +42,6 @@ func main() {
 
 	log.Info().Msg("Initializing top5 list...")
 	api.InitTop5()
-	// api.InitHockeySchedule()
-	api.HomeTeamName = "Saint John"
 
 	dbName = filepath.Join(env.Environment.DataPath, "db.db")
 
@@ -73,7 +70,6 @@ func main() {
 	startJobs()
 
 	log.Info().Msg("Initialiing server and middleware")
-
 	e := initServer()
 
 	log.Info().Msg("Starting server...")
@@ -184,8 +180,6 @@ func startJobs() {
 }
 
 func archiveCronJob() {
-	log.Debug().Msg("[CRON] Running archive backup script")
-
 	scriptPath := filepath.Join(env.Environment.ScriptsPath, "ar.sh")
 	cmd := exec.Command(scriptPath)
 

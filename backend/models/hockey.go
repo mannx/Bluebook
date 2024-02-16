@@ -40,10 +40,3 @@ type HockeyScheduleImport struct {
 	HomeImage  string
 	AwayImage  string
 }
-
-// This table should only contain 1 entry which is the URL to fetch data from
-// type HockeyFetchURL struct {
-// 	gorm.Model
-//
-// 	URL string
-// }

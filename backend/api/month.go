@@ -375,9 +375,8 @@ func genHockeyData(db *gorm.DB, date time.Time) (models.HockeySchedule, error) {
 
 	hd.Valid = true
 	// hd.HomeGame = hd.Home == HomeTeamName
-	// htn := GetHomeTeamName(db)
-	// log.Debug().Msgf("[genhockeydata] team: %v", htn)
-	hd.HomeGame = hd.Home == HomeTeamName
+	htn := GetHomeTeamName(db)
+	hd.HomeGame = hd.Home == htn
 
 	return hd, nil
 }

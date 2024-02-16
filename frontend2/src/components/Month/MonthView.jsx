@@ -128,6 +128,7 @@ function O(obj) {
 function P(obj) {
   return NF(obj, "", "%");
 } // output a percent
+
 function Dol(obj) {
   return NF(obj, "$", "");
 }

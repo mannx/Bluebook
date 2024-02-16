@@ -48,7 +48,7 @@ export default function Settings() {
     display: data.DisplayHockey,
     print: data.PrintHockey,
     hockey_url: data.HockeyURL,
-    home_team: data.HomeHockeyTeam,
+    home_team: data.HockeyHomeTeam,
   });
 
   const [manualURL, setManualURL] = React.useState("");
