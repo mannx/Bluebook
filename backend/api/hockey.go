@@ -140,6 +140,8 @@ func HockeyManualImportHandler(c echo.Context, db *gorm.DB) error {
 }
 
 func runImportScript(url string, db *gorm.DB) {
+	log.Info().Msg("Running hockey import script...")
+
 	// get the path to the ghd.sh script in the /scripts directory
 	scriptPath := filepath.Join(env.Environment.ScriptsPath, "ghd.sh")
 	dbPath := filepath.Join(env.Environment.DataPath, "db.db")
