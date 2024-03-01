@@ -1,9 +1,7 @@
 package api
 
 import (
-	"encoding/json"
 	"net/http"
-	"os"
 	"os/exec"
 	"path/filepath"
 	"strconv"
@@ -17,62 +15,15 @@ import (
 	"gorm.io/gorm"
 )
 
-type TeamNameData struct {
-	Raw     string `json:"Raw"`
-	Correct string `json:"Correct"`
-	Image   string // image name in /public to display for this team
-}
-
-var (
-	teamNameData map[string]TeamNameData
-	HomeTeamName string // todo: have this configured by user and stored in db
-)
-
-// return the image string for a given team. uses the Correct team name
-func getTeamImage(name string) string {
-	for _, i := range teamNameData {
-		if i.Correct == name {
-			return i.Image
-		}
+// Returns the home team name from the settings table, returns an empty string on error or if not set
+func GetHomeTeamName(db *gorm.DB) string {
+	settings := models.BluebookSettings{}
+	res := db.Find(&settings)
+	if res.Error != nil {
+		return ""
 	}
 
-	return "error.png"
-}
-
-func readHockeyConfig() ([]byte, error) {
-	HomeTeamName = "Saint John"
-	// try and read the user supplied config file
-	fname := filepath.Join(env.Environment.DataPath, "hockey.json")
-	f, err := os.ReadFile(fname)
-	if err == nil {
-		return f, nil // read success
-	}
-
-	return nil, err
-}
-
-func InitHockeySchedule() {
-	f, err := readHockeyConfig()
-	if err != nil {
-		log.Error().Err(err).Msg("Unable to read user config file for hockey team name substitution")
-		return
-	}
-
-	type jsonData struct {
-		Data []TeamNameData
-	}
-
-	var data jsonData
-	err = json.Unmarshal(f, &data)
-	if err != nil {
-		log.Error().Err(err).Msg("Unable to parse hockey team file")
-		return
-	}
-
-	teamNameData = make(map[string]TeamNameData)
-	for _, i := range data.Data {
-		teamNameData[i.Raw] = i
-	}
+	return settings.HockeyHomeTeam
 }
 
 func HockeyDataYearsHandler(c echo.Context, db *gorm.DB) error {
@@ -123,11 +74,8 @@ func HockeyDataHandler(c echo.Context, db *gorm.DB) error {
 		return LogAndReturnError(c, "Unable to bind to year parameter", err)
 	}
 
-	log.Debug().Msgf("[hockey data] year: %v", year)
-
 	var hschedule []models.HockeySchedule
-	// res := db.Where("Home = ?", HomeTeamName).Find(&hschedule)
-	op := db.Where("Home = ?", HomeTeamName)
+	op := db.Where("Home = ?", GetHomeTeamName(db))
 
 	// if year!=0, add in a year filter
 	if year != 0 {
@@ -192,6 +140,8 @@ func HockeyManualImportHandler(c echo.Context, db *gorm.DB) error {
 }
 
 func runImportScript(url string, db *gorm.DB) {
+	log.Info().Msg("Running hockey import script...")
+
 	// get the path to the ghd.sh script in the /scripts directory
 	scriptPath := filepath.Join(env.Environment.ScriptsPath, "ghd.sh")
 	dbPath := filepath.Join(env.Environment.DataPath, "db.db")
@@ -243,6 +193,8 @@ func mergeHockeyTables(db *gorm.DB) error {
 			obj.Away = e.Away
 			obj.Date = e.Date
 			obj.Arena = e.Arena
+			obj.HomeImage = e.HomeImage
+			obj.AwayImage = e.AwayImage
 		}
 
 		// convert since the python script might store them as a string instead of an integer

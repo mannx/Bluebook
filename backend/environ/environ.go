@@ -20,7 +20,8 @@ type EnvironmentDefinition struct {
 	BackupPath  string `envconfig:"BLUEBOOK_BACKUP_PATH"`  // where to make the db backup on startup
 	ScriptsPath string `envconfig:"BLUEBOOK_SCRIPTS_PATH"` // path to the scripts directory.
 
-	CronTime string `envconfig:"BLUEBOOK_CRON_JOB"` // 	cron string when to run auto imports
+	CronTime   string `envconfig:"BLUEBOOK_IMPORT_TIMER"` // 	cron string when to run auto imports
+	BackupTime string `envconfig:"BLUEBOOK_BACKUP_TIMER"` // cron sstring when to create a backup archive
 
 	// UserID and GroupID are used to set the file permissions for all exported files
 	UserID  int `envconfig:"PUID"` // userid the container should be running under
@@ -61,6 +62,7 @@ func (e *EnvironmentDefinition) Default() {
 
 	e.LogLevelString = "Info"
 	e.CronTime = "@daily"
+	e.BackupTime = "@daily"
 
 	e.Port = 8080
 	e.IgnoreChecks = false

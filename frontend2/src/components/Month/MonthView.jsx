@@ -38,6 +38,7 @@ export default function MonthView() {
           <span>{prevMonth(data)} </span>
           <span>{nextMonth(data)} </span>
           <span>{prevYear(data)} </span>
+          <span>{nextYear(data)}</span>
         </h3>
         <h1>
           {data.MonthName} {data.Year}
@@ -127,6 +128,7 @@ function O(obj) {
 function P(obj) {
   return NF(obj, "", "%");
 } // output a percent
+
 function Dol(obj) {
   return NF(obj, "$", "");
 }
@@ -321,6 +323,15 @@ function prevYear(data) {
   return monthNavLink(data.Month, data.Year - 1, "Prev Year");
 }
 
+function nextYear(data) {
+  const currentYear = (new Date()).getFullYear();
+
+  if(data.Year !== currentYear) {
+    return monthNavLink(data.Month, data.Year + 1, "Next Year");
+  }
+
+  return <></>;
+}
 // return the nav link for the given data
 function monthNavLink(month, year, str) {
   const url = "/" + month + "/" + year;

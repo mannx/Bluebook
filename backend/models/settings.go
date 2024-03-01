@@ -9,4 +9,5 @@ type BluebookSettings struct {
 	HockeyURL           string // url used to fetch the hockey schedule
 	DisplayHockeyWeekly bool   `json:"DisplayHockey"` // do we display hockey information on the /today view?
 	PrintHockeyWeekly   bool   `json:"PrintHockey"`   // do we print the hockey info on the /today view?
+	HockeyHomeTeam      string // name of home hockey team to show which games to display on month view
 }

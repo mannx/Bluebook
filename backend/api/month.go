@@ -321,7 +321,6 @@ func calculateWeeklyAverage(date time.Time, numWeeks int, db *gorm.DB) float64 {
 		total = total + obj.NetSales
 	}
 
-	// return total / float64(numWeeks)
 	n := total / float64(numWeeks)
 	if math.IsNaN(n) {
 		log.Warn().Msg("[month.go] weekly avarage is NaN, returning 0")
@@ -339,19 +338,12 @@ func genEmptyMonth(data *[]dayViewData, start time.Time, numDays int) {
 }
 
 func genEmptyDVD(date time.Time) dayViewData {
-	// eow := false
-	//
-	// if date.Weekday() == 2 {
-	// 	eow = true
-	// }
-
 	dvd := dayViewData{
 		DayData: models.DayData{
 			Date: datatypes.Date(date),
 		},
-		DayOfWeek:  date.Weekday().String(),
-		DayOfMonth: date.Day(),
-		// IsEndOfWeek: eow,
+		DayOfWeek:   date.Weekday().String(),
+		DayOfMonth:  date.Day(),
 		IsEndOfWeek: date.Weekday() == 2,
 		Day:         date.Day(),
 		Month:       date.Month(),
@@ -382,9 +374,9 @@ func genHockeyData(db *gorm.DB, date time.Time) (models.HockeySchedule, error) {
 	}
 
 	hd.Valid = true
-	hd.HomeGame = hd.Home == HomeTeamName
-	hd.HomeImage = getTeamImage(hd.Home)
-	hd.AwayImage = getTeamImage(hd.Away)
+	// hd.HomeGame = hd.Home == HomeTeamName
+	htn := GetHomeTeamName(db)
+	hd.HomeGame = hd.Home == htn
 
 	return hd, nil
 }

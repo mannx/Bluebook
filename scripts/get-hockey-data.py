@@ -1,6 +1,7 @@
 import json
 import sqlite3
 import argparse
+import os
 
 # location our downloaded file is stored at from the previous script
 # TODO: skip ghd.sh and download the file ourselves here
@@ -29,13 +30,26 @@ inputFile = "/tmp/index.html"
 def safe(s):
     return s.replace("'", "\\'")
 
+# get file name for the team image from the path
+def getImage(s):
+    file = os.path.basename(s)
+    return updateExtension(file)
+
+# some files have incorrect extensions, change on a case by case basis
+def updateExtension(s):
+    if s == "3.jpg":
+        return "3.png"
+    else:
+        return s
 
 def output(e, cur):
     # insert the entries into the table
-    sql = 'INSERT INTO hockey_schedule_imports (date, home, away, gf_home, gf_away, attendance, arena) VALUES ("{}", "{}", "{}","{}","{}", "{}", "{}")'.format(
-        e[1], safe(e[2][1]), safe(e[4][1]), e[3], e[5], e[7], safe(e[9])
+    sql = 'INSERT INTO hockey_schedule_imports (date, home, away, gf_home, gf_away, attendance, arena, home_image, away_image) VALUES ("{}", "{}", "{}","{}","{}", "{}", "{}", "{}", "{}")'.format(
+        e[1], safe(e[2][1]), safe(e[4][1]), e[3], e[5], e[7], safe(e[9]), getImage(e[2][0]),getImage(e[4][0])
     )
     cur.execute(sql)
+
+    getImage(e[2][0])
 
 
 # parse command line arguments
