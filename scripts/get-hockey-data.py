@@ -35,13 +35,12 @@ def getImage(s):
     file = os.path.basename(s)
     return updateExtension(file)
 
-# if the image file is a .jpg, change to .png, otherwise return as usual as all images are png
+# some files have incorrect extensions, change on a case by case basis
 def updateExtension(s):
-    file,ext = os.path.splitext(s)
-    if ext == ".jpg":
-        return file+".png"
+    if s == "3.jpg":
+        return "3.png"
     else:
-        return file
+        return s
 
 def output(e, cur):
     # insert the entries into the table
