@@ -167,6 +167,15 @@ func runImportScript(url string, db *gorm.DB) {
 	}
 }
 
+func HockeyDebugMerge(db *gorm.DB) error {
+	err := mergeHockeyTables(db)
+	if err != nil {
+		log.Error().Err(err).Msg("Error merging hockey tables")
+	}
+
+	return err
+}
+
 // merge the hockey import table to the schedule table.  update the schedule table if an entry already exists
 func mergeHockeyTables(db *gorm.DB) error {
 	var data []models.HockeyScheduleImport

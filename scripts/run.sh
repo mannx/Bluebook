@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # create a backup before we start
-/scripts/backup.sh
+/scripts/ar.sh
 
 # todo:
 #	handle any error exits before starting?

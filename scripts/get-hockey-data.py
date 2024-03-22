@@ -10,10 +10,10 @@ inputFile = "/tmp/index.html"
 # Data format is array of objects
 # indexes as follows
 #   0: Game Number
-#   1: Date
-#   2: Away Team
+#   1: Date: [Date, Date]
+#   2: Away Team: [Image Url, Team Name]
 #   3: Away Score
-#   4: Home Team
+#   4: Home Team: [Image Url, Team Name]
 #   5: Home Score
 #   6: Time Information (see below)
 #   7: Attendance (if game has occurred, blank otherwise)
@@ -21,10 +21,12 @@ inputFile = "/tmp/index.html"
 #   9: Arena name
 
 # time information
-#   0: "Final" or game start time
-#   1: Url of arena
-#   2: "Final" or game start time
-
+#   0: ???
+#   1: "Final" or game date and time with timezone offset
+#   2: Url of arena
+#   3: "Final" or game date and time start with timezone offset
+#   4: User friendly game time
+#   5: "h:mm a z" for timezone decoding?
 
 # replace any ' with escape characters
 def safe(s):
@@ -44,12 +46,19 @@ def updateExtension(s):
 
 def output(e, cur):
     # insert the entries into the table
+    home = safe(e[4][1])
+    away = safe(e[2][1])
+    hg = e[5]
+    ag = e[3]
+    att = e[7]
+    arena = safe(e[9])
+    himage = getImage(e[4][0])
+    aimage = getImage(e[2][0])
+
     sql = 'INSERT INTO hockey_schedule_imports (date, home, away, gf_home, gf_away, attendance, arena, home_image, away_image) VALUES ("{}", "{}", "{}","{}","{}", "{}", "{}", "{}", "{}")'.format(
-        e[1], safe(e[2][1]), safe(e[4][1]), e[3], e[5], e[7], safe(e[9]), getImage(e[2][0]),getImage(e[4][0])
+        e[1][0],home,away,hg,ag,att,arena,himage,aimage
     )
     cur.execute(sql)
-
-    getImage(e[2][0])
 
 
 # parse command line arguments
