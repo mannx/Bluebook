@@ -49,6 +49,8 @@ export const UrlApiDailyUndoList = "/api/backup/daydata/get";
 export const UrlApiDailyUndoAction = "/api/backup/daydata/action";
 export const UrlApiDailyUndoClear = "/api/backup/daydata/clear";
 
+export const UrlApiManualArchive = "/api/backup/archive";
+
 export const UrlApiCommentSearch = "/api/comment/search"; // search for all comments containing the search term
 
 export const UrlApiHockeyData = "/api/hockey/data";
