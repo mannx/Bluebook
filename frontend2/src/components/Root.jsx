@@ -153,6 +153,7 @@ function navHeader2() {
                   <MenuItem
                     key={i}
                     onClick={() => {
+                      setAnchorE1user(null);
                       navigate(item.Url);
                     }}
                   >
