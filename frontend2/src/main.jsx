@@ -88,6 +88,8 @@ import SimpleStats, {
   SimpleStatsYear,
 } from "./components/Stats/Stats";
 
+import FilterDayData from "./components/Stats/Filter.jsx";
+
 import Settings, {
   loader as settingsLoader,
   action as settingsAction,
@@ -256,6 +258,10 @@ const router = createBrowserRouter([
         element: <Settings />,
         loader: settingsLoader,
         action: settingsAction,
+      },
+      {
+        path: "/filter",
+        element: <FilterDayData />,
       },
     ],
   },
