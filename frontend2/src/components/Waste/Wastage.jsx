@@ -16,7 +16,7 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 
-import * as dayjs from "dayjs";
+import dayjs from "dayjs";
 
 import {
   UrlGet,
@@ -34,14 +34,14 @@ const notTuesday = (date) => {
 // returns the closest tuesday from where we are
 function getInitialDate() {
   const now = dayjs();
-  const day = now.day();    // 0-sunday
+  const day = now.day(); // 0-sunday
 
   // 0-1 push ahead to the next tuesday
   // 2 - tue, do nothing
   // 3-6 - move back to previous tue
   let offset = 0;
 
-  switch(day) {
+  switch (day) {
     case 0:
     case 1:
       offset = 2 - day;
@@ -54,7 +54,7 @@ function getInitialDate() {
       break;
   }
 
-  return now.add(offset,'day');
+  return now.add(offset, "day");
 }
 
 export default function WasteView() {
