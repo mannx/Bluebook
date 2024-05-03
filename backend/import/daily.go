@@ -124,7 +124,7 @@ func ImportDaily(fileName string, db *gorm.DB) error {
 }
 
 // returns which version of the sheet we are using
-func getSheetVersion(sheet *excelize.File) int {
+func getSheetVersion(_ *excelize.File) int {
 	return 0
 }
 

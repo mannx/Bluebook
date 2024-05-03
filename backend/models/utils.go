@@ -6,3 +6,9 @@ type ServerReturnMessage struct {
 	Error   bool   `json:"Error"`
 	Data    string `json:"Data"` // optional extra data in a json formatted string
 }
+
+type ApiReturnMessage struct {
+	Error   bool   // if true, message contains the error message
+	Data    string // json encoded data
+	Message string // error message if Error==true, message to display to user if Error==false, empty if nothing to show
+}

@@ -21,6 +21,7 @@ import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 
 import { UrlGet, UrlApiTop5, UrlApiTop5Data } from "../URLs";
+import ErrorOrData from "../Error";
 
 const monthNames = [
   "Any",
@@ -43,6 +44,7 @@ export async function loader() {
   const resp = await fetch(url);
   const data = await resp.json();
 
+  // return JSON.parse(data.Data);
   return { data };
 }
 
@@ -59,11 +61,8 @@ export default function Top5() {
     setYear(e.target.value);
   };
 
-  return (
-    <>
-      <Container component={Paper}>
-        <h3>Top 5</h3>
-
+  const outputData = (data) => {
+      return (<>
         <Stack spacing={2}>
           <InputLabel id="month">Month</InputLabel>
           <Select
@@ -100,6 +99,51 @@ export default function Top5() {
             <Button variant="contained">View</Button>
           </Link>
         </Stack>
+      </>);
+  }
+
+  return (
+    <>
+      <Container component={Paper}>
+        <h3>Top 5</h3>
+
+        {/* <Stack spacing={2}>
+          <InputLabel id="month">Month</InputLabel>
+          <Select
+            labelId="month"
+            id="month-select"
+            value={month}
+            label="MonthL"
+            onChange={updateMonth}
+          >
+            {monthNames.map((n, i) => {
+              return (
+                <MenuItem key={i} value={i}>
+                  {n}
+                </MenuItem>
+              );
+            })}
+          </Select>
+
+          <InputLabel id="year">Year</InputLabel>
+          <Select labelId="year" value={year} onChange={updateYear}>
+            <MenuItem key={-1} value="0">
+              Any
+            </MenuItem>
+            {data.map((n) => {
+              return (
+                <MenuItem key={n} value={n}>
+                  {n}
+                </MenuItem>
+              );
+            })}
+          </Select>
+
+          <Link to={`/top5/${month}/${year}`}>
+            <Button variant="contained">View</Button>
+          </Link>
+        </Stack> */}
+        {ErrorOrData(data, outputData)}
       </Container>
       <Outlet />
     </>
@@ -134,38 +178,42 @@ export function Top5Data() {
     );
   };
 
-  return data.Data.map((n) => {
-    return (
-      <>
-        <Typography sx={{ flex: "1 1 100%" }} component="div" variant="h6">
-          {n.Title}
-        </Typography>
+  const outputData = (data, resp) => {
+    return data.Data.map((n) => {
+      return (
+        <>
+          <Typography sx={{ flex: "1 1 100%" }} component="div" variant="h6">
+            {n.Title}
+          </Typography>
 
-        <TableContainer sx={{ width: 1 / 8 }}>
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell>Date</TableCell>
-                <TableCell>$</TableCell>
-              </TableRow>
-            </TableHead>
+          <TableContainer sx={{ width: 1 / 8 }}>
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Date</TableCell>
+                  <TableCell>$</TableCell>
+                </TableRow>
+              </TableHead>
 
-            <TableBody>
-              {n.Data.map((obj) => {
-                const f = n.Field;
-                const val = obj[f];
+              <TableBody>
+                {n.Data.map((obj) => {
+                  const f = n.Field;
+                  const val = obj[f];
 
-                return (
-                  <TableRow>
-                    <TableCell>{obj.DateString}</TableCell>
-                    <TableCell>{NF(val)}</TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </>
-    );
-  });
+                  return (
+                    <TableRow>
+                      <TableCell>{obj.DateString}</TableCell>
+                      <TableCell>{NF(val)}</TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </>
+      );
+    });
+  }
+
+  return ErrorOrData(data, outputData);
 }

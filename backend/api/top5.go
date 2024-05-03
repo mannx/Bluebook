@@ -3,7 +3,6 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
 	"os"
 	"path/filepath"
 	"sort"
@@ -90,7 +89,8 @@ func GetTop5Data(c echo.Context, db *gorm.DB) error {
 	// make sure years is sorted current to earliest
 	sort.Sort(sort.Reverse(sort.IntSlice(years)))
 
-	return c.JSON(http.StatusOK, years)
+	// return c.JSON(http.StatusOK, years)
+	return ReturnApiRequest(c, false, years, "")
 }
 
 // GetTop5ViewHandler expects params of none (top all time, year=YYYY for top of year, year=YYYY&month=MM for best of month
@@ -147,7 +147,8 @@ func GetTop5ViewHandler(c echo.Context, db *gorm.DB) error {
 		Data:    data,
 	}
 
-	return c.JSON(http.StatusOK, &msg)
+	// return c.JSON(http.StatusOK, &msg)
+	return ReturnApiRequest(c, false, &msg, "")
 }
 
 func getTop5Data(month int, year int, limit int, db *gorm.DB) []top5Data {
