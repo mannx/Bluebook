@@ -27,7 +27,6 @@ func ImportWISR(fileName string, db *gorm.DB) ImportReport {
 
 	if err != nil {
 		log.Error().Err(err).Msgf("Unable to convert [%v] from pdf to text", fileName)
-		// return err
 		status = append(status, "Unable to convert [%v] from pdf to text")
 		return ImportReport{Messages: status}
 	}
@@ -35,7 +34,6 @@ func ImportWISR(fileName string, db *gorm.DB) ImportReport {
 	contents, err := os.ReadFile(txtFile)
 	if err != nil {
 		log.Error().Err(err).Msgf("Unable to read file: %v", txtFile)
-		// return err
 		status = append(status, fmt.Sprintf("Unable to read file: %v", txtFile))
 		return ImportReport{Messages: status}
 	}
@@ -45,7 +43,6 @@ func ImportWISR(fileName string, db *gorm.DB) ImportReport {
 	weekEnding := reWISRWeekEnd.FindStringSubmatch(cstr)
 	if weekEnding == nil {
 		log.Error().Msgf("Unable to find week ending date in file: %v", fileName)
-		// return errors.New("unable to find week ending date")
 		status = append(status, "unable to find week ending date")
 		return ImportReport{Messages: status}
 	}
@@ -63,19 +60,16 @@ func ImportWISR(fileName string, db *gorm.DB) ImportReport {
 
 	catering := reCateringSales.FindStringSubmatch(cstr)
 	if catering == nil {
-		// return reFail("wisr.go", "Catering", report)
 		report.Add("[wisr] Unable to parse Catering")
 	}
 
 	labour := reLabourCost.FindStringSubmatch(cstr)
 	if labour == nil {
-		// return reFail("wisr.go", "labour", report)
 		report.Add("[wisr] Unable to parse Labour")
 	}
 
 	food := reFoodCost.FindStringSubmatch(cstr)
 	if food == nil {
-		// return reFail("wisr.go", "food", report)
 		report.Add("[wisr] Unable to parse food")
 	}
 
@@ -89,7 +83,6 @@ func ImportWISR(fileName string, db *gorm.DB) ImportReport {
 	// convert net sales to a float, remove all , to get a 1000+ value as just digits
 	party, err := strconv.ParseFloat(strings.ReplaceAll(strings.TrimSpace(catering[1]), ",", ""), 64)
 	if err != nil {
-		// return reFail("wisr.go", "catering parse", report)
 		report.Add("[wisr] Unable to convert catering")
 	}
 

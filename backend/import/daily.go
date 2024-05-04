@@ -26,8 +26,6 @@ const (
 // ImportDaily is used to import a single sheet into the database
 // func ImportDaily(fileName string, db *gorm.DB) error {
 func ImportDaily(fileName string, db *gorm.DB) ImportReport {
-	log.Info().Msgf("ImportDaily(%v)", fileName)
-
 	statusMessages := make([]string, 0)
 
 	f, err := excelize.OpenFile(fileName)

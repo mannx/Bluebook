@@ -46,7 +46,6 @@ func ImportControl(fileName string, db *gorm.DB) ImportReport {
 	txtFile, err := PDFToText(fileName)
 	if err != nil {
 		log.Error().Err(err).Msgf("Unable to convert [%v] from pdf to a usuable text file.", fileName)
-		// return ImportReport{}
 		report.Add(fmt.Sprintf("Unable to convert [%v] from pdf to a usuable text file.", fileName))
 		return report
 	}
@@ -54,7 +53,6 @@ func ImportControl(fileName string, db *gorm.DB) ImportReport {
 	contents, err := os.ReadFile(txtFile)
 	if err != nil {
 		log.Error().Err(err).Msgf("Unable to read temp text file [%v] for pdf file [%v]", txtFile, fileName)
-		// return ImportReport{}
 		report.Add(fmt.Sprintf("Unable to read temp text file [%v] for pdf file [%v]", txtFile, fileName))
 		return report
 	}
@@ -65,8 +63,6 @@ func ImportControl(fileName string, db *gorm.DB) ImportReport {
 	weekEnding := reWeekEnding.FindStringSubmatch(cstr)
 	if weekEnding == nil {
 		log.Error().Msgf("Unable to find week ending date in file: %v", fileName)
-		// return errors.New("unable to find week ending date")
-		// return ImportReport{}
 		report.Add(fmt.Sprintf("Unable to find week ending date in file: %v", fileName))
 		return report
 	}
@@ -82,57 +78,36 @@ func ImportControl(fileName string, db *gorm.DB) ImportReport {
 	// extract the relevant information
 	prod := reProductivity.FindStringSubmatch(cstr)
 	if prod == nil {
-		// return reFail("control.go", "Productivity")
-		// _ = reFail("control.go", "Productivity")
-		// return ImportReport{}
 		report.Add("[control] Unable to parse Productivity")
 	}
 
 	factor := reFactor.FindStringSubmatch(cstr)
 	if factor == nil {
-		// return reFail("control.go", "Factor")
-		// _ = reFail("control.go", "Factor")
-		// return ImportReport{}
 		report.Add("[control] Unable to parse Factor")
 	}
 
 	unitSold := reUnitsSold.FindStringSubmatch(cstr)
 	if unitSold == nil {
-		// return reFail("control.go", "Units Sold")
-		// _ = reFail("control.go", "Units Sold")
-		// return ImportReport{}
 		report.Add("[control] Unable to parse Units Sold")
 	}
 
 	custCount := reCustomerCount.FindStringSubmatch(cstr)
 	if custCount == nil {
-		// return reFail("control.go", "Customer count")
-		// _ = reFail("control.go", "Customer count")
-		// return ImportReport{}
 		report.Add("[control] Unable to parse Customer Count")
 	}
 
 	hoursWorkd := reHoursWorked.FindStringSubmatch(cstr)
 	if hoursWorkd == nil {
-		// return reFail("control.go", "Hours worked")
-		// _ = reFail("control.go", "Hours worked")
-		// return ImportReport{}
 		report.Add("[control] Unable to parse Hours Workd")
 	}
 
 	breadCredits := reBreadWaste.FindStringSubmatch(cstr)
 	if breadCredits == nil {
-		// return reFail("control.go", "Bread Credits")
-		// _ = reFail("control.go", "Bread Credits")
-		// return ImportReport{}
 		report.Add("[control] Unable to parse Bread Credits")
 	}
 
 	netSales := reNetSales.FindStringSubmatch(cstr)
 	if netSales == nil {
-		// return reFail("control.go", "Net Sales")
-		// _ = reFail("control.go", "Net Sales")
-		// return ImportReport{}
 		report.Add("[control] Unable to parse Net Sales")
 	}
 
@@ -143,9 +118,6 @@ func ImportControl(fileName string, db *gorm.DB) ImportReport {
 		// find way of not having to use 2 regex for this
 		bos = reBreadOverShort2.FindAllStringSubmatch(cstr, -1)
 		if bos == nil {
-			// return reFail("control.go", "Bread over short")
-			// _ = reFail("control.go", "Bread over short")
-			// return ImportReport{}
 			report.Add("[control] Unable to parse Bread over short")
 		}
 	}
@@ -189,9 +161,6 @@ func ImportControl(fileName string, db *gorm.DB) ImportReport {
 	res := db.Where("Date = ?", endDate).Find(&wi)
 	if res.Error != nil {
 		log.Error().Err(res.Error).Msg("DB Error")
-		// return reFail("control.go", "Unable to retrieve weekly information for netsales")
-		// _ = reFail("control.go", "Unable to retrieve weekly information for netsales")
-		// return ImportReport{}
 		report.Add("[control] Unable to retrieve weekly information for netsales")
 	}
 
@@ -203,9 +172,6 @@ func ImportControl(fileName string, db *gorm.DB) ImportReport {
 	// update the netsales value and save
 	ns, err := strconv.ParseFloat(strings.ReplaceAll(netSales[1], ",", ""), 64)
 	if err != nil {
-		// return reFail("control.go", "Unable to convert net sales to float")
-		// _ = reFail("control.go", "Unable to convert net sales to float")
-		// return ImportReport{}
 		report.Add("[control] Unable to convert net sales to float")
 	}
 
@@ -213,9 +179,6 @@ func ImportControl(fileName string, db *gorm.DB) ImportReport {
 	res = db.Save(&wi)
 	if res.Error != nil {
 		log.Error().Err(res.Error).Msgf("Unable to save weekly info")
-		// return reFail("control.go", "weekly info save")
-		// _ = reFail("control.go", "weekly info save")
-		// return ImportReport{}
 		report.Add("[control] Unable to save weekly info")
 	}
 

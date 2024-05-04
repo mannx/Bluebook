@@ -11,10 +11,6 @@ import (
 
 func ReturnServerMessage(c echo.Context, message string, err bool) error {
 	return c.JSON(http.StatusOK,
-		// models.ServerReturnMessage{
-		// 	Message: message,
-		// 	Error:   err,
-		// })
 		models.ApiReturnMessage{
 			Error:   err,
 			Message: message,
