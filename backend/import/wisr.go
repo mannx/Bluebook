@@ -1,7 +1,7 @@
 package daily
 
 import (
-	"errors"
+	"fmt"
 	"os"
 	"regexp"
 	"strconv"
@@ -21,17 +21,23 @@ var (
 	reFoodCost      = regexp.MustCompile(`COST OF GOODS\s+(\d+,?\d+)\s+(\d+)`)   // 2 groups -> [0] dollar value [1] percent
 )
 
-func ImportWISR(fileName string, db *gorm.DB) error {
+func ImportWISR(fileName string, db *gorm.DB) ImportReport {
 	txtFile, err := PDFToText(fileName)
+	status := make([]string, 0)
+
 	if err != nil {
 		log.Error().Err(err).Msgf("Unable to convert [%v] from pdf to text", fileName)
-		return err
+		// return err
+		status = append(status, "Unable to convert [%v] from pdf to text")
+		return ImportReport{Messages: status}
 	}
 
 	contents, err := os.ReadFile(txtFile)
 	if err != nil {
 		log.Error().Err(err).Msgf("Unable to read file: %v", txtFile)
-		return err
+		// return err
+		status = append(status, fmt.Sprintf("Unable to read file: %v", txtFile))
+		return ImportReport{Messages: status}
 	}
 
 	cstr := string(contents[:])
@@ -39,7 +45,9 @@ func ImportWISR(fileName string, db *gorm.DB) error {
 	weekEnding := reWISRWeekEnd.FindStringSubmatch(cstr)
 	if weekEnding == nil {
 		log.Error().Msgf("Unable to find week ending date in file: %v", fileName)
-		return errors.New("unable to find week ending date")
+		// return errors.New("unable to find week ending date")
+		status = append(status, "unable to find week ending date")
+		return ImportReport{Messages: status}
 	}
 
 	month, _ := strconv.Atoi(weekEnding[1])

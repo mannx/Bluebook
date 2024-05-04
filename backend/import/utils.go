@@ -13,6 +13,10 @@ import (
 	"gorm.io/gorm"
 )
 
+type ImportReport struct {
+	Messages []string // any status messages generated during the import
+}
+
 // PDFToText takes a filename, and returns a new file name
 // of a temporary file that has been converted to text
 // returns an error if anything failed during the conversion, nil otherwise
@@ -65,7 +69,8 @@ func getWeeklyInfoOrNew(date time.Time, db *gorm.DB) models.WeeklyInfo {
 }
 
 // reFail will display an error message noting the function and which item failed its regex check
-func reFail(from string, item string) error {
+func reFail(from string, item string) string {
 	log.Error().Msgf("[%v]{reFail} Unable to parse data for: %v", from, item)
-	return fmt.Errorf("unable to parse data for: %v", item)
+	// return fmt.Errorf("unable to parse data for: %v", item)
+	return fmt.Sprintf("unable to parse data for: %v", item)
 }

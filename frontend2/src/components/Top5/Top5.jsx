@@ -44,7 +44,6 @@ export async function loader() {
   const resp = await fetch(url);
   const data = await resp.json();
 
-  // return JSON.parse(data.Data);
   return { data };
 }
 
@@ -57,12 +56,14 @@ export default function Top5() {
   const updateMonth = (e) => {
     setMonth(e.target.value);
   };
+
   const updateYear = (e) => {
     setYear(e.target.value);
   };
 
   const outputData = (data) => {
-      return (<>
+    return (
+      <>
         <Stack spacing={2}>
           <InputLabel id="month">Month</InputLabel>
           <Select
@@ -99,50 +100,14 @@ export default function Top5() {
             <Button variant="contained">View</Button>
           </Link>
         </Stack>
-      </>);
-  }
+      </>
+    );
+  };
 
   return (
     <>
       <Container component={Paper}>
         <h3>Top 5</h3>
-
-        {/* <Stack spacing={2}>
-          <InputLabel id="month">Month</InputLabel>
-          <Select
-            labelId="month"
-            id="month-select"
-            value={month}
-            label="MonthL"
-            onChange={updateMonth}
-          >
-            {monthNames.map((n, i) => {
-              return (
-                <MenuItem key={i} value={i}>
-                  {n}
-                </MenuItem>
-              );
-            })}
-          </Select>
-
-          <InputLabel id="year">Year</InputLabel>
-          <Select labelId="year" value={year} onChange={updateYear}>
-            <MenuItem key={-1} value="0">
-              Any
-            </MenuItem>
-            {data.map((n) => {
-              return (
-                <MenuItem key={n} value={n}>
-                  {n}
-                </MenuItem>
-              );
-            })}
-          </Select>
-
-          <Link to={`/top5/${month}/${year}`}>
-            <Button variant="contained">View</Button>
-          </Link>
-        </Stack> */}
         {ErrorOrData(data, outputData)}
       </Container>
       <Outlet />
@@ -213,7 +178,7 @@ export function Top5Data() {
         </>
       );
     });
-  }
+  };
 
   return ErrorOrData(data, outputData);
 }

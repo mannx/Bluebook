@@ -90,8 +90,8 @@ func StatsAverageSalesByDayHandler(c echo.Context, db *gorm.DB) error {
 	}
 
 	type returnData struct {
-		Data   []statsData
 		Counts map[time.Weekday]int
+		Data   []statsData
 		Total  int
 	}
 

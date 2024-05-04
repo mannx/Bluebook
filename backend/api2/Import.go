@@ -8,7 +8,6 @@ import (
 	api "github.com/mannx/Bluebook/api"
 	env "github.com/mannx/Bluebook/environ"
 	"github.com/rs/zerolog/log"
-	"gorm.io/gorm"
 )
 
 // This function returns the list of files that can be imported
@@ -39,7 +38,7 @@ func importFileHandler(fileMask string) ([]string, error) {
 }
 
 // return a list of all the possible files we can import as seperate lists
-func GetImportList(c echo.Context, db *gorm.DB) error {
+func GetImportList(c echo.Context) error {
 	type importList struct {
 		Daily   []string // list of all daily sheets (*.xlsx)
 		Control []string // list of all control sheets

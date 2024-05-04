@@ -41,7 +41,6 @@ func readConfig() ([]byte, error) {
 	return nil, err
 }
 
-// func init() {
 func InitTop5() {
 	f, err := readConfig()
 	if err != nil {
@@ -65,7 +64,6 @@ func InitTop5() {
 }
 
 func GetTop5Data(c echo.Context, db *gorm.DB) error {
-
 	var first, last models.DayData
 
 	res := db.Select("Date").Order("Date").Take(&first)
@@ -89,7 +87,6 @@ func GetTop5Data(c echo.Context, db *gorm.DB) error {
 	// make sure years is sorted current to earliest
 	sort.Sort(sort.Reverse(sort.IntSlice(years)))
 
-	// return c.JSON(http.StatusOK, years)
 	return ReturnApiRequest(c, false, years, "")
 }
 
@@ -147,7 +144,6 @@ func GetTop5ViewHandler(c echo.Context, db *gorm.DB) error {
 		Data:    data,
 	}
 
-	// return c.JSON(http.StatusOK, &msg)
 	return ReturnApiRequest(c, false, &msg, "")
 }
 
