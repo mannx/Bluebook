@@ -17,6 +17,10 @@ type ImportReport struct {
 	Messages []string // any status messages generated during the import
 }
 
+func (report *ImportReport) Add(msg string) {
+	report.Messages = append(report.Messages, msg)
+}
+
 // PDFToText takes a filename, and returns a new file name
 // of a temporary file that has been converted to text
 // returns an error if anything failed during the conversion, nil otherwise
@@ -69,8 +73,11 @@ func getWeeklyInfoOrNew(date time.Time, db *gorm.DB) models.WeeklyInfo {
 }
 
 // reFail will display an error message noting the function and which item failed its regex check
-func reFail(from string, item string) string {
+func reFail(from string, item string, msg ImportReport) ImportReport {
 	log.Error().Msgf("[%v]{reFail} Unable to parse data for: %v", from, item)
 	// return fmt.Errorf("unable to parse data for: %v", item)
-	return fmt.Sprintf("unable to parse data for: %v", item)
+	// return fmt.Sprintf("unable to parse data for: %v", item)
+
+	msg.Messages = append(msg.Messages, fmt.Sprintf("Unable to parse data for: %v", item))
+	return msg
 }

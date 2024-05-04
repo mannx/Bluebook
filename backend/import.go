@@ -12,7 +12,7 @@ import (
 )
 
 // File contains all functions related to importing data
-func importPostHandler(c echo.Context, handler func(string, *gorm.DB) error) error {
+func importPostHandler(c echo.Context, handler func(string, *gorm.DB) daily.ImportReport) error {
 	arr := make([]string, 0)
 
 	if err := c.Bind(&arr); err != nil {

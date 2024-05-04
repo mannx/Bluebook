@@ -54,22 +54,29 @@ func ImportWISR(fileName string, db *gorm.DB) ImportReport {
 	day, _ := strconv.Atoi(weekEnding[2])
 	year, _ := strconv.Atoi(weekEnding[3])
 
+	report := ImportReport{
+		Messages: make([]string, 0),
+	}
+
 	// get the start and ending days of the week
 	endDate := time.Date(year, time.Month(month), day, 0, 0, 0, 0, time.UTC)
 
 	catering := reCateringSales.FindStringSubmatch(cstr)
 	if catering == nil {
-		return reFail("wisr.go", "Catering")
+		// return reFail("wisr.go", "Catering", report)
+		report.Add("[wisr] Unable to parse Catering")
 	}
 
 	labour := reLabourCost.FindStringSubmatch(cstr)
 	if labour == nil {
-		return reFail("wisr.go", "labour")
+		// return reFail("wisr.go", "labour", report)
+		report.Add("[wisr] Unable to parse Labour")
 	}
 
 	food := reFoodCost.FindStringSubmatch(cstr)
 	if food == nil {
-		return reFail("wisr.go", "food")
+		// return reFail("wisr.go", "food", report)
+		report.Add("[wisr] Unable to parse food")
 	}
 
 	lstr := strings.ReplaceAll(labour[1], ",", "")
@@ -82,7 +89,8 @@ func ImportWISR(fileName string, db *gorm.DB) ImportReport {
 	// convert net sales to a float, remove all , to get a 1000+ value as just digits
 	party, err := strconv.ParseFloat(strings.ReplaceAll(strings.TrimSpace(catering[1]), ",", ""), 64)
 	if err != nil {
-		return reFail("wisr.go", "catering parse")
+		// return reFail("wisr.go", "catering parse", report)
+		report.Add("[wisr] Unable to convert catering")
 	}
 
 	wi := getWeeklyInfoOrNew(endDate, db)
@@ -95,5 +103,5 @@ func ImportWISR(fileName string, db *gorm.DB) ImportReport {
 
 	db.Save(&wi)
 
-	return nil
+	return report
 }
