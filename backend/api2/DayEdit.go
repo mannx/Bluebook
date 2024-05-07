@@ -2,7 +2,6 @@ package api2
 
 import (
 	"fmt"
-	"net/http"
 	"strings"
 	"time"
 
@@ -60,7 +59,7 @@ func DayDataEdit(c echo.Context, db *gorm.DB) error {
 		Tags:    tags,
 	}
 
-	return c.JSON(http.StatusOK, &ret)
+	return api.ReturnApiRequest(c, false, &ret, "")
 }
 
 func extractDate(d string) (time.Time, error) {
