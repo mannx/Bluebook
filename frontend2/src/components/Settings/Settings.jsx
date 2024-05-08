@@ -6,6 +6,7 @@ import {
   UrlApiSettingsGet,
   UrlApiSettingsSet,
   UrlApiHockeyImportUrl,
+  UrlApiManualArchive,
 } from "../URLs.jsx";
 
 import Button from "@mui/material/Button";
@@ -16,6 +17,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
 import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
+import { Typography } from "@mui/material";
 
 export async function loader() {
   const resp = await fetch(UrlGet(UrlApiSettingsGet));
@@ -52,6 +54,7 @@ export default function Settings() {
   });
 
   const [manualURL, setManualURL] = React.useState("");
+  const [errorMsg, setErrorMsg] = React.useState(null);
 
   const handleChange = (e) => {
     setState({
@@ -69,9 +72,30 @@ export default function Settings() {
     await fetch(UrlGet(UrlApiHockeyImportUrl), opts);
   };
 
+  const manualArchive = async () => {
+    const resp = await fetch(UrlGet(UrlApiManualArchive));
+    const json = await resp.json();
+    console.log(json);
+
+    if(json.Error!==undefined){
+      if(json.Error === true){
+        setErrorMsg(json.Message);
+      }else{
+        setErrorMsg(null);
+      }
+    }else{
+      // misformed return data?
+      setErrorMsg("Unknown return information");
+    }
+  };
+
   return (
     <>
       <h3>Settings</h3>
+
+      <Box>
+        <Typography sx={{color: "red"}} >{errorMsg}</Typography>
+      </Box>
 
       <Box>
         <TextField
@@ -139,6 +163,8 @@ export default function Settings() {
             }
             label="Print Hockey Data"
           />
+
+          <Button onClick={manualArchive}>Create backup archive</Button>
         </Stack>
       </Form>
     </>

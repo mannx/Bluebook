@@ -24,3 +24,7 @@ func LogAndReturnError(c echo.Context, message string, err error) error {
 func ReturnServerOK(c echo.Context) error {
 	return ReturnServerMessage(c, "Success", false)
 }
+
+func ReturnServerMessage2(c echo.Context, msg models.ServerReturnMessage) error {
+	return c.JSON(http.StatusOK, msg)
+}

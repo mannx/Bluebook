@@ -67,6 +67,7 @@ func initServer() *echo.Echo {
 	e.GET("/api/backup/daydata/get", func(c echo.Context) error { return api.BackupViewHandler(c, DB) })
 	e.POST("/api/backup/daydata/action", func(c echo.Context) error { return api.BackupUndoHandler(c, DB) })
 	e.GET("/api/backup/daydata/clear", func(c echo.Context) error { return api.DailyBackupClearHandler(c, DB) })
+	e.GET("/api/backup/archive", func(c echo.Context) error { return api.RunArchiveScript(c) })
 
 	//
 	// VERSION 2
@@ -95,5 +96,7 @@ func initServer() *echo.Echo {
 	e.POST("/api/settings/set", func(c echo.Context) error { return api.HandleSettingsSet(c, DB) })
 
 	e.GET("/api/raw/daydata", func(c echo.Context) error { return api2.HandleRawDayData(c, DB) })
+
+	e.GET("/api/hockey/merge", func(c echo.Context) error { return api.HockeyDebugMerge(DB) })
 	return e
 }

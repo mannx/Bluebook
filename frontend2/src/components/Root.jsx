@@ -89,6 +89,10 @@ function navHeader2() {
       Title: "Day Data Viewer",
       Url: "/ddviewer",
     },
+    {
+      Title: "Day Filter",
+      Url: "/filter",
+    },
   ];
 
   const [anchorE1user, setAnchorE1user] = React.useState(null);
@@ -153,6 +157,7 @@ function navHeader2() {
                   <MenuItem
                     key={i}
                     onClick={() => {
+                      setAnchorE1user(null);
                       navigate(item.Url);
                     }}
                   >

@@ -4,4 +4,5 @@ package models
 type ServerReturnMessage struct {
 	Message string `json:"Message"`
 	Error   bool   `json:"Error"`
+	Data    string `json:"Data"` // optional extra data in a json formatted string
 }

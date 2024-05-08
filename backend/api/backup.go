@@ -2,9 +2,13 @@ package api
 
 import (
 	"net/http"
+	"os/exec"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/labstack/echo/v4"
+	env "github.com/mannx/Bluebook/environ"
 	"github.com/mannx/Bluebook/models"
 	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
@@ -60,4 +64,30 @@ func DailyBackupClearHandler(c echo.Context, db *gorm.DB) error {
 	}
 
 	return ReturnServerMessage(c, "Day Data Backup Table Cleared", false)
+}
+
+// Run the archive script manually to create a backup archive
+func RunArchiveScript(c echo.Context) error {
+	log.Info().Msg("Running archive script manually...")
+
+	// get the path to the ghd.sh script in the /scripts directory
+	scriptPath := filepath.Join(env.Environment.ScriptsPath, "ar.sh")
+
+	cmd := exec.Command(scriptPath)
+
+	var out strings.Builder
+	cmd.Stdout = &out
+
+	err := cmd.Run()
+	if err != nil {
+		return LogAndReturnError(c, "Unable to run ar.sh", err)
+	}
+
+	msg := models.ServerReturnMessage{
+		Message: "Unable to run ar.sh",
+		Error:   true,
+		Data:    out.String(),
+	}
+
+	return ReturnServerMessage2(c, msg)
 }

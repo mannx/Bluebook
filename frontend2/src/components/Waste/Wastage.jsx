@@ -16,6 +16,8 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 
+import dayjs from "dayjs";
+
 import {
   UrlGet,
   UrlApiWasteView,
@@ -29,13 +31,41 @@ const notTuesday = (date) => {
   return date.day() !== 2;
 };
 
+// returns the closest tuesday from where we are
+function getInitialDate() {
+  const now = dayjs();
+  const day = now.day(); // 0-sunday
+
+  // 0-1 push ahead to the next tuesday
+  // 2 - tue, do nothing
+  // 3-6 - move back to previous tue
+  let offset = 0;
+
+  switch (day) {
+    case 0:
+    case 1:
+      offset = 2 - day;
+      break;
+    case 3:
+    case 4:
+    case 5:
+    case 6:
+      offset = -(day - 2);
+      break;
+  }
+
+  return now.add(offset, "day");
+}
+
 export default function WasteView() {
-  const [date, setDate] = React.useState(null);
+  const [date, setDate] = React.useState(getInitialDate());
 
   // if we have a selected date, get its values and pull in the weekly data
   let url = null;
 
   if (date !== null) {
+    const now = dayjs();
+
     const day = date.date();
     const month = date.month() + 1; // month is 0 based
     const year = date.year();
