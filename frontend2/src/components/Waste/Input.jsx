@@ -76,7 +76,9 @@ export default function WasteInput() {
   const [confirm, setConfirm] = React.useState(false);
 
   const [textInput, setTextInput] = React.useState(0);
-  const handleTextInput = (e) => {setTextInput(e.target.value)}
+  const handleTextInput = (e) => {
+    setTextInput(e.target.value);
+  };
 
   const navigate = useNavigate();
   const data = useLoaderData();
@@ -111,7 +113,7 @@ export default function WasteInput() {
   // when we click copy from the conversion calculator, copy this value into the current input field
   const copyCallback = (n) => {
     setTextInput(n);
-  }
+  };
 
   return (
     <>
@@ -178,11 +180,13 @@ export default function WasteInput() {
                       step: "any",
                       inputMode: "numeric",
                       pattern: "[0-9](.[0-9]*)?",
-                    }} value={textInput} onChange={handleTextInput} 
+                    }}
+                    value={textInput}
+                    onChange={handleTextInput}
                   />
                 </TableCell>
                 <TableCell>
-                  <TextField label="Reason" variant="standard" name="Reason"/>
+                  <TextField label="Reason" variant="standard" name="Reason" />
                 </TableCell>
                 <TableCell>
                   <Button type="submit">Add</Button>

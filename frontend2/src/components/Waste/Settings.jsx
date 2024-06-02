@@ -140,6 +140,7 @@ export default function WasteSettings() {
                 <TableCell>Location</TableCell>
                 <TableCell>Conversion</TableCell>
                 <TableCell>Unit Weight</TableCell>
+                <TableCell>Pack Size</TableCell>
               </TableRow>
             </TableHead>
 
@@ -173,8 +174,9 @@ export default function WasteSettings() {
                       {obj.CustomConversion === true ? (
                         <TableCell>{obj.UnitWeight}</TableCell>
                       ) : (
-                        <></>
+                        <TableCell></TableCell>
                       )}
+                      <TableCell>{obj.PackSize}</TableCell>
                     </TableRow>
                   );
                 })}
@@ -208,6 +210,7 @@ export async function EditAction({ request, params }) {
       updates.conversion === undefined ? 0.0 : parseFloat(updates.conversion),
     Name: updates.Name,
     Location: parseInt(updates.Location),
+    PackSize: updates.PackSize,
   };
 
   const opt = GetPostOptions(JSON.stringify(body));
