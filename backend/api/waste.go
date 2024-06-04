@@ -54,12 +54,14 @@ func GetWasteSettingHandler(c echo.Context, db *gorm.DB) error {
 
 func UpdateWasteSettingHandler(c echo.Context, db *gorm.DB) error {
 	type itemUpdate struct {
-		Name       string
-		ID         int
-		Unit       int
-		HasCustom  bool
-		Conversion float64
-		Location   int
+		Name         string
+		ID           int
+		Unit         int
+		HasCustom    bool
+		Conversion   float64
+		Location     int
+		PackSize     float64
+		PackSizeUnit int
 	}
 
 	update := itemUpdate{}
@@ -81,7 +83,10 @@ func UpdateWasteSettingHandler(c echo.Context, db *gorm.DB) error {
 	data.Location = update.Location
 	data.UnitMeasure = update.Unit
 	data.CustomConversion = update.HasCustom
+	data.PackSize = update.PackSize
+	data.PackSizeUnit = update.PackSizeUnit
 
+	log.Debug().Msgf("pack Size unit: %v", data.PackSizeUnit)
 	if data.CustomConversion {
 		data.UnitWeight = update.Conversion
 	}
@@ -97,11 +102,11 @@ func UpdateWasteSettingHandler(c echo.Context, db *gorm.DB) error {
 
 // WasteViewItem is  a single item and its total waste amount
 type WasteViewItem struct {
-	Name           string  `json:"Name"`
-	LocationString string  `json:"LocationString"`
-	UnitOfMeasure  string  `json:"UnitOfMeasure"` // unit of measure in string form
-	Amount         float64 `json:"Amount"`
-	Location       int     `json:"Location"`
+	Name           string  // `json:"Name"`
+	LocationString string  // `json:"LocationString"`
+	UnitOfMeasure  string  // `json:"UnitOfMeasure"` // unit of measure in string form
+	Amount         float64 // `json:"Amount"`
+	Location       int     // `json:"Location"`
 }
 
 // GetWasteViewHandler handls the waste report generation

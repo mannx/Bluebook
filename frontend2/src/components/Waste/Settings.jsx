@@ -210,9 +210,11 @@ export async function EditAction({ request, params }) {
       updates.conversion === undefined ? 0.0 : parseFloat(updates.conversion),
     Name: updates.Name,
     Location: parseInt(updates.Location),
-    PackSize: updates.PackSize,
+    PackSize: parseFloat(updates.packsize),
+    PackSizeUnit: parseInt(updates.PackSizeUnit),
   };
 
+  console.log("Pack size unit: " + body.PackSizeUnit);
   const opt = GetPostOptions(JSON.stringify(body));
   await fetch(UrlGet(UrlApiWasteItemUpdate), opt);
 
@@ -226,6 +228,7 @@ export function WasteSettingsEdit() {
   const [unit, setUnit] = React.useState(data.Item.UnitMeasure);
   const [location, setLocation] = React.useState(data.Item.Location);
   const [checked, setChecked] = React.useState(data.Item.CustomConversion);
+  const [packSize, setPackSize] = React.useState(data.Item.PackSizeUnit);
 
   const updateUnit = (e) => {
     setUnit(e.target.value);
@@ -233,6 +236,10 @@ export function WasteSettingsEdit() {
 
   const updateLocation = (e) => {
     setLocation(e.target.value);
+  };
+
+  const updatePackSize = (e) => {
+    setPackSize(e.target.value);
   };
 
   const unitKeys = Object.keys(data.Units);
@@ -250,7 +257,7 @@ export function WasteSettingsEdit() {
             Back
           </Button>
         </Stack>
-
+        Unit Measure
         <TableContainer component={Paper} sx={{ width: 0.75 }}>
           <Table size="small">
             <TableHead></TableHead>
@@ -330,6 +337,47 @@ export function WasteSettingsEdit() {
                     inputProps={{ step: "any" }}
                     defaultValue={data.Item.UnitWeight}
                   />
+                </TableCell>
+              </TableRow>
+
+              <TableRow>
+                <TableCell>Pack Size</TableCell>
+                <TableCell>
+                  <TextField
+                    label="Pack Size"
+                    type="number"
+                    variant="standard"
+                    name="packsize"
+                    inputProps={{ step: "any" }}
+                    defaultValue={data.Item.PackSize}
+                  />
+                </TableCell>
+              </TableRow>
+
+              <TableRow>
+                <TableCell>Pack Size Measurement</TableCell>
+                <TableCell>
+                  <InputLabel id="unit">Unit</InputLabel>
+                  <Select
+                    labelId="unit"
+                    name="PackSizeUnit"
+                    label="Unit"
+                    value={packSize}
+                    onChange={updatePackSize}
+                  >
+                    {unitKeys.map((u) => {
+                      // skip Pack unit size
+                      if (data.Units[u] === "Pack") {
+                        return;
+                      }
+
+                      return (
+                        <MenuItem key={u} value={u}>
+                          {data.Units[u]}
+                        </MenuItem>
+                      );
+                    })}
+                  </Select>
                 </TableCell>
               </TableRow>
             </TableBody>

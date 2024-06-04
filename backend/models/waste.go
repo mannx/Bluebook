@@ -60,6 +60,9 @@ type WastageItem struct {
 
 	PackSize float64 `gorm:"column:PackSize"` // size of a pack to divide WasteageEntry.Amount by if UnitMeasure==WastePack
 
+	// input waste is first converted to this measure unit before being divided by the pack size
+	PackSizeUnit int `gorm:"column:PackSizeUnit"` // unit measurement for PackSize if UnitMeasure == WastePack.  This cannot be WastePack
+
 	// the remaing fields are not stored in the db, and only provide data generated at runtime
 	UnitString     string `gorm:"-"` // string version of the unit measure
 	LocationString string `gorm:"-"` // string version of the location
@@ -170,7 +173,16 @@ func (wi *WastageItem) Convert(n float64) float64 {
 		return n / 16
 	case WastePack:
 		if wi.PackSize != 0.0 {
-			return n / wi.PackSize
+			// convert n to the proper unit first, then divide
+			// return n / wi.PackSize
+			x := do_convert(n, wi.PackSizeUnit)
+			log.Debug().Msgf("[WastageItem] converting item %v. Amount: %v  PackSize: %v  x: %v  PackSizeUnit: %v", wi.Name, n, wi.PackSize, x, wi.PackSizeUnit)
+			if x != 0. {
+				return n / wi.PackSize
+			} else {
+				log.Warn().Msgf("[WastageItem 2] Trying to convert to pack size with no pack size set for item %v [x=%v]", wi.Name, x)
+				return 0.
+			}
 		} else {
 			log.Warn().Msgf("[WastageItem] Trying to convert to pack size with no pack size set for item %v", wi.Name)
 			return 0.
@@ -178,4 +190,24 @@ func (wi *WastageItem) Convert(n float64) float64 {
 	}
 
 	return n
+}
+
+func do_convert(n float64, unit int) float64 {
+	switch unit {
+	case WasteKilo:
+		return n * 0.45359237
+	case WasteGram:
+		return n * 453.59237
+	case WasteOunce:
+		// convert from ounce to pounds
+		return n / 16
+	}
+
+	if unit == WastePack {
+		log.Error().Msgf("[do_convert] Unable to convert to type WastePack.  Returning 0.!")
+		return 0.
+	}
+
+	log.Error().Msgf("[do_convert] Reached end with no conversion, returning 0.!")
+	return 0.
 }
