@@ -214,7 +214,6 @@ export async function EditAction({ request, params }) {
     PackSizeUnit: parseInt(updates.PackSizeUnit),
   };
 
-  console.log("Pack size unit: " + body.PackSizeUnit);
   const opt = GetPostOptions(JSON.stringify(body));
   await fetch(UrlGet(UrlApiWasteItemUpdate), opt);
 

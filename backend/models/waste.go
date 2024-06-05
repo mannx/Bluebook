@@ -174,11 +174,9 @@ func (wi *WastageItem) Convert(n float64) float64 {
 	case WastePack:
 		if wi.PackSize != 0.0 {
 			// convert n to the proper unit first, then divide
-			// return n / wi.PackSize
 			x := do_convert(n, wi.PackSizeUnit)
-			log.Debug().Msgf("[WastageItem] converting item %v. Amount: %v  PackSize: %v  x: %v  PackSizeUnit: %v", wi.Name, n, wi.PackSize, x, wi.PackSizeUnit)
 			if x != 0. {
-				return n / wi.PackSize
+				return x / wi.PackSize
 			} else {
 				log.Warn().Msgf("[WastageItem 2] Trying to convert to pack size with no pack size set for item %v [x=%v]", wi.Name, x)
 				return 0.
@@ -192,6 +190,8 @@ func (wi *WastageItem) Convert(n float64) float64 {
 	return n
 }
 
+// called when needing to convert the WastageItem amount before dividing by PackSize
+// redo to avoid duplicate code between here and Convert()?
 func do_convert(n float64, unit int) float64 {
 	switch unit {
 	case WasteKilo:
@@ -201,6 +201,9 @@ func do_convert(n float64, unit int) float64 {
 	case WasteOunce:
 		// convert from ounce to pounds
 		return n / 16
+	case WasteUnitCount:
+	case WastePounds:
+		return n
 	}
 
 	if unit == WastePack {
