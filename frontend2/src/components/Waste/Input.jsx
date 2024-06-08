@@ -36,6 +36,7 @@ import {
 } from "../URLs";
 
 import ConversionCalculatorInput from "./ConversionCalculator";
+import PortionConverter from "./PortionConverter";
 
 // load the current waste data in the holding table, the waste names for autocomplete
 export async function loader({ params }) {
@@ -74,6 +75,7 @@ export async function action({ request }) {
 export default function WasteInput() {
   const [wasteDate, setWasteDate] = React.useState(null);
   const [confirm, setConfirm] = React.useState(false);
+  const [portionValue, setPortionValue] = React.useState(0);
 
   const [textInput, setTextInput] = React.useState(0);
   const handleTextInput = (e) => {
@@ -115,6 +117,11 @@ export default function WasteInput() {
     setTextInput(n);
   };
 
+  const portionCallback = (n) => {
+    // copy this value to the input conversion value
+    setPortionValue(n);
+  };
+
   return (
     <>
       <Container>
@@ -124,7 +131,15 @@ export default function WasteInput() {
         </Button>
       </Container>
 
-      <ConversionCalculatorInput callback={copyCallback} useCallback />
+      <ConversionCalculatorInput
+        callback={copyCallback}
+        useCallback
+        defaultInput={portionValue}
+      />
+      <PortionConverter
+        callback={portionCallback}
+        buttonText="Copy To Converter"
+      />
 
       <TableContainer component={Paper}>
         <Form method="post">
