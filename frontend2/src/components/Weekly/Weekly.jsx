@@ -1,3 +1,4 @@
+import * as React from "react";
 import { Form, useLoaderData } from "react-router-dom";
 import { NumericFormat } from "react-number-format";
 
@@ -5,6 +6,7 @@ import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
 import Container from "@mui/material/Container";
+import Switch from "@mui/material/Switch";
 
 import {
   UrlGet,
@@ -13,6 +15,7 @@ import {
   GetPostOptions,
 } from "../URLs";
 import { Typography } from "@mui/material";
+// import React from "react";
 
 export async function loader({ params }) {
   const url =
@@ -60,9 +63,20 @@ function NF(obj) {
 }
 
 export default function Weekly() {
+  const [useNetSales, setUseNetSales] = React.useState(false);
   const data = useLoaderData();
 
+  const handleNetSalesChange = (e) => {
+    setUseNetSales(e.target.checked);
+  }
+
   const mismatch = data.NetSalesMismatch ? <Typography sx={{color: "red"}} variant="h4">Net Sales Mismatch</Typography> : <></>;
+
+  const mismatchOutput = <>
+    <td className="Month"><Switch checked={useNetSales} onChange={handleNetSalesChange} /></td>
+    <td className="Month">{data.WisrNetSales}</td>
+  </>;
+
 
   return (
     <>
@@ -92,6 +106,7 @@ export default function Weekly() {
             <tr className="Month">
               <td className="Month">Sales This Week</td>
               <td className="Month">{NF(data.NetSales)}</td>
+              {data.NetSalesMismatch === true ? mismatchOutput : <></>}
             </tr>
             <tr className="Month">
               <td className="Month">Upcoming Sales</td>
@@ -177,6 +192,7 @@ export default function Weekly() {
             label="Sysco Cost"
             variant="outlined"
           />
+          <input type="hidden" id="netsales" name="netsales" value={useNetSales} />
           <Button variant="contained" type="submit">
             Export
           </Button>

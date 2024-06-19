@@ -46,12 +46,13 @@ var wasteStartRow = 2
 
 func ExportWeeklyHandler(c echo.Context, db *gorm.DB) error {
 	type weeklyParams struct {
-		Month   string `query:"month"`
-		Day     string `query:"day"`
-		Year    string `query:"year"`
-		Hours   string `query:"hours"`
-		Manager string `query:"manager"`
-		Sysco   string `query:"sysco"`
+		Month    string `query:"month"`
+		Day      string `query:"day"`
+		Year     string `query:"year"`
+		Hours    string `query:"hours"`
+		Manager  string `query:"manager"`
+		Sysco    string `query:"sysco"`
+		NetSales string `query:"netsales"`
 	}
 
 	var params weeklyParams
@@ -95,9 +96,15 @@ func ExportWeeklyHandler(c echo.Context, db *gorm.DB) error {
 		return LogAndReturnError(c, "unable to retrieve weekly data", err)
 	}
 
+	// if netsales=true, use the value from the wisr instead of the calculated weekly value
+	netsales, err := strconv.ParseBool(params.NetSales)
+	if err != nil {
+		return LogAndReturnError(c, "unable to parse netsales bool", err)
+	}
+
 	weekEnding := time.Date(year, time.Month(month), day, 0, 0, 0, 0, time.UTC)
 
-	err = exportWeekly(weekly, weekEnding, hours, manager, sysco)
+	err = exportWeekly(weekly, weekEnding, hours, manager, sysco, netsales)
 	if err != nil {
 		return LogAndReturnError(c, "Unable to export weekly", err)
 	}
@@ -107,7 +114,7 @@ func ExportWeeklyHandler(c echo.Context, db *gorm.DB) error {
 
 // Export weekly from given date into excel template
 // outputs in Environment.OutputDir
-func exportWeekly(weekly weeklyInfo, weekEnding time.Time, hours float64, manager float64, sysco float64) error {
+func exportWeekly(weekly weeklyInfo, weekEnding time.Time, hours float64, manager float64, sysco float64, netsales bool) error {
 	// open the template and set the fields we need
 	path := filepath.Join(env.Environment.DataPath, "weekly.xlsx")
 	f, err := excelize.OpenFile(path)
@@ -125,7 +132,13 @@ func exportWeekly(weekly weeklyInfo, weekEnding time.Time, hours float64, manage
 	f.SetCellValue("Sheet1", labourCost, weekly.LabourCostAmount)
 	f.SetCellValue("Sheet1", partySales, weekly.PartySales)
 
-	f.SetCellValue("Sheet1", netSales, weekly.NetSales)
+	netsalesAmount := weekly.NetSales
+	if netsales {
+		// use wisr amount if netsales is true
+		netsalesAmount = weekly.WisrNetSales
+	}
+
+	f.SetCellValue("Sheet1", netSales, netsalesAmount)
 	f.SetCellInt("Sheet1", customerCount, weekly.CustomerCount)
 	f.SetCellValue("Sheet1", gcSold, weekly.GiftCardSold)
 	f.SetCellValue("Sheet1", gcRedeem, weekly.GiftCardRedeem)

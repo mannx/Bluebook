@@ -7,6 +7,8 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 
+import { GetClosestWeekending } from "../Waste/Wastage";
+
 // true if day is not a tuesday to disable in the picker
 // avoid picking unusable dates and needing an error message
 const notTuesday = (date) => {
@@ -15,7 +17,7 @@ const notTuesday = (date) => {
 
 // pick our week ending, display error if not a tuesday
 export default function WeeklyNav() {
-  const [date, setDate] = React.useState(null);
+  const [date, setDate] = React.useState(GetClosestWeekending());
 
   // if we have a selected date, get its values and pull in the weekly data
   let url = null;
