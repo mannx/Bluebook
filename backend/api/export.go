@@ -25,14 +25,16 @@ var breadCount = "D13"
 var foodCost = "D15"
 var syscoCost = "D17"
 var labourCost = "D21"
-var customerCount = "D28"
-var customerPrev = "D29"
-var partySales = "D31"
+var customerCount = "D32"
+var customerPrev = "D33"
+var partySales = "D35"
 var hoursUsed = "D23"
 var managerHours = "D24"
 var targetHours = "D26"
-var gcSold = "D32"
-var gcRedeem = "D33"
+var gcSold = "D36"
+var gcRedeem = "D37"
+var prodActual = "D28"
+var prodBudget = "D30"
 
 // mapings for the initial cells for the waste chart
 //
@@ -152,6 +154,8 @@ func exportWeekly(weekly weeklyInfo, weekEnding time.Time, hours float64, manage
 	f.SetCellValue("Sheet1", managerHours, manager)
 	f.SetCellValue("Sheet1", syscoCost, sysco)
 
+	f.SetCellValue("Sheet1", prodActual, weekly.ProductivityActual)
+	f.SetCellValue("Sheet1", prodBudget, weekly.ProductivityBudget)
 	// set the correct date
 	f.SetCellValue("Sheet1", weekEndingCell, weekEnding)
 

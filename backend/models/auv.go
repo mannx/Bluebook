@@ -16,18 +16,23 @@ type AUVEntry2 struct {
 
 	Week1AUV   int
 	Week1Hours int
+	Week1Prod  float64
 
 	Week2AUV   int
 	Week2Hours int
+	Week2Prod  float64
 
 	Week3AUV   int
 	Week3Hours int
+	Week3Prod  float64
 
 	Week4AUV   int
 	Week4Hours int
+	Week4Prod  float64
 
 	Week5AUV   int
 	Week5Hours int
+	Week5Prod  float64
 }
 
 // Holds an AUVEntry2 but stored in arrays instead of Week?__ fields
@@ -37,9 +42,10 @@ type AUVEntryArray struct {
 	Month int
 	Year  int
 
-	Dates []time.Time
-	AUV   []int
-	Hours []int
+	Dates        []time.Time
+	AUV          []int
+	Hours        []int
+	Productivity []float64
 }
 
 func (entry *AUVEntry2) ToArray() AUVEntryArray {
@@ -51,6 +57,7 @@ func (entry *AUVEntry2) ToArray() AUVEntryArray {
 
 	auv.Hours = make([]int, len(auv.Dates))
 	auv.AUV = make([]int, len(auv.Dates))
+	auv.Productivity = make([]float64, len(auv.Dates))
 
 	auv.Hours[0] = entry.Week1Hours
 	auv.Hours[1] = entry.Week2Hours
@@ -68,6 +75,14 @@ func (entry *AUVEntry2) ToArray() AUVEntryArray {
 		auv.AUV[4] = entry.Week5AUV
 	}
 
+	auv.Productivity[0] = entry.Week1Prod
+	auv.Productivity[1] = entry.Week2Prod
+	auv.Productivity[2] = entry.Week3Prod
+	auv.Productivity[3] = entry.Week4Prod
+	if len(auv.Dates) > 4 {
+		auv.Productivity[4] = entry.Week5Prod
+	}
+
 	return auv
 }
 
@@ -78,6 +93,7 @@ func (entry *AUVEntryArray) Blank(month time.Month, year int) {
 	entry.Dates = daysInMonth(month, year)
 	entry.AUV = make([]int, len(entry.Dates))
 	entry.Hours = make([]int, len(entry.Dates))
+	entry.Productivity = make([]float64, len(entry.Dates))
 }
 
 func daysInMonth(month time.Month, year int) []time.Time {

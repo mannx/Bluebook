@@ -23,6 +23,8 @@ var (
 	reUnitsSold     = regexp.MustCompile(`ALL UNITS SOLD\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+`)
 	reCustomerCount = regexp.MustCompile(`CUSTOMER COUNT\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+`)
 	reHoursWorked   = regexp.MustCompile(`HOURS WORKED\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)`)
+
+	reTotalProd = regexp.MustCompile(`PRODUCTIVITY\s+(\d+\.\d+)`)
 )
 
 var reBreadWaste = regexp.MustCompile(`- CREDITS\s+(-?\d+[.]\d+)\s+(-?\d+[.]\d+)\s+(-?\d+[.]\d+)\s+(-?\d+[.]\d+)\s+(-?\d+[.]\d+)\s+(-?\d+[.]\d+)\s+(-?\d+[.]\d+)\s+(-?\d+[.]\d+)\s+`)
@@ -58,6 +60,13 @@ func ImportControl(fileName string, db *gorm.DB) ImportReport {
 	}
 
 	cstr := string(contents[:])
+
+	// get the total weekly productivity (should be first match)
+	totprodStr := reTotalProd.FindStringSubmatch(cstr)
+	if totprodStr == nil {
+		// log.Debug().Msgf("[CONTROL.GO] -> totprod == nil")
+		report.Add("[control] total productivity not parsed")
+	}
 
 	// find the week ending date
 	weekEnding := reWeekEnding.FindStringSubmatch(cstr)
@@ -176,6 +185,11 @@ func ImportControl(fileName string, db *gorm.DB) ImportReport {
 	}
 
 	wi.NetSales = ns
+	wi.Productivity, err = strconv.ParseFloat(totprodStr[1], 64)
+	if err != nil {
+		report.Add("[control] Unable to convert total productivity to float")
+	}
+
 	res = db.Save(&wi)
 	if res.Error != nil {
 		log.Error().Err(res.Error).Msgf("Unable to save weekly info")

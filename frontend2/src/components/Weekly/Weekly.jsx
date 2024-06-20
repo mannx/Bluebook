@@ -133,6 +133,14 @@ export default function Weekly() {
               <td className="Month"></td>
             </tr>
             <tr className="Month">
+              <td className="Month">Productivity Budget</td>
+              <td className="Month">{NF(data.ProductivityBudget)}</td>
+            </tr>
+            <tr className="Month">
+              <td className="Month">Productivity Actual</td>
+              <td className="Month">{NF(data.ProductivityActual)}</td>
+            </tr>
+            <tr className="Month">
               <td className="Month">Customer Count</td>
               <td className="Month">{NF(data.CustomerCount)}</td>
             </tr>
