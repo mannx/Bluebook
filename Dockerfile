@@ -41,8 +41,9 @@ FROM alpine:3.17
 # make sure required packages are installed
 # poppler-utils required for pdf parsing 
 # python3 required for some python scripts found in /scripts
+# bash required for init scripts
 RUN apk update
-RUN apk add tzdata poppler-utils sqlite python3
+RUN apk add tzdata poppler-utils sqlite python3 bash
 
 WORKDIR /
 
@@ -56,8 +57,11 @@ COPY ./backend/api/data.json /top5.json
 COPY ./scripts /scripts
 
 # copy initialization data and scripts
-COPY ./init/init.bin /init
+COPY ./init/init.bin /init/init.bin
 COPY ./init/init.sh /scripts
+
+# make sure init script is runnable -- todo: fix before here
+RUN chmod +x /scripts/init.sh
 
 EXPOSE 8080
 ENTRYPOINT ["/scripts/run.sh"]

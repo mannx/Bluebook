@@ -16,7 +16,7 @@ else
     DATA_PATH="/data"
 fi
 
-tar -zxf init.bin --one-top-level=$INIT_PATH
+tar -zxf $INIT_PATH/init.bin -C $INIT_PATH
 
 files=("weekly.xlsx" "waste_def.json" "waste.xlsx")
 
