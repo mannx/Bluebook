@@ -1,6 +1,7 @@
 package daily
 
 import (
+	"errors"
 	"fmt"
 	"os/exec"
 	"path/filepath"
@@ -35,6 +36,12 @@ func PDFToText(fileName string) (string, error) {
 	cmd := exec.Command("pdftotext", "-layout", fileName, outFile)
 	err := cmd.Run()
 	if err != nil {
+		var exit *exec.ExitError
+		if errors.As(err, &exit) {
+			// exit error
+			log.Debug().Msgf("[PDFToText -- Exit Error] Exit Code: %v", exit.ExitCode())
+			log.Debug().Msgf("[PDFToText -- Error Message] %v", string(exit.Stderr[:]))
+		}
 		log.Error().Err(err).Msgf("Unable to convert from pdf to text: %v", fileName)
 		return "", err
 	}
