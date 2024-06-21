@@ -55,5 +55,9 @@ COPY ./backend/api/data.json /top5.json
 # copy run and backup scripts
 COPY ./scripts /scripts
 
+# copy initialization data and scripts
+COPY ./init/init.bin /init
+COPY ./init/init.sh /scripts
+
 EXPOSE 8080
 ENTRYPOINT ["/scripts/run.sh"]
