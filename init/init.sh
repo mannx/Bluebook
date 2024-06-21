@@ -16,6 +16,7 @@ else
     DATA_PATH="/data"
 fi
 
+echo Extracting initializing files...
 tar -zxf $INIT_PATH/init.bin -C $INIT_PATH
 
 files=("weekly.xlsx" "waste_def.json" "waste.xlsx")
