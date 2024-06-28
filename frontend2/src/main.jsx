@@ -136,7 +136,8 @@ const router = createBrowserRouter([
         // edit day information including comments/tags.
         // id is unused if date is provided
         // date format: YYYYMMDD
-        path: "/edit/:id/:date?",
+        // :month & :year are the month/year to return to when finished
+        path: "/edit/:month/:year/:id/:date?",
         element: <DayEdit />,
         loader: dayEditLoader,
         action: dayEditAction,

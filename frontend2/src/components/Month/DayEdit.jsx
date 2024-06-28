@@ -45,7 +45,10 @@ export async function loader({ params }) {
   const resp = await fetch(url);
   const data = await resp.json();
 
-  return { data };
+  return { data, 
+    month: params.month,
+    year: params.year
+  };
 }
 
 export async function action({ request, params }) {
@@ -70,13 +73,14 @@ export async function action({ request, params }) {
     return data;
   }
 
-  return redirect("/today");
+  return redirect("/" + updates.month + "/" + updates.year);
 }
 
 // this page is used to edit DayData information including comments and tags
 // we are provided with either a db ID or a date if no entry has been created yet
+// we also have the month/year of the page to return to when done
 export default function DayEdit() {
-  const { data } = useLoaderData();
+  const { data, month, year } = useLoaderData();
   const navigate = useNavigate();
   const  action  = useActionData();
 
@@ -160,6 +164,8 @@ export default function DayEdit() {
               </TableBody>
             </Table>
           </TableContainer>
+          <input type="hidden" name="month" value={month} />
+          <input type="hidden" name="year" value={year} />
         </Form>
       </>
     );
