@@ -39,7 +39,15 @@ export async function loader({ params }) {
   // re-use top5 api endpoint
   const years = await (await fetch(UrlGet(UrlApiTop5))).json();
 
-  return { data, years };
+  if(years.Error === true) {
+    console.log("error fetching errors.  todo");
+
+    return {data, years: {}};
+  }
+
+  const yr = JSON.parse(years.Data);
+
+  return { data, years: yr};
 }
 
 const columns = [
@@ -56,6 +64,7 @@ export default function DayDataViewer() {
   const [maxYear, setMaxYear] = React.useState(years[0]);
   const [limit, setLimit] = React.useState(0);
 
+  
   const rows = data.map((obj) => {
     const day = dayjs(obj.Date);
 

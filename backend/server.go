@@ -79,7 +79,7 @@ func initServer() *echo.Echo {
 	e.GET("/api2/day/edit", func(c echo.Context) error { return api2.DayDataEdit(c, DB) })
 	e.POST("/api2/day/update", func(c echo.Context) error { return api2.DayDataUpdate(c, DB) })
 
-	e.GET("/api2/import/list", func(c echo.Context) error { return api2.GetImportList(c, DB) })
+	e.GET("/api2/import/list", func(c echo.Context) error { return api2.GetImportList(c) })
 
 	e.POST("/api2/weekly/export", func(c echo.Context) error { return api.ExportWeeklyHandler(c, DB) })
 

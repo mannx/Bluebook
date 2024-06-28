@@ -21,6 +21,7 @@ import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 
 import { UrlGet, UrlApiTop5, UrlApiTop5Data } from "../URLs";
+import ErrorOrData from "../Error";
 
 const monthNames = [
   "Any",
@@ -55,15 +56,14 @@ export default function Top5() {
   const updateMonth = (e) => {
     setMonth(e.target.value);
   };
+
   const updateYear = (e) => {
     setYear(e.target.value);
   };
 
-  return (
-    <>
-      <Container component={Paper}>
-        <h3>Top 5</h3>
-
+  const outputData = (data) => {
+    return (
+      <>
         <Stack spacing={2}>
           <InputLabel id="month">Month</InputLabel>
           <Select
@@ -100,6 +100,15 @@ export default function Top5() {
             <Button variant="contained">View</Button>
           </Link>
         </Stack>
+      </>
+    );
+  };
+
+  return (
+    <>
+      <Container component={Paper}>
+        <h3>Top 5</h3>
+        {ErrorOrData(data, outputData)}
       </Container>
       <Outlet />
     </>
@@ -134,38 +143,42 @@ export function Top5Data() {
     );
   };
 
-  return data.Data.map((n) => {
-    return (
-      <>
-        <Typography sx={{ flex: "1 1 100%" }} component="div" variant="h6">
-          {n.Title}
-        </Typography>
+  const outputData = (data, resp) => {
+    return data.Data.map((n) => {
+      return (
+        <>
+          <Typography sx={{ flex: "1 1 100%" }} component="div" variant="h6">
+            {n.Title}
+          </Typography>
 
-        <TableContainer sx={{ width: 1 / 8 }}>
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell>Date</TableCell>
-                <TableCell>$</TableCell>
-              </TableRow>
-            </TableHead>
+          <TableContainer sx={{ width: 1 / 8 }}>
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Date</TableCell>
+                  <TableCell>$</TableCell>
+                </TableRow>
+              </TableHead>
 
-            <TableBody>
-              {n.Data.map((obj) => {
-                const f = n.Field;
-                const val = obj[f];
+              <TableBody>
+                {n.Data.map((obj) => {
+                  const f = n.Field;
+                  const val = obj[f];
 
-                return (
-                  <TableRow>
-                    <TableCell>{obj.DateString}</TableCell>
-                    <TableCell>{NF(val)}</TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </>
-    );
-  });
+                  return (
+                    <TableRow>
+                      <TableCell>{obj.DateString}</TableCell>
+                      <TableCell>{NF(val)}</TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </>
+      );
+    });
+  };
+
+  return ErrorOrData(data, outputData);
 }

@@ -67,6 +67,7 @@ export async function action({ request, params }) {
   // combine the data into arrays
   let auv = [];
   let hours = [];
+  let prod = [];
 
   for (let i = 0; i <= 4; i++) {
     const a = formData.get("auv" + i);
@@ -78,6 +79,11 @@ export async function action({ request, params }) {
     if (h !== null) {
       hours.push(parseInt(h));
     }
+
+    const p = formData.get("prod" + i);
+    if (p !== null) {
+      prod.push(parseFloat(p));
+    }
   }
 
   // build the object
@@ -86,6 +92,7 @@ export async function action({ request, params }) {
     Year: parseInt(params.year),
     AUV: auv,
     Hours: hours,
+    Productivity: prod,
   };
 
   // send to the server
@@ -117,6 +124,7 @@ export function AUVLayout() {
                 <TableCell>Date</TableCell>
                 <TableCell>AUV</TableCell>
                 <TableCell>Hours</TableCell>
+                <TableCell>Productivity</TableCell>
               </TableRow>
             </TableHead>
 
@@ -170,6 +178,9 @@ function AUVData(data, index) {
             label="Hours"
             defaultValue={data.Hours[index]}
           />
+        </TableCell>
+        <TableCell>
+          <TextField name={"prod" + index} id={"prod" + index} label="Productivity" defaultValue={data.Productivity[index]} />
         </TableCell>
       </TableRow>
     </>

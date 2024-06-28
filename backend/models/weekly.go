@@ -20,5 +20,6 @@ type WeeklyInfo struct {
 
 	NetSales float64 `gorm:"column:NetSales"`
 
-	PartySales float64 `gorm:"column:PartySales"`
+	PartySales   float64 `gorm:"column:PartySales"`
+	Productivity float64 // total productivity for the week
 }

@@ -15,6 +15,9 @@ type weeklyInfo struct {
 	TargetAUV   int // from the auv tables
 	TargetHours int
 
+	ProductivityBudget float64
+	ProductivityActual float64
+
 	FoodCostAmount   float64
 	LabourCostAmount float64
 	PartySales       float64
@@ -91,6 +94,7 @@ func getWeeklyData(month int, day int, year int, c echo.Context, db *gorm.DB) (w
 	weekly.PartySales = wi.PartySales
 	weekly.NetSalesMismatch = weekly.NetSales != wi.NetSales
 	weekly.WisrNetSales = wi.NetSales
+	weekly.ProductivityActual = wi.Productivity
 
 	// retrieve the last years data if available
 	lastYear := weekEnding.AddDate(-1, 0, 0)
@@ -159,6 +163,7 @@ func getAuvData(weekEnding time.Time, wi *weeklyInfo, db *gorm.DB) error {
 		if d.Equal(weekEnding) {
 			wi.TargetHours = auvArr.Hours[i]
 			wi.TargetAUV = auvArr.AUV[i]
+			wi.ProductivityBudget = auvArr.Productivity[i]
 			break
 		}
 	}

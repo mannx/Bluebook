@@ -31,6 +31,11 @@ const notTuesday = (date) => {
   return date.day() !== 2;
 };
 
+// returns the clostest date to the current week ending
+export function GetClosestWeekending() {
+  return getInitialDate();
+}
+
 // returns the closest tuesday from where we are
 function getInitialDate() {
   const now = dayjs();

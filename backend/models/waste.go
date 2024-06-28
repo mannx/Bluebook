@@ -3,6 +3,7 @@ package models
 import (
 	"sort"
 
+	"github.com/rs/zerolog/log"
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
@@ -18,7 +19,7 @@ const (
 	WasteKilo      = 2 // item is counted in kilos
 	WasteGram      = 3 // item is counted in grams
 	WasteOunce     = 4 // item is counted in ounces
-	WasteFrac      = 5 // item is converted by dividing its amount by a specific value
+	WastePack      = 5 // item is a portion of a pack (needs pack size set, WasteageEntry.Amount / pack_size to get output weight)
 
 	WasteLocationOther      = 0 // item is located inan unspecificed area
 	WasteLocationProtein    = 1 // item is a protein
@@ -35,6 +36,7 @@ var unitStringTable = map[int]string{
 	WasteGram:      "gram",
 	WasteOunce:     "ounce",
 	// WasteFrac:      "Frac",
+	WastePack: "Pack",
 }
 
 var locationStringTable = map[int]string{
@@ -55,6 +57,11 @@ type WastageItem struct {
 	CustomConversion bool    `gorm:"column:CustomConversion"` // do we havea custom conversion in use? if so, Weight*CustomConversion => UnitMeasure => Ouput value
 	UnitWeight       float64 `gorm:"column:UnitWeight"`       // what we multiple the items weight/count by if custom
 	// also what we divide by if Frac
+
+	PackSize float64 `gorm:"column:PackSize"` // size of a pack to divide WasteageEntry.Amount by if UnitMeasure==WastePack
+
+	// input waste is first converted to this measure unit before being divided by the pack size
+	PackSizeUnit int `gorm:"column:PackSizeUnit"` // unit measurement for PackSize if UnitMeasure == WastePack.  This cannot be WastePack
 
 	// the remaing fields are not stored in the db, and only provide data generated at runtime
 	UnitString     string `gorm:"-"` // string version of the unit measure
@@ -164,9 +171,46 @@ func (wi *WastageItem) Convert(n float64) float64 {
 	case WasteOunce:
 		// convert from ounce to pounds
 		return n / 16
-	case WasteFrac:
-		return n / wi.UnitWeight
+	case WastePack:
+		if wi.PackSize != 0.0 {
+			// convert n to the proper unit first, then divide
+			x := do_convert(n, wi.PackSizeUnit)
+			if x != 0. {
+				return x / wi.PackSize
+			} else {
+				log.Warn().Msgf("[WastageItem 2] Trying to convert to pack size with no pack size set for item %v [x=%v]", wi.Name, x)
+				return 0.
+			}
+		} else {
+			log.Warn().Msgf("[WastageItem] Trying to convert to pack size with no pack size set for item %v", wi.Name)
+			return 0.
+		}
 	}
 
 	return n
+}
+
+// called when needing to convert the WastageItem amount before dividing by PackSize
+// redo to avoid duplicate code between here and Convert()?
+func do_convert(n float64, unit int) float64 {
+	switch unit {
+	case WasteKilo:
+		return n * 0.45359237
+	case WasteGram:
+		return n * 453.59237
+	case WasteOunce:
+		// convert from ounce to pounds
+		return n / 16
+	case WasteUnitCount:
+	case WastePounds:
+		return n
+	}
+
+	if unit == WastePack {
+		log.Error().Msgf("[do_convert] Unable to convert to type WastePack.  Returning 0.!")
+		return 0.
+	}
+
+	log.Error().Msgf("[do_convert] Reached end with no conversion, returning 0.!")
+	return 0.
 }

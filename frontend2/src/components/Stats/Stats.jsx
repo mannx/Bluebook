@@ -9,6 +9,8 @@ import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import Button from "@mui/material/Button";
 
+import ErrorOrData from "../Error";
+
 export async function dataLoader({ params }) {
   const url = UrlGet(UrlApi2AverageStats) + "?year=" + params.year;
   const resp = await fetch(url);
@@ -33,9 +35,8 @@ export default function SimpleStats() {
     setYear(e.target.value);
   };
 
-  return (
-    <>
-      <Container>
+  const outputData = (data) => {
+    return (<>
         <Stack>
           <InputLabel id="year">Year</InputLabel>
           <Select labelId="year" value={year} onChange={updateYear}>
@@ -54,10 +55,18 @@ export default function SimpleStats() {
         </Stack>
 
         <Outlet />
+      </>);
+  };
+
+  return (
+    <>
+      <Container>
+        {ErrorOrData(data, outputData)}
       </Container>
     </>
   );
 }
+
 // display several different stats to start with
 export function SimpleStatsYear() {
   const { data } = useLoaderData();
@@ -71,11 +80,8 @@ export function SimpleStatsYear() {
     "Saturday",
   ];
 
-  return (
-    <>
-      <Container>
-        <h3>Top Day per week</h3>
-        <Container>
+  const dataDisplay = (data) => {
+    return (<>
           <h3>Counts</h3>
           <span>Total: {data.Total}</span>
           <hr />
@@ -87,6 +93,15 @@ export function SimpleStatsYear() {
               </div>
             );
           })}
+          </>);
+  }
+
+  return (
+    <>
+      <Container>
+        <h3>Top Day per week</h3>
+        <Container>
+          {ErrorOrData(data, dataDisplay)}
         </Container>
       </Container>
     </>
