@@ -96,5 +96,6 @@ func ImportWISR(fileName string, db *gorm.DB) ImportReport {
 
 	db.Save(&wi)
 
+	report.Add(fmt.Sprintf("Successfully imported wisr sheet week ending %v/%v/%v", month, day, year))
 	return report
 }

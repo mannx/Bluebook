@@ -22,6 +22,12 @@ func (report *ImportReport) Add(msg string) {
 	report.Messages = append(report.Messages, msg)
 }
 
+func NewImportReport() ImportReport {
+	return ImportReport{
+		Messages: make([]string, 0),
+	}
+}
+
 // PDFToText takes a filename, and returns a new file name
 // of a temporary file that has been converted to text
 // returns an error if anything failed during the conversion, nil otherwise
