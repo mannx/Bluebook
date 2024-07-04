@@ -5,6 +5,7 @@ ImportDaily(file string) -> imports a daily sheet from the provided file name
 */
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -23,13 +24,22 @@ const (
 )
 
 // ImportDaily is used to import a single sheet into the database
-func ImportDaily(fileName string, db *gorm.DB) error {
-	log.Info().Msgf("ImportDaily(%v)", fileName)
+// func ImportDaily(fileName string, db *gorm.DB) error {
+func ImportDaily(fileName string, db *gorm.DB) ImportReport {
+	// statusMessages := make([]string, 0)
+	report := NewImportReport()
 
 	f, err := excelize.OpenFile(fileName)
 	if err != nil {
 		log.Error().Err(err).Msgf("Unable to open file: %v", fileName)
-		return err
+		// statusMessages = append(statusMessages, fmt.Sprintf("Unable to open file: %v", fileName))
+		report.Add(fmt.Sprintf("Unable to open file: %v", fileName))
+
+		// return err
+		// return ImportReport{
+		// 	Messages: statusMessages,
+		// }
+		return report
 	}
 
 	defer func() {
@@ -51,6 +61,9 @@ func ImportDaily(fileName string, db *gorm.DB) error {
 		n, err := f.GetCellValue("Sheet1", i)
 		if err != nil {
 			log.Error().Err(err).Msgf("Unable to read cell Sheet1.%v", i)
+			// statusMessages = append(statusMessages, fmt.Sprintf("Unable to read cell Sheet1.%v", i))
+			report.Add(fmt.Sprintf("Unable to read cell Sheet1.%v", i))
+
 			continue
 		}
 
@@ -66,6 +79,11 @@ func ImportDaily(fileName string, db *gorm.DB) error {
 			_, de = time.Parse(altDateFormat, n)
 			if de != nil {
 				log.Warn().Err(de).Msgf("Unable to parse time (alt format): %v", n)
+				// statusMessages = append(statusMessages, fmt.Sprintf("Unablet to parse time (alt format): %v", n))
+				report.Add(fmt.Sprintf("Unablet to parse time (alt format): %v", n))
+				// statusMessages = append(statusMessages, fmt.Sprintf("Skipping rest of sheet: %v", fileName))
+				report.Add(fmt.Sprintf("Skipping rest of sheet: %v", fileName))
+
 				// bad dates should cause a stop
 				break
 			}
@@ -80,6 +98,8 @@ func ImportDaily(fileName string, db *gorm.DB) error {
 		date, err := f.GetCellValue("Sheet1", Dates[i])
 		if err != nil {
 			log.Error().Err(err).Msg("Unable to get date value (2)")
+			// statusMessages = append(statusMessages, "Unable to get date value (2)")
+			report.Add("Unable to get date value (2)")
 			continue
 		}
 
@@ -90,6 +110,8 @@ func ImportDaily(fileName string, db *gorm.DB) error {
 			d, err = time.Parse(altDateFormat, date)
 			if err != nil {
 				log.Error().Err(err).Msg("Unable to parse alt date (2)")
+				// statusMessages = append(statusMessages, fmt.Sprintf("Unable to parse date or alt date (2) for %v", fileName))
+				report.Add(fmt.Sprintf("Unable to parse date or alt date (2) for %v", fileName))
 				continue
 			}
 		}
@@ -109,8 +131,6 @@ func ImportDaily(fileName string, db *gorm.DB) error {
 			}
 		}
 
-		log.Debug().Msgf(" == Backup original ID: %v", dd.ID)
-
 		// save to database
 		db.Save(&dd)
 
@@ -118,13 +138,18 @@ func ImportDaily(fileName string, db *gorm.DB) error {
 		backup.DayID = dd.ID
 		db.Save(&backup)
 
+		report.Add(fmt.Sprintf("Parsed data for day %v", date))
+
 	}
 
-	return nil
+	// return ImportReport{
+	// 	Messages: statusMessages,
+	// }
+	return report
 }
 
 // returns which version of the sheet we are using
-func getSheetVersion(sheet *excelize.File) int {
+func getSheetVersion(_ *excelize.File) int {
 	return 0
 }
 

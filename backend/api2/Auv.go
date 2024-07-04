@@ -82,6 +82,14 @@ func UpdateAUVHandler(c echo.Context, db *gorm.DB) error {
 		auv.Week5Hours = data.Hours[4]
 	}
 
+	auv.Week1Prod = data.Productivity[0]
+	auv.Week2Prod = data.Productivity[1]
+	auv.Week3Prod = data.Productivity[2]
+	auv.Week4Prod = data.Productivity[3]
+	if len(data.AUV) > 4 {
+		auv.Week5Prod = data.Productivity[4]
+	}
+
 	// update the db
 	db.Save(&auv)
 

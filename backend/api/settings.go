@@ -33,7 +33,5 @@ func HandleSettingsSet(c echo.Context, db *gorm.DB) error {
 	db.Where("1=1").Delete(&models.BluebookSettings{})
 	db.Save(&data)
 
-	log.Debug().Msgf("display: %v", data.DisplayHockeyWeekly)
-
 	return ReturnServerMessage(c, "Success", false)
 }

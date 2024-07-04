@@ -8,6 +8,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
+import Stack from "@mui/material/Stack";
 
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -36,6 +37,7 @@ import {
 } from "../URLs";
 
 import ConversionCalculatorInput from "./ConversionCalculator";
+import PortionConverter from "./PortionConverter";
 
 // load the current waste data in the holding table, the waste names for autocomplete
 export async function loader({ params }) {
@@ -74,9 +76,12 @@ export async function action({ request }) {
 export default function WasteInput() {
   const [wasteDate, setWasteDate] = React.useState(null);
   const [confirm, setConfirm] = React.useState(false);
+  const [portionValue, setPortionValue] = React.useState(0);
 
   const [textInput, setTextInput] = React.useState(0);
-  const handleTextInput = (e) => {setTextInput(e.target.value)}
+  const handleTextInput = (e) => {
+    setTextInput(e.target.value);
+  };
 
   const navigate = useNavigate();
   const data = useLoaderData();
@@ -111,7 +116,12 @@ export default function WasteInput() {
   // when we click copy from the conversion calculator, copy this value into the current input field
   const copyCallback = (n) => {
     setTextInput(n);
-  }
+  };
+
+  const portionCallback = (n) => {
+    // copy this value to the input conversion value
+    setPortionValue(n);
+  };
 
   return (
     <>
@@ -122,7 +132,17 @@ export default function WasteInput() {
         </Button>
       </Container>
 
-      <ConversionCalculatorInput callback={copyCallback} useCallback />
+      <Stack spacing={2}>
+        <ConversionCalculatorInput
+          callback={copyCallback}
+          useCallback
+          defaultInput={portionValue}
+        />
+        <PortionConverter
+          callback={portionCallback}
+          buttonText="Copy To Converter"
+        />
+      </Stack>
 
       <TableContainer component={Paper}>
         <Form method="post">
@@ -178,11 +198,13 @@ export default function WasteInput() {
                       step: "any",
                       inputMode: "numeric",
                       pattern: "[0-9](.[0-9]*)?",
-                    }} value={textInput} onChange={handleTextInput} 
+                    }}
+                    value={textInput}
+                    onChange={handleTextInput}
                   />
                 </TableCell>
                 <TableCell>
-                  <TextField label="Reason" variant="standard" name="Reason"/>
+                  <TextField label="Reason" variant="standard" name="Reason" />
                 </TableCell>
                 <TableCell>
                   <Button type="submit">Add</Button>

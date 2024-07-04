@@ -224,9 +224,9 @@ function Row(data) {
       <td className="Month no-print">{Tag(data.Tags, data.TagID)}</td>
       <td className="Month no-print">
         {data.ID !== 0 ? (
-          <Link to={"/edit/" + data.ID}>E</Link>
+          <Link to={"/edit/" + data.Month + "/" + data.Year + "/" + data.ID}>E</Link>
         ) : (
-          <Link to={"/edit/0/" + hashDate(data)}>C</Link>
+          <Link to={"/edit/"+ data.Month + "/" + data.Year + "/0/" + hashDate(data)}>C</Link>
         )}
       </td>
     </tr>

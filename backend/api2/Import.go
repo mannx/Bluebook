@@ -1,21 +1,19 @@
 package api2
 
 import (
-	"io/ioutil"
-	"net/http"
+	"os"
 	"path/filepath"
 
 	"github.com/labstack/echo/v4"
 	api "github.com/mannx/Bluebook/api"
 	env "github.com/mannx/Bluebook/environ"
 	"github.com/rs/zerolog/log"
-	"gorm.io/gorm"
 )
 
 // This function returns the list of files that can be imported
 // uses fileMask to only return files types that match
 func importFileHandler(fileMask string) ([]string, error) {
-	files, err := ioutil.ReadDir(env.Environment.ImportPath)
+	files, err := os.ReadDir(env.Environment.ImportPath)
 	if err != nil {
 		log.Error().Err(err).Msg("Unable to read directory provided by BLUEBOOK_IMPORT_PATH")
 		return nil, err
@@ -40,7 +38,7 @@ func importFileHandler(fileMask string) ([]string, error) {
 }
 
 // return a list of all the possible files we can import as seperate lists
-func GetImportList(c echo.Context, db *gorm.DB) error {
+func GetImportList(c echo.Context) error {
 	type importList struct {
 		Daily   []string // list of all daily sheets (*.xlsx)
 		Control []string // list of all control sheets
@@ -63,9 +61,9 @@ func GetImportList(c echo.Context, db *gorm.DB) error {
 		return api.LogAndReturnError(c, "Unable to fetch wisr sheets", err)
 	}
 
-	return c.JSON(http.StatusOK, &importList{
+	return api.ReturnApiRequest(c, false, &importList{
 		daily,
 		control,
 		wisr,
-	})
+	}, "")
 }

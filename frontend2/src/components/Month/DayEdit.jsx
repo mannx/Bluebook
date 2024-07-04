@@ -1,4 +1,4 @@
-import { Form, useLoaderData, useNavigate, redirect } from "react-router-dom";
+import { Form, useLoaderData, useActionData, useNavigate, redirect } from "react-router-dom";
 import {
   UrlGet,
   UrlApi2DayEdit,
@@ -16,8 +16,11 @@ import Paper from "@mui/material/Paper";
 
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
+import Container  from "@mui/material/Container";
+import Typography from "@mui/material/Typography";
 
 import TextField from "@mui/material/TextField";
+import ErrorOrData from "../Error.jsx";
 
 // Tag builds the user friendly display of all tags on this day
 // returns as a string
@@ -42,7 +45,10 @@ export async function loader({ params }) {
   const resp = await fetch(url);
   const data = await resp.json();
 
-  return { data };
+  return { data, 
+    month: params.month,
+    year: params.year
+  };
 }
 
 export async function action({ request, params }) {
@@ -59,89 +65,111 @@ export async function action({ request, params }) {
   };
 
   const opt = GetPostOptions(JSON.stringify(body));
-  await fetch(UrlGet(UrlApi2DayUpdate), opt);
+  const resp = await fetch(UrlGet(UrlApi2DayUpdate), opt);
+  const data = await resp.json();
 
-  return redirect("/today");
+  // if we have an error, display the message and allow to be re-submitted
+  if(data.Error !== undefined && data.Error == true){
+    return data;
+  }
+
+  return redirect("/" + updates.month + "/" + updates.year);
 }
 
 // this page is used to edit DayData information including comments and tags
 // we are provided with either a db ID or a date if no entry has been created yet
+// we also have the month/year of the page to return to when done
 export default function DayEdit() {
-  const { data } = useLoaderData();
+  const { data, month, year } = useLoaderData();
   const navigate = useNavigate();
+  const  action  = useActionData();
 
-  return (
-    <>
-      <h1>Day Data Edit</h1>
-      <Form method="post" id="daydata-edit">
-        <Stack direction="row" spacing={2}>
-          <Button variant="contained" type="submit">
-            Save
-          </Button>
-          <Button variant="contained" onClick={() => navigate(-1)}>
-            Cancel
-          </Button>
-        </Stack>
+  const outputData = (data) => {
+    const displayError = () => {
+        if(action !== undefined && action.Error !== undefined && action.Error === true) {
+          return (<><div><Typography sx={{color: "red"}} variant="h5">{action.Message}</Typography></div></>);
+        }
+        return <></>;
+    }
 
-        <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 650 }}>
-            <TableHead>
-              <TableRow>
-                <TableCell>Item</TableCell>
-                <TableCell>Value</TableCell>
-              </TableRow>
-            </TableHead>
+    return (
+      <>
+        <h1>Day Data Edit</h1>
+        <Form method="post" id="daydata-edit">
+          <Stack direction="row" spacing={2}>
+            <Button variant="contained" type="submit">
+              Save
+            </Button>
+            <Button variant="contained" onClick={() => navigate(-1)}>
+              Cancel
+            </Button>
+          </Stack>
 
-            <TableBody>
-              <TableRow
-                row="Date"
-                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-              >
-                <TableCell component="th" scope="row">
-                  Date
-                </TableCell>
-                <TableCell>{data.Date}</TableCell>
-              </TableRow>
+          <Container>{displayError()}</Container>
+          <TableContainer component={Paper}>
+            <Table sx={{ minWidth: 650 }}>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Item</TableCell>
+                  <TableCell>Value</TableCell>
+                </TableRow>
+              </TableHead>
 
-              <TableRow
-                row="Comment"
-                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-              >
-                <TableCell component="th" scope="row">
-                  Comment
-                </TableCell>
-                <TableCell>
-                  <TextField
-                    id="comment"
-                    label="Comment"
-                    defaultValue={data.Comment}
-                    name="comment"
-                    fullWidth
-                  />
-                </TableCell>
-              </TableRow>
+              <TableBody>
+                <TableRow
+                  row="Date"
+                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                >
+                  <TableCell component="th" scope="row">
+                    Date
+                  </TableCell>
+                  <TableCell>{data.Date}</TableCell>
+                </TableRow>
 
-              <TableRow
-                row="Tags"
-                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-              >
-                <TableCell component="th" scope="row">
-                  Comment
-                </TableCell>
-                <TableCell>
-                  <TextField
-                    id="tags"
-                    label="tags"
-                    defaultValue={Tag(data.Tags)}
-                    name="tags"
-                    fullWidth
-                  />
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Form>
-    </>
-  );
+                <TableRow
+                  row="Comment"
+                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                >
+                  <TableCell component="th" scope="row">
+                    Comment
+                  </TableCell>
+                  <TableCell>
+                    <TextField
+                      id="comment"
+                      label="Comment"
+                      defaultValue={data.Comment}
+                      name="comment"
+                      fullWidth
+                    />
+                  </TableCell>
+                </TableRow>
+
+                <TableRow
+                  row="Tags"
+                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                >
+                  <TableCell component="th" scope="row">
+                    Comment
+                  </TableCell>
+                  <TableCell>
+                    <TextField
+                      id="tags"
+                      label="tags"
+                      defaultValue={Tag(data.Tags)}
+                      name="tags"
+                      fullWidth
+                    />
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <input type="hidden" name="month" value={month} />
+          <input type="hidden" name="year" value={year} />
+        </Form>
+      </>
+    );
+  }
+
+  return ErrorOrData(data, outputData);
 }

@@ -54,12 +54,14 @@ func GetWasteSettingHandler(c echo.Context, db *gorm.DB) error {
 
 func UpdateWasteSettingHandler(c echo.Context, db *gorm.DB) error {
 	type itemUpdate struct {
-		ID         int
-		Unit       int
-		HasCustom  bool
-		Conversion float64
-		Name       string
-		Location   int
+		Name         string
+		ID           int
+		Unit         int
+		HasCustom    bool
+		Conversion   float64
+		Location     int
+		PackSize     float64
+		PackSizeUnit int
 	}
 
 	update := itemUpdate{}
@@ -81,6 +83,8 @@ func UpdateWasteSettingHandler(c echo.Context, db *gorm.DB) error {
 	data.Location = update.Location
 	data.UnitMeasure = update.Unit
 	data.CustomConversion = update.HasCustom
+	data.PackSize = update.PackSize
+	data.PackSizeUnit = update.PackSizeUnit
 
 	if data.CustomConversion {
 		data.UnitWeight = update.Conversion
@@ -97,11 +101,11 @@ func UpdateWasteSettingHandler(c echo.Context, db *gorm.DB) error {
 
 // WasteViewItem is  a single item and its total waste amount
 type WasteViewItem struct {
-	Name           string  `json:"Name"`
-	Amount         float64 `json:"Amount"`
-	Location       int     `json:"Location"`
-	LocationString string  `json:"LocationString"`
-	UnitOfMeasure  string  `json:"UnitOfMeasure"` // unit of measure in string form
+	Name           string
+	LocationString string
+	UnitOfMeasure  string
+	Amount         float64
+	Location       int
 }
 
 // GetWasteViewHandler handls the waste report generation
@@ -143,7 +147,8 @@ func GetWasteViewHandler(c echo.Context, db *gorm.DB) error {
 		data[n.Item] = data[n.Item] + n.Amount
 	}
 
-	output := WasteView{WeekEnding: weekEnding}
+	// output := WasteView{WeekEnding: weekEnding}
+	output := WasteView{}
 	for k, n := range data {
 		wi := models.WastageItem{}
 		err := db.Find(&wi, "ID = ?", k)
@@ -289,14 +294,13 @@ func GetWasteNamesHandler(c echo.Context, db *gorm.DB) error {
 }
 
 type wasteHoldingJSON struct {
-	// Date     string
-	Name     string  // name of the item
+	Name     string // name of the item
+	Reason   string
 	Quantity float64 // amount
 	ID       uint    // id of the entry
 	Year     int
 	Month    int
 	Day      int
-	Reason   string
 }
 
 func getWasteHoldingEntries(db *gorm.DB) []wasteHoldingJSON {
@@ -403,9 +407,9 @@ func WasteHoldingDeleteHandler(c echo.Context, db *gorm.DB) error {
 	db.Delete(&entry)
 
 	type returnData struct {
-		Error   bool
 		Message string
 		Items   []wasteHoldingJSON
+		Error   bool
 	}
 
 	ret := returnData{
@@ -572,10 +576,10 @@ func WasteExport(c echo.Context, db *gorm.DB) error {
 func GetWasteItemInfo(c echo.Context, db *gorm.DB) error {
 	// combined data we will be returning
 	type returnData struct {
-		Item      models.WastageItem
-		Count     uint // total number of wastage entries
 		Units     map[int]string
 		Locations map[int]string
+		Item      models.WastageItem
+		Count     uint // total number of wastage entries
 	}
 
 	var id uint

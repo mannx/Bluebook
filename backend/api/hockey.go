@@ -234,6 +234,10 @@ func HockeyImportCronJob(db *gorm.DB) {
 		return
 	}
 
+	// only continue if we are set to run
+	if !settings.RunHockeyFetch {
+		return
+	}
 	// make sure we have a non-empty url string
 	if len(settings.HockeyURL) == 0 {
 		log.Warn().Msg("Aborting hockey schedule import.  HockeyURL is empty")

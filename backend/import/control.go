@@ -1,7 +1,7 @@
 package daily
 
 import (
-	"errors"
+	"fmt"
 	"os"
 	"regexp"
 	"strconv"
@@ -16,12 +16,16 @@ import (
 
 // regular expressions to capture that wanted data
 
-var reWeekEnding = regexp.MustCompile(`WEEK ENDING\s*(\d\d?)/(\d\d?)/(\d{4})`)
-var reProductivity = regexp.MustCompile(`PRODUCTIVITY\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)`)
-var reFactor = regexp.MustCompile(`FACTOR\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)`)
-var reUnitsSold = regexp.MustCompile(`ALL UNITS SOLD\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+`)
-var reCustomerCount = regexp.MustCompile(`CUSTOMER COUNT\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+`)
-var reHoursWorked = regexp.MustCompile(`HOURS WORKED\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)`)
+var (
+	reWeekEnding    = regexp.MustCompile(`WEEK ENDING\s*(\d\d?)/(\d\d?)/(\d{4})`)
+	reProductivity  = regexp.MustCompile(`PRODUCTIVITY\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)`)
+	reFactor        = regexp.MustCompile(`FACTOR\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)`)
+	reUnitsSold     = regexp.MustCompile(`ALL UNITS SOLD\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+`)
+	reCustomerCount = regexp.MustCompile(`CUSTOMER COUNT\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+`)
+	reHoursWorked   = regexp.MustCompile(`HOURS WORKED\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)`)
+
+	reTotalProd = regexp.MustCompile(`PRODUCTIVITY\s+(\d+\.\d+)`)
+)
 
 var reBreadWaste = regexp.MustCompile(`- CREDITS\s+(-?\d+[.]\d+)\s+(-?\d+[.]\d+)\s+(-?\d+[.]\d+)\s+(-?\d+[.]\d+)\s+(-?\d+[.]\d+)\s+(-?\d+[.]\d+)\s+(-?\d+[.]\d+)\s+(-?\d+[.]\d+)\s+`)
 
@@ -33,30 +37,43 @@ var reBreadOverShort2 = regexp.MustCompile(`/= OVER\/SHORT\s+(-?\d*,?\d+[.]\d+)\
 
 var reNetSales = regexp.MustCompile(`NET SUBWAY SALES\s+(\d+,?\d+[.]\d+)`) // 1 group -> weekly net sales
 
-func ImportControl(fileName string, db *gorm.DB) error {
+func ImportControl(fileName string, db *gorm.DB) ImportReport {
 	log.Info().Msgf("ImportControl(%v)", fileName)
+	report := ImportReport{
+		Messages: make([]string, 0),
+	}
 
 	// for now, we are parseing the sheet and outputing to make sure everything works as intended before commiting to the db
 	//	1) convert the file from a pdf to a readable text file (saves to a temp file)
 	txtFile, err := PDFToText(fileName)
 	if err != nil {
 		log.Error().Err(err).Msgf("Unable to convert [%v] from pdf to a usuable text file.", fileName)
-		return err
+		report.Add(fmt.Sprintf("Unable to convert [%v] from pdf to a usuable text file.", fileName))
+		return report
 	}
 
 	contents, err := os.ReadFile(txtFile)
 	if err != nil {
 		log.Error().Err(err).Msgf("Unable to read temp text file [%v] for pdf file [%v]", txtFile, fileName)
-		return err
+		report.Add(fmt.Sprintf("Unable to read temp text file [%v] for pdf file [%v]", txtFile, fileName))
+		return report
 	}
 
 	cstr := string(contents[:])
+
+	// get the total weekly productivity (should be first match)
+	totprodStr := reTotalProd.FindStringSubmatch(cstr)
+	if totprodStr == nil {
+		// log.Debug().Msgf("[CONTROL.GO] -> totprod == nil")
+		report.Add("[control] total productivity not parsed")
+	}
 
 	// find the week ending date
 	weekEnding := reWeekEnding.FindStringSubmatch(cstr)
 	if weekEnding == nil {
 		log.Error().Msgf("Unable to find week ending date in file: %v", fileName)
-		return errors.New("unable to find week ending date")
+		report.Add(fmt.Sprintf("Unable to find week ending date in file: %v", fileName))
+		return report
 	}
 
 	month, _ := strconv.Atoi(weekEnding[1])
@@ -70,37 +87,37 @@ func ImportControl(fileName string, db *gorm.DB) error {
 	// extract the relevant information
 	prod := reProductivity.FindStringSubmatch(cstr)
 	if prod == nil {
-		return reFail("control.go", "Productivity")
+		report.Add("[control] Unable to parse Productivity")
 	}
 
 	factor := reFactor.FindStringSubmatch(cstr)
 	if factor == nil {
-		return reFail("control.go", "Factor")
+		report.Add("[control] Unable to parse Factor")
 	}
 
 	unitSold := reUnitsSold.FindStringSubmatch(cstr)
 	if unitSold == nil {
-		return reFail("control.go", "Units Sold")
+		report.Add("[control] Unable to parse Units Sold")
 	}
 
 	custCount := reCustomerCount.FindStringSubmatch(cstr)
 	if custCount == nil {
-		return reFail("control.go", "Customer count")
+		report.Add("[control] Unable to parse Customer Count")
 	}
 
 	hoursWorkd := reHoursWorked.FindStringSubmatch(cstr)
 	if hoursWorkd == nil {
-		return reFail("control.go", "Hours worked")
+		report.Add("[control] Unable to parse Hours Workd")
 	}
 
 	breadCredits := reBreadWaste.FindStringSubmatch(cstr)
 	if breadCredits == nil {
-		return reFail("control.go", "Bread Credits")
+		report.Add("[control] Unable to parse Bread Credits")
 	}
 
 	netSales := reNetSales.FindStringSubmatch(cstr)
 	if netSales == nil {
-		return reFail("control.go", "Net Sales")
+		report.Add("[control] Unable to parse Net Sales")
 	}
 
 	// multiple possible results, we need the 2nd result
@@ -110,7 +127,7 @@ func ImportControl(fileName string, db *gorm.DB) error {
 		// find way of not having to use 2 regex for this
 		bos = reBreadOverShort2.FindAllStringSubmatch(cstr, -1)
 		if bos == nil {
-			return reFail("control.go", "Bread over short")
+			report.Add("[control] Unable to parse Bread over short")
 		}
 	}
 
@@ -143,6 +160,7 @@ func ImportControl(fileName string, db *gorm.DB) error {
 		// save it
 		db.Save(&dd)
 
+		report.Add(fmt.Sprintf("Imported daily data for %v", dd.Date))
 	}
 
 	// save the netsales in the weeklyinfo table
@@ -153,7 +171,7 @@ func ImportControl(fileName string, db *gorm.DB) error {
 	res := db.Where("Date = ?", endDate).Find(&wi)
 	if res.Error != nil {
 		log.Error().Err(res.Error).Msg("DB Error")
-		return reFail("control.go", "Unable to retrieve weekly information for netsales")
+		report.Add("[control] Unable to retrieve weekly information for netsales")
 	}
 
 	if res.RowsAffected == 0 {
@@ -164,19 +182,25 @@ func ImportControl(fileName string, db *gorm.DB) error {
 	// update the netsales value and save
 	ns, err := strconv.ParseFloat(strings.ReplaceAll(netSales[1], ",", ""), 64)
 	if err != nil {
-		return reFail("control.go", "Unable to convert net sales to float")
+		report.Add("[control] Unable to convert net sales to float")
 	}
 
 	wi.NetSales = ns
+	wi.Productivity, err = strconv.ParseFloat(totprodStr[1], 64)
+	if err != nil {
+		report.Add("[control] Unable to convert total productivity to float")
+	}
+
 	res = db.Save(&wi)
 	if res.Error != nil {
 		log.Error().Err(res.Error).Msgf("Unable to save weekly info")
-		return reFail("control.go", "weekly info save")
+		report.Add("[control] Unable to save weekly info")
 	}
 
 	if res.RowsAffected == 0 {
 		log.Warn().Msgf("Unable to save WEEKLY_INFO record for date: %v", time.Time(endDate).Format("2006-01-02"))
 	}
 
-	return nil
+	report.Add(fmt.Sprintf("Successfully imported control sheet week ending %v/%v/%v", month, day, year))
+	return report
 }

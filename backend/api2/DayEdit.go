@@ -2,7 +2,6 @@ package api2
 
 import (
 	"fmt"
-	"net/http"
 	"strings"
 	"time"
 
@@ -28,7 +27,6 @@ func DayDataEdit(c echo.Context, db *gorm.DB) error {
 		Uint("id", &id).
 		String("date", &date).
 		BindError()
-
 	if err != nil {
 		return err
 	}
@@ -61,7 +59,7 @@ func DayDataEdit(c echo.Context, db *gorm.DB) error {
 		Tags:    tags,
 	}
 
-	return c.JSON(http.StatusOK, &ret)
+	return api.ReturnApiRequest(c, false, &ret, "")
 }
 
 func extractDate(d string) (time.Time, error) {
@@ -79,10 +77,10 @@ func extractDate(d string) (time.Time, error) {
 // tags may or maynot have a # before them that needs to be removed
 func DayDataUpdate(c echo.Context, db *gorm.DB) error {
 	type updateData struct {
-		ID      uint   `json:"ID"`
 		Date    string `json:"Date"`
 		Comment string `json:"Comment"`
 		Tags    string `json:"Tags"`
+		ID      uint   `json:"ID"`
 	}
 
 	var update updateData

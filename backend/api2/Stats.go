@@ -1,7 +1,6 @@
 package api2
 
 import (
-	"net/http"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -91,8 +90,8 @@ func StatsAverageSalesByDayHandler(c echo.Context, db *gorm.DB) error {
 	}
 
 	type returnData struct {
-		Data   []statsData
 		Counts map[time.Weekday]int
+		Data   []statsData
 		Total  int
 	}
 
@@ -102,5 +101,6 @@ func StatsAverageSalesByDayHandler(c echo.Context, db *gorm.DB) error {
 		Total:  totalCounts,
 	}
 
-	return c.JSON(http.StatusOK, &rd)
+	// return c.JSON(http.StatusOK, &rd)
+	return api.ReturnApiRequest(c, false, &rd, "")
 }

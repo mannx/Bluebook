@@ -1,7 +1,7 @@
 package daily
 
 import (
-	"errors"
+	"fmt"
 	"os"
 	"regexp"
 	"strconv"
@@ -21,17 +21,21 @@ var (
 	reFoodCost      = regexp.MustCompile(`COST OF GOODS\s+(\d+,?\d+)\s+(\d+)`)   // 2 groups -> [0] dollar value [1] percent
 )
 
-func ImportWISR(fileName string, db *gorm.DB) error {
+func ImportWISR(fileName string, db *gorm.DB) ImportReport {
 	txtFile, err := PDFToText(fileName)
+	status := make([]string, 0)
+
 	if err != nil {
 		log.Error().Err(err).Msgf("Unable to convert [%v] from pdf to text", fileName)
-		return err
+		status = append(status, "Unable to convert [%v] from pdf to text")
+		return ImportReport{Messages: status}
 	}
 
 	contents, err := os.ReadFile(txtFile)
 	if err != nil {
 		log.Error().Err(err).Msgf("Unable to read file: %v", txtFile)
-		return err
+		status = append(status, fmt.Sprintf("Unable to read file: %v", txtFile))
+		return ImportReport{Messages: status}
 	}
 
 	cstr := string(contents[:])
@@ -39,29 +43,34 @@ func ImportWISR(fileName string, db *gorm.DB) error {
 	weekEnding := reWISRWeekEnd.FindStringSubmatch(cstr)
 	if weekEnding == nil {
 		log.Error().Msgf("Unable to find week ending date in file: %v", fileName)
-		return errors.New("unable to find week ending date")
+		status = append(status, "unable to find week ending date")
+		return ImportReport{Messages: status}
 	}
 
 	month, _ := strconv.Atoi(weekEnding[1])
 	day, _ := strconv.Atoi(weekEnding[2])
 	year, _ := strconv.Atoi(weekEnding[3])
 
+	report := ImportReport{
+		Messages: make([]string, 0),
+	}
+
 	// get the start and ending days of the week
 	endDate := time.Date(year, time.Month(month), day, 0, 0, 0, 0, time.UTC)
 
 	catering := reCateringSales.FindStringSubmatch(cstr)
 	if catering == nil {
-		return reFail("wisr.go", "Catering")
+		report.Add("[wisr] Unable to parse Catering")
 	}
 
 	labour := reLabourCost.FindStringSubmatch(cstr)
 	if labour == nil {
-		return reFail("wisr.go", "labour")
+		report.Add("[wisr] Unable to parse Labour")
 	}
 
 	food := reFoodCost.FindStringSubmatch(cstr)
 	if food == nil {
-		return reFail("wisr.go", "food")
+		report.Add("[wisr] Unable to parse food")
 	}
 
 	lstr := strings.ReplaceAll(labour[1], ",", "")
@@ -74,7 +83,7 @@ func ImportWISR(fileName string, db *gorm.DB) error {
 	// convert net sales to a float, remove all , to get a 1000+ value as just digits
 	party, err := strconv.ParseFloat(strings.ReplaceAll(strings.TrimSpace(catering[1]), ",", ""), 64)
 	if err != nil {
-		return reFail("wisr.go", "catering parse")
+		report.Add("[wisr] Unable to convert catering")
 	}
 
 	wi := getWeeklyInfoOrNew(endDate, db)
@@ -87,5 +96,6 @@ func ImportWISR(fileName string, db *gorm.DB) error {
 
 	db.Save(&wi)
 
-	return nil
+	report.Add(fmt.Sprintf("Successfully imported wisr sheet week ending %v/%v/%v", month, day, year))
+	return report
 }

@@ -1,6 +1,7 @@
 package daily
 
 import (
+	"errors"
 	"fmt"
 	"os/exec"
 	"path/filepath"
@@ -12,6 +13,20 @@ import (
 	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
 )
+
+type ImportReport struct {
+	Messages []string // any status messages generated during the import
+}
+
+func (report *ImportReport) Add(msg string) {
+	report.Messages = append(report.Messages, msg)
+}
+
+func NewImportReport() ImportReport {
+	return ImportReport{
+		Messages: make([]string, 0),
+	}
+}
 
 // PDFToText takes a filename, and returns a new file name
 // of a temporary file that has been converted to text
@@ -27,6 +42,12 @@ func PDFToText(fileName string) (string, error) {
 	cmd := exec.Command("pdftotext", "-layout", fileName, outFile)
 	err := cmd.Run()
 	if err != nil {
+		var exit *exec.ExitError
+		if errors.As(err, &exit) {
+			// exit error
+			log.Debug().Msgf("[PDFToText -- Exit Error] Exit Code: %v", exit.ExitCode())
+			log.Debug().Msgf("[PDFToText -- Error Message] %v", string(exit.Stderr[:]))
+		}
 		log.Error().Err(err).Msgf("Unable to convert from pdf to text: %v", fileName)
 		return "", err
 	}
@@ -65,7 +86,11 @@ func getWeeklyInfoOrNew(date time.Time, db *gorm.DB) models.WeeklyInfo {
 }
 
 // reFail will display an error message noting the function and which item failed its regex check
-func reFail(from string, item string) error {
-	log.Error().Msgf("[%v]{reFail} Unable to parse data for: %v", from, item)
-	return fmt.Errorf("unable to parse data for: %v", item)
-}
+// func reFail(from string, item string, msg ImportReport) ImportReport {
+// 	log.Error().Msgf("[%v]{reFail} Unable to parse data for: %v", from, item)
+// 	// return fmt.Errorf("unable to parse data for: %v", item)
+// 	// return fmt.Sprintf("unable to parse data for: %v", item)
+
+// 	msg.Messages = append(msg.Messages, fmt.Sprintf("Unable to parse data for: %v", item))
+// 	return msg
+// }
