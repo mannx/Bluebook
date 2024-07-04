@@ -55,7 +55,7 @@ export default function PortionConverter(params) {
         label="Portion Size"
       >
         {portionSizes.map((obj) => {
-          return <MenuItem value={obj}>{obj}</MenuItem>;
+          return <MenuItem value={obj}>{obj} oz</MenuItem>;
         })}
       </Select>
 

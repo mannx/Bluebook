@@ -8,6 +8,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
+import Stack from "@mui/material/Stack";
 
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -131,15 +132,17 @@ export default function WasteInput() {
         </Button>
       </Container>
 
-      <ConversionCalculatorInput
-        callback={copyCallback}
-        useCallback
-        defaultInput={portionValue}
-      />
-      <PortionConverter
-        callback={portionCallback}
-        buttonText="Copy To Converter"
-      />
+      <Stack spacing={2}>
+        <ConversionCalculatorInput
+          callback={copyCallback}
+          useCallback
+          defaultInput={portionValue}
+        />
+        <PortionConverter
+          callback={portionCallback}
+          buttonText="Copy To Converter"
+        />
+      </Stack>
 
       <TableContainer component={Paper}>
         <Form method="post">

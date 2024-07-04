@@ -51,6 +51,7 @@ export default function Settings() {
     print: data.PrintHockey,
     hockey_url: data.HockeyURL,
     home_team: data.HockeyHomeTeam,
+    runHockey: data.RunHockeyFetch,
   });
 
   const [manualURL, setManualURL] = React.useState("");
@@ -121,7 +122,7 @@ export default function Settings() {
         </Stack>
         <br />
 
-        <Stack>
+        <Stack spacing={2}>
           <Stack direction="row" spacing={2}>
             <TextField
               label="Hockey Schedule URL"
@@ -138,6 +139,8 @@ export default function Settings() {
             >
               Fetch
             </Button>
+            {/* <FormControlLabel control={<Switch name="runHockey" id="runHockey" checked={state.runHockey} onChange={(e)=>setState({...state,runHockey: e.target.value}) }/>} label="Run Hockey Scheduler" /> */}
+            <Switch name="runHockey" checked={state.runHockey} onChange={(e)=>{setState({...state, runHockey: e.target.value})}} />
           </Stack>
 
           <TextField label="Home Hockey Team" name="home_team" value={state.home_team} onChange={(e) => {setState({...state,home_team: e.target.value})}} />
