@@ -66,7 +66,9 @@ export default function DayDataViewer() {
 
   
   const rows = data.map((obj) => {
-    const day = dayjs(obj.Date);
+    // remove timezone information otherwise pushes day back 1 depending on timezone
+    const ds = obj.Date.substr(0,obj.Date.length - 10);
+    const day = dayjs(ds);
 
     return {
       id: obj.ID,
