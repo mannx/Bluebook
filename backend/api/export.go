@@ -16,7 +16,10 @@ import (
 )
 
 // cell mappings for where values are stored
+var managerName = "B5"
+var storeNumber = "B3"
 var weekEndingCell = "B4"
+
 var auvTarget = "D7"
 var lastYearSales = "D8"
 var netSales = "D9"
@@ -98,6 +101,13 @@ func ExportWeeklyHandler(c echo.Context, db *gorm.DB) error {
 		return LogAndReturnError(c, "unable to retrieve weekly data", err)
 	}
 
+	// retrieve settings for manager/store number
+	var settings models.BluebookSettings
+	res := db.First(&settings)
+	if res.Error != nil {
+		log.Error().Err(res.Error).Msg("Unable to retrieve settings from db.  Using defaults for name/store number")
+	}
+
 	// if netsales=true, use the value from the wisr instead of the calculated weekly value
 	netsales, err := strconv.ParseBool(params.NetSales)
 	if err != nil {
@@ -106,7 +116,7 @@ func ExportWeeklyHandler(c echo.Context, db *gorm.DB) error {
 
 	weekEnding := time.Date(year, time.Month(month), day, 0, 0, 0, 0, time.UTC)
 
-	err = exportWeekly(weekly, weekEnding, hours, manager, sysco, netsales)
+	err = exportWeekly(weekly, weekEnding, hours, manager, sysco, netsales, settings)
 	if err != nil {
 		return LogAndReturnError(c, "Unable to export weekly", err)
 	}
@@ -116,7 +126,7 @@ func ExportWeeklyHandler(c echo.Context, db *gorm.DB) error {
 
 // Export weekly from given date into excel template
 // outputs in Environment.OutputDir
-func exportWeekly(weekly weeklyInfo, weekEnding time.Time, hours float64, manager float64, sysco float64, netsales bool) error {
+func exportWeekly(weekly weeklyInfo, weekEnding time.Time, hours float64, manager float64, sysco float64, netsales bool, settings models.BluebookSettings) error {
 	// open the template and set the fields we need
 	path := filepath.Join(env.Environment.DataPath, "weekly.xlsx")
 	f, err := excelize.OpenFile(path)
@@ -126,6 +136,9 @@ func exportWeekly(weekly weeklyInfo, weekEnding time.Time, hours float64, manage
 	}
 
 	defer f.Close()
+
+	f.SetCellStr("Sheet1", managerName, settings.ManagerName)
+	f.SetCellStr("Sheet1", storeNumber, settings.StoreNumber)
 
 	f.SetCellInt("Sheet1", auvTarget, weekly.TargetAUV)
 	f.SetCellInt("Sheet1", targetHours, weekly.TargetHours)

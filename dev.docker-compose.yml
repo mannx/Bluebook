@@ -1,0 +1,32 @@
+# docker compose for dev purposes only
+services:
+  backend:
+    build: 
+      context: ./
+      dockerfile: Backend.Dockerfile
+    container_name: backend-dev
+    ports:
+      - 8080:8080
+    environment:
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - ./backend:/src
+      - ./backend/data:/data
+
+      # cache go mod files here instead of redownloading everytime
+      - ~/go/pkg:/go/pkg
+    deploy:
+      restart_policy:
+        condition: on-failure
+
+  frontend:
+    build:
+      context: ./
+      dockerfile: Frontend.Dockerfile
+    ports:
+      - 5173:5173
+    volumes:
+      - ./frontend2:/app
+    command: npm run dev
+    container_name: frontend-dev
