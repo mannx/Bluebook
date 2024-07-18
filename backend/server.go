@@ -1,10 +1,13 @@
 package main
 
 import (
+	"net/http"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	api "github.com/mannx/Bluebook/api"
 	api2 "github.com/mannx/Bluebook/api2"
+	"github.com/rs/zerolog/log"
 )
 
 func initServer() *echo.Echo {
@@ -98,5 +101,12 @@ func initServer() *echo.Echo {
 	e.GET("/api/raw/daydata", func(c echo.Context) error { return api2.HandleRawDayData(c, DB) })
 
 	e.GET("/api/hockey/merge", func(c echo.Context) error { return api.HockeyDebugMerge(DB) })
+
+	e.GET("/api/status", statusApi)
 	return e
+}
+
+func statusApi(c echo.Context) error {
+	log.Debug().Msgf("Status API Reached")
+	return c.String(http.StatusOK, "Server is running")
 }

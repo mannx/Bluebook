@@ -24,9 +24,21 @@ services:
     build:
       context: ./
       dockerfile: Frontend.Dockerfile
-    ports:
-      - 5173:5173
+    # ports:
+    #   - 5173:5173
+    #   - 9229:9229
+    #   - 8080:8080
     volumes:
-      - ./frontend2:/app
-    command: npm run dev
+      - ./frontend2:/src
     container_name: frontend-dev
+    # networks:
+    #   - frontend
+    environment:
+      - PUID=1000
+      - PGID=1000
+    command: npm run dev
+    network_mode: host
+
+# networks:
+#   frontend:
+#     driver: host

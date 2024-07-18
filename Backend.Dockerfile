@@ -21,6 +21,15 @@ RUN go install github.com/mitranim/gow@latest
 COPY backend-run.sh .
 RUN chmod +x backend-run.sh
 
+# setup default dev environment variables
+ENV BLUEBOOK_IMPORT_PATH ./data/downloads
+ENV BLUEBOOK_OUTPUT_PATH ./data/downloads
+ENV BLUEBOOK_DATA_PATH ./data
+ENV BLUEBOOK_LOG_LEVEL Debug
+ENV BLUEBOOK_IGNORE True
+ENV BLUEBOOK_SCRIPTS_PATH ./scripts
+ENV BLUEBOOK_BACKUP_PATH ./data/downloads
+
 # export required ports
 EXPOSE 8080
 
