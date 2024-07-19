@@ -15,7 +15,7 @@ services:
       - ./backend/data:/data
 
       # cache go mod files here instead of redownloading everytime
-      - ~/go/pkg:/go/pkg
+      - ./go/pkg:/go/pkg
     deploy:
       restart_policy:
         condition: on-failure
