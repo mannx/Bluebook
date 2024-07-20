@@ -84,13 +84,3 @@ func getWeeklyInfoOrNew(date time.Time, db *gorm.DB) models.WeeklyInfo {
 
 	return n
 }
-
-// reFail will display an error message noting the function and which item failed its regex check
-// func reFail(from string, item string, msg ImportReport) ImportReport {
-// 	log.Error().Msgf("[%v]{reFail} Unable to parse data for: %v", from, item)
-// 	// return fmt.Errorf("unable to parse data for: %v", item)
-// 	// return fmt.Sprintf("unable to parse data for: %v", item)
-
-// 	msg.Messages = append(msg.Messages, fmt.Sprintf("Unable to parse data for: %v", item))
-// 	return msg
-// }

@@ -40,7 +40,12 @@ require (
 
 require github.com/robfig/cron/v3 v3.0.1
 
-require filippo.io/edwards25519 v1.1.0 // indirect
+require (
+	filippo.io/edwards25519 v1.1.0 // indirect
+	github.com/mitranim/gg v0.1.19 // indirect
+	github.com/mitranim/gow v0.0.0-20231026105220-af11a6e1e9eb // indirect
+	github.com/rjeczalik/notify v0.9.3 // indirect
+)
 
 replace (
 	github.com/mannx/Bluebook/api => ../api

@@ -160,7 +160,7 @@ func ImportControl(fileName string, db *gorm.DB) ImportReport {
 		// save it
 		db.Save(&dd)
 
-		report.Add(fmt.Sprintf("Imported daily data for %v", dd.Date))
+		report.Add(fmt.Sprintf("Imported daily data for %v", time.Time(dd.Date).Format("2006-01-02")))
 	}
 
 	// save the netsales in the weeklyinfo table
