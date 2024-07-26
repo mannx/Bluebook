@@ -35,7 +35,7 @@ COPY ./frontend2 .
 
 # Copy over and run frontend pre-build script to run before building
 COPY front-build.sh .
-RUN front-build.sh
+RUN ./front-build.sh
 
 RUN npm install 
 RUN npm run build

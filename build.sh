@@ -30,4 +30,4 @@ fi
 
 echo "Building container with tag: $TAG..."
 
-docker buildx build -t bluebook:latest --build-arg GIT_COMMIT=$(git rev-parse HEAD) .
+docker buildx build -t bluebook:$TAG --build-arg GIT_COMMIT=$(git rev-parse HEAD) .
