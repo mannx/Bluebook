@@ -24,6 +24,9 @@ import (
 	models "github.com/mannx/Bluebook/models"
 )
 
+// commit hash set during linking for version display
+var Commit string
+
 // DB is the database connection for the entire run
 var DB *gorm.DB
 
@@ -35,6 +38,8 @@ func main() {
 
 	log.Info().Msgf("Bluebook Helper")
 	log.Info().Msg("Initializing environment...")
+	log.Info().Msgf("Commit version: %v", Commit)
+
 	env.Environment.Init()
 
 	log.Info().Msgf("Setting log level to: %v", env.Environment.LogLevelString)

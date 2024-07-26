@@ -103,10 +103,23 @@ func initServer() *echo.Echo {
 	e.GET("/api/hockey/merge", func(c echo.Context) error { return api.HockeyDebugMerge(DB) })
 
 	e.GET("/api/status", statusApi)
+	e.GET("/api/version", versionApi)
 	return e
 }
 
 func statusApi(c echo.Context) error {
 	log.Debug().Msgf("Status API Reached")
 	return c.String(http.StatusOK, "Server is running")
+}
+
+func versionApi(c echo.Context) error {
+	type VersionInfo struct {
+		Commit string
+	}
+
+	ver := VersionInfo{
+		Commit: Commit,
+	}
+
+	return api.ReturnApiRequest(c, false, ver, "")
 }

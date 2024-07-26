@@ -4,9 +4,13 @@
 # Go Build Stage
 #
 
-FROM golang:1.21-alpine3.17 as Build
+FROM golang:1.21-alpine3.17 AS build
 
-ENV GOPATH /go/src
+# GIT_COMMIT contains the git commit and is provided by the build script or set manually
+ARG GIT_COMMIT
+ENV GIT_COMMIT=$GIT_COMMIT
+
+ENV GOPATH=/go/src
 WORKDIR /go/src/github.com/mannx/Bluebook
 
 # need CGO_ENABLED and build-base for sqlite to compile
@@ -17,17 +21,22 @@ RUN apk add build-base
 COPY backend/ ./
 
 RUN go mod download
-RUN go build -o /bluebook .
+RUN go build -o /bluebook -ldflags="-X main.Commit=$GIT_COMMIT" .
 
 #
 # React Build Stage
 #
 
-FROM node:alpine as react
+FROM node:alpine AS react
 
 WORKDIR /app
 
 COPY ./frontend2 .
+
+# Copy over and run frontend pre-build script to run before building
+COPY front-build.sh .
+RUN front-build.sh
+
 RUN npm install 
 RUN npm run build
 

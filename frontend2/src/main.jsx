@@ -88,8 +88,6 @@ import SimpleStats, {
   SimpleStatsYear,
 } from "./components/Stats/Stats";
 
-import FilterDayData from "./components/Stats/Filter.jsx";
-
 import Settings, {
   loader as settingsLoader,
   action as settingsAction,
@@ -98,6 +96,10 @@ import Settings, {
 import DayDataViewer, {
   loader as ddViewerLoader,
 } from "./components/Stats/DayDataViewer.jsx";
+
+import VersionInfo, {
+  loader as versionInfoLoader,
+} from "./components/Stats/Version.jsx";
 
 import "./index.css";
 import "@fontsource/roboto/300.css";
@@ -261,9 +263,10 @@ const router = createBrowserRouter([
         action: settingsAction,
       },
       {
-        path: "/filter",
-        element: <FilterDayData />,
-      },
+        path: "/version",
+        element: <VersionInfo />,
+        loader: versionInfoLoader,
+      }
     ],
   },
 ]);

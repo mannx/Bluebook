@@ -1,8 +1,3 @@
-// development, set to http://localhost:8080, for production, leave empty
-//  need to use to redirect to port 8080 since dev server runs on 5173 and cant bind to both during dev
-const production = false;
-const baseURL = "http://localhost:8080";
-
 // urls for all our api endpoints
 // /api is the original endpoints
 // /api2 is the newer endpoints and part of the api redo
@@ -67,13 +62,11 @@ export const UrlApiSettingsSet = "/api/settings/set"; // update the global setti
 
 export const UrlApi2RawDayData = "/api/raw/daydata";
 
-export function UrlGet(name) {
-  var base = "";
-  if (production === false) {
-    base = baseURL;
-  }
+export const UrlVersion = "/api/version";
 
-  return base + name;
+export function UrlGet(name) {
+  // the localhost part is stripped before building and is only used during dev
+  return "http://localhost:8080" + name;
 }
 
 // headers sent when doing a POST operation
