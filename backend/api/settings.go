@@ -9,7 +9,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func HandleSettingsGet(c echo.Context, db *gorm.DB) error {
+func HandleSettingsGet(c echo.Context, db *gorm.DB, commitID string) error {
 	var set models.BluebookSettings
 
 	res := db.First(&set)
@@ -17,6 +17,8 @@ func HandleSettingsGet(c echo.Context, db *gorm.DB) error {
 		log.Error().Err(res.Error).Msg("Unable to retreive user settings.  Returning fresh settings")
 		return c.JSON(http.StatusOK, &models.BluebookSettings{})
 	}
+
+	set.CommitID = commitID
 
 	return c.JSON(http.StatusOK, &set)
 }

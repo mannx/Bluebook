@@ -19,6 +19,8 @@ import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
 import { Typography } from "@mui/material";
 
+import Grid from "@mui/material/Grid";
+
 export async function loader() {
   const resp = await fetch(UrlGet(UrlApiSettingsGet));
   const data = await resp.json();
@@ -36,6 +38,8 @@ export async function action({ request, params }) {
     PrintHockey: updates.print === "on",
     HockeyHomeTeam: updates.home_team,
     RunHockeyFetch: updates.runHockey === "on",
+    ManagerName: updates.manager,
+    StoreNumber: updates.storeNumber,
   };
 
   const opt = GetPostOptions(JSON.stringify(body));
@@ -53,6 +57,8 @@ export default function Settings() {
     hockey_url: data.HockeyURL,
     home_team: data.HockeyHomeTeam,
     runHockey: data.RunHockeyFetch,
+    manager: data.ManagerName,
+    storeNumber: data.StoreNumber,
   });
 
   const [manualURL, setManualURL] = React.useState("");
@@ -100,6 +106,9 @@ export default function Settings() {
       </Box>
 
       <Box>
+        Running Version: {data.CommitID}
+      </Box>
+      <Box>
         <TextField
           label="Manual Hockey Fetch URL"
           onChange={(e) => setManualURL(e.target.value)}
@@ -141,8 +150,11 @@ export default function Settings() {
               Fetch
             </Button>
             <FormControlLabel control={<Switch name="runHockey" id="runHockey" checked={state.runHockey} onChange={handleChange}/>} label="Run Hockey Scheduler" />
-            {/* <Switch name="runHockey" checked={state.runHockey} onChange={(e)=>{setState({...state, runHockey: e.target.value})}} />
-              <Typography>Run Hockey Scheduler</Typography> */}
+          </Stack>
+
+          <Stack direction="row" spacing={2}>
+              <TextField id="managerName" name="managerName" label="Name Here" value={state.managerName} onChange={(e)=>{setState({...state,managerName: e.target.value})}} />
+              <TextField id="storeNumber" name="storeNumber" label="Store Number Here" value={state.storeNumber} onChange={(e)=>{setState({...state,storeNumber: e.target.value})}} />
           </Stack>
 
           <TextField label="Home Hockey Team" name="home_team" value={state.home_team} onChange={(e) => {setState({...state,home_team: e.target.value})}} />
@@ -168,6 +180,15 @@ export default function Settings() {
             }
             label="Print Hockey Data"
           />
+
+          {/* <Grid container spacing={2} >
+            <Grid item xs={6}>
+              Manager Name: 
+            </Grid>
+            <Grid item xs={6}>
+              <TextField id="managerName" name="managerName" defaultValue="Name Here" value={state.managerName} onChange={(e)=>{setState({...state,managerName: e.target.value})}} />
+            </Grid>
+          </Grid> */}
 
           <Button onClick={manualArchive}>Create backup archive</Button>
         </Stack>

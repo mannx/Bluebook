@@ -14,6 +14,9 @@ import Stack from "@mui/material/Stack";
 import { DataGrid } from "@mui/x-data-grid";
 
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+
+dayjs.extend(utc);
 
 export async function loader({ params }) {
   let query = [];
@@ -66,7 +69,8 @@ export default function DayDataViewer() {
 
   
   const rows = data.map((obj) => {
-    const day = dayjs(obj.Date);
+    // remove timezone information from date to prevent showing previous day
+    const day = dayjs.utc(obj.Date);
 
     return {
       id: obj.ID,
