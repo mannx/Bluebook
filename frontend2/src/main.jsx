@@ -97,10 +97,6 @@ import DayDataViewer, {
   loader as ddViewerLoader,
 } from "./components/Stats/DayDataViewer.jsx";
 
-import VersionInfo, {
-  loader as versionInfoLoader,
-} from "./components/Stats/Version.jsx";
-
 import "./index.css";
 import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
@@ -262,11 +258,6 @@ const router = createBrowserRouter([
         loader: settingsLoader,
         action: settingsAction,
       },
-      {
-        path: "/version",
-        element: <VersionInfo />,
-        loader: versionInfoLoader,
-      }
     ],
   },
 ]);

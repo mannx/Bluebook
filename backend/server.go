@@ -1,13 +1,10 @@
 package main
 
 import (
-	"net/http"
-
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	api "github.com/mannx/Bluebook/api"
 	api2 "github.com/mannx/Bluebook/api2"
-	"github.com/rs/zerolog/log"
 )
 
 func initServer() *echo.Echo {
@@ -21,7 +18,6 @@ func initServer() *echo.Echo {
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
 	}))
 
-	// e.Use(middleware.Static("./static"))
 	e.Use(middleware.StaticWithConfig(middleware.StaticConfig{
 		Root:  "./static",
 		HTML5: true, // redirects all not found requests to the root to let the frontend handle routing
@@ -95,31 +91,12 @@ func initServer() *echo.Echo {
 
 	e.POST("/api/hockey/import", func(c echo.Context) error { return api.HockeyManualImportHandler(c, DB) })
 
-	e.GET("/api/settings/get", func(c echo.Context) error { return api.HandleSettingsGet(c, DB) })
+	e.GET("/api/settings/get", func(c echo.Context) error { return api.HandleSettingsGet(c, DB, Commit) })
 	e.POST("/api/settings/set", func(c echo.Context) error { return api.HandleSettingsSet(c, DB) })
 
 	e.GET("/api/raw/daydata", func(c echo.Context) error { return api2.HandleRawDayData(c, DB) })
 
 	e.GET("/api/hockey/merge", func(c echo.Context) error { return api.HockeyDebugMerge(DB) })
 
-	e.GET("/api/status", statusApi)
-	e.GET("/api/version", versionApi)
 	return e
-}
-
-func statusApi(c echo.Context) error {
-	log.Debug().Msgf("Status API Reached")
-	return c.String(http.StatusOK, "Server is running")
-}
-
-func versionApi(c echo.Context) error {
-	type VersionInfo struct {
-		Commit string
-	}
-
-	ver := VersionInfo{
-		Commit: Commit,
-	}
-
-	return api.ReturnApiRequest(c, false, ver, "")
 }

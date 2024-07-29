@@ -106,6 +106,9 @@ export default function Settings() {
       </Box>
 
       <Box>
+        Running Version: {data.CommitID}
+      </Box>
+      <Box>
         <TextField
           label="Manual Hockey Fetch URL"
           onChange={(e) => setManualURL(e.target.value)}
