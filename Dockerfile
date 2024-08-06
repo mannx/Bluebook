@@ -6,22 +6,20 @@
 
 FROM golang:1.21-alpine3.17 AS build
 
-# GIT_COMMIT contains the git commit and is provided by the build script or set manually
-ARG GIT_COMMIT
-ENV GIT_COMMIT=$GIT_COMMIT
-
 ENV GOPATH=/go/src
 WORKDIR /go/src/github.com/mannx/Bluebook
 
 # need CGO_ENABLED and build-base for sqlite to compile
 ENV CGO_ENABLED=1
-RUN apk add build-base
+RUN apk add build-base git
 
 # copy source files and directories (need separate COPY for directories?)
 COPY backend/ ./
+COPY .git .git
 
 RUN go mod download
-RUN go build -o /bluebook -ldflags="-X main.Commit=$GIT_COMMIT" .
+# RUN go build -o /bluebook -ldflags="-X main.Commit=$GIT_COMMIT" .
+RUN go build -o /bluebook -ldflags="-X main.Commit=$(git rev-parse --short HEAD)" -ldflags="-X main.Branch=$(get rev-parse --abbrev-ref HEAD)" .
 
 #
 # React Build Stage

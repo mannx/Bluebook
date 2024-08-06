@@ -3,7 +3,6 @@ import { useNavigate, Form, Link, useLoaderData } from "react-router-dom";
 import Button from "@mui/material/Button";
 
 import {
-  UrlGet,
   UrlApiDailyUndoList,
   UrlApiDailyUndoAction,
   GetPostOptions,
@@ -12,7 +11,7 @@ import {
 
 // retrieve the list of backup days we have available
 export async function loader() {
-  const url = UrlGet(UrlApiDailyUndoList);
+  const url = UrlApiDailyUndoList;
   const resp = await fetch(url);
   const data = await resp.json();
 
@@ -31,7 +30,7 @@ export async function action({ request }) {
     })
     .filter((o) => o !== undefined);
 
-  const url = UrlGet(UrlApiDailyUndoAction);
+  const url = UrlApiDailyUndoAction;
   const opt = GetPostOptions(JSON.stringify(ids));
 
   await fetch(url, opt);
@@ -47,7 +46,7 @@ export default function Backups() {
   const clearBackupTable = async () => {
     setErrMsg("Clearing backup table...");
 
-    const url = UrlGet(UrlApiDailyUndoClear);
+    const url = UrlApiDailyUndoClear;
     const resp = await fetch(url);
     const json = await resp.json();
 
@@ -102,4 +101,3 @@ export default function Backups() {
     </>
   );
 }
-

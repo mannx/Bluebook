@@ -14,6 +14,4 @@ type BluebookSettings struct {
 
 	ManagerName string // name of the mananger to place on the weekly sheet
 	StoreNumber string // store number to place on the weekly sheet
-
-	CommitID string `gorm:"-"`
 }

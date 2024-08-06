@@ -1,7 +1,6 @@
 import * as React from "react";
 import { useLoaderData, Form } from "react-router-dom";
 import {
-  UrlGet,
   GetPostOptions,
   UrlApiSettingsGet,
   UrlApiSettingsSet,
@@ -22,7 +21,7 @@ import { Typography } from "@mui/material";
 import Grid from "@mui/material/Grid";
 
 export async function loader() {
-  const resp = await fetch(UrlGet(UrlApiSettingsGet));
+  const resp = await fetch(UrlApiSettingsGet);
   const data = await resp.json();
 
   return { data };
@@ -43,7 +42,7 @@ export async function action({ request, params }) {
   };
 
   const opt = GetPostOptions(JSON.stringify(body));
-  await fetch(UrlGet(UrlApiSettingsSet), opt);
+  await fetch(UrlApiSettingsSet, opt);
 
   return null;
 }
@@ -77,21 +76,21 @@ export default function Settings() {
     };
 
     const opts = GetPostOptions(JSON.stringify(body));
-    await fetch(UrlGet(UrlApiHockeyImportUrl), opts);
+    await fetch(UrlApiHockeyImportUrl, opts);
   };
 
   const manualArchive = async () => {
-    const resp = await fetch(UrlGet(UrlApiManualArchive));
+    const resp = await fetch(UrlApiManualArchive);
     const json = await resp.json();
     console.log(json);
 
-    if(json.Error!==undefined){
-      if(json.Error === true){
+    if (json.Error !== undefined) {
+      if (json.Error === true) {
         setErrorMsg(json.Message);
-      }else{
+      } else {
         setErrorMsg(null);
       }
-    }else{
+    } else {
       // misformed return data?
       setErrorMsg("Unknown return information");
     }
@@ -102,12 +101,9 @@ export default function Settings() {
       <h3>Settings</h3>
 
       <Box>
-        <Typography sx={{color: "red"}} >{errorMsg}</Typography>
+        <Typography sx={{ color: "red" }}>{errorMsg}</Typography>
       </Box>
 
-      <Box>
-        Running Version: {data.CommitID}
-      </Box>
       <Box>
         <TextField
           label="Manual Hockey Fetch URL"
@@ -149,15 +145,48 @@ export default function Settings() {
             >
               Fetch
             </Button>
-            <FormControlLabel control={<Switch name="runHockey" id="runHockey" checked={state.runHockey} onChange={handleChange}/>} label="Run Hockey Scheduler" />
+            <FormControlLabel
+              control={
+                <Switch
+                  name="runHockey"
+                  id="runHockey"
+                  checked={state.runHockey}
+                  onChange={handleChange}
+                />
+              }
+              label="Run Hockey Scheduler"
+            />
           </Stack>
 
           <Stack direction="row" spacing={2}>
-              <TextField id="managerName" name="managerName" label="Name Here" value={state.managerName} onChange={(e)=>{setState({...state,managerName: e.target.value})}} />
-              <TextField id="storeNumber" name="storeNumber" label="Store Number Here" value={state.storeNumber} onChange={(e)=>{setState({...state,storeNumber: e.target.value})}} />
+            <TextField
+              id="managerName"
+              name="managerName"
+              label="Name Here"
+              value={state.managerName}
+              onChange={(e) => {
+                setState({ ...state, managerName: e.target.value });
+              }}
+            />
+            <TextField
+              id="storeNumber"
+              name="storeNumber"
+              label="Store Number Here"
+              value={state.storeNumber}
+              onChange={(e) => {
+                setState({ ...state, storeNumber: e.target.value });
+              }}
+            />
           </Stack>
 
-          <TextField label="Home Hockey Team" name="home_team" value={state.home_team} onChange={(e) => {setState({...state,home_team: e.target.value})}} />
+          <TextField
+            label="Home Hockey Team"
+            name="home_team"
+            value={state.home_team}
+            onChange={(e) => {
+              setState({ ...state, home_team: e.target.value });
+            }}
+          />
 
           <FormControlLabel
             control={

@@ -1,19 +1,18 @@
 import { useLoaderData, redirect, Link } from "react-router-dom";
 import { NumericFormat } from "react-number-format";
-import { UrlGet, UrlApiMonth, UrlApiSettingsGet } from "../URLs.jsx";
+import { UrlApiMonth, UrlApiSettingsGet } from "../URLs.jsx";
 
 // make sure we have the correct css for our table
 import "./month.css";
 
 // retrieve the month/year we want to see
 export async function loader({ params }) {
-  const url =
-    UrlGet(UrlApiMonth) + "?month=" + params.month + "&year=" + params.year;
+  const url = UrlApiMonth + "?month=" + params.month + "&year=" + params.year;
   const resp = await fetch(url);
   const data = await resp.json();
 
   // get the settings for optional display items
-  const r2 = await fetch(UrlGet(UrlApiSettingsGet));
+  const r2 = await fetch(UrlApiSettingsGet);
   const settings = await r2.json();
 
   return { data, settings };
@@ -224,9 +223,17 @@ function Row(data) {
       <td className="Month no-print">{Tag(data.Tags, data.TagID)}</td>
       <td className="Month no-print">
         {data.ID !== 0 ? (
-          <Link to={"/edit/" + data.Month + "/" + data.Year + "/" + data.ID}>E</Link>
+          <Link to={"/edit/" + data.Month + "/" + data.Year + "/" + data.ID}>
+            E
+          </Link>
         ) : (
-          <Link to={"/edit/"+ data.Month + "/" + data.Year + "/0/" + hashDate(data)}>C</Link>
+          <Link
+            to={
+              "/edit/" + data.Month + "/" + data.Year + "/0/" + hashDate(data)
+            }
+          >
+            C
+          </Link>
         )}
       </td>
     </tr>
@@ -324,9 +331,9 @@ function prevYear(data) {
 }
 
 function nextYear(data) {
-  const currentYear = (new Date()).getFullYear();
+  const currentYear = new Date().getFullYear();
 
-  if(data.Year !== currentYear) {
+  if (data.Year !== currentYear) {
     return monthNavLink(data.Month, data.Year + 1, "Next Year");
   }
 

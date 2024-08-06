@@ -15,12 +15,7 @@ import Stack from "@mui/material/Stack";
 
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 
-import {
-  UrlGet,
-  UrlApi2AUVView,
-  UrlApi2AUVUpdate,
-  GetPostOptions,
-} from "../URLs";
+import { UrlApi2AUVView, UrlApi2AUVUpdate, GetPostOptions } from "../URLs";
 
 import dayjs from "dayjs";
 
@@ -54,7 +49,7 @@ export async function loader({ params }) {
   const year = params.year;
   const q = "?month=" + month + "&year=" + year;
 
-  const url = UrlGet(UrlApi2AUVView) + q;
+  const url = UrlApi2AUVView + q;
   const resp = await fetch(url);
   const data = await resp.json();
 
@@ -97,7 +92,7 @@ export async function action({ request, params }) {
 
   // send to the server
   const opts = GetPostOptions(JSON.stringify(body));
-  await fetch(UrlGet(UrlApi2AUVUpdate), opts);
+  await fetch(UrlApi2AUVUpdate, opts);
 
   return null;
 }
@@ -180,7 +175,12 @@ function AUVData(data, index) {
           />
         </TableCell>
         <TableCell>
-          <TextField name={"prod" + index} id={"prod" + index} label="Productivity" defaultValue={data.Productivity[index]} />
+          <TextField
+            name={"prod" + index}
+            id={"prod" + index}
+            label="Productivity"
+            defaultValue={data.Productivity[index]}
+          />
         </TableCell>
       </TableRow>
     </>

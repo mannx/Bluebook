@@ -12,7 +12,6 @@ import Stack from "@mui/material/Stack";
 import Container from "@mui/material/Container";
 
 import {
-  UrlGet,
   GetPostOptions,
   UrlApi2ImportList,
   UrlApiImportDaily,
@@ -58,7 +57,7 @@ function a11yProps(index) {
 }
 
 export async function loader() {
-  const url = UrlGet(UrlApi2ImportList);
+  const url = UrlApi2ImportList;
   const resp = await fetch(url);
   const data = await resp.json();
 
@@ -99,7 +98,7 @@ export async function action({ request }) {
   }
 
   const opt = GetPostOptions(JSON.stringify(files));
-  const resp = await fetch(UrlGet(url), opt);
+  const resp = await fetch(url, opt);
   const data = await resp.json();
 
   return data;

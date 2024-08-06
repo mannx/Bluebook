@@ -11,7 +11,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 
-import { UrlGet, UrlApiCommentSearch } from "../URLs";
+import { UrlApiCommentSearch } from "../URLs";
 
 // load our search results if we have any
 export async function loader({ request }) {
@@ -23,7 +23,7 @@ export async function loader({ request }) {
     return {};
   }
 
-  const url = UrlGet(UrlApiCommentSearch) + "?" + url1.searchParams;
+  const url = UrlApiCommentSearch + "?" + url1.searchParams;
   const resp = await fetch(url);
   const data = await resp.json();
 
