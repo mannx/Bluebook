@@ -50,7 +50,8 @@ FROM alpine:3.17
 # python3 required for some python scripts found in /scripts
 # bash required for init scripts
 RUN apk update
-RUN apk add tzdata poppler-utils sqlite python3 bash
+# RUN apk add tzdata poppler-utils sqlite python3 bash
+RUN apk add tzdata poppler-utils sqlite python3 
 
 WORKDIR /
 
@@ -64,11 +65,15 @@ COPY ./backend/api/data.json /top5.json
 COPY ./scripts /scripts
 
 # copy initialization data and scripts
-COPY ./init/init.bin /init/init.bin
-COPY ./init/init.sh /scripts
+# COPY ./init/init.bin /init/init.bin
+# COPY ./init/init.sh /scripts
+
+# copy and extract the initialization files
+COPY ./init/init.bin /init/init.tar.gz
+RUN tar -zxf /init/init.tar.gz -C /init
 
 # make sure init script is runnable -- todo: fix before here
-RUN chmod +x /scripts/init.sh
+# RUN chmod +x /scripts/init.sh
 
 EXPOSE 8080
 ENTRYPOINT ["/scripts/run.sh"]
