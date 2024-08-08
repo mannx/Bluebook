@@ -31,7 +31,6 @@ import { Container } from "@mui/material";
 
 import {
   GetPostOptions,
-  UrlGet,
   UrlApiWasteSettingsGet,
   UrlApiWasteRemoveUnused,
   UrlApiWasteItem,
@@ -40,7 +39,7 @@ import {
 } from "../URLs";
 
 export async function loader() {
-  const url = UrlGet(UrlApiWasteSettingsGet);
+  const url = UrlApiWasteSettingsGet;
   const resp = await fetch(url);
   const data = await resp.json();
 
@@ -72,7 +71,7 @@ export default function WasteSettings() {
   const [combined, setCombined] = React.useState(genState(data.Data.length));
 
   const removeUnused = async () => {
-    const url = UrlGet(UrlApiWasteRemoveUnused);
+    const url = UrlApiWasteRemoveUnused;
 
     const resp = await fetch(url);
     const json = await resp.json();
@@ -81,7 +80,7 @@ export default function WasteSettings() {
   };
 
   const addNew = async () => {
-    const url = UrlGet(UrlApiWasteItemNew);
+    const url = UrlApiWasteItemNew;
     const opt = GetPostOptions(null);
     const resp = await fetch(url, opt);
     const json = await resp.json();
@@ -189,7 +188,7 @@ export default function WasteSettings() {
 }
 
 export async function EditLoader({ params }) {
-  const url = UrlGet(UrlApiWasteItem) + "?id=" + params.id;
+  const url = UrlApiWasteItem + "?id=" + params.id;
   const resp = await fetch(url);
   const data = await resp.json();
 
@@ -215,7 +214,7 @@ export async function EditAction({ request, params }) {
   };
 
   const opt = GetPostOptions(JSON.stringify(body));
-  await fetch(UrlGet(UrlApiWasteItemUpdate), opt);
+  await fetch(UrlApiWasteItemUpdate, opt);
 
   return redirect("/waste/settings/");
 }

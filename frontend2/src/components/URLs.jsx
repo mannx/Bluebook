@@ -2,72 +2,85 @@
 // /api is the original endpoints
 // /api2 is the newer endpoints and part of the api redo
 
-export const UrlApiMonth = "/api/month";
-export const UrlApiImportDaily = "/api/import/daily";
-export const UrlApiImportControl = "/api/import/control";
-export const UrlApiImportWISR = "/api/import/wisr";
+export const UrlApiMonth = "http://localhost:8080/api/month";
+export const UrlApiImportDaily = "http://localhost:8080/api/import/daily";
+export const UrlApiImportControl = "http://localhost:8080/api/import/control";
+export const UrlApiImportWISR = "http://localhost:8080/api/import/wisr";
 
-export const UrlApi2DayEdit = "/api2/day/edit";
-export const UrlApi2DayUpdate = "/api2/day/update";
+export const UrlApi2DayEdit = "http://localhost:8080/api2/day/edit";
+export const UrlApi2DayUpdate = "http://localhost:8080/api2/day/update";
 
-export const UrlApi2ImportList = "/api2/import/list"; // get list of all files we can import
+export const UrlApi2ImportList = "http://localhost:8080/api2/import/list"; // get list of all files we can import
 
-export const UrlApiWeekly = "/api/weekly/view";
-export const UrlApi2WeeklyExport = "/api2/weekly/export";
+export const UrlApiWeekly = "http://localhost:8080/api/weekly/view";
+export const UrlApi2WeeklyExport = "http://localhost:8080/api2/weekly/export";
 
-export const UrlApi2AUVView = "/api2/auv/view";
-export const UrlApi2AUVUpdate = "/api2/auv/update";
+export const UrlApi2AUVView = "http://localhost:8080/api2/auv/view";
+export const UrlApi2AUVUpdate = "http://localhost:8080/api2/auv/update";
 
-export const UrlApiWasteView = "/api/waste/view";
-export const UrlApiWasteExport = "/api/waste/export";
-export const UrlApiWasteNames = "/api/waste/names";
+export const UrlApiWasteView = "http://localhost:8080/api/waste/view";
+export const UrlApiWasteExport = "http://localhost:8080/api/waste/export";
+export const UrlApiWasteNames = "http://localhost:8080/api/waste/names";
 
-export const UrlApiWasteRemoveUnused = "/api/waste/unused";
+export const UrlApiWasteRemoveUnused = "http://localhost:8080/api/waste/unused";
 
-export const UrlApiWasteHolding = "/api/waste/holding";
-export const UrlApiWasteHoldingAdd = "/api/waste/holding/add";
-export const UrlApiWasteHoldingConfirm = "/api/waste/holding/confirm";
-export const UrlApiWasteHoldingDelete = "/api/waste/holding/delete";
+export const UrlApiWasteHolding = "http://localhost:8080/api/waste/holding";
+export const UrlApiWasteHoldingAdd =
+  "http://localhost:8080/api/waste/holding/add";
+export const UrlApiWasteHoldingConfirm =
+  "http://localhost:8080/api/waste/holding/confirm";
+export const UrlApiWasteHoldingDelete =
+  "http://localhost:8080/api/waste/holding/delete";
 
-export const UrlApiWasteSettingsGet = "/api/waste/settings";
-export const UrlApiWasteItem = "/api/waste/item"; // retreive a single wastage item information
-export const UrlApiWasteItemUpdate = "/api/waste/item/update";
-export const UrlApiWasteItemNew = "/api/waste/item/new";
+export const UrlApiWasteSettingsGet =
+  "http://localhost:8080/api/waste/settings";
+export const UrlApiWasteItem = "http://localhost:8080/api/waste/item"; // retreive a single wastage item information
+export const UrlApiWasteItemUpdate =
+  "http://localhost:8080/api/waste/item/update";
+export const UrlApiWasteItemNew = "http://localhost:8080/api/waste/item/new";
 
-export const UrlApiGetTags = "/api/tags/view";
-export const UrlApiGetTagId = "/api/tags/data";
+export const UrlApiGetTags = "http://localhost:8080/api/tags/view";
+export const UrlApiGetTagId = "http://localhost:8080/api/tags/data";
 
-export const UrlApiTop5 = "/api/top5";
-export const UrlApiTop5Data = "/api/top5/data";
+export const UrlApiTop5 = "http://localhost:8080/api/top5";
+export const UrlApiTop5Data = "http://localhost:8080/api/top5/data";
 
-export const UrlApiDailyUndoList = "/api/backup/daydata/get";
-export const UrlApiDailyUndoAction = "/api/backup/daydata/action";
-export const UrlApiDailyUndoClear = "/api/backup/daydata/clear";
+export const UrlApiDailyUndoList =
+  "http://localhost:8080/api/backup/daydata/get";
+export const UrlApiDailyUndoAction =
+  "http://localhost:8080/api/backup/daydata/action";
+export const UrlApiDailyUndoClear =
+  "http://localhost:8080/api/backup/daydata/clear";
 
-export const UrlApiManualArchive = "/api/backup/archive";
+export const UrlApiManualArchive = "http://localhost:8080/api/backup/archive";
 
-export const UrlApiCommentSearch = "/api/comment/search"; // search for all comments containing the search term
+export const UrlApiCommentSearch = "http://localhost:8080/api/comment/search"; // search for all comments containing the search term
 
-export const UrlApiHockeyData = "/api/hockey/data";
-export const UrlApiHockeyDataYear = "/api/hockey/data/years"; // used to get range of years we have data for
-export const UrlApiHockeyImportUrl = "/api/hockey/import";
+export const UrlApiHockeyData = "http://localhost:8080/api/hockey/data";
+export const UrlApiHockeyDataYear =
+  "http://localhost:8080/api/hockey/data/years"; // used to get range of years we have data for
+export const UrlApiHockeyImportUrl = "http://localhost:8080/api/hockey/import";
 
-export const UrlApi2AverageStats = "/api/stats/average";
+export const UrlApi2AverageStats = "http://localhost:8080/api/stats/average";
 
-export const UrlApiGetNotifications = "/api/notifications/get";
-export const UrlApiClearNotifications = "/api/notifications/clear";
+export const UrlApiGetNotifications =
+  "http://localhost:8080/api/notifications/get";
+export const UrlApiClearNotifications =
+  "http://localhost:8080/api/notifications/clear";
 
-export const UrlApiSettingsGet = "/api/settings/get"; // get the global settings
-export const UrlApiSettingsSet = "/api/settings/set"; // update the global settings
+export const UrlApiSettingsGet = "http://localhost:8080/api/settings/get"; // get the global settings
+export const UrlApiSettingsSet = "http://localhost:8080/api/settings/set"; // update the global settings
 
-export const UrlApi2RawDayData = "/api/raw/daydata";
+export const UrlApi2RawDayData = "http://localhost:8080/api/raw/daydata";
 
-export const UrlVersion = "/api/version";
+// export const UrlVersion = "/api/version";
+export const UrlAbout = "http://localhost:8080/api/about";
 
-export function UrlGet(name) {
-  // the localhost part is stripped before building and is only used during dev
-  return "http://localhost:8080" + name;
-}
+// export function UrlGet(name) {
+//   // the localhost part is stripped before building and is only used during dev
+//   // return "http://localhost:8080" + name;
+//   return name;
+// }
 
 // headers sent when doing a POST operation
 const headers = {
@@ -84,4 +97,7 @@ export function GetPostOptions(body) {
   };
 }
 
-export default UrlGet;
+// export default UrlGet;
+export default function UrlDefFunc() {
+  return "";
+}

@@ -90,13 +90,27 @@ func initServer() *echo.Echo {
 	e.GET("/api/stats/average", func(c echo.Context) error { return api2.StatsAverageSalesByDayHandler(c, DB) })
 
 	e.POST("/api/hockey/import", func(c echo.Context) error { return api.HockeyManualImportHandler(c, DB) })
+	e.GET("/api/hockey/merge", func(c echo.Context) error { return api.HockeyDebugMerge(DB) })
 
-	e.GET("/api/settings/get", func(c echo.Context) error { return api.HandleSettingsGet(c, DB, Commit) })
 	e.POST("/api/settings/set", func(c echo.Context) error { return api.HandleSettingsSet(c, DB) })
+	e.GET("/api/settings/get", func(c echo.Context) error { return api.HandleSettingsGet(c, DB) })
 
 	e.GET("/api/raw/daydata", func(c echo.Context) error { return api2.HandleRawDayData(c, DB) })
 
-	e.GET("/api/hockey/merge", func(c echo.Context) error { return api.HockeyDebugMerge(DB) })
-
+	e.GET("/api/about", aboutPage)
 	return e
+}
+
+func aboutPage(c echo.Context) error {
+	type AboutInfo struct {
+		Commit string
+		Branch string
+	}
+
+	info := AboutInfo{
+		Commit,
+		Branch,
+	}
+
+	return api.ReturnApiRequest(c, false, info, "")
 }

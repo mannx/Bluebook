@@ -3,13 +3,12 @@ package main
 import (
 	"context"
 	"fmt"
-	"strings"
-
 	"net/http"
 	"os"
 	"os/exec"
 	"os/signal"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/rs/zerolog"
@@ -25,7 +24,10 @@ import (
 )
 
 // commit hash set during linking for version display
-var Commit string
+var (
+	Commit string
+	Branch string
+)
 
 // DB is the database connection for the entire run
 var DB *gorm.DB
@@ -38,7 +40,7 @@ func main() {
 
 	log.Info().Msgf("Bluebook Helper")
 	log.Info().Msg("Initializing environment...")
-	log.Info().Msgf("Commit version: %v", Commit)
+	log.Info().Msgf("Version: %v-%v", Branch, Commit)
 
 	env.Environment.Init()
 

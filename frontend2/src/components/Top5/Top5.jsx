@@ -20,7 +20,7 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 
-import { UrlGet, UrlApiTop5, UrlApiTop5Data } from "../URLs";
+import { UrlApiTop5, UrlApiTop5Data } from "../URLs";
 import ErrorOrData from "../Error";
 
 const monthNames = [
@@ -40,7 +40,7 @@ const monthNames = [
 ];
 
 export async function loader() {
-  const url = UrlGet(UrlApiTop5);
+  const url = UrlApiTop5;
   const resp = await fetch(url);
   const data = await resp.json();
 
@@ -118,7 +118,7 @@ export default function Top5() {
 // top5Data loader /:month/:year  if either is unused, is 0
 export async function dataLoader({ params }) {
   const p = "?month=" + params.month + "&year=" + params.year + "&limit=5";
-  const url = UrlGet(UrlApiTop5Data) + p;
+  const url = UrlApiTop5Data + p;
   const resp = await fetch(url);
   const data = await resp.json();
 

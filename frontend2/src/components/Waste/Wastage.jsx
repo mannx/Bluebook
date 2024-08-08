@@ -18,12 +18,7 @@ import Typography from "@mui/material/Typography";
 
 import dayjs from "dayjs";
 
-import {
-  UrlGet,
-  UrlApiWasteView,
-  UrlApiWasteExport,
-  GetPostOptions,
-} from "../URLs";
+import { UrlApiWasteView, UrlApiWasteExport, GetPostOptions } from "../URLs";
 
 // true if day is not a tuesday to disable in the picker
 // avoid picking unusable dates and needing an error message
@@ -108,7 +103,7 @@ export default function WasteView() {
 
 export async function loader({ params }) {
   const url =
-    UrlGet(UrlApiWasteView) +
+    UrlApiWasteView +
     "?month=" +
     params.month +
     "&day=" +
@@ -136,7 +131,7 @@ function NF(obj) {
 }
 
 export async function action({ params }) {
-  const url = UrlGet(UrlApiWasteExport);
+  const url = UrlApiWasteExport;
   const body = {
     Month: parseInt(params.month),
     Day: parseInt(params.day),

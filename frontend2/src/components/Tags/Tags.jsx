@@ -11,11 +11,11 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 
-import { UrlGet, UrlApiGetTags, UrlApiGetTagId } from "../URLs";
+import { UrlApiGetTags, UrlApiGetTagId } from "../URLs";
 
 export async function loader() {
   // retrieve all the tags
-  const url = UrlGet(UrlApiGetTags);
+  const url = UrlApiGetTags;
   const resp = await fetch(url);
   const data = await resp.json();
 
@@ -51,7 +51,7 @@ export default function Tags() {
 
 // load information for a given tag with 'id'
 export async function idLoader({ params }) {
-  const url = UrlGet(UrlApiGetTagId) + "?id=" + params.id;
+  const url = UrlApiGetTagId + "?id=" + params.id;
   const resp = await fetch(url);
   const data = await resp.json();
 

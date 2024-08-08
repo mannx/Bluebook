@@ -1,10 +1,11 @@
-import { Form, useLoaderData, useActionData, useNavigate, redirect } from "react-router-dom";
 import {
-  UrlGet,
-  UrlApi2DayEdit,
-  UrlApi2DayUpdate,
-  GetPostOptions,
-} from "../URLs.jsx";
+  Form,
+  useLoaderData,
+  useActionData,
+  useNavigate,
+  redirect,
+} from "react-router-dom";
+import { UrlApi2DayEdit, UrlApi2DayUpdate, GetPostOptions } from "../URLs.jsx";
 
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -16,7 +17,7 @@ import Paper from "@mui/material/Paper";
 
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
-import Container  from "@mui/material/Container";
+import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 
 import TextField from "@mui/material/TextField";
@@ -41,14 +42,11 @@ export async function loader({ params }) {
     q = "?id=0&date=" + params.date;
   }
 
-  const url = UrlGet(UrlApi2DayEdit) + q;
+  const url = UrlApi2DayEdit + q;
   const resp = await fetch(url);
   const data = await resp.json();
 
-  return { data, 
-    month: params.month,
-    year: params.year
-  };
+  return { data, month: params.month, year: params.year };
 }
 
 export async function action({ request, params }) {
@@ -65,11 +63,11 @@ export async function action({ request, params }) {
   };
 
   const opt = GetPostOptions(JSON.stringify(body));
-  const resp = await fetch(UrlGet(UrlApi2DayUpdate), opt);
+  const resp = await fetch(UrlApi2DayUpdate, opt);
   const data = await resp.json();
 
   // if we have an error, display the message and allow to be re-submitted
-  if(data.Error !== undefined && data.Error == true){
+  if (data.Error !== undefined && data.Error == true) {
     return data;
   }
 
@@ -82,15 +80,27 @@ export async function action({ request, params }) {
 export default function DayEdit() {
   const { data, month, year } = useLoaderData();
   const navigate = useNavigate();
-  const  action  = useActionData();
+  const action = useActionData();
 
   const outputData = (data) => {
     const displayError = () => {
-        if(action !== undefined && action.Error !== undefined && action.Error === true) {
-          return (<><div><Typography sx={{color: "red"}} variant="h5">{action.Message}</Typography></div></>);
-        }
-        return <></>;
-    }
+      if (
+        action !== undefined &&
+        action.Error !== undefined &&
+        action.Error === true
+      ) {
+        return (
+          <>
+            <div>
+              <Typography sx={{ color: "red" }} variant="h5">
+                {action.Message}
+              </Typography>
+            </div>
+          </>
+        );
+      }
+      return <></>;
+    };
 
     return (
       <>
@@ -169,7 +179,7 @@ export default function DayEdit() {
         </Form>
       </>
     );
-  }
+  };
 
   return ErrorOrData(data, outputData);
 }
