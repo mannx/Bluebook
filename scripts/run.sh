@@ -1,7 +1,7 @@
 #!/bin/sh
 
-# run the init script to initialize any files we might need
-# /scripts/init.sh
+# make sure our templates are in place
+cp /init/* /data/
 
 # create a backup before we start
 /scripts/ar.sh

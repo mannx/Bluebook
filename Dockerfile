@@ -18,7 +18,7 @@ COPY backend/ ./
 COPY .git .git
 
 RUN go mod download
-RUN go build -o /bluebook -ldflags="-X main.Commit=$(git rev-parse --short HEAD) -X main.Branch=$(get rev-parse --abbrev-ref HEAD)" .
+RUN go build -o /bluebook -ldflags="-X main.Commit=$(git rev-parse --short HEAD) -X main.Branch=$(git rev-parse --abbrev-ref HEAD)" .
 
 #
 # React Build Stage
@@ -47,7 +47,6 @@ FROM alpine:3.17
 # make sure required packages are installed
 # poppler-utils required for pdf parsing 
 # python3 required for some python scripts found in /scripts
-# bash required for init scripts
 RUN apk update
 RUN apk add tzdata poppler-utils sqlite python3 
 
@@ -62,16 +61,9 @@ COPY ./backend/api/data.json /top5.json
 # copy run and backup scripts
 COPY ./scripts /scripts
 
-# copy initialization data and scripts
-# COPY ./init/init.bin /init/init.bin
-# COPY ./init/init.sh /scripts
-
 # copy and extract the initialization files
 COPY ./init/init.bin /init/init.tar.gz
 RUN tar -zxf /init/init.tar.gz -C /init && rm /init/init.tar.gz
-
-# make sure init script is runnable -- todo: fix before here
-# RUN chmod +x /scripts/init.sh
 
 EXPOSE 8080
 ENTRYPOINT ["/scripts/run.sh"]
