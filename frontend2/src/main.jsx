@@ -97,7 +97,7 @@ import DayDataViewer, {
   loader as ddViewerLoader,
 } from "./components/Stats/DayDataViewer.jsx";
 
-import AboutPage, { loader as aboutLoader } from "./components/About/About.jsx";
+import AboutPage, { loader as aboutLoader } from "./components/About/About.tsx";
 
 import "./index.css";
 import "@fontsource/roboto/300.css";

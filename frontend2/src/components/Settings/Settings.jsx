@@ -18,8 +18,6 @@ import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
 import { Typography } from "@mui/material";
 
-import Grid from "@mui/material/Grid";
-
 export async function loader() {
   const resp = await fetch(UrlApiSettingsGet);
   const data = await resp.json();
@@ -37,7 +35,7 @@ export async function action({ request, params }) {
     PrintHockey: updates.print === "on",
     HockeyHomeTeam: updates.home_team,
     RunHockeyFetch: updates.runHockey === "on",
-    ManagerName: updates.manager,
+    ManagerName: updates.managerName,
     StoreNumber: updates.storeNumber,
   };
 
@@ -56,7 +54,7 @@ export default function Settings() {
     hockey_url: data.HockeyURL,
     home_team: data.HockeyHomeTeam,
     runHockey: data.RunHockeyFetch,
-    manager: data.ManagerName,
+    managerName: data.ManagerName,
     storeNumber: data.StoreNumber,
   });
 
@@ -121,13 +119,6 @@ export default function Settings() {
       <Divider />
 
       <Form method="post">
-        <Stack direction="row" spacing={2}>
-          <Button variant="contained" type="submit">
-            Update
-          </Button>
-        </Stack>
-        <br />
-
         <Stack spacing={2}>
           <Stack direction="row" spacing={2}>
             <TextField
@@ -210,17 +201,15 @@ export default function Settings() {
             label="Print Hockey Data"
           />
 
-          {/* <Grid container spacing={2} >
-            <Grid item xs={6}>
-              Manager Name: 
-            </Grid>
-            <Grid item xs={6}>
-              <TextField id="managerName" name="managerName" defaultValue="Name Here" value={state.managerName} onChange={(e)=>{setState({...state,managerName: e.target.value})}} />
-            </Grid>
-          </Grid> */}
+          <Stack direction="row" spacing={2}>
+            <Button variant="contained" type="submit">
+              Update
+            </Button>
+          </Stack>
 
           <Button onClick={manualArchive}>Create backup archive</Button>
         </Stack>
+
       </Form>
     </>
   );

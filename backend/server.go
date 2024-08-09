@@ -1,6 +1,8 @@
 package main
 
 import (
+	"net/http"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	api "github.com/mannx/Bluebook/api"
@@ -112,5 +114,5 @@ func aboutPage(c echo.Context) error {
 		Branch,
 	}
 
-	return api.ReturnApiRequest(c, false, info, "")
+	return c.JSON(http.StatusOK, &info)
 }

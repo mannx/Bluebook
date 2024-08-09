@@ -13,19 +13,23 @@ export async function loader() {
   return { data };
 }
 
-export default function AboutPage() {
-  const { data } = useLoaderData();
+interface AboutInfo {
+  Branch: string;
+  Commit: string;
+}
 
-  const output = ErrorOrData(data, (d) => {
-    return <>Version: {d.Branch}-{d.Commit}</>
-  });
+export default function AboutPage() {
+  // const { data } = useLoaderData();
+  const {data}:AboutInfo=useLoaderData();
+
+  // const output = ErrorOrData(data, (d) => {
+  //   return <>Version: {d.Branch}-{d.Commit}</>
+  // });
 
   return (
-    <>
       <Box>
         <Typography variant="h3">About</Typography>
-        {output}
+        Version: {data.Branch}-{data.Commit}
       </Box>
-    </>
   );
 }
