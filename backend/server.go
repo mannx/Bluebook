@@ -2,11 +2,16 @@ package main
 
 import (
 	"net/http"
+	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	api "github.com/mannx/Bluebook/api"
 	api2 "github.com/mannx/Bluebook/api2"
+	env "github.com/mannx/Bluebook/environ"
+	"github.com/mannx/Bluebook/models"
 )
 
 func initServer() *echo.Echo {
@@ -94,12 +99,22 @@ func initServer() *echo.Echo {
 	e.POST("/api/hockey/import", func(c echo.Context) error { return api.HockeyManualImportHandler(c, DB) })
 	e.GET("/api/hockey/merge", func(c echo.Context) error { return api.HockeyDebugMerge(DB) })
 
+	// test api function
+	// delete once no longer required
+	// retunrs the index.html file locally cached instead of fetching each time
+	e.GET("/api/hockey/raw", getRawHockeyFile)
+
 	e.POST("/api/settings/set", func(c echo.Context) error { return api.HandleSettingsSet(c, DB) })
 	e.GET("/api/settings/get", func(c echo.Context) error { return api.HandleSettingsGet(c, DB) })
 
 	e.GET("/api/raw/daydata", func(c echo.Context) error { return api2.HandleRawDayData(c, DB) })
 
 	e.GET("/api/about", aboutPage)
+
+	// typescript frontend dev api points -- Delete after conversion complete
+	e.GET("/api/test/ok", testApiOK)
+	e.GET("/api/test/fail", testApiFail)
+	e.GET("/api/test/bad", testApiBad)
 	return e
 }
 
@@ -115,4 +130,71 @@ func aboutPage(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, &info)
+}
+
+func testApiOK(c echo.Context) error {
+	type TestInfo struct {
+		Number int
+		Msg    string
+	}
+
+	ti := TestInfo{
+		Number: 42,
+		Msg:    "This is a test message",
+	}
+
+	rmsg := models.ApiTestMessage{
+		Error:   false,
+		Message: "",
+		Data:    ti,
+	}
+
+	return c.JSON(http.StatusOK, &rmsg)
+}
+
+func testApiFail(c echo.Context) error {
+	r := models.ApiTestMessage{
+		Error:   true,
+		Message: "Failure success",
+	}
+
+	return c.JSON(http.StatusOK, &r)
+}
+
+func testApiBad(c echo.Context) error {
+	type BadApi struct {
+		Float  float64
+		ApiVal string
+	}
+
+	r := BadApi{
+		Float:  3.14,
+		ApiVal: "Api Val String",
+	}
+
+	return c.JSON(http.StatusOK, &r)
+}
+
+func getRawHockeyFile(c echo.Context) error {
+	// read in the cached index.html from /data
+	fname := filepath.Join(env.Environment.DataPath, "index.html")
+	f, err := os.ReadFile(fname)
+	if err != nil {
+		return api.LogAndReturnError(c, "Unable to read /data/index.html", err)
+	}
+
+	// convert to a string and extract the json data we want
+	datastr := string(f[:])
+	lines := strings.Split(datastr, "\n")
+
+	// find the line we want
+	for _, l := range lines {
+		if strings.Contains(l, "data:") {
+			// found it, split and return
+			data := l[10 : len(l)-3]
+			return api.ReturnApiRequest(c, false, data, "")
+		}
+	}
+
+	return api.ReturnApiRequest(c, true, nil, "Unable to get data to parse")
 }

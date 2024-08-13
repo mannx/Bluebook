@@ -11,5 +11,10 @@ type ApiReturnMessage struct {
 	Error   bool   // if true, message contains the error message
 	Data    string // json encoded data
 	Message string // error message if Error==true, message to display to user if Error==false, empty if nothing to show
+}
 
+type ApiTestMessage struct {
+	Error   bool
+	Message string
+	Data    interface{}
 }

@@ -20,16 +20,16 @@ interface AboutInfo {
 
 export default function AboutPage() {
   // const { data } = useLoaderData();
-  const {data}:AboutInfo=useLoaderData();
+  const { data }: AboutInfo = useLoaderData();
 
   // const output = ErrorOrData(data, (d) => {
   //   return <>Version: {d.Branch}-{d.Commit}</>
   // });
 
   return (
-      <Box>
-        <Typography variant="h3">About</Typography>
-        Version: {data.Branch}-{data.Commit}
-      </Box>
+    <Box>
+      <Typography variant="h3">About</Typography>
+      Version: {data.Branch}-{data.Commit}
+    </Box>
   );
 }

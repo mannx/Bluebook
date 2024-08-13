@@ -60,6 +60,7 @@ export const UrlApiHockeyData = "http://localhost:8080/api/hockey/data";
 export const UrlApiHockeyDataYear =
   "http://localhost:8080/api/hockey/data/years"; // used to get range of years we have data for
 export const UrlApiHockeyImportUrl = "http://localhost:8080/api/hockey/import";
+export const UrlApiHockeyRaw = "http://localhost:8080/api/hockey/raw"; // get the raw json of the hockey data
 
 export const UrlApi2AverageStats = "http://localhost:8080/api/stats/average";
 
