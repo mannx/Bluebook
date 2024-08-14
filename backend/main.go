@@ -63,6 +63,10 @@ func main() {
 	log.Info().Msg("Auto migrating the database...")
 	migrateDB()
 
+	// JSON temp test
+	// api.HockeyJSONTest(DB)
+	// return
+
 	// check for any duplicate day entries
 	if !env.Environment.IgnoreChecks {
 		err = checkDuplicateEntries()

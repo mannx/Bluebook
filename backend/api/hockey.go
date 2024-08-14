@@ -1,7 +1,10 @@
 package api
 
 import (
+	"encoding/json"
+	"errors"
 	"net/http"
+	"os"
 	"os/exec"
 	"path/filepath"
 	"strconv"
@@ -245,4 +248,50 @@ func HockeyImportCronJob(db *gorm.DB) {
 	}
 
 	go runImportScript(settings.HockeyURL, db)
+}
+
+func HockeyJSONTest(db *gorm.DB) error {
+	data, err := getRawHockeyFile()
+	if err != nil {
+		log.Error().Err(err).Msgf("Unable to rad index.html for JSONTest")
+		return err
+	}
+
+	var jData []interface{}
+	err = json.Unmarshal([]byte(data), &jData)
+	if err != nil {
+		log.Error().Err(err).Msgf("unable to unmarshall data")
+		return err
+	}
+
+	// for i, n := range jData {
+	// 	fmt.Println("Game #%v", n[0])
+
+	// }
+
+	return nil
+}
+
+func getRawHockeyFile() (string, error) {
+	// read in the cached index.html from /data
+	fname := filepath.Join(env.Environment.DataPath, "index.html")
+	f, err := os.ReadFile(fname)
+	if err != nil {
+		return "", err
+	}
+
+	// convert to a string and extract the json data we want
+	datastr := string(f[:])
+	lines := strings.Split(datastr, "\n")
+
+	// find the line we want
+	for _, l := range lines {
+		if strings.Contains(l, "data:") {
+			// found it, split and return
+			data := l[10 : len(l)-3]
+			return data, nil
+		}
+	}
+
+	return "", errors.New("Unable to parse data from /data/index.html")
 }

@@ -10,7 +10,8 @@ export async function loader() {
 
 export default function HockeyParse() {
   const raw = useLoaderData();
-  const data = JSON.parse(raw.data.Data);
+  const d1 = JSON.parse(raw.data.Data);
+  const data = JSON.parse(d1);  // data is now a json object
 
   return <>Parsing data here</>;
 }
