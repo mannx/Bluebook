@@ -102,7 +102,7 @@ import AboutPage, { loader as aboutLoader } from "./components/About/About.tsx";
 import TestApi, { loader as testLoader } from "./components/Test/Test.tsx";
 import HockeyParse, {
   loader as hpLoader,
-} from "./components/Hockey/HockeyParse.jsx";
+} from "./components/Hockey/HockeyParse.tsx";
 
 import "./index.css";
 import "@fontsource/roboto/300.css";

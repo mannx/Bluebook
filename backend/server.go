@@ -96,8 +96,9 @@ func initServer() *echo.Echo {
 
 	e.GET("/api/stats/average", func(c echo.Context) error { return api2.StatsAverageSalesByDayHandler(c, DB) })
 
-	e.POST("/api/hockey/import", func(c echo.Context) error { return api.HockeyManualImportHandler(c, DB) })
-	e.GET("/api/hockey/merge", func(c echo.Context) error { return api.HockeyDebugMerge(DB) })
+	// e.POST("/api/hockey/import", func(c echo.Context) error { return api.HockeyManualImportHandler(c, DB) })
+	// e.GET("/api/hockey/merge", func(c echo.Context) error { return api.HockeyDebugMerge(DB) })
+	e.POST("/api/hockey/import2", func(c echo.Context) error { return api.HockeyImport(c, DB) })
 
 	// test api function
 	// delete once no longer required

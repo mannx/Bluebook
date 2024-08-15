@@ -1,20 +1,16 @@
 package api
 
 import (
-	"encoding/json"
 	"errors"
 	"net/http"
-	"os"
-	"os/exec"
-	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/labstack/echo/v4"
-	env "github.com/mannx/Bluebook/environ"
 	models "github.com/mannx/Bluebook/models"
 	"github.com/rs/zerolog/log"
+	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
 
@@ -125,173 +121,296 @@ func HockeyDataHandler(c echo.Context, db *gorm.DB) error {
 	return c.JSON(http.StatusOK, &hdata)
 }
 
-func HockeyManualImportHandler(c echo.Context, db *gorm.DB) error {
-	// we have a url to use to fetch been post'd to us
-	type urlData struct {
-		Data string `json:"Data"`
+func HockeyImport(c echo.Context, db *gorm.DB) error {
+	type HockeyScheduleImport struct {
+		Date       string
+		Away       string
+		Home       string
+		GFAway     string
+		GFHome     string
+		Attendance string
+		Arena      string
+		HomeImage  string
+		AwayImage  string
 	}
 
-	var data urlData
+	var data []HockeyScheduleImport
+
 	if err := c.Bind(&data); err != nil {
-		return LogAndReturnError(c, "Unable to get fetch url for manual hockey import", err)
+		return LogAndReturnError(c, "Unable to bind hockey scheudle data", err)
 	}
 
-	// start a goroutine to call the scripts to perform the import
-	go runImportScript(data.Data, db)
+	for _, d := range data {
+		// convert to proper struct and store in db
+		date, err := time.Parse("2006-01-02", d.Date)
+		if err != nil {
+			log.Error().Err(err).Msgf("Unable to parse date [%v], exiting early", d.Date)
+			return ReturnApiRequest(c, true, nil, "Unabe to parse date")
+		}
 
-	return ReturnServerMessage(c, "Success?", false)
+		gfaway, err := strconv.ParseUint(d.GFAway, 10, 32)
+		if err != nil {
+			// if d.GFAway is "" then game hasnt been played
+			// if d.GFAway != "" {
+			if d.GFAway != " " {
+				log.Error().Msgf("Unable to parse away score: [%v]", d.GFAway)
+				log.Error().Msgf("  for date: %v", d.Date)
+				return LogAndReturnError(c, "Unable to parse away score", err)
+			} else {
+				log.Info().Msgf("away score empty...setting to 0")
+				gfaway = 0
+			}
+		}
+
+		gfhome, err := strconv.ParseUint(d.GFHome, 10, 32)
+		if err != nil {
+			if d.GFHome != " " {
+				log.Error().Msgf("Unable to parse home score: [%v]", d.GFHome)
+				log.Error().Msgf("  for date: %v", d.Date)
+				return LogAndReturnError(c, "Unable to parse home score", err)
+			} else {
+				log.Info().Msgf("home score empty...setting to 0")
+				gfhome = 0
+			}
+		}
+
+		atten, err := strconv.ParseUint(d.Attendance, 10, 32)
+		if err != nil {
+			if d.Attendance != "" {
+				return LogAndReturnError(c, "Unable to parse attendance", err)
+			} else {
+				log.Info().Msgf("attendance empty...setting to 0")
+				atten = 0
+			}
+		}
+
+		// extract the image filename
+		// idx := strings.LastIndex(d.HomeImage, "/")
+		// if idx == -1 {
+		// 	log.Error().Msgf("Unable to extract home image.  unable to find last /")
+		// 	log.Error().Msgf("  Skipping home image for team %v", d.Home)
+		// } else {
+		// 	hi := d.HomeImage[idx+1:]
+		// 	log.Debug().Msgf("Home image for team %v = %v", d.Home, hi)
+		// }
+
+		himage, err := extractFilename(d.HomeImage)
+		if err != nil {
+			log.Error().Err(err).Msgf("Unable to extract home image for team %v .... skipping", d.Home)
+		}
+
+		aimage, err := extractFilename(d.AwayImage)
+		if err != nil {
+			log.Error().Err(err).Msgf("Unable to extract away image for team %v .... skipping", d.Away)
+		}
+
+		hs := models.HockeySchedule{
+			Date:       datatypes.Date(date),
+			Away:       d.Away,
+			Home:       d.Home,
+			GFAway:     uint(gfaway),
+			GFHome:     uint(gfhome),
+			Attendance: uint(atten),
+			Arena:      d.Arena,
+			HomeImage:  himage,
+			AwayImage:  aimage,
+		}
+
+		// log.Debug().Msgf("Away: %v", hs.Away)
+		// log.Debug().Msgf("GF: %v", hs.GFAway)
+		log.Debug().Msgf("Import game data for date [%v]", d.Date)
+		db.Save(&hs)
+	}
+
+	return ReturnApiRequest(c, false, nil, "")
 }
 
-func runImportScript(url string, db *gorm.DB) {
-	log.Info().Msg("Running hockey import script...")
+// extract the image file name from the home/away image fields
+func extractFilename(fname string) (string, error) {
+	idx := strings.LastIndex(fname, "/")
+	if idx == -1 {
+		// log.Error().Msgf("Unable to extract image filename.  unable to find last /")
+		return "", errors.New("Unable to extract image filename")
+	} else {
+		hi := fname[idx+1:]
 
-	// get the path to the ghd.sh script in the /scripts directory
-	scriptPath := filepath.Join(env.Environment.ScriptsPath, "ghd.sh")
-	dbPath := filepath.Join(env.Environment.DataPath, "db.db")
+		// fix several filenames
+		switch hi {
+		case "3.jpg":
+			hi = "3.png"
+		}
 
-	cmd := exec.Command(scriptPath, url, dbPath)
-
-	var out strings.Builder
-	cmd.Stdout = &out
-
-	err := cmd.Run()
-	if err != nil {
-		log.Error().Err(err).Msg("Unable to run ghd.sh script!")
-		return
-	}
-
-	if len(out.String()) > 0 {
-		log.Info().Msg(out.String())
-	}
-
-	err = mergeHockeyTables(db)
-	if err != nil {
-		log.Error().Err(err).Msg("Error merging hockey tables")
+		return hi, nil
 	}
 }
 
-func HockeyDebugMerge(db *gorm.DB) error {
-	err := mergeHockeyTables(db)
-	if err != nil {
-		log.Error().Err(err).Msg("Error merging hockey tables")
-	}
+// func HockeyManualImportHandler(c echo.Context, db *gorm.DB) error {
+// 	// we have a url to use to fetch been post'd to us
+// 	type urlData struct {
+// 		Data string `json:"Data"`
+// 	}
 
-	return err
-}
+// 	var data urlData
+// 	if err := c.Bind(&data); err != nil {
+// 		return LogAndReturnError(c, "Unable to get fetch url for manual hockey import", err)
+// 	}
+
+// 	// start a goroutine to call the scripts to perform the import
+// 	go runImportScript(data.Data, db)
+
+// 	return ReturnServerMessage(c, "Success?", false)
+// }
+
+// func runImportScript(url string, db *gorm.DB) {
+// 	log.Info().Msg("Running hockey import script...")
+
+// 	// get the path to the ghd.sh script in the /scripts directory
+// 	scriptPath := filepath.Join(env.Environment.ScriptsPath, "ghd.sh")
+// 	dbPath := filepath.Join(env.Environment.DataPath, "db.db")
+
+// 	cmd := exec.Command(scriptPath, url, dbPath)
+
+// 	var out strings.Builder
+// 	cmd.Stdout = &out
+
+// 	err := cmd.Run()
+// 	if err != nil {
+// 		log.Error().Err(err).Msg("Unable to run ghd.sh script!")
+// 		return
+// 	}
+
+// 	if len(out.String()) > 0 {
+// 		log.Info().Msg(out.String())
+// 	}
+
+// 	err = mergeHockeyTables(db)
+// 	if err != nil {
+// 		log.Error().Err(err).Msg("Error merging hockey tables")
+// 	}
+// }
+
+// func HockeyDebugMerge(db *gorm.DB) error {
+// 	err := mergeHockeyTables(db)
+// 	if err != nil {
+// 		log.Error().Err(err).Msg("Error merging hockey tables")
+// 	}
+
+// 	return err
+// }
 
 // merge the hockey import table to the schedule table.  update the schedule table if an entry already exists
-func mergeHockeyTables(db *gorm.DB) error {
-	var data []models.HockeyScheduleImport
+// func mergeHockeyTables(db *gorm.DB) error {
+// 	var data []models.HockeyScheduleImport
 
-	res := db.Find(&data)
-	if res.Error != nil {
-		log.Error().Err(res.Error).Msgf("Unable to retrieve records from HockeyScheduleImports table")
-		return res.Error
-	}
+// 	res := db.Find(&data)
+// 	if res.Error != nil {
+// 		log.Error().Err(res.Error).Msgf("Unable to retrieve records from HockeyScheduleImports table")
+// 		return res.Error
+// 	}
 
-	for _, e := range data {
-		// if the current date already exists, update it otherwise we create a new entry
-		obj := models.HockeySchedule{}
+// 	for _, e := range data {
+// 		// if the current date already exists, update it otherwise we create a new entry
+// 		obj := models.HockeySchedule{}
 
-		res = db.Find(&obj, "Date = ?", e.Date)
-		if res.Error != nil {
-			log.Error().Err(res.Error).Msgf("Unable to retrieve hockey schedule for date check...skipping")
-			continue
-		}
+// 		res = db.Find(&obj, "Date = ?", e.Date)
+// 		if res.Error != nil {
+// 			log.Error().Err(res.Error).Msgf("Unable to retrieve hockey schedule for date check...skipping")
+// 			continue
+// 		}
 
-		if res.RowsAffected == 0 {
-			// copy everything over
-			obj.Home = e.Home
-			obj.Away = e.Away
-			obj.Date = e.Date
-			obj.Arena = e.Arena
-			obj.HomeImage = e.HomeImage
-			obj.AwayImage = e.AwayImage
-		}
+// 		if res.RowsAffected == 0 {
+// 			// copy everything over
+// 			obj.Home = e.Home
+// 			obj.Away = e.Away
+// 			obj.Date = e.Date
+// 			obj.Arena = e.Arena
+// 			obj.HomeImage = e.HomeImage
+// 			obj.AwayImage = e.AwayImage
+// 		}
 
-		// convert since the python script might store them as a string instead of an integer
-		// TODO: fix the script so we don't have to convert here and just store them as uints
-		home, _ := strconv.Atoi(e.GFHome)
-		away, _ := strconv.Atoi(e.GFAway)
-		att, _ := strconv.Atoi(e.Attendance)
+// 		// convert since the python script might store them as a string instead of an integer
+// 		// TODO: fix the script so we don't have to convert here and just store them as uints
+// 		home, _ := strconv.Atoi(e.GFHome)
+// 		away, _ := strconv.Atoi(e.GFAway)
+// 		att, _ := strconv.Atoi(e.Attendance)
 
-		obj.GFHome = uint(home)
-		obj.GFAway = uint(away)
-		obj.Attendance = uint(att)
+// 		obj.GFHome = uint(home)
+// 		obj.GFAway = uint(away)
+// 		obj.Attendance = uint(att)
 
-		db.Save(&obj)
-	}
+// 		db.Save(&obj)
+// 	}
 
-	return nil
-}
+// 	return nil
+// }
 
-func HockeyImportCronJob(db *gorm.DB) {
-	log.Info().Msgf("Running Hockey Import Cron Job!")
+// func HockeyImportCronJob(db *gorm.DB) {
+// 	log.Info().Msgf("Running Hockey Import Cron Job!")
 
-	// retrieve the url from the settings table and run the script
-	var settings models.BluebookSettings
+// 	// retrieve the url from the settings table and run the script
+// 	var settings models.BluebookSettings
 
-	res := db.Find(&settings)
-	if res.Error != nil {
-		log.Error().Err(res.Error).Msg("Unable to retrieve settings table.  Aborting hockey schedule import")
-		return
-	}
+// 	res := db.Find(&settings)
+// 	if res.Error != nil {
+// 		log.Error().Err(res.Error).Msg("Unable to retrieve settings table.  Aborting hockey schedule import")
+// 		return
+// 	}
 
-	// only continue if we are set to run
-	if !settings.RunHockeyFetch {
-		return
-	}
-	// make sure we have a non-empty url string
-	if len(settings.HockeyURL) == 0 {
-		log.Warn().Msg("Aborting hockey schedule import.  HockeyURL is empty")
-		return
-	}
+// 	// only continue if we are set to run
+// 	if !settings.RunHockeyFetch {
+// 		return
+// 	}
+// 	// make sure we have a non-empty url string
+// 	if len(settings.HockeyURL) == 0 {
+// 		log.Warn().Msg("Aborting hockey schedule import.  HockeyURL is empty")
+// 		return
+// 	}
 
-	go runImportScript(settings.HockeyURL, db)
-}
+// 	go runImportScript(settings.HockeyURL, db)
+// }
 
-func HockeyJSONTest(db *gorm.DB) error {
-	data, err := getRawHockeyFile()
-	if err != nil {
-		log.Error().Err(err).Msgf("Unable to rad index.html for JSONTest")
-		return err
-	}
+// func HockeyJSONTest(db *gorm.DB) error {
+// 	data, err := getRawHockeyFile()
+// 	if err != nil {
+// 		log.Error().Err(err).Msgf("Unable to rad index.html for JSONTest")
+// 		return err
+// 	}
 
-	var jData []interface{}
-	err = json.Unmarshal([]byte(data), &jData)
-	if err != nil {
-		log.Error().Err(err).Msgf("unable to unmarshall data")
-		return err
-	}
+// 	var jData []interface{}
+// 	err = json.Unmarshal([]byte(data), &jData)
+// 	if err != nil {
+// 		log.Error().Err(err).Msgf("unable to unmarshall data")
+// 		return err
+// 	}
 
-	// for i, n := range jData {
-	// 	fmt.Println("Game #%v", n[0])
+// 	// for i, n := range jData {
+// 	// 	fmt.Println("Game #%v", n[0])
 
-	// }
+// 	// }
 
-	return nil
-}
+// 	return nil
+// }
 
-func getRawHockeyFile() (string, error) {
-	// read in the cached index.html from /data
-	fname := filepath.Join(env.Environment.DataPath, "index.html")
-	f, err := os.ReadFile(fname)
-	if err != nil {
-		return "", err
-	}
+// func getRawHockeyFile() (string, error) {
+// 	// read in the cached index.html from /data
+// 	fname := filepath.Join(env.Environment.DataPath, "index.html")
+// 	f, err := os.ReadFile(fname)
+// 	if err != nil {
+// 		return "", err
+// 	}
 
-	// convert to a string and extract the json data we want
-	datastr := string(f[:])
-	lines := strings.Split(datastr, "\n")
+// 	// convert to a string and extract the json data we want
+// 	datastr := string(f[:])
+// 	lines := strings.Split(datastr, "\n")
 
-	// find the line we want
-	for _, l := range lines {
-		if strings.Contains(l, "data:") {
-			// found it, split and return
-			data := l[10 : len(l)-3]
-			return data, nil
-		}
-	}
+// 	// find the line we want
+// 	for _, l := range lines {
+// 		if strings.Contains(l, "data:") {
+// 			// found it, split and return
+// 			data := l[10 : len(l)-3]
+// 			return data, nil
+// 		}
+// 	}
 
-	return "", errors.New("Unable to parse data from /data/index.html")
-}
+// 	return "", errors.New("Unable to parse data from /data/index.html")
+// }

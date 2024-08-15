@@ -5,18 +5,14 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"os/exec"
 	"os/signal"
 	"path/filepath"
-	"strings"
 	"time"
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
-
-	"github.com/robfig/cron/v3"
 
 	api "github.com/mannx/Bluebook/api"
 	env "github.com/mannx/Bluebook/environ"
@@ -63,10 +59,6 @@ func main() {
 	log.Info().Msg("Auto migrating the database...")
 	migrateDB()
 
-	// JSON temp test
-	// api.HockeyJSONTest(DB)
-	// return
-
 	// check for any duplicate day entries
 	if !env.Environment.IgnoreChecks {
 		err = checkDuplicateEntries()
@@ -77,8 +69,8 @@ func main() {
 		log.Info().Msg("Skipping duplicate day check...")
 	}
 
-	log.Info().Msg("Starting cron jobs...")
-	startJobs()
+	// log.Info().Msg("Starting cron jobs...")
+	// startJobs()
 
 	log.Info().Msg("Initialiing server and middleware")
 	e := initServer()
@@ -119,7 +111,7 @@ func migrateDB() {
 	DB.AutoMigrate(&models.DayDataBackup{})
 
 	DB.AutoMigrate(&models.HockeySchedule{})
-	DB.AutoMigrate(&models.HockeyScheduleImport{})
+	// DB.AutoMigrate(&models.HockeyScheduleImport{})
 
 	DB.AutoMigrate(&models.BluebookSettings{})
 }
@@ -174,35 +166,35 @@ func checkDuplicateEntries() error {
 	return nil
 }
 
-func startJobs() {
-	c := cron.New()
+// func startJobs() {
+// c := cron.New()
 
-	_, err := c.AddFunc(env.Environment.CronTime, func() { api.HockeyImportCronJob(DB) })
-	if err != nil {
-		log.Error().Err(err).Msgf("Unable to add cron job for hockey import.  cron string [%v]", env.Environment.CronTime)
-	}
+// _, err := c.AddFunc(env.Environment.CronTime, func() { api.HockeyImportCronJob(DB) })
+// if err != nil {
+// 	log.Error().Err(err).Msgf("Unable to add cron job for hockey import.  cron string [%v]", env.Environment.CronTime)
+// }
 
-	_, err = c.AddFunc(env.Environment.BackupTime, archiveCronJob)
-	if err != nil {
-		log.Error().Err(err).Msgf("Unable to add cron job for archive script. cron string [%v]", env.Environment.BackupTime)
-	}
+// _, err = c.AddFunc(env.Environment.BackupTime, archiveCronJob)
+// if err != nil {
+// 	log.Error().Err(err).Msgf("Unable to add cron job for archive script. cron string [%v]", env.Environment.BackupTime)
+// }
 
-	c.Start()
-}
+// c.Start()
+// }
 
-func archiveCronJob() {
-	scriptPath := filepath.Join(env.Environment.ScriptsPath, "ar.sh")
-	cmd := exec.Command(scriptPath)
+// func archiveCronJob() {
+// 	scriptPath := filepath.Join(env.Environment.ScriptsPath, "ar.sh")
+// 	cmd := exec.Command(scriptPath)
 
-	var out strings.Builder
-	cmd.Stdout = &out
+// 	var out strings.Builder
+// 	cmd.Stdout = &out
 
-	err := cmd.Run()
-	if err != nil {
-		log.Error().Err(err).Msg("Unable to run archive script")
-	}
+// 	err := cmd.Run()
+// 	if err != nil {
+// 		log.Error().Err(err).Msg("Unable to run archive script")
+// 	}
 
-	if len(out.String()) > 0 {
-		log.Info().Msg(out.String())
-	}
-}
+// 	if len(out.String()) > 0 {
+// 		log.Info().Msg(out.String())
+// 	}
+// }
