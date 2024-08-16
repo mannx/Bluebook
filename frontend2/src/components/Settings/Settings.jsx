@@ -4,7 +4,6 @@ import {
   GetPostOptions,
   UrlApiSettingsGet,
   UrlApiSettingsSet,
-  UrlApiHockeyImport,
   UrlApiManualArchive,
 } from "../URLs.jsx";
 
@@ -36,7 +35,6 @@ export async function action({ request, params }) {
     DisplayHockey: updates.display === "on",
     PrintHockey: updates.print === "on",
     HockeyHomeTeam: updates.home_team,
-    RunHockeyFetch: updates.runHockey === "on",
     ManagerName: updates.managerName,
     StoreNumber: updates.storeNumber,
   };
@@ -55,7 +53,6 @@ export default function Settings() {
     print: data.PrintHockey,
     hockey_url: data.HockeyURL,
     home_team: data.HockeyHomeTeam,
-    runHockey: data.RunHockeyFetch,
     managerName: data.ManagerName,
     storeNumber: data.StoreNumber,
   });
@@ -133,17 +130,6 @@ export default function Settings() {
             >
               Fetch
             </Button>
-            <FormControlLabel
-              control={
-                <Switch
-                  name="runHockey"
-                  id="runHockey"
-                  checked={state.runHockey}
-                  onChange={handleChange}
-                />
-              }
-              label="Run Hockey Scheduler"
-            />
           </Stack>
 
           <Stack direction="row" spacing={2}>

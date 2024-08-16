@@ -1,11 +1,8 @@
-import { useLoaderData } from "react-router-dom";
 import {
   GetPostOptions,
   UrlApiHockeyRaw,
   UrlApiHockeyImport,
 } from "../URLs.jsx";
-
-import Button from "@mui/material/Button";
 
 async function getRawData(url: string) {
   const opts = GetPostOptions(JSON.stringify(url));
@@ -27,7 +24,7 @@ interface HockeyData {
   HomeImage: string;
 }
 
-export default async function HockeyParse(url) {
+export default async function HockeyParse(url: string) {
   const raw = await getRawData(url);
   const d1 = JSON.parse(raw.data.Data);
   const data = JSON.parse(d1); // data is now a json object
@@ -52,15 +49,7 @@ export default async function HockeyParse(url) {
     arr.push(val);
   }
 
-  // runImport(arr);
   const opt = GetPostOptions(JSON.stringify(arr));
   const resp = await fetch(UrlApiHockeyImport, opt);
   const d = await resp.json();
 }
-//
-// async function runImport(data: HockeyData[]) {
-//   const opt = GetPostOptions(JSON.stringify(data));
-//   const resp = await fetch(UrlApiHockeyImport, opt);
-//   const d = await resp.json();
-// }
-
