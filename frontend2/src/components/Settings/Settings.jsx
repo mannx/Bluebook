@@ -4,9 +4,11 @@ import {
   GetPostOptions,
   UrlApiSettingsGet,
   UrlApiSettingsSet,
-  UrlApiHockeyImportUrl,
+  UrlApiHockeyImport,
   UrlApiManualArchive,
 } from "../URLs.jsx";
+
+import HockeyParse from "../Hockey/HockeyParse.tsx";
 
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
@@ -69,12 +71,7 @@ export default function Settings() {
   };
 
   const manualFetch = async (url) => {
-    const body = {
-      Data: url,
-    };
-
-    const opts = GetPostOptions(JSON.stringify(body));
-    await fetch(UrlApiHockeyImportUrl, opts);
+    await HockeyParse(url);
   };
 
   const manualArchive = async () => {
@@ -209,7 +206,6 @@ export default function Settings() {
 
           <Button onClick={manualArchive}>Create backup archive</Button>
         </Stack>
-
       </Form>
     </>
   );

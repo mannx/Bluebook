@@ -48,6 +48,9 @@ func main() {
 
 	dbName = filepath.Join(env.Environment.DataPath, "db.db")
 
+	log.Info().Msg("Backing up db before initialization and migration...")
+	backupDB()
+
 	log.Info().Msg("Initializing database...")
 	dbo, err := gorm.Open(sqlite.Open(dbName), &gorm.Config{})
 	if err != nil {
@@ -68,9 +71,6 @@ func main() {
 	} else {
 		log.Info().Msg("Skipping duplicate day check...")
 	}
-
-	// log.Info().Msg("Starting cron jobs...")
-	// startJobs()
 
 	log.Info().Msg("Initialiing server and middleware")
 	e := initServer()
@@ -111,7 +111,6 @@ func migrateDB() {
 	DB.AutoMigrate(&models.DayDataBackup{})
 
 	DB.AutoMigrate(&models.HockeySchedule{})
-	// DB.AutoMigrate(&models.HockeyScheduleImport{})
 
 	DB.AutoMigrate(&models.BluebookSettings{})
 }
@@ -166,35 +165,6 @@ func checkDuplicateEntries() error {
 	return nil
 }
 
-// func startJobs() {
-// c := cron.New()
-
-// _, err := c.AddFunc(env.Environment.CronTime, func() { api.HockeyImportCronJob(DB) })
-// if err != nil {
-// 	log.Error().Err(err).Msgf("Unable to add cron job for hockey import.  cron string [%v]", env.Environment.CronTime)
-// }
-
-// _, err = c.AddFunc(env.Environment.BackupTime, archiveCronJob)
-// if err != nil {
-// 	log.Error().Err(err).Msgf("Unable to add cron job for archive script. cron string [%v]", env.Environment.BackupTime)
-// }
-
-// c.Start()
-// }
-
-// func archiveCronJob() {
-// 	scriptPath := filepath.Join(env.Environment.ScriptsPath, "ar.sh")
-// 	cmd := exec.Command(scriptPath)
-
-// 	var out strings.Builder
-// 	cmd.Stdout = &out
-
-// 	err := cmd.Run()
-// 	if err != nil {
-// 		log.Error().Err(err).Msg("Unable to run archive script")
-// 	}
-
-// 	if len(out.String()) > 0 {
-// 		log.Info().Msg(out.String())
-// 	}
-// }
+func backupDB() {
+	log.Debug().Msgf(" -- DB backup functions go here -- ")
+}

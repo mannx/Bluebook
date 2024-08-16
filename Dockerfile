@@ -30,9 +30,8 @@ WORKDIR /app
 
 COPY ./frontend2 .
 
-# Copy over and run frontend pre-build script to run before building
-COPY front-build.sh .
-RUN ./front-build.sh
+# fix urls for prod
+RUN sed -i 's|http://localhost:8080||' src/components/URLs.jsx
 
 RUN npm install 
 RUN npm run build
@@ -46,9 +45,8 @@ FROM alpine:3.17
 
 # make sure required packages are installed
 # poppler-utils required for pdf parsing 
-# python3 required for some python scripts found in /scripts
 RUN apk update
-RUN apk add tzdata poppler-utils sqlite python3 
+RUN apk add tzdata poppler-utils sqlite 
 
 WORKDIR /
 

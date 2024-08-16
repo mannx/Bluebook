@@ -22,21 +22,3 @@ type HockeySchedule struct {
 	HomeImage string // url of image to use for this team
 	AwayImage string // url of image to use for this team
 }
-
-// This table is used by the fetch script to add everything in
-// after its updated, we merge into the main HockeySchedule table
-// everything is stored as strings since this table is filled out by the python script
-// and currently will insert an empty string instead of a 0 for score/attendance
-// type HockeyScheduleImport struct {
-// 	gorm.Model
-
-// 	Date       datatypes.Date
-// 	Away       string
-// 	Home       string
-// 	GFAway     string
-// 	GFHome     string
-// 	Attendance string
-// 	Arena      string
-// 	HomeImage  string
-// 	AwayImage  string
-// }

@@ -59,9 +59,8 @@ export const UrlApiCommentSearch = "http://localhost:8080/api/comment/search"; /
 export const UrlApiHockeyData = "http://localhost:8080/api/hockey/data";
 export const UrlApiHockeyDataYear =
   "http://localhost:8080/api/hockey/data/years"; // used to get range of years we have data for
-export const UrlApiHockeyImportUrl = "http://localhost:8080/api/hockey/import";
 export const UrlApiHockeyRaw = "http://localhost:8080/api/hockey/raw"; // get the raw json of the hockey data
-export const UrlApiHockeyImport = "http://localhost:8080/api/hockey/import2";
+export const UrlApiHockeyImport = "http://localhost:8080/api/hockey/import";
 
 export const UrlApi2AverageStats = "http://localhost:8080/api/stats/average";
 
@@ -75,14 +74,7 @@ export const UrlApiSettingsSet = "http://localhost:8080/api/settings/set"; // up
 
 export const UrlApi2RawDayData = "http://localhost:8080/api/raw/daydata";
 
-// export const UrlVersion = "/api/version";
 export const UrlAbout = "http://localhost:8080/api/about";
-
-// export function UrlGet(name) {
-//   // the localhost part is stripped before building and is only used during dev
-//   // return "http://localhost:8080" + name;
-//   return name;
-// }
 
 // headers sent when doing a POST operation
 const headers = {
@@ -99,7 +91,8 @@ export function GetPostOptions(body) {
   };
 }
 
-// export default UrlGet;
+// default export function
+// if we remove unable to import any fucntions even if noted default
 export default function UrlDefFunc() {
   return "";
 }
