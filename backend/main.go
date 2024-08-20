@@ -48,9 +48,6 @@ func main() {
 
 	dbName = filepath.Join(env.Environment.DataPath, "db.db")
 
-	log.Info().Msg("Backing up db before initialization and migration...")
-	backupDB()
-
 	log.Info().Msg("Initializing database...")
 	dbo, err := gorm.Open(sqlite.Open(dbName), &gorm.Config{})
 	if err != nil {
@@ -163,8 +160,4 @@ func checkDuplicateEntries() error {
 	}
 
 	return nil
-}
-
-func backupDB() {
-	log.Debug().Msgf(" -- DB backup functions go here -- ")
 }
