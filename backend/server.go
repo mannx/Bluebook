@@ -1,10 +1,13 @@
 package main
 
 import (
+	"net/http"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	api "github.com/mannx/Bluebook/api"
 	api2 "github.com/mannx/Bluebook/api2"
+	"github.com/mannx/Bluebook/models"
 )
 
 func initServer() *echo.Echo {
@@ -89,14 +92,76 @@ func initServer() *echo.Echo {
 
 	e.GET("/api/stats/average", func(c echo.Context) error { return api2.StatsAverageSalesByDayHandler(c, DB) })
 
-	e.POST("/api/hockey/import", func(c echo.Context) error { return api.HockeyManualImportHandler(c, DB) })
+	e.POST("/api/hockey/import", func(c echo.Context) error { return api.HockeyImport(c, DB) })
+	e.POST("/api/hockey/raw", api.HockeyGetData) // fetchs raw html from hockey site
 
-	e.GET("/api/settings/get", func(c echo.Context) error { return api.HandleSettingsGet(c, DB, Commit) })
 	e.POST("/api/settings/set", func(c echo.Context) error { return api.HandleSettingsSet(c, DB) })
+	e.GET("/api/settings/get", func(c echo.Context) error { return api.HandleSettingsGet(c, DB) })
 
 	e.GET("/api/raw/daydata", func(c echo.Context) error { return api2.HandleRawDayData(c, DB) })
 
-	e.GET("/api/hockey/merge", func(c echo.Context) error { return api.HockeyDebugMerge(DB) })
+	e.GET("/api/about", aboutPage)
 
+	// typescript frontend dev api points -- Delete after conversion complete
+	e.GET("/api/test/ok", testApiOK)
+	e.GET("/api/test/fail", testApiFail)
+	e.GET("/api/test/bad", testApiBad)
 	return e
+}
+
+func aboutPage(c echo.Context) error {
+	type AboutInfo struct {
+		Commit string
+		Branch string
+	}
+
+	info := AboutInfo{
+		Commit,
+		Branch,
+	}
+
+	return c.JSON(http.StatusOK, &info)
+}
+
+func testApiOK(c echo.Context) error {
+	type TestInfo struct {
+		Number int
+		Msg    string
+	}
+
+	ti := TestInfo{
+		Number: 42,
+		Msg:    "This is a test message",
+	}
+
+	rmsg := models.ApiTestMessage{
+		Error:   false,
+		Message: "",
+		Data:    ti,
+	}
+
+	return c.JSON(http.StatusOK, &rmsg)
+}
+
+func testApiFail(c echo.Context) error {
+	r := models.ApiTestMessage{
+		Error:   true,
+		Message: "Failure success",
+	}
+
+	return c.JSON(http.StatusOK, &r)
+}
+
+func testApiBad(c echo.Context) error {
+	type BadApi struct {
+		Float  float64
+		ApiVal string
+	}
+
+	r := BadApi{
+		Float:  3.14,
+		ApiVal: "Api Val String",
+	}
+
+	return c.JSON(http.StatusOK, &r)
 }

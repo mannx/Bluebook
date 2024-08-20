@@ -72,13 +72,24 @@ func (e *EnvironmentDefinition) Default() {
 func (e *EnvironmentDefinition) parseLogLevel() zerolog.Level {
 	str := strings.ToLower(e.LogLevelString)
 
-	if str == "debug" {
+	// if str == "debug" {
+	// 	return zerolog.DebugLevel
+	// } else if str == "info" {
+	// 	return zerolog.InfoLevel
+	// } else if str == "warn" {
+	// 	return zerolog.WarnLevel
+	// } else if str == "error" {
+	// 	return zerolog.ErrorLevel
+	// }
+
+	switch str {
+	case "debug":
 		return zerolog.DebugLevel
-	} else if str == "info" {
+	case "info":
 		return zerolog.InfoLevel
-	} else if str == "warn" {
+	case "warn":
 		return zerolog.WarnLevel
-	} else if str == "error" {
+	case "error":
 		return zerolog.ErrorLevel
 	}
 

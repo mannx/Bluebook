@@ -8,18 +8,13 @@ import Stack from "@mui/material/Stack";
 import Container from "@mui/material/Container";
 import Switch from "@mui/material/Switch";
 
-import {
-  UrlGet,
-  UrlApiWeekly,
-  UrlApi2WeeklyExport,
-  GetPostOptions,
-} from "../URLs";
+import { UrlApiWeekly, UrlApi2WeeklyExport, GetPostOptions } from "../URLs";
 import { Typography } from "@mui/material";
 // import React from "react";
 
 export async function loader({ params }) {
   const url =
-    UrlGet(UrlApiWeekly) +
+    UrlApiWeekly +
     "?month=" +
     params.month +
     "&day=" +
@@ -44,7 +39,7 @@ export async function action({ request, params }) {
     ...updates,
   };
 
-  const url = UrlGet(UrlApi2WeeklyExport);
+  const url = UrlApi2WeeklyExport;
   const resp = await fetch(url, GetPostOptions(JSON.stringify(body)));
   const data = await resp.json();
 
@@ -68,15 +63,24 @@ export default function Weekly() {
 
   const handleNetSalesChange = (e) => {
     setUseNetSales(e.target.checked);
-  }
+  };
 
-  const mismatch = data.NetSalesMismatch ? <Typography sx={{color: "red"}} variant="h4">Net Sales Mismatch</Typography> : <></>;
+  const mismatch = data.NetSalesMismatch ? (
+    <Typography sx={{ color: "red" }} variant="h4">
+      Net Sales Mismatch
+    </Typography>
+  ) : (
+    <></>
+  );
 
-  const mismatchOutput = <>
-    <td className="Month"><Switch checked={useNetSales} onChange={handleNetSalesChange} /></td>
-    <td className="Month">{data.WisrNetSales}</td>
-  </>;
-
+  const mismatchOutput = (
+    <>
+      <td className="Month">
+        <Switch checked={useNetSales} onChange={handleNetSalesChange} />
+      </td>
+      <td className="Month">{data.WisrNetSales}</td>
+    </>
+  );
 
   return (
     <>
@@ -200,7 +204,12 @@ export default function Weekly() {
             label="Sysco Cost"
             variant="outlined"
           />
-          <input type="hidden" id="netsales" name="netsales" value={useNetSales} />
+          <input
+            type="hidden"
+            id="netsales"
+            name="netsales"
+            value={useNetSales}
+          />
           <Button variant="contained" type="submit">
             Export
           </Button>

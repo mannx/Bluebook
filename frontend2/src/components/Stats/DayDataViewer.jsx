@@ -1,5 +1,5 @@
 import * as React from "react";
-import { UrlGet, UrlApi2RawDayData, UrlApiTop5 } from "../URLs";
+import { UrlApi2RawDayData, UrlApiTop5 } from "../URLs";
 import { Form, useLoaderData, Link } from "react-router-dom";
 
 import TextField from "@mui/material/TextField";
@@ -34,23 +34,23 @@ export async function loader({ params }) {
   }
 
   const q = query.join("&");
-  const url = UrlGet(UrlApi2RawDayData) + "?" + q;
+  const url = UrlApi2RawDayData + "?" + q;
   const resp = await fetch(url);
   const data = await resp.json();
 
   // get list of years for filtering
   // re-use top5 api endpoint
-  const years = await (await fetch(UrlGet(UrlApiTop5))).json();
+  const years = await (await fetch(UrlApiTop5)).json();
 
-  if(years.Error === true) {
+  if (years.Error === true) {
     console.log("error fetching errors.  todo");
 
-    return {data, years: {}};
+    return { data, years: {} };
   }
 
   const yr = JSON.parse(years.Data);
 
-  return { data, years: yr};
+  return { data, years: yr };
 }
 
 const columns = [
@@ -67,7 +67,6 @@ export default function DayDataViewer() {
   const [maxYear, setMaxYear] = React.useState(years[0]);
   const [limit, setLimit] = React.useState(0);
 
-  
   const rows = data.map((obj) => {
     // remove timezone information from date to prevent showing previous day
     const day = dayjs.utc(obj.Date);
@@ -157,4 +156,3 @@ export default function DayDataViewer() {
     </>
   );
 }
-

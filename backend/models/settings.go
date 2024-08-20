@@ -7,13 +7,10 @@ type BluebookSettings struct {
 	gorm.Model
 
 	HockeyURL           string // url used to fetch the hockey schedule
-	RunHockeyFetch      bool   // true if we need to fetch the hockey data periodically
 	DisplayHockeyWeekly bool   `json:"DisplayHockey"` // do we display hockey information on the /today view?
 	PrintHockeyWeekly   bool   `json:"PrintHockey"`   // do we print the hockey info on the /today view?
 	HockeyHomeTeam      string // name of home hockey team to show which games to display on month view
 
 	ManagerName string // name of the mananger to place on the weekly sheet
 	StoreNumber string // store number to place on the weekly sheet
-
-	CommitID string `gorm:"-"`
 }

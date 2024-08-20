@@ -27,7 +27,6 @@ import DialogTitle from "@mui/material/DialogTitle";
 import Autocomplete from "@mui/material/Autocomplete";
 
 import {
-  UrlGet,
   UrlApiWasteNames,
   UrlApiWasteHolding,
   UrlApiWasteHoldingAdd,
@@ -42,14 +41,14 @@ import PortionConverter from "./PortionConverter";
 // load the current waste data in the holding table, the waste names for autocomplete
 export async function loader({ params }) {
   // retrieve all wastage item names
-  const nameUrls = UrlGet(UrlApiWasteNames);
+  const nameUrls = UrlApiWasteNames;
   const namesResp = await fetch(nameUrls);
   const names = {
     Names: await namesResp.json(),
   };
 
   // retrieve all items currently in the wastage holding table
-  const holdUrls = UrlGet(UrlApiWasteHolding);
+  const holdUrls = UrlApiWasteHolding;
   const holdResp = await fetch(holdUrls);
   const holding = {
     Holding: await holdResp.json(),
@@ -68,7 +67,7 @@ export async function action({ request }) {
   const updates = Object.fromEntries(formData);
 
   const opt = GetPostOptions(JSON.stringify(updates));
-  await fetch(UrlGet(UrlApiWasteHoldingAdd), opt);
+  await fetch(UrlApiWasteHoldingAdd, opt);
 
   return redirect("/waste/input");
 }
@@ -88,7 +87,7 @@ export default function WasteInput() {
 
   // button handler for removing an item
   const deleteItem = async (id) => {
-    const url = UrlGet(UrlApiWasteHoldingDelete);
+    const url = UrlApiWasteHoldingDelete;
     const body = {
       ID: id,
     };
@@ -106,7 +105,7 @@ export default function WasteInput() {
   };
 
   const confirmBtn = async () => {
-    const url = UrlGet(UrlApiWasteHoldingConfirm);
+    const url = UrlApiWasteHoldingConfirm;
     const opts = GetPostOptions("");
     await fetch(url, opts);
 

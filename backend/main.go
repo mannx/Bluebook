@@ -3,11 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
-	"strings"
-
 	"net/http"
 	"os"
-	"os/exec"
 	"os/signal"
 	"path/filepath"
 	"time"
@@ -17,15 +14,16 @@ import (
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 
-	"github.com/robfig/cron/v3"
-
 	api "github.com/mannx/Bluebook/api"
 	env "github.com/mannx/Bluebook/environ"
 	models "github.com/mannx/Bluebook/models"
 )
 
 // commit hash set during linking for version display
-var Commit string
+var (
+	Commit string
+	Branch string
+)
 
 // DB is the database connection for the entire run
 var DB *gorm.DB
@@ -38,7 +36,7 @@ func main() {
 
 	log.Info().Msgf("Bluebook Helper")
 	log.Info().Msg("Initializing environment...")
-	log.Info().Msgf("Commit version: %v", Commit)
+	log.Info().Msgf("Version: %v-%v", Branch, Commit)
 
 	env.Environment.Init()
 
@@ -70,9 +68,6 @@ func main() {
 	} else {
 		log.Info().Msg("Skipping duplicate day check...")
 	}
-
-	log.Info().Msg("Starting cron jobs...")
-	startJobs()
 
 	log.Info().Msg("Initialiing server and middleware")
 	e := initServer()
@@ -113,7 +108,6 @@ func migrateDB() {
 	DB.AutoMigrate(&models.DayDataBackup{})
 
 	DB.AutoMigrate(&models.HockeySchedule{})
-	DB.AutoMigrate(&models.HockeyScheduleImport{})
 
 	DB.AutoMigrate(&models.BluebookSettings{})
 }
@@ -166,37 +160,4 @@ func checkDuplicateEntries() error {
 	}
 
 	return nil
-}
-
-func startJobs() {
-	c := cron.New()
-
-	_, err := c.AddFunc(env.Environment.CronTime, func() { api.HockeyImportCronJob(DB) })
-	if err != nil {
-		log.Error().Err(err).Msgf("Unable to add cron job for hockey import.  cron string [%v]", env.Environment.CronTime)
-	}
-
-	_, err = c.AddFunc(env.Environment.BackupTime, archiveCronJob)
-	if err != nil {
-		log.Error().Err(err).Msgf("Unable to add cron job for archive script. cron string [%v]", env.Environment.BackupTime)
-	}
-
-	c.Start()
-}
-
-func archiveCronJob() {
-	scriptPath := filepath.Join(env.Environment.ScriptsPath, "ar.sh")
-	cmd := exec.Command(scriptPath)
-
-	var out strings.Builder
-	cmd.Stdout = &out
-
-	err := cmd.Run()
-	if err != nil {
-		log.Error().Err(err).Msg("Unable to run archive script")
-	}
-
-	if len(out.String()) > 0 {
-		log.Info().Msg(out.String())
-	}
 }

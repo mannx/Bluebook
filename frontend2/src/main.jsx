@@ -97,6 +97,10 @@ import DayDataViewer, {
   loader as ddViewerLoader,
 } from "./components/Stats/DayDataViewer.jsx";
 
+import AboutPage, { loader as aboutLoader } from "./components/About/About.tsx";
+
+import TestApi, { loader as testLoader } from "./components/Test/Test.tsx";
+
 import "./index.css";
 import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
@@ -257,6 +261,16 @@ const router = createBrowserRouter([
         element: <Settings />,
         loader: settingsLoader,
         action: settingsAction,
+      },
+      {
+        path: "/about",
+        element: <AboutPage />,
+        loader: aboutLoader,
+      },
+      {
+        path: "/test",
+        element: <TestApi />,
+        loader: testLoader,
       },
     ],
   },

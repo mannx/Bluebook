@@ -62,6 +62,10 @@ function navHeader2() {
 
   const settingsMenu = [
     {
+      Title: "About",
+      Url: "/about",
+    },
+    {
       Title: "Settings",
       Url: "/settings",
     },
