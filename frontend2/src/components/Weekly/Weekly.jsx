@@ -82,6 +82,8 @@ export default function Weekly() {
     </>
   );
 
+  let sysco_week="09-04-24";
+
   return (
     <>
       <Container sx={{ margin: 2 }}>
@@ -201,7 +203,7 @@ export default function Weekly() {
           <TextField
             id="sysco"
             name="sysco"
-            label="Sysco Cost"
+            label={"Sysco "+sysco_week}
             variant="outlined"
           />
           <input
