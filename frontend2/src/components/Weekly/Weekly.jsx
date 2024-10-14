@@ -10,7 +10,9 @@ import Switch from "@mui/material/Switch";
 
 import { UrlApiWeekly, UrlApi2WeeklyExport, GetPostOptions } from "../URLs";
 import { Typography } from "@mui/material";
-// import React from "react";
+
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
 
 export async function loader({ params }) {
   const url =
@@ -24,6 +26,7 @@ export async function loader({ params }) {
   const resp = await fetch(url);
   const data = await resp.json();
 
+  console.log(params);
   return {
     ...data,
     ...params,
@@ -82,7 +85,7 @@ export default function Weekly() {
     </>
   );
 
-  let sysco_week="09-04-24";
+  const sysco_week = dayjs.utc(data.PrevWeek).format("MM-DD-YYYY");
 
   return (
     <>
@@ -203,7 +206,7 @@ export default function Weekly() {
           <TextField
             id="sysco"
             name="sysco"
-            label={"Sysco "+sysco_week}
+            label={"Sysco " + sysco_week}
             variant="outlined"
           />
           <input

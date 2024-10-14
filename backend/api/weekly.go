@@ -33,6 +33,8 @@ type weeklyInfo struct {
 	LastYearSales         float64
 	LastYearCustomerCount int
 	UpcomingSales         float64
+
+	PrevWeek time.Time
 }
 
 // GetWeeklyViewHandler handles the weekly report generation params: /?month=MM&day=DD&year=YYYY
@@ -104,6 +106,11 @@ func getWeeklyData(month int, day int, year int, c echo.Context, db *gorm.DB) (w
 		diff := weekEnding.Weekday() - lastYear.Weekday()
 		lastYear = lastYear.AddDate(0, 0, int(diff))
 	}
+
+	// compute the previous delivery week
+	// (NOTE:: this only works for single delivery days, adjust here
+	//         and frontend if changes are required. Easier done here than in js
+	weekly.PrevWeek = weekEnding.AddDate(0, 0, -8)
 
 	// compute last years sales data
 	lys := lastYear.AddDate(0, 0, -6)
