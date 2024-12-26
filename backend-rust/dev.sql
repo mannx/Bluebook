@@ -1,0 +1,1 @@
+-- rename existing tables from current db to prepare to migrate to new db schema
