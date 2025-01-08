@@ -2,15 +2,15 @@
 
 diesel::table! {
     weekly_info (id) {
-        id -> Nullable<Integer>,
-        Date -> Date,
-        BreadCount -> Nullable<Integer>,
-        FoodCostAmount -> Nullable<Float>,
-        FoodCostPercent -> Nullable<Float>,
-        LabourCostAmount -> Nullable<Float>,
-        LabourCostPercent -> Nullable<Float>,
-        NetSales -> Nullable<Float>,
-        PartySales -> Nullable<Float>,
-        Productivity -> Nullable<Float>,
+        id -> Integer,
+        // DayDate -> Date,
+        BreadCount -> Integer,
+        FoodCostAmount -> Float,
+        FoodCostPercent -> Float,
+        LabourCostAmount -> Float,
+        LabourCostPercent -> Float,
+        NetSales -> Float,
+        PartySales -> Float,
+        Productivity -> Float,
     }
 }
