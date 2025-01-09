@@ -54,8 +54,8 @@ fn test_db(conn: &mut SqliteConnection) {
         .expect("error");
 
     for wi in results {
-        println!("id: {}", wi.id);
-        println!("net sales: {}", wi.NetSales);
+        println!("id: {}", wi.id.unwrap());
+        println!("net sales: {}", wi.NetSales.unwrap());
         println!();
     }
 }
