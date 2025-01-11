@@ -17,11 +17,17 @@ import utc from "dayjs/plugin/utc";
 export async function loader({ params }) {
   const url =
     UrlApiWeekly +
-    "?month=" +
+    // "?month=" +
+    // params.month +
+    // "&day=" +
+    // params.day +
+    // "&year=" +
+    // params.year;
+    "/" +
     params.month +
-    "&day=" +
+    "/" +
     params.day +
-    "&year=" +
+    "/" +
     params.year;
   const resp = await fetch(url);
   const data = await resp.json();

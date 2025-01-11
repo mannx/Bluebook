@@ -1,17 +1,17 @@
 CREATE TABLE IF NOT EXISTS weekly_info (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
 
   DayDate DATE NOT NULL,
 
-  BreadCount INTEGER,
+  BreadCount INTEGER NOT NULL,
 
-  FoodCostAmount REAL,
-  FoodCostPercent REAL,
+  FoodCostAmount REAL NOT NULL,
+  FoodCostPercent REAL NOT NULL,
 
-  LabourCostAmount REAL,
-  LabourCostPercent REAL,
+  LabourCostAmount REAL NOT NULL,
+  LabourCostPercent REAL NOT NULL,
 
-  NetSales REAL,
-  PartySales REAL,
-  Productivity REAL
+  NetSales REAL NOT NULL,
+  PartySales REAL NOT NULL,
+  Productivity REAL NOT NULL
 )

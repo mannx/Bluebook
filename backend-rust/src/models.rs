@@ -17,25 +17,26 @@
 // }
 
 #![allow(non_snake_case)]
-use chrono::prelude::*;
 use diesel::prelude::*;
+use serde::Serialize;
 
 #[derive(Queryable, Selectable)]
 #[diesel(table_name=crate::schema::weekly_info)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
+#[derive(Serialize)]
 pub struct WeeklyInfo {
-    pub id: Option<i32>,
-    // pub DayDate: DateTime<Utc>,
-    pub BreadCount: Option<i32>,
+    pub id: i32,
+    pub DayDate: time::Date,
+    pub BreadCount: i32,
 
-    pub FoodCostAmount: Option<f32>,
-    pub FoodCostPercent: Option<f32>,
+    pub FoodCostAmount: f32,
+    pub FoodCostPercent: f32,
 
-    pub LabourCostAmount: Option<f32>,
-    pub LabourCostPercent: Option<f32>,
+    pub LabourCostAmount: f32,
+    pub LabourCostPercent: f32,
 
-    pub NetSales: Option<f32>,
+    pub NetSales: f32,
 
-    pub PartySales: Option<f32>,
-    pub Productivity: Option<f32>,
+    pub PartySales: f32,
+    pub Productivity: f32,
 }
