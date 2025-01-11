@@ -11,9 +11,12 @@ UPDATE weekly_infos SET PartySales=0 WHERE PartySales IS NULL;
 UPDATE weekly_infos SET NetSales=0 WHERE NetSales IS NULL;
 UPDATE weekly_infos SET productivity=0 WHERE productivity IS NULL;
 
+UPDATE weekly_infos set Date=substr(Date,0,11);
 -- 2) copy the data over
 
-INSERT INTO weekly_info (
+ATTACH DATABASE 'db.db' AS db;
+
+INSERT INTO db.weekly_info (
   id, DayDate,
   BreadCount,
   FoodCostAmount, FoodCostPercent, LabourCostAmount,LabourCostPercent,NetSales,PartySales,
@@ -21,6 +24,3 @@ INSERT INTO weekly_info (
 )
 SELECT id,Date,BreadCount,FoodCostAmount,FoodCostPercent,LabourCostAmount,LabourCostPercent,NetSales,PartySales,
 Productivity FROM weekly_infos;
-
--- 3) Cleanup the date field
-UPDATE weekly_info set DayDate=substr(DayDate,0,11);

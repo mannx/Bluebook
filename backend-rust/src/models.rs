@@ -1,21 +1,3 @@
-// type WeeklyInfo struct {
-// 	gorm.Model
-//
-// 	Date       datatypes.Date `gorm:"column:Date"`
-// 	BreadCount int            `gorm:"column:BreadCount"`
-//
-// 	FoodCostAmount  float64 `gorm:"column:FoodCostAmount"`
-// 	FoodCostPercent float64 `gorm:"column:FoodCostPercent"`
-//
-// 	LabourCostAmount  float64 `gorm:"column:LabourCostAmount"`
-// 	LabourCostPercent float64 `gorm:"column:LabourCostPercent"`
-//
-// 	NetSales float64 `gorm:"column:NetSales"`
-//
-// 	PartySales   float64 `gorm:"column:PartySales"`
-// 	Productivity float64 // total productivity for the week
-// }
-
 #![allow(non_snake_case)]
 use diesel::prelude::*;
 use serde::Serialize;
@@ -39,4 +21,52 @@ pub struct WeeklyInfo {
 
     pub PartySales: f32,
     pub Productivity: f32,
+}
+
+#[derive(Queryable, Selectable)]
+#[diesel(table_name=crate::schema::day_data_extra)]
+#[diesel(check_for_backend(diesel::sqlite::Sqlite))]
+#[derive(Serialize)]
+pub struct DayDataExtra {
+    pub id: i32,
+    pub HoursWorked: f32,
+    pub Productivity: f32,
+    pub Factor: f32,
+    pub AdjustedSales: f32,
+    pub CustomerCount: i32,
+    pub BreadCredits: f32,
+    pub BreadOverShort: f32,
+}
+
+#[derive(Queryable, Selectable)]
+#[diesel(table_name=crate::schema::day_data)]
+#[diesel(check_for_backend(diesel::sqlite::Sqlite))]
+#[derive(Serialize)]
+pub struct DayData {
+    pub id: i32,
+    pub DayDate: time::Date,
+    pub CashDeposit: f32,
+    pub DebitCard: f32,
+    pub MasterCard: f32,
+    pub Visa: f32,
+    pub Amex: f32,
+    pub CreditSales: f32,
+    pub GiftCardRedeem: f32,
+    pub SubwayCaters: f32,
+    pub PayPal: f32,
+    pub SkipTheDishes: f32,
+    pub DoorDash: f32,
+    pub UberEats: f32,
+    pub PettyCash: f32,
+    pub Tips: f32,
+    pub Hst: f32,
+    pub BottleDeposit: f32,
+    pub NetSales: f32,
+    pub CreditSalesRedeemed: f32,
+    pub CreditSalesRedeemed2: f32,
+    pub CreditFood: f32,
+    pub GiftCardSold: f32,
+    pub USFunds: f32,
+    pub WeeklyAverage: f32,
+    pub CommentData: Option<String>,
 }

@@ -24,6 +24,7 @@ diesel = { version = "2.2", features = [
   "returning_clauses_for_sqlite_3_35",
   "r2d2",
   "time",
+  # "64-column-tables",
 ] }
 
 # db pool connection

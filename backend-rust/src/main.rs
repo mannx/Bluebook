@@ -67,34 +67,3 @@ fn test_db(conn: &mut SqliteConnection) {
         println!();
     }
 }
-
-// #[get("/api/weekly/view/{month}/{day}/{year}")]
-// async fn weekly_test(
-//     pool: web::Data<DbPool>,
-//     name: web::Path<(u8, u8, i32)>,
-// ) -> actix_web::Result<impl Responder> {
-//     let (month, day, year) = name.into_inner();
-//     // let date_str = format!("{month}-{day}-{year}");
-//     let month = time::Month::try_from(month).expect("invalid month provided");
-//     let date = time::Date::from_calendar_date(year, month, day).expect("unable to build date");
-//     println!("date: {:?}", date);
-//
-//     let result = web::block(move || -> diesel::QueryResult<WeeklyInfo> {
-//         use crate::schema::weekly_info::dsl::*;
-//
-//         let mut conn = pool.get().expect("unable to get db connection from pool");
-//
-//         let results = weekly_info
-//             .filter(DayDate.eq(date))
-//             .select(models::WeeklyInfo::as_select())
-//             // .load(&mut conn)
-//             .first::<WeeklyInfo>(&mut conn)
-//             .expect("unable to retrieve data");
-//
-//         Ok(results)
-//     })
-//     .await?
-//     .map_err(error::ErrorInternalServerError)?;
-//
-//     Ok(HttpResponse::Ok().json(result))
-// }
