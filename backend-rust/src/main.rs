@@ -44,6 +44,7 @@ async fn main() -> std::io::Result<()> {
             .app_data(web::Data::new(pool.clone()))
             .service(tags_test)
             .service(api::weekly::weekly_test)
+            .service(api::month::get_month_view_handler)
             .service(actix_files::Files::new("/", "./dist/").index_file("index.html"))
     })
     .bind(("127.0.0.1", 8080))?
