@@ -68,13 +68,29 @@ UPDATE day_data set Date=substr(Date,0,11);
 -- attach to new db and copy everything over
 ATTACH DATABASE 'db.db' AS db;
 
+-- Copy main data over
 INSERT INTO db.day_data (
   id, DayDate,CashDeposit,DebitCard,MasterCard,Visa,Amex,CreditSales,GiftCardRedeem,SubwayCaters,PayPal,
   SkipTheDishes,DoorDash,UberEats,PettyCash,Tips,Hst,BottleDeposit,NetSales,CreditSalesRedeemed,
-  CreditSalesRedeemed2,CreditFood,GiftCardSold,USFunds,WeeklyAverage,CommentData
+  CreditFood,GiftCardSold,USFunds,WeeklyAverage,CommentData,
+  HoursWorked,Productivity,Factor,AdjustedSales,CustomerCount,BreadCredits,BreadOverShort
 )
 SELECT 
   id, Date,CashDeposit,DebitCard,MasterCard,Visa,Amex,CreditSales,GiftCardRedeem,SubwayCaters,PayPal,
-  SkipTheDishes,DoorDash,UberEats,PettyCash,Tips,Hst,BottleDeposit,NetSales,CreditSalesRedeemed,
-  CreditSalesRedeemed,CreditFood,GiftCardSold,USFunds,WeeklyAverage,Comment
+  SkipTheDishes,DoorDash,UberEats,PettyCash,Tips,Hst,BottleDeposit,NetSales,CreditSalesRedeemed+
+  CreditSalesRedeemed,CreditFood,GiftCardSold,USFunds,WeeklyAverage,Comment,
+  HoursWorked,Productivity,Factor,AdjustedSales,CustomerCount,BreadCredits,BreadOverShort
 FROM day_data;
+
+-- Copy extra day over
+-- INSERT INTO db.day_data_extra (
+--   id, HoursWorked, 
+--   Productivity ,
+--   Factor ,
+--   AdjustedSales ,
+--   CustomerCount ,
+--   BreadCredits ,
+--   BreadOverShort
+-- )
+-- SELECT id,HoursWorked,Productivity,Factor,AdjustedSales,CustomerCount,BreadCredits,BreadOverShort
+-- FROM day_data;

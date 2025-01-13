@@ -22,12 +22,18 @@ diesel::table! {
         BottleDeposit -> Float,
         NetSales -> Float,
         CreditSalesRedeemed -> Float,
-        CreditSalesRedeemed2 -> Float,
         CreditFood -> Float,
         GiftCardSold -> Float,
         USFunds -> Float,
         WeeklyAverage -> Float,
         CommentData -> Nullable<Text>,
+        HoursWorked -> Float,
+        Productivity -> Float,
+        Factor -> Float,
+        AdjustedSales -> Float,
+        CustomerCount -> Integer,
+        BreadCredits -> Float,
+        BreadOverShort -> Float,
     }
 }
 

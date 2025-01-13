@@ -23,7 +23,6 @@ CREATE TABLE IF NOT EXISTS day_data (
   BottleDeposit REAL NOT NULL,
   NetSales REAL NOT NULL,
   CreditSalesRedeemed REAL NOT NULL,
-  CreditSalesRedeemed2 REAL NOT NULL,
   CreditFood REAL NOT NULL,
   GiftCardSold REAL NOT NULL,
 
@@ -32,7 +31,14 @@ CREATE TABLE IF NOT EXISTS day_data (
   
   WeeklyAverage REAL NOT NULL,
   
-  CommentData TEXT
+  CommentData TEXT,
+  HoursWorked REAL NOT NULL,
+  Productivity REAL NOT NULL,
+  Factor REAL NOT NULL,
+  AdjustedSales REAL NOT NULL,
+  CustomerCount INTEGER NOT NULL,
+  BreadCredits REAL NOT NULL,
+  BreadOverShort REAL NOT NULL
 );
 
 -- Table contains information from the weekly sheets

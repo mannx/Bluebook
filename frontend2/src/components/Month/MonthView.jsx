@@ -7,15 +7,17 @@ import "./month.css";
 
 // retrieve the month/year we want to see
 export async function loader({ params }) {
-  const url = UrlApiMonth + "?month=" + params.month + "&year=" + params.year;
+  // const url = UrlApiMonth + "?month=" + params.month + "&year=" + params.year;
+  const url = UrlApiMonth + "/" + params.month + "/" + params.year;
   const resp = await fetch(url);
   const data = await resp.json();
 
   // get the settings for optional display items
-  const r2 = await fetch(UrlApiSettingsGet);
-  const settings = await r2.json();
-
-  return { data, settings };
+  // const r2 = await fetch(UrlApiSettingsGet);
+  // const settings = await r2.json();
+  //
+  // return { data, settings };
+  return { data };
 }
 
 // /today needs to redirect to the correct page for the current date
@@ -80,13 +82,15 @@ export default function MonthView() {
         </tr>
       </thead>
       <tbody>
-        {data.Data.map((obj) => {
+        {data.map((obj) => {
           const row = Row(obj);
           let eow = null;
 
-          if (obj.IsEndOfWeek) {
+          // if (obj.IsEndOfWeek) {
+          if (obj.EndOfWeek !== null) {
             // show table data & end of week row
-            eow = EOW(obj);
+            console.log("end of week");
+            eow = EndOfWeek(obj);
           }
 
           return (
@@ -140,34 +144,35 @@ function Zero(obj) {
 
 function Row(data) {
   let cls = "";
-  let url = "/" + data.Hockey.AwayImage;
-  let img = <img className="team-logo" src={url} />;
-  let hock = data.Hockey.HomeGame === true ? img : <></>;
+  // let url = "/" + data.Hockey.AwayImage;
+  // let img = <img className="team-logo" src={url} />;
+  // let hock = data.Hockey.HomeGame === true ? img : <></>;
+  let hock = <></>;
 
   let hcls = "";
   let htip = "";
 
-  if (data.Hockey.HomeGame === true) {
-    if (data.Hockey.GFHome === 0 && data.Hockey.GFAway === 0) {
-      // game not yet played, skip
-    } else if (data.Hockey.GFHome > data.Hockey.GFAway) {
-      hcls = "HockeyWin";
-    } else {
-      hcls = "HockeyLoss";
-    }
-
-    htip = (
-      <>
-        <span>
-          {data.Hockey.Away}
-          <br />
-        </span>
-        <span>
-          Home: {data.Hockey.GFHome} Away: {data.Hockey.GFAway}
-        </span>
-      </>
-    );
-  }
+  // if (data.Hockey.HomeGame === true) {
+  //   if (data.Hockey.GFHome === 0 && data.Hockey.GFAway === 0) {
+  //     // game not yet played, skip
+  //   } else if (data.Hockey.GFHome > data.Hockey.GFAway) {
+  //     hcls = "HockeyWin";
+  //   } else {
+  //     hcls = "HockeyLoss";
+  //   }
+  //
+  //   htip = (
+  //     <>
+  //       <span>
+  //         {data.Hockey.Away}
+  //         <br />
+  //       </span>
+  //       <span>
+  //         Home: {data.Hockey.GFHome} Away: {data.Hockey.GFAway}
+  //       </span>
+  //     </>
+  //   );
+  // }
 
   switch (data.SalesLastWeek) {
     case 1:
@@ -183,32 +188,32 @@ function Row(data) {
 
   return (
     <tr key={data.ID}>
-      <td className="Month">{Zero(data.DayOfMonth)}</td>
+      <td className="Month">{Zero(data.Day)}</td>
       <td className="Month">{data.DayOfWeek}</td>
       <td className="Month">{O(data.GrossSales)}</td>
-      <td className="Month">{O(data.HST)}</td>
-      <td className="Month">{O(data.BottleDeposit)}</td>
+      <td className="Month">{O(data.Data.Hst)}</td>
+      <td className="Month">{O(data.Data.BottleDeposit)}</td>
       <td className={`${cls} ${"Month"}`}>
         <div className="tooltip-month">
-          {O(data.NetSales)}
+          {O(data.Data.NetSales)}
           <span className="tooltiptext-month">{O(data.WeeklyAverage)}</span>
         </div>
       </td>
       <td className="blank"></td>
-      <td className="Month">{O(data.DebitCard)}</td>
-      <td className="Month">{O(data.Visa)}</td>
-      <td className="Month">{O(data.MasterCard)}</td>
-      <td className="Month">{O(data.Amex)}</td>
-      <td className="Month">{O(data.CreditSales)}</td>
+      <td className="Month">{O(data.Data.DebitCard)}</td>
+      <td className="Month">{O(data.Data.Visa)}</td>
+      <td className="Month">{O(data.Data.MasterCard)}</td>
+      <td className="Month">{O(data.Data.Amex)}</td>
+      <td className="Month">{O(data.Data.CreditSales)}</td>
       <td className="blank"></td>
-      <td className="Month">{O(data.GiftCardRedeem)}</td>
-      <td className="Month">{O(data.GiftCardSold)}</td>
+      <td className="Month">{O(data.Data.GiftCardRedeem)}</td>
+      <td className="Month">{O(data.Data.GiftCardSold)}</td>
       <td className="blank"></td>
-      <td className="Month">{O(data.HoursWorked)}</td>
-      <td className="Month">{O(data.Productivity)}</td>
-      <td className="Month">{O(data.Factor)}</td>
-      <td className="Month">{O(data.AdjustedSales)}</td>
-      <td className="Month">{O(data.CustomerCount)}</td>
+      <td className="Month">{O(data.Data.HoursWorked)}</td>
+      <td className="Month">{O(data.Data.Productivity)}</td>
+      <td className="Month">{O(data.Data.Factor)}</td>
+      <td className="Month">{O(data.Data.AdjustedSales)}</td>
+      <td className="Month">{O(data.Data.CustomerCount)}</td>
       <td className="Month no-print">{Dol(data.ThirdPartyDollar)}</td>
       <td className="Month no-print">{P(data.ThirdPartyPercent)}</td>
 
@@ -219,7 +224,7 @@ function Row(data) {
           <div className="tooltiptext-month">{htip}</div>
         </div>
       </td>
-      <td className="Month">{data.Comment}</td>
+      <td className="Month">{data.Data.CommentData}</td>
       <td className="Month no-print">{Tag(data.Tags, data.TagID)}</td>
       <td className="Month no-print">
         {data.ID !== 0 ? (
@@ -249,7 +254,7 @@ function hashDate(data) {
 
   return year + month + day;
 }
-function EOW(data) {
+function EndOfWeek(data) {
   return (
     <tr key={"eow-" + data.ID} className="blank">
       <td className="spacer"></td>
@@ -257,7 +262,7 @@ function EOW(data) {
       <td className="spacer"></td>
       <td className="spacer"></td>
       <td className="spacer"></td>
-      <td className="Net">{O(data.EOW.NetSales)}</td>
+      <td className="Net">{O(data.EndOfWeek.NetSales)}</td>
 
       <td className="spacer"></td>
       <td className="spacer"></td>
@@ -273,10 +278,10 @@ function EOW(data) {
       <td className="spacer"></td>
       <td className="spacer"></td>
       <td className="spacer"></td>
-      <td className="CustomerCount">{O(data.EOW.CustomerCount)}</td>
-      <td className="no-print">{O(data.EOW.ThirdPartyTotal)}</td>
+      <td className="CustomerCount">{O(data.EndOfWeek.CustomerCount)}</td>
+      <td className="no-print">{O(data.EndOfWeek.ThirdPartyTotal)}</td>
       <td className="ThirdPartyPerc no-print">
-        {O(data.EOW.ThirdPartyPercent)}%
+        {O(data.EndOfWeek.ThirdPartyPercent)}%
       </td>
     </tr>
   );
