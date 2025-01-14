@@ -82,15 +82,6 @@ SELECT
   HoursWorked,Productivity,Factor,AdjustedSales,CustomerCount,BreadCredits,BreadOverShort
 FROM day_data;
 
--- Copy extra day over
--- INSERT INTO db.day_data_extra (
---   id, HoursWorked, 
---   Productivity ,
---   Factor ,
---   AdjustedSales ,
---   CustomerCount ,
---   BreadCredits ,
---   BreadOverShort
--- )
--- SELECT id,HoursWorked,Productivity,Factor,AdjustedSales,CustomerCount,BreadCredits,BreadOverShort
--- FROM day_data;
+-- copy tag data over
+INSERT INTO db.tag_list (id, Tag) SELECT id, Tag FROM tag_lists;
+INSERT INTO db.tag_data (id, DayID, TagID) SELECT id,DayID,TagID FROM tag_data;
