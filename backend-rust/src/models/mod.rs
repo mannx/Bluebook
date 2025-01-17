@@ -1,5 +1,6 @@
 pub mod day_data;
 pub mod hockey;
+pub mod settings;
 pub mod weekly;
 
 pub mod prelude {

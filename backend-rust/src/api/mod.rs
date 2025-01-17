@@ -1,7 +1,6 @@
 pub mod month;
+pub mod settings;
 pub mod weekly;
-
-// pub mod write_test;
 
 use diesel::prelude::*;
 

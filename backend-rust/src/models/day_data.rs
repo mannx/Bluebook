@@ -52,6 +52,7 @@ pub struct TagList {
 #[derive(Queryable, Selectable)]
 #[diesel(table_name=crate::schema::tag_data)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
+#[allow(dead_code)]
 pub struct TagData {
     pub id: i32,
     pub TagID: i32,

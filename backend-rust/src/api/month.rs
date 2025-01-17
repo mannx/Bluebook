@@ -9,39 +9,6 @@ use serde::{Deserialize, Serialize};
 use crate::api::{DbError, DbPool};
 use crate::models::hockey::HockeySchedule;
 use crate::models::prelude::*;
-use crate::schema::hockey_schedule;
-
-// endOfWeek provides data totaling the previous week of sales
-// type endOfWeek struct {
-// 	NetSales          float64
-// 	CustomerCount     int
-// 	ThirdPartyPercent float64
-// 	ThirdPartyTotal   float64
-// }
-//
-// // dayViewData is an expanded DayData object with additional properties
-// type dayViewData struct {
-// 	models.DayData
-//
-// 	ThirdPartyDollar  float64
-// 	ThirdPartyPercent float64
-// 	GrossSales        float64
-// 	DayOfMonth        int       // 1-31 for what day of the month it is
-// 	DayOfWeek         string    // user friendly name of what day it is
-// 	IsEndOfWeek       bool      // is this a tuesday?
-// 	EOW               endOfWeek // end of week data if required
-// 	Tags              []string  // list of tags on this day
-// 	TagID             []uint
-// 	SalesLastWeek     int  // 0 if same, -1 if less, 1 if > than last weeks sales for this day
-// 	Exists            bool // true if found in db, false if auto filled
-//
-// 	// below is the extracted date.  Issues parsing date client side in js so this workaround is used for now
-// 	Day   int
-// 	Month time.Month
-// 	Year  int
-//
-// 	Hockey models.HockeySchedule
-// }
 
 #[derive(Serialize, Deserialize)]
 struct EndOfWeek {
@@ -94,7 +61,6 @@ impl MonthData {
             DayOfWeek: data.DayDate.weekday().to_string(),
             EndOfWeek: None,
             Tags: Vec::new(),
-            // TagID: Vec::new(),
             SalesLastWeek: 0,
             WeeklyAverage: 0.,
             Day: data.DayDate.day(),
@@ -166,14 +132,6 @@ fn get_month_data(
 
         // get hockey schedule information if any
         md.Hockey = get_hockey_data(conn, r.DayDate).ok();
-        match &md.Hockey {
-            None => {
-                println!("[{}] no hockey", r.DayDate);
-            }
-            Some(_) => {
-                println!("[{}] hockey  __ vs __", r.DayDate);
-            }
-        }
 
         data.push(md);
     }
@@ -181,8 +139,6 @@ fn get_month_data(
     // do we have missing days to pad out?
     if data.len() != month.length(year) as usize {
         let missing = month.length(year) as usize - data.len();
-        // let date = data.last().unwrap().Data.DayDate;
-
         let date = match data.last() {
             None => {
                 // no entries for the month, set date to end of previous month

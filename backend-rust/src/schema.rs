@@ -53,6 +53,18 @@ diesel::table! {
 }
 
 diesel::table! {
+    settings (id) {
+        id -> Integer,
+        HockeyURL -> Nullable<Text>,
+        DisplayHockeyWeekly -> Bool,
+        PrintHockeyWeekly -> Bool,
+        HockeyHomeTeam -> Nullable<Text>,
+        ManagerName -> Nullable<Text>,
+        StoreNumber -> Nullable<Text>,
+    }
+}
+
+diesel::table! {
     tag_data (id) {
         id -> Integer,
         TagID -> Integer,
@@ -85,6 +97,7 @@ diesel::table! {
 diesel::allow_tables_to_appear_in_same_query!(
     day_data,
     hockey_schedule,
+    settings,
     tag_data,
     tag_list,
     weekly_info,

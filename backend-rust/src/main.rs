@@ -6,12 +6,8 @@ use env_logger::Env;
 use std::env;
 
 mod api;
-mod db;
 mod models;
 mod schema;
-mod tag_test;
-
-use tag_test::tags_test;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -33,9 +29,9 @@ async fn main() -> std::io::Result<()> {
             .wrap(Logger::new("%a %{User-Agent}i"))
             .wrap(cors)
             .app_data(web::Data::new(pool.clone()))
-            .service(tags_test)
             .service(api::weekly::weekly_test)
             .service(api::month::get_month_view_handler)
+            .service(api::settings::get_bluebook_settings)
             .service(actix_files::Files::new("/", "./dist/").index_file("index.html"))
     })
     .bind(("127.0.0.1", 8080))?

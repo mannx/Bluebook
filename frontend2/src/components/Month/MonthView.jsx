@@ -14,12 +14,11 @@ export async function loader({ params }) {
   const data = await resp.json();
 
   // get the settings for optional display items
-  // const r2 = await fetch(UrlApiSettingsGet);
-  // const settings = await r2.json();
-  //
-  // return { data, settings };
+  const r2 = await fetch(UrlApiSettingsGet);
+  const settings = await r2.json();
+
   params.month = params.month - 1; // adjust since dayjs using a 0 based month system
-  return { data, params };
+  return { data, params, settings };
 }
 
 // /today needs to redirect to the correct page for the current date
@@ -31,7 +30,7 @@ export async function today() {
 }
 
 export default function MonthView() {
-  const { data, params } = useLoaderData();
+  const { data, params, settings } = useLoaderData();
 
   // month navigation buttons are to be shows beside the month instead of the main navigation menu as previously done
   const date = dayjs(new Date(params.year, params.month, 1));
@@ -84,7 +83,7 @@ export default function MonthView() {
       </thead>
       <tbody>
         {data.map((obj) => {
-          const row = Row(obj);
+          const row = Row(obj, settings);
           let eow = null;
 
           if (obj.EndOfWeek !== null) {
@@ -141,30 +140,35 @@ function Zero(obj) {
   return s.substring(s.length - 2, s.length);
 }
 
-function get_hockey_tag(data) {
-  // if (data.Hockey != null || data.Hockey !== undefined) {
+function get_hockey_tag(data, settings) {
   if (data.Hockey) {
     const url = "/" + data.Hockey.AwayImage;
     const img = <img className="team-logo" src={url} />;
-    // let hock = data.Hockey.HomeGame === true ? img : <></>;
-    return data.Hockey.HomeGame === true ? img : <></>;
+    const home_game = is_home_game(data, settings);
+    return home_game ? img : <></>;
   } else {
     return <></>;
   }
 }
 
-function Row(data) {
+function is_home_game(data, settings) {
+  if (data.Hockey) {
+    return data.Hockey.Home === settings.HockeyHomeTeam;
+  }
+  return false;
+}
+
+function Row(data, settings) {
   let cls = "";
 
-  const hock = get_hockey_tag(data);
+  const hock = get_hockey_tag(data, settings);
+  const home_game = is_home_game(data, settings);
 
   let hcls = "";
   let htip = "";
 
-  // if (data.Hockey !== null || data.Hockey !== undefined) {
   if (data.Hockey) {
-    console.log("hockey");
-    if (data.Hockey.HomeGame === true) {
+    if (home_game) {
       if (data.Hockey.GFHome === 0 && data.Hockey.GFAway === 0) {
         // game not yet played, skip
       } else if (data.Hockey.GFHome > data.Hockey.GFAway) {
@@ -172,8 +176,6 @@ function Row(data) {
       } else {
         hcls = "HockeyLoss";
       }
-
-      console.log("hockey home game");
 
       htip = (
         <>
