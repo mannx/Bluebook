@@ -1,13 +1,24 @@
 use actix_cors::Cors;
 use actix_web::{middleware::Logger, web, App, HttpServer};
 use diesel::r2d2;
+use diesel::sqlite::Sqlite;
 use diesel::SqliteConnection;
 use env_logger::Env;
-use std::env;
+use std::{env, error::Error};
 
 mod api;
 mod models;
 mod schema;
+
+const MIGRATIONS: diesel_migrations::EmbeddedMigrations = diesel_migrations::embed_migrations!();
+
+fn run_migrations(
+    conn: &mut impl diesel_migrations::MigrationHarness<Sqlite>,
+) -> Result<(), Box<dyn Error + Send + Sync + 'static>> {
+    conn.run_pending_migrations(MIGRATIONS)?;
+
+    Ok(())
+}
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -20,6 +31,17 @@ async fn main() -> std::io::Result<()> {
     let pool = r2d2::Pool::builder()
         .build(manager)
         .expect("unable to build pool");
+
+    // run the migrations on the database if required
+    let mut conn = match pool.get() {
+        Err(e) => panic!("Unable to get pool connection to migrate db! [{e}]"),
+        Ok(con) => con,
+    };
+
+    match run_migrations(&mut conn) {
+        Ok(_) => println!("migrations run successfully!"),
+        Err(e) => println!("error unable to migrate db.: {:?}", e),
+    }
 
     HttpServer::new(move || {
         let cors = Cors::default().allow_any_origin().allow_any_method();

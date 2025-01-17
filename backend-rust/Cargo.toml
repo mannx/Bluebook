@@ -27,6 +27,8 @@ diesel = { version = "2.2", features = [
   # "64-column-tables",
 ] }
 
+diesel_migrations = "2.2.0"
+
 # db pool connection
 # r2d2 = "0.8.10"
 
