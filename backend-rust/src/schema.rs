@@ -38,15 +38,17 @@ diesel::table! {
 }
 
 diesel::table! {
-    day_data_extra (id) {
+    hockey_schedule (id) {
         id -> Integer,
-        HoursWorked -> Float,
-        Productivity -> Float,
-        Factor -> Float,
-        AdjustedSales -> Float,
-        CustomerCount -> Integer,
-        BreadCredits -> Float,
-        BreadOverShort -> Float,
+        DayDate -> Date,
+        Away -> Text,
+        Home -> Text,
+        GFAway -> Integer,
+        GFHome -> Integer,
+        Attendance -> Integer,
+        Arena -> Text,
+        HomeImage -> Text,
+        AwayImage -> Text,
     }
 }
 
@@ -82,7 +84,7 @@ diesel::table! {
 
 diesel::allow_tables_to_appear_in_same_query!(
     day_data,
-    day_data_extra,
+    hockey_schedule,
     tag_data,
     tag_list,
     weekly_info,

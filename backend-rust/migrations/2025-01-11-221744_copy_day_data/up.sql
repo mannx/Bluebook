@@ -41,22 +41,6 @@ CREATE TABLE IF NOT EXISTS day_data (
   BreadOverShort REAL NOT NULL
 );
 
--- Table contains information from the weekly sheets
--- split into 2nd table to avoid needing 64-column feature
-CREATE TABLE IF NOT EXISTS day_data_extra (
-  id INTEGER PRIMARY KEY NOT NULL,
-  --
-  --  Control Sheet Information
-  --
-  HoursWorked REAL NOT NULL,
-  Productivity REAL NOT NULL,
-  Factor REAL NOT NULL,
-  AdjustedSales REAL NOT NULL,
-  CustomerCount INTEGER NOT NULL,
-  BreadCredits REAL NOT NULL,
-  BreadOverShort REAL NOT NULL
-);
-
 CREATE TABLE IF NOT EXISTS tag_list (
   id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
   Tag TEXT
