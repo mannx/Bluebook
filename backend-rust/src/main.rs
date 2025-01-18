@@ -24,7 +24,11 @@ fn run_migrations(
 async fn main() -> std::io::Result<()> {
     env_logger::init_from_env(Env::default().default_filter_or("debug"));
 
-    dotenvy::dotenv().expect("unable to read .env");
+    // dotenvy::dotenv().expect("unable to read .env");
+    println!("loading .env file if present...");
+    if dotenvy::dotenv().is_err() {
+        println!("[dotenvy] unable to load .env file.  proceeding without");
+    }
 
     let url = env::var("DATABASE_URL").expect("DATABASE_URL required");
     let manager = r2d2::ConnectionManager::<SqliteConnection>::new(url);
