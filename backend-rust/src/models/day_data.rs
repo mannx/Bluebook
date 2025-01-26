@@ -1,4 +1,5 @@
 #![allow(non_snake_case)]
+use chrono::NaiveDate;
 use diesel::prelude::*;
 use serde::{Deserialize, Serialize};
 
@@ -8,7 +9,8 @@ use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize, Clone)]
 pub struct DayData {
     pub id: i32,
-    pub DayDate: time::Date,
+    // pub DayDate: time::Date,
+    pub DayDate: NaiveDate,
     pub CashDeposit: f32,
     pub DebitCard: f32,
     pub MasterCard: f32,
@@ -69,7 +71,7 @@ pub struct TagData {
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 #[derive(Serialize, Deserialize, Clone)]
 pub struct DayDataInsert {
-    pub DayDate: time::Date,
+    pub DayDate: NaiveDate,
     pub CashDeposit: f32,
     pub DebitCard: f32,
     pub MasterCard: f32,
@@ -103,7 +105,8 @@ pub struct DayDataInsert {
 }
 
 impl DayData {
-    pub fn new(date: time::Date) -> Self {
+    // pub fn new(date: time::Date) -> Self {
+    pub fn new(date: chrono::NaiveDate) -> Self {
         Self {
             id: 0,
             DayDate: date,
@@ -142,7 +145,7 @@ impl DayData {
 }
 
 impl DayDataInsert {
-    pub fn new(date: time::Date) -> Self {
+    pub fn new(date: chrono::NaiveDate) -> Self {
         Self {
             DayDate: date,
             CashDeposit: 0.,

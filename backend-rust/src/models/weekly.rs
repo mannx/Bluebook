@@ -1,4 +1,5 @@
 #![allow(non_snake_case)]
+use chrono::NaiveDate;
 use diesel::prelude::*;
 use serde::Serialize;
 
@@ -8,7 +9,7 @@ use serde::Serialize;
 #[derive(Serialize)]
 pub struct WeeklyInfo {
     pub id: i32,
-    pub DayDate: time::Date,
+    pub DayDate: NaiveDate,
     pub BreadCount: i32,
 
     pub FoodCostAmount: f32,
@@ -21,4 +22,21 @@ pub struct WeeklyInfo {
 
     pub PartySales: f32,
     pub Productivity: f32,
+}
+
+impl WeeklyInfo {
+    pub fn new(date: chrono::NaiveDate) -> Self {
+        Self {
+            id: 0,
+            DayDate: date,
+            BreadCount: 0,
+            FoodCostAmount: 0.,
+            FoodCostPercent: 0.,
+            LabourCostAmount: 0.,
+            LabourCostPercent: 0.,
+            NetSales: 0.,
+            PartySales: 0.,
+            Productivity: 0.,
+        }
+    }
 }

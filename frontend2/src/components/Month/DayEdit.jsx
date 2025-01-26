@@ -35,11 +35,13 @@ export async function loader({ params }) {
   var q = "";
   if (params.date === undefined) {
     // no date, use id
-    q = "?id=" + params.id;
+    // q = "?id=" + params.id;
+    q = "/" + params.id + "/2020-01-01";
   } else {
     // date provided, ignore id
     // but id is required by api -- set to 0
-    q = "?id=0&date=" + params.date;
+    // q = "?id=0&date=" + params.date;
+    q = "/0/" + params.date;
   }
 
   const url = UrlApi2DayEdit + q;
@@ -82,104 +84,104 @@ export default function DayEdit() {
   const navigate = useNavigate();
   const action = useActionData();
 
-  const outputData = (data) => {
-    const displayError = () => {
-      if (
-        action !== undefined &&
-        action.Error !== undefined &&
-        action.Error === true
-      ) {
-        return (
-          <>
-            <div>
-              <Typography sx={{ color: "red" }} variant="h5">
-                {action.Message}
-              </Typography>
-            </div>
-          </>
-        );
-      }
-      return <></>;
-    };
-
-    return (
-      <>
-        <h1>Day Data Edit</h1>
-        <Form method="post" id="daydata-edit">
-          <Stack direction="row" spacing={2}>
-            <Button variant="contained" type="submit">
-              Save
-            </Button>
-            <Button variant="contained" onClick={() => navigate(-1)}>
-              Cancel
-            </Button>
-          </Stack>
-
-          <Container>{displayError()}</Container>
-          <TableContainer component={Paper}>
-            <Table sx={{ minWidth: 650 }}>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Item</TableCell>
-                  <TableCell>Value</TableCell>
-                </TableRow>
-              </TableHead>
-
-              <TableBody>
-                <TableRow
-                  row="Date"
-                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                >
-                  <TableCell component="th" scope="row">
-                    Date
-                  </TableCell>
-                  <TableCell>{data.Date}</TableCell>
-                </TableRow>
-
-                <TableRow
-                  row="Comment"
-                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                >
-                  <TableCell component="th" scope="row">
-                    Comment
-                  </TableCell>
-                  <TableCell>
-                    <TextField
-                      id="comment"
-                      label="Comment"
-                      defaultValue={data.Comment}
-                      name="comment"
-                      fullWidth
-                    />
-                  </TableCell>
-                </TableRow>
-
-                <TableRow
-                  row="Tags"
-                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                >
-                  <TableCell component="th" scope="row">
-                    Comment
-                  </TableCell>
-                  <TableCell>
-                    <TextField
-                      id="tags"
-                      label="tags"
-                      defaultValue={Tag(data.Tags)}
-                      name="tags"
-                      fullWidth
-                    />
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </TableContainer>
-          <input type="hidden" name="month" value={month} />
-          <input type="hidden" name="year" value={year} />
-        </Form>
-      </>
-    );
+  // const outputData = (data) => {
+  const displayError = () => {
+    if (
+      action !== undefined &&
+      action.Error !== undefined &&
+      action.Error === true
+    ) {
+      return (
+        <>
+          <div>
+            <Typography sx={{ color: "red" }} variant="h5">
+              {action.Message}
+            </Typography>
+          </div>
+        </>
+      );
+    }
+    return <></>;
   };
 
-  return ErrorOrData(data, outputData);
+  return (
+    <>
+      <h1>Day Data Edit</h1>
+      <Form method="post" id="daydata-edit">
+        <Stack direction="row" spacing={2}>
+          <Button variant="contained" type="submit">
+            Save
+          </Button>
+          <Button variant="contained" onClick={() => navigate(-1)}>
+            Cancel
+          </Button>
+        </Stack>
+
+        <Container>{displayError()}</Container>
+        <TableContainer component={Paper}>
+          <Table sx={{ minWidth: 650 }}>
+            <TableHead>
+              <TableRow>
+                <TableCell>Item</TableCell>
+                <TableCell>Value</TableCell>
+              </TableRow>
+            </TableHead>
+
+            <TableBody>
+              <TableRow
+                row="Date"
+                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+              >
+                <TableCell component="th" scope="row">
+                  Date
+                </TableCell>
+                <TableCell>{data.Date}</TableCell>
+              </TableRow>
+
+              <TableRow
+                row="Comment"
+                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+              >
+                <TableCell component="th" scope="row">
+                  Comment
+                </TableCell>
+                <TableCell>
+                  <TextField
+                    id="comment"
+                    label="Comment"
+                    defaultValue={data.Comment}
+                    name="comment"
+                    fullWidth
+                  />
+                </TableCell>
+              </TableRow>
+
+              <TableRow
+                row="Tags"
+                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+              >
+                <TableCell component="th" scope="row">
+                  Comment
+                </TableCell>
+                <TableCell>
+                  <TextField
+                    id="tags"
+                    label="tags"
+                    defaultValue={Tag(data.Tags)}
+                    name="tags"
+                    fullWidth
+                  />
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <input type="hidden" name="month" value={month} />
+        <input type="hidden" name="year" value={year} />
+      </Form>
+    </>
+  );
+  // };
+  //
+  // return outputData(data);
 }

@@ -11,6 +11,7 @@ actix-cors = "0.7"
 
 # loggings
 env_logger = "0.11.6"
+log = "0.4"
 
 # .env file reading
 dotenvy = "0.15"
@@ -23,14 +24,10 @@ diesel = { version = "2.2", features = [
   "sqlite",
   "returning_clauses_for_sqlite_3_35",
   "r2d2",
-  "time",
-  # "64-column-tables",
+  "chrono",
 ] }
 
 diesel_migrations = "2.2.0"
 
-# db pool connection
-# r2d2 = "0.8.10"
-
 # time library
-time = { version = "0.3", features = ["serde"] }
+chrono = { version = "0.4", features = ["serde"] }

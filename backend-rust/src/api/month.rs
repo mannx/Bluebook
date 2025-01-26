@@ -2,10 +2,12 @@
 use actix_web::error;
 use actix_web::HttpResponse;
 use actix_web::{get, web, Responder};
+use chrono::{Datelike, Days, NaiveDate};
 use diesel::prelude::*;
 use diesel::SqliteConnection;
 use serde::{Deserialize, Serialize};
 
+use crate::api::get_days_in_month;
 use crate::api::{DbError, DbPool};
 use crate::models::hockey::HockeySchedule;
 use crate::models::prelude::*;
@@ -18,10 +20,11 @@ struct EndOfWeek {
     ThirdPartyTotal: f32,
 }
 
+// Tags is reused else where.  move to another mod with get_tags?
 #[derive(Serialize, Deserialize)]
-struct Tags {
-    tag: String,
-    id: i32,
+pub struct Tags {
+    pub tag: String,
+    pub id: i32,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -30,7 +33,7 @@ struct MonthData {
     ThirdPartyDollar: f32,
     ThirdPartyPercent: f32,
     GrossSales: f32,
-    DayOfWeek: String,
+    DayOfWeek: String, // text form of the day of the week (Mon,Tue,etc)
     EndOfWeek: Option<EndOfWeek>,
     Tags: Vec<Tags>,
 
@@ -43,7 +46,7 @@ struct MonthData {
 
     // split out as DayData.DayDate gets serialized as [year, day_in_year] with no month
     Day: u8,
-    Month: time::Month,
+    Month: u8,
     Year: i32,
     Hockey: Option<HockeySchedule>,
 }
@@ -63,8 +66,8 @@ impl MonthData {
             Tags: Vec::new(),
             SalesLastWeek: 0,
             WeeklyAverage: 0.,
-            Day: data.DayDate.day(),
-            Month: data.DayDate.month(),
+            Day: data.DayDate.day() as u8,
+            Month: data.DayDate.month() as u8,
             Year: data.DayDate.year(),
             Hockey: None,
         }
@@ -73,7 +76,7 @@ impl MonthData {
 #[get("/api/month/{month}/{year}")]
 pub async fn get_month_view_handler(
     pool: web::Data<DbPool>,
-    params: web::Path<(u8, i32)>,
+    params: web::Path<(u32, i32)>,
 ) -> actix_web::Result<impl Responder> {
     let (month, year) = params.into_inner();
 
@@ -89,15 +92,14 @@ pub async fn get_month_view_handler(
 
 fn get_month_data(
     conn: &mut SqliteConnection,
-    month: u8,
+    month: u32,
     year: i32,
 ) -> Result<Vec<MonthData>, DbError> {
     use crate::schema::day_data::dsl::*;
 
-    let month = time::Month::try_from(month).expect("invalid month provided");
-    let start_day = time::Date::from_calendar_date(year, month, 1).expect("invalid date provided");
-    let end_day = time::Date::from_calendar_date(year, month, month.length(year))
-        .expect("invalid date provided");
+    let days = get_days_in_month(year, month);
+    let start_day = NaiveDate::from_ymd_opt(year, month, 1).expect("invalid date provided");
+    let end_day = NaiveDate::from_ymd_opt(year, month, days).expect("invalid date provided (2)");
 
     // retrieve the data from the db
     let results = day_data
@@ -114,7 +116,7 @@ fn get_month_data(
 
         // calculate various fields
         // calculate the week ending information if required
-        if md.Data.DayDate.weekday() == time::Weekday::Tuesday {
+        if md.Data.DayDate.weekday() == chrono::Weekday::Tue {
             md.EndOfWeek = Some(calculate_week_ending(conn, &md.Data)?);
         }
 
@@ -137,19 +139,18 @@ fn get_month_data(
     }
 
     // do we have missing days to pad out?
-    if data.len() != month.length(year) as usize {
-        let missing = month.length(year) as usize - data.len();
+    if data.len() != days as usize {
+        let missing = days as usize - data.len();
         let date = match data.last() {
             None => {
                 // no entries for the month, set date to end of previous month
-                time::Date::from_calendar_date(year, month, month.length(year))?
-                    .saturating_add(time::Duration::days(1))
+                NaiveDate::from_ymd_opt(2025, 1, 1).unwrap()
             }
             Some(date) => date.Data.DayDate,
         };
 
         for i in 0..missing {
-            let new_date = date.saturating_add(time::Duration::days((i + 1) as i64));
+            let new_date = date.checked_add_days(Days::new((i + 1) as u64)).unwrap();
             data.push(MonthData::new(&DayData::new(new_date)));
         }
     }
@@ -164,7 +165,10 @@ fn calculate_week_ending(
     use crate::schema::day_data::dsl::*;
 
     // get the previous 7 days
-    let start_date = data.DayDate.saturating_sub(time::Duration::days(6));
+    let start_date = data
+        .DayDate
+        .checked_sub_days(Days::new(6))
+        .expect("invalid date provided");
 
     let results: Vec<DayData> = day_data
         .filter(DayDate.ge(start_date).and(DayDate.le(data.DayDate)))
@@ -194,10 +198,12 @@ fn calculate_week_ending(
 
 /// Calculates the weekly average of the past 4 weeks to compare to this one
 /// TODO: have number of weeks a changable setting?
-fn calculate_weekly_average(conn: &mut SqliteConnection, date: time::Date) -> Result<f32, DbError> {
+fn calculate_weekly_average(conn: &mut SqliteConnection, date: NaiveDate) -> Result<f32, DbError> {
     use crate::schema::day_data::dsl::*;
 
-    let start_date = date.saturating_sub(time::Duration::weeks(4));
+    let start_date = date
+        .checked_sub_days(Days::new(4 * 7))
+        .expect("invalid start date"); // 4 weeks
 
     let results: Vec<DayData> = day_data
         .filter(DayDate.ge(start_date).and(DayDate.le(date)))
@@ -217,7 +223,8 @@ fn calculate_weekly_average(conn: &mut SqliteConnection, date: time::Date) -> Re
 }
 
 // get all tags for a given day based on id
-fn get_tags(conn: &mut SqliteConnection, day_id: i32) -> Result<Vec<Tags>, DbError> {
+// pub as this can get reused elsewhere.  move to another mod?
+pub fn get_tags(conn: &mut SqliteConnection, day_id: i32) -> Result<Vec<Tags>, DbError> {
     use crate::schema::tag_data::dsl::*;
 
     // retrieve all tags for this day
@@ -251,7 +258,7 @@ fn get_tags(conn: &mut SqliteConnection, day_id: i32) -> Result<Vec<Tags>, DbErr
 
 fn get_hockey_data(
     conn: &mut SqliteConnection,
-    date: time::Date,
+    date: NaiveDate,
 ) -> Result<HockeySchedule, DbError> {
     use crate::schema::hockey_schedule::dsl::*;
 

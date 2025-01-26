@@ -1,7 +1,9 @@
 use actix_web::error;
 use actix_web::HttpResponse;
 use actix_web::{get, web, Responder};
+use chrono::NaiveDate;
 use diesel::prelude::*;
+use log::error;
 
 use crate::api::*;
 use crate::models::prelude::*;
@@ -9,12 +11,11 @@ use crate::models::prelude::*;
 #[get("/api/weekly/view/{month}/{day}/{year}")]
 pub async fn weekly_test(
     pool: web::Data<DbPool>,
-    name: web::Path<(u8, u8, i32)>,
+    name: web::Path<(u32, u32, i32)>,
 ) -> actix_web::Result<impl Responder> {
     let (month, day, year) = name.into_inner();
-    let month = time::Month::try_from(month).expect("invalid month provided");
-    let date = time::Date::from_calendar_date(year, month, day).expect("unable to build date");
-    println!("date: {:?}", date);
+
+    let date = NaiveDate::from_ymd_opt(year, month, day).expect("invalid date provided!");
 
     let result = web::block(move || -> diesel::QueryResult<WeeklyInfo> {
         use crate::schema::weekly_info::dsl::*;
@@ -24,11 +25,20 @@ pub async fn weekly_test(
         let results = weekly_info
             .filter(DayDate.eq(date))
             .select(WeeklyInfo::as_select())
-            // .load(&mut conn)
-            .first::<WeeklyInfo>(&mut conn)
-            .expect("unable to retrieve data");
+            .first::<WeeklyInfo>(&mut conn);
 
-        Ok(results)
+        match results {
+            Ok(r) => Ok(r),
+            Err(e) => {
+                error!(
+                    "unable to retrieve weekly information for week of {}.  Returning blank data",
+                    date
+                );
+                error!("{}", e);
+
+                Ok(WeeklyInfo::new(date))
+            }
+        }
     })
     .await?
     .map_err(error::ErrorInternalServerError)?;

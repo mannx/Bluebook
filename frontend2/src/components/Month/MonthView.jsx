@@ -246,8 +246,10 @@ function Row(data, settings) {
       <td className="Month">{data.Data.CommentData}</td>
       <td className="Month no-print">{Tag(data.Tags)}</td>
       <td className="Month no-print">
-        {data.ID !== 0 ? (
-          <Link to={"/edit/" + data.Month + "/" + data.Year + "/" + data.ID}>
+        {data.Data.id !== 0 ? (
+          <Link
+            to={"/edit/" + data.Month + "/" + data.Year + "/" + data.Data.id}
+          >
             E
           </Link>
         ) : (
@@ -271,7 +273,8 @@ function hashDate(data) {
   const month = Zero("" + data.Month);
   const day = Zero("" + data.Day);
 
-  return year + month + day;
+  // return year + month + day;
+  return "" + data.Year + "-" + data.Month + "-" + data.Day;
 }
 function EndOfWeek(data) {
   return (

@@ -7,7 +7,7 @@ FROM rust AS build
 WORKDIR /app
 
 COPY backend-rust/ ./
-RUN cargo build
+RUN cargo build --release
 
 #
 # React Build Stage
@@ -31,19 +31,21 @@ RUN npm run build
 #
 
 # FROM alpine:3.17
-#
-# # make sure required packages are installed
-# # poppler-utils required for pdf parsing 
+FROM debian:bookworm-slim
+
+# make sure required packages are installed
+# poppler-utils required for pdf parsing 
 # RUN apk update
 # RUN apk add tzdata poppler-utils sqlite 
+RUN apt update && apt install sqlite3 -y
 
-FROM debian:bookworm-slim AS runtime
-
-# update and install required deps
-RUN apt update && apt install sqlite3 bash -y
+# FROM debian:bookworm-slim AS runtime
+#
+# # update and install required deps
+# RUN apt update && apt install sqlite3 bash -y
 WORKDIR /
 
-COPY --from=build /app/target/debug/backend-rust /bluebook
+COPY --from=build /app/target/release/backend-rust /bluebook
 COPY --from=react /app/dist /dist
 
 # copy in default config file for top5 api

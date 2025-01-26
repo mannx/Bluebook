@@ -1,4 +1,5 @@
 #![allow(non_snake_case)]
+use chrono::NaiveDate;
 use diesel::prelude::*;
 use serde::{Deserialize, Serialize};
 
@@ -8,7 +9,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize, Clone)]
 pub struct HockeySchedule {
     pub id: i32,
-    pub DayDate: time::Date,
+    pub DayDate: NaiveDate,
     pub Away: String,
     pub Home: String,
     pub GFAway: i32,

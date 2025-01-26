@@ -1,6 +1,6 @@
 services:
   bluebook:
-    image: bluebook:dev
+    image: bluebook:latest
     container_name: bluebook
     # env_file: ".env"
     ports:
@@ -10,6 +10,7 @@ services:
       - DATABASE_URL=/data/db.db
       - PUID=1000
       - PGID=1000
+      - RUST_LOG=debug
     volumes:
       - ./data:/data:z
       - ./import_data:/import
@@ -17,3 +18,4 @@ services:
     deploy:
       restart_policy:
         condition: on-failure
+    network_mode: host
