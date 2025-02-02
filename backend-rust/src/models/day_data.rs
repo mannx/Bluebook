@@ -51,12 +51,27 @@ pub struct TagList {
     pub Tag: Option<String>,
 }
 
+#[derive(Insertable)]
+#[diesel(table_name=crate::schema::tag_list)]
+#[diesel(check_for_backend(diesel::sqlite::Sqlite))]
+pub struct TagListInsert {
+    pub Tag: Option<String>,
+}
+
 #[derive(Queryable, Selectable)]
 #[diesel(table_name=crate::schema::tag_data)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 #[allow(dead_code)]
 pub struct TagData {
     pub id: i32,
+    pub TagID: i32,
+    pub DayID: i32,
+}
+
+#[derive(Insertable)]
+#[diesel(table_name=crate::schema::tag_data)]
+#[diesel(check_for_backend(diesel::sqlite::Sqlite))]
+pub struct TagDataInsert {
     pub TagID: i32,
     pub DayID: i32,
 }
@@ -180,4 +195,41 @@ impl DayDataInsert {
             BreadOverShort: 0.,
         }
     }
+
+    // create an insertable entry from the main entry
+    // pub fn from(data:&DayData)->Self{
+    //     Self{
+    //         DayDate:data.DayDate,
+    //         CashDeposit
+    //         DebitCard
+    //         MasterCard
+    //         Visa
+    //         Amex
+    //         CreditSales
+    //         GiftCardRedeem
+    //         SubwayCaters
+    //         PayPal
+    //         SkipTheDishes
+    //         DoorDash
+    //         UberEats
+    //         PettyCash
+    //         Tips
+    //         Hst
+    //         BottleDeposit
+    //         NetSales
+    //         CreditSalesRedeemed
+    //         CreditFood
+    //         GiftCardSold
+    //         USFunds
+    //         WeeklyAverage
+    //         CommentData
+    //         HoursWorked
+    //         Productivity
+    //         Factor
+    //         AdjustedSales
+    //         CustomerCount
+    //         BreadCredits
+    //         BreadOverShort
+    //     }
+    // }
 }

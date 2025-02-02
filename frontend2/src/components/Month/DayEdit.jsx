@@ -34,13 +34,11 @@ function Tag(data) {
 export async function loader({ params }) {
   var q = "";
   if (params.date === undefined) {
-    // no date, use id
-    // q = "?id=" + params.id;
+    // no date, use id, date is required even if not used
     q = "/" + params.id + "/2020-01-01";
   } else {
     // date provided, ignore id
     // but id is required by api -- set to 0
-    // q = "?id=0&date=" + params.date;
     q = "/0/" + params.date;
   }
 
@@ -64,6 +62,7 @@ export async function action({ request, params }) {
     Date: params.date,
   };
 
+  console.log("date: " + params.date);
   const opt = GetPostOptions(JSON.stringify(body));
   const resp = await fetch(UrlApi2DayUpdate, opt);
   const data = await resp.json();

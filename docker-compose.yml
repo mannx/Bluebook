@@ -18,4 +18,4 @@ services:
     deploy:
       restart_policy:
         condition: on-failure
-    network_mode: host
+    # network_mode: host

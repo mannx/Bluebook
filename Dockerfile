@@ -19,12 +19,11 @@ WORKDIR /app
 
 COPY ./frontend2 .
 
-# fix urls for prod
+# fix urls
 RUN sed -i 's|http://localhost:8080||' src/components/URLs.jsx
 
 RUN npm install 
 RUN npm run build
-
 
 #
 # Deploy Stage

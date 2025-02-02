@@ -48,8 +48,8 @@ async fn main() -> std::io::Result<()> {
     }
 
     HttpServer::new(move || {
-        let cors = Cors::default().allow_any_origin().allow_any_method();
-        // let cors = Cors::permissive();
+        // let cors = Cors::default().allow_any_origin().allow_any_method();
+        let cors = Cors::permissive();
 
         App::new()
             .wrap(Logger::default())
@@ -60,9 +60,11 @@ async fn main() -> std::io::Result<()> {
             .service(api::month::get_month_view_handler)
             .service(api::settings::get_bluebook_settings)
             .service(api::day_edit::day_edit_get)
+            .service(api::day_edit::day_edit_update)
             .service(actix_files::Files::new("/", "./dist/").index_file("index.html"))
     })
-    .bind(("127.0.0.1", 8080))?
+    // .bind(("127.0.0.1", 8080))?
+    .bind(("0.0.0.0", 8080))?
     .run()
     .await
 }

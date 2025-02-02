@@ -1,4 +1,5 @@
 pub mod day_edit;
+pub mod error;
 pub mod month;
 pub mod settings;
 pub mod weekly;
