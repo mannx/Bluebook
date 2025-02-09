@@ -5,14 +5,22 @@ use diesel::r2d2;
 use diesel::sqlite::Sqlite;
 use diesel::SqliteConnection;
 use env_logger::Env;
+use enviroment::Environment;
+use lazy_static::lazy_static;
+use log::debug;
 use std::{env, error::Error};
 
 mod api;
+mod enviroment;
 mod handlers;
 mod models;
 mod schema;
 
 const MIGRATIONS: diesel_migrations::EmbeddedMigrations = diesel_migrations::embed_migrations!();
+
+lazy_static! {
+    static ref ENVIRONMENT: Environment = Environment::load();
+}
 
 fn run_migrations(
     conn: &mut impl diesel_migrations::MigrationHarness<Sqlite>,
@@ -49,6 +57,8 @@ async fn main() -> std::io::Result<()> {
         Err(e) => println!("error unable to migrate db.: {:?}", e),
     }
 
+    debug!("import path: {}", ENVIRONMENT.ImportPath);
+
     HttpServer::new(move || {
         // let cors = Cors::default().allow_any_origin().allow_any_method();
         let cors = Cors::permissive();
@@ -63,6 +73,7 @@ async fn main() -> std::io::Result<()> {
             .service(api::settings::get_bluebook_settings)
             .service(handlers::day_edit::day_edit_get)
             .service(handlers::day_edit::day_edit_update)
+            .service(handlers::import::import_list)
             // return the index on all other paths so react-router works
             .service(
                 actix_files::Files::new("/", "./dist/")

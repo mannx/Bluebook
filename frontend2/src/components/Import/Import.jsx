@@ -122,7 +122,8 @@ export default function Import() {
       return;
     }
 
-    const data = JSON.parse(action.Data);
+    // const data = JSON.parse(action.Data);
+    const data = action.Data;
 
     return (
       <>

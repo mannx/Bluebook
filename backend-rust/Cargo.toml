@@ -31,3 +31,10 @@ diesel_migrations = "2.2.0"
 
 # time library
 chrono = { version = "0.4", features = ["serde"] }
+
+# file utils
+#  - allows pattern matching on file names
+glob = "0.3.2"
+
+# misc
+lazy_static = "1.5.0"
