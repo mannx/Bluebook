@@ -7,8 +7,8 @@ pub mod weekly;
 use chrono::NaiveDate;
 use diesel::prelude::*;
 
-type DbPool = diesel::r2d2::Pool<diesel::r2d2::ConnectionManager<SqliteConnection>>;
-type DbError = Box<dyn std::error::Error + Send + Sync>;
+pub type DbPool = diesel::r2d2::Pool<diesel::r2d2::ConnectionManager<SqliteConnection>>;
+pub type DbError = Box<dyn std::error::Error + Send + Sync>;
 
 pub fn get_days_in_month(year: i32, month: u32) -> u32 {
     NaiveDate::from_ymd_opt(

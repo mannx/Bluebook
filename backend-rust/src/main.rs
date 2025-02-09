@@ -1,4 +1,5 @@
 use actix_cors::Cors;
+use actix_web::dev::ServiceResponse;
 use actix_web::{middleware::Logger, web, App, HttpServer};
 use diesel::r2d2;
 use diesel::sqlite::Sqlite;
@@ -7,6 +8,7 @@ use env_logger::Env;
 use std::{env, error::Error};
 
 mod api;
+mod handlers;
 mod models;
 mod schema;
 
@@ -57,13 +59,26 @@ async fn main() -> std::io::Result<()> {
             .wrap(cors)
             .app_data(web::Data::new(pool.clone()))
             .service(api::weekly::weekly_test)
-            .service(api::month::get_month_view_handler)
+            .service(handlers::month::get_month_view_handler)
             .service(api::settings::get_bluebook_settings)
-            .service(api::day_edit::day_edit_get)
-            .service(api::day_edit::day_edit_update)
-            .service(actix_files::Files::new("/", "./dist/").index_file("index.html"))
+            .service(handlers::day_edit::day_edit_get)
+            .service(handlers::day_edit::day_edit_update)
+            // return the index on all other paths so react-router works
+            .service(
+                actix_files::Files::new("/", "./dist/")
+                    .prefer_utf8(true)
+                    .index_file("index.html")
+                    .default_handler(|req: actix_web::dev::ServiceRequest| {
+                        let (http_req, _) = req.into_parts();
+
+                        async {
+                            let resp = actix_files::NamedFile::open("./dist/index.html")?
+                                .into_response(&http_req);
+                            Ok(ServiceResponse::new(http_req, resp))
+                        }
+                    }),
+            )
     })
-    // .bind(("127.0.0.1", 8080))?
     .bind(("0.0.0.0", 8080))?
     .run()
     .await

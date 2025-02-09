@@ -1,14 +1,14 @@
 #![allow(non_snake_case)]
-use actix_web::error;
-use actix_web::HttpResponse;
-use actix_web::{get, web, Responder};
+// use actix_web::error;
+// use actix_web::HttpResponse;
+// use actix_web::{get, web, Responder};
 use chrono::{Datelike, Days, NaiveDate};
 use diesel::prelude::*;
 use diesel::SqliteConnection;
 use serde::{Deserialize, Serialize};
 
 use crate::api::get_days_in_month;
-use crate::api::{DbError, DbPool};
+use crate::api::DbError;
 use crate::models::hockey::HockeySchedule;
 use crate::models::prelude::*;
 
@@ -28,7 +28,7 @@ pub struct Tags {
 }
 
 #[derive(Serialize, Deserialize)]
-struct MonthData {
+pub struct MonthData {
     Data: DayData,
     ThirdPartyDollar: f32,
     ThirdPartyPercent: f32,
@@ -73,24 +73,24 @@ impl MonthData {
         }
     }
 }
-#[get("/api/month/{month}/{year}")]
-pub async fn get_month_view_handler(
-    pool: web::Data<DbPool>,
-    params: web::Path<(u32, i32)>,
-) -> actix_web::Result<impl Responder> {
-    let (month, year) = params.into_inner();
+// #[get("/api/month/{month}/{year}")]
+// pub async fn get_month_view_handler(
+//     pool: web::Data<DbPool>,
+//     params: web::Path<(u32, i32)>,
+// ) -> actix_web::Result<impl Responder> {
+//     let (month, year) = params.into_inner();
+//
+//     let results = web::block(move || {
+//         let mut conn = pool.get()?;
+//         get_month_data(&mut conn, month, year)
+//     })
+//     .await?
+//     .map_err(error::ErrorInternalServerError)?;
+//
+//     Ok(HttpResponse::Ok().json(results))
+// }
 
-    let results = web::block(move || {
-        let mut conn = pool.get()?;
-        get_month_data(&mut conn, month, year)
-    })
-    .await?
-    .map_err(error::ErrorInternalServerError)?;
-
-    Ok(HttpResponse::Ok().json(results))
-}
-
-fn get_month_data(
+pub fn get_month_data(
     conn: &mut SqliteConnection,
     month: u32,
     year: i32,

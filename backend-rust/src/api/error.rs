@@ -17,6 +17,7 @@ impl<T> ApiReturnMessage<T> {
         }
     }
 
+    #[allow(dead_code)]
     pub fn ok(data: T) -> Self {
         Self {
             Error: false,
