@@ -2,12 +2,14 @@
 use crate::api::error::ApiReturnMessage;
 use crate::ENVIRONMENT;
 use actix_web::HttpResponse;
-use actix_web::{get, Responder};
-use log::error;
+use actix_web::{get, post, web, Responder};
+use log::{debug, error};
 
 use glob::glob;
 use serde::Serialize;
 use std::path::PathBuf;
+
+use crate::api::DbPool;
 
 #[derive(Serialize)]
 struct ImportFileList {
@@ -43,6 +45,22 @@ pub async fn import_list() -> actix_web::Result<impl Responder> {
     Ok(HttpResponse::Ok().json(res))
 }
 
+#[post("/api/import/daily")]
+pub async fn import_daily(
+    pool: web::Data<DbPool>,
+    data: web::Json<Vec<String>>,
+) -> actix_web::Result<impl Responder> {
+    debug!("[import_daily]");
+
+    for f in data.iter() {
+        // debug!("file: {f}");
+        crate::imports::daily::daily_import(f);
+    }
+
+    Ok(HttpResponse::Ok())
+}
+
+// get the list of files possible to import to the db
 fn get_file_list() -> std::io::Result<ImportFileList> {
     let daily = get_files("*.xlsx")?;
     let control = get_files("ControlSheetReport_*.pdf")?;

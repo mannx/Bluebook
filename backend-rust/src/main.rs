@@ -13,6 +13,7 @@ use std::{env, error::Error};
 mod api;
 mod enviroment;
 mod handlers;
+mod imports;
 mod models;
 mod schema;
 
@@ -32,13 +33,14 @@ fn run_migrations(
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    env_logger::init_from_env(Env::default().default_filter_or("debug"));
-
     // dotenvy::dotenv().expect("unable to read .env");
     println!("loading .env file if present...");
     if dotenvy::dotenv().is_err() {
         println!("[dotenvy] unable to load .env file.  proceeding without");
     }
+
+    env_logger::init_from_env(Env::default().default_filter_or("info"));
+    debug!("Logger initialized");
 
     let url = env::var("DATABASE_URL").expect("DATABASE_URL required");
     let manager = r2d2::ConnectionManager::<SqliteConnection>::new(url);
@@ -74,6 +76,7 @@ async fn main() -> std::io::Result<()> {
             .service(handlers::day_edit::day_edit_get)
             .service(handlers::day_edit::day_edit_update)
             .service(handlers::import::import_list)
+            .service(handlers::import::import_daily)
             // return the index on all other paths so react-router works
             .service(
                 actix_files::Files::new("/", "./dist/")
