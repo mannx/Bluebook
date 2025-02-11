@@ -3,20 +3,10 @@ use actix_web::error;
 use actix_web::HttpResponse;
 use actix_web::{get, post, web, Responder};
 use chrono::NaiveDate;
-// use diesel::prelude::*;
-// use diesel::result::Error::NotFound;
-// use diesel::SqliteConnection;
-// use log::error;
-// use serde::Deserialize;
-// use serde::Serialize;
-//
-// use crate::api::month::get_tags;
-use crate::api::DbPool;
-// use crate::models::day_data::*;
-// use crate::models::prelude::DayDataInsert;
 
 use crate::api::day_edit::*;
 use crate::api::error::ApiReturnMessage;
+use crate::api::DbPool;
 
 #[get("/api2/day/edit/{id}/{date}")]
 pub async fn day_edit_get(

@@ -122,13 +122,10 @@ export default function Import() {
       return;
     }
 
-    // const data = JSON.parse(action.Data);
-    const data = action.Data;
-
     return (
       <>
         <ul>
-          {data.map((o) => {
+          {action.Messages.map((o) => {
             return <li>{o}</li>;
           })}
         </ul>
@@ -154,7 +151,7 @@ export default function Import() {
             {createForm("control", data.Control)}
           </TabPanel>
           <TabPanel value={value} index={2}>
-            {createForm("wisr", data.WISR)}
+            {createForm("wisr", data.Wisr)}
           </TabPanel>
         </Box>
         <Container>{displayResults()}</Container>

@@ -9,7 +9,6 @@ use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize, Clone)]
 pub struct DayData {
     pub id: i32,
-    // pub DayDate: time::Date,
     pub DayDate: NaiveDate,
     pub CashDeposit: f32,
     pub DebitCard: f32,
@@ -120,7 +119,6 @@ pub struct DayDataInsert {
 }
 
 impl DayData {
-    // pub fn new(date: time::Date) -> Self {
     pub fn new(date: chrono::NaiveDate) -> Self {
         Self {
             id: 0,
@@ -197,39 +195,39 @@ impl DayDataInsert {
     }
 
     // create an insertable entry from the main entry
-    // pub fn from(data:&DayData)->Self{
-    //     Self{
-    //         DayDate:data.DayDate,
-    //         CashDeposit
-    //         DebitCard
-    //         MasterCard
-    //         Visa
-    //         Amex
-    //         CreditSales
-    //         GiftCardRedeem
-    //         SubwayCaters
-    //         PayPal
-    //         SkipTheDishes
-    //         DoorDash
-    //         UberEats
-    //         PettyCash
-    //         Tips
-    //         Hst
-    //         BottleDeposit
-    //         NetSales
-    //         CreditSalesRedeemed
-    //         CreditFood
-    //         GiftCardSold
-    //         USFunds
-    //         WeeklyAverage
-    //         CommentData
-    //         HoursWorked
-    //         Productivity
-    //         Factor
-    //         AdjustedSales
-    //         CustomerCount
-    //         BreadCredits
-    //         BreadOverShort
-    //     }
-    // }
+    pub fn from(data: &DayData) -> Self {
+        Self {
+            DayDate: data.DayDate,
+            CashDeposit: data.CashDeposit,
+            DebitCard: data.DebitCard,
+            MasterCard: data.MasterCard,
+            Visa: data.Visa,
+            Amex: data.Amex,
+            CreditSales: data.CreditSales,
+            GiftCardRedeem: data.GiftCardRedeem,
+            SubwayCaters: data.SubwayCaters,
+            PayPal: data.PayPal,
+            SkipTheDishes: data.SkipTheDishes,
+            DoorDash: data.DoorDash,
+            UberEats: data.UberEats,
+            PettyCash: data.PettyCash,
+            Tips: data.Tips,
+            Hst: data.Hst,
+            BottleDeposit: data.BottleDeposit,
+            NetSales: data.NetSales,
+            CreditSalesRedeemed: data.CreditSalesRedeemed,
+            CreditFood: data.CreditFood,
+            GiftCardSold: data.GiftCardSold,
+            USFunds: data.USFunds,
+            WeeklyAverage: data.WeeklyAverage,
+            CommentData: data.CommentData.clone(),
+            HoursWorked: data.HoursWorked,
+            Productivity: data.Productivity,
+            Factor: data.Factor,
+            AdjustedSales: data.AdjustedSales,
+            CustomerCount: data.CustomerCount,
+            BreadCredits: data.BreadCredits,
+            BreadOverShort: data.BreadOverShort,
+        }
+    }
 }

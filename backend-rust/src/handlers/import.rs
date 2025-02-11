@@ -1,15 +1,18 @@
 #![allow(non_snake_case)]
 use crate::api::error::ApiReturnMessage;
+use crate::imports::daily::daily_import;
+use crate::imports::ImportResult;
 use crate::ENVIRONMENT;
-use actix_web::HttpResponse;
+use actix_web::{error, HttpResponse};
 use actix_web::{get, post, web, Responder};
-use log::{debug, error};
+use diesel::SqliteConnection;
+use log::error;
 
 use glob::glob;
 use serde::Serialize;
 use std::path::PathBuf;
 
-use crate::api::DbPool;
+use crate::api::{DbError, DbPool};
 
 #[derive(Serialize)]
 struct ImportFileList {
@@ -50,14 +53,28 @@ pub async fn import_daily(
     pool: web::Data<DbPool>,
     data: web::Json<Vec<String>>,
 ) -> actix_web::Result<impl Responder> {
-    debug!("[import_daily]");
+    let mut messages: ImportResult = web::block(move || {
+        let mut conn = pool.get()?;
+        do_import(&mut conn, &data)
+    })
+    .await?
+    .map_err(error::ErrorInternalServerError)?;
+
+    messages.add("Import Complete".to_owned());
+
+    Ok(HttpResponse::Ok().json(messages))
+}
+
+fn do_import(conn: &mut SqliteConnection, data: &[String]) -> Result<ImportResult, DbError> {
+    let mut msg = ImportResult::new();
 
     for f in data.iter() {
-        // debug!("file: {f}");
-        crate::imports::daily::daily_import(f);
+        // try to import the given file
+        let mut res = daily_import(conn, f);
+        msg.combine(&mut res);
     }
 
-    Ok(HttpResponse::Ok())
+    Ok(msg)
 }
 
 // get the list of files possible to import to the db
