@@ -4,6 +4,7 @@ pub mod daily;
 use crate::api::DbError;
 use serde::Serialize;
 use umya_spreadsheet::XlsxError;
+use diesel::result::Error;
 
 // List of all messages for the user generated during importing.  errors or status messages
 // TODO: indicate error vs status message for clearer messaging
@@ -34,9 +35,9 @@ impl ImportResult {
         self.Messages.append(&mut ir.Messages);
     }
 
-    #[allow(dead_code)]
+    // #[allow(dead_code)]
     // TODO: remove if we decide against using this
-    fn db_error(&mut self, err: DbError) {
+    fn db_error(&mut self, err: Error) {
         self.Error = Some(format!("Database error occurred: {err}"));
     }
 }

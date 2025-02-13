@@ -8,7 +8,6 @@ use diesel::prelude::*;
 use diesel::SqliteConnection;
 use log::{debug, error, info};
 use serde::Deserialize;
-use std::os::unix::fs::chroot;
 use std::path::PathBuf;
 use umya_spreadsheet::*;
 
@@ -165,7 +164,6 @@ fn parse_day(
     data.SubwayCaters = get_value(sheet, &config.SubwayCaters[version][day_index]);
     data.SkipTheDishes = get_value(sheet, &config.SkipTheDishes[version][day_index]);
     data.DoorDash = get_value(sheet, &config.DoorDash[version][day_index]);
-    // data.USFunds = get_value(sheet, &config.USCash[version][day_index]);
     data.PettyCash = get_value(sheet, &config.PettyCash[version][day_index]);
 
     // from sheet2
@@ -210,7 +208,7 @@ fn get_value(sheet: &Worksheet, cell: &str) -> f32 {
 }
 
 // insert or update the DayData table for the day we just processed
-fn insert_or_update(conn: &mut SqliteConnection, data: &DayData) -> Result<(), DbError> {
+fn insert_or_update(conn: &mut SqliteConnection, data: &DayData) -> Result<(), diesel::result::Error> {
     // try to retrieve the object from the db with the same date
     use crate::schema::day_data::dsl::*;
 
@@ -223,7 +221,7 @@ fn insert_or_update(conn: &mut SqliteConnection, data: &DayData) -> Result<(), D
     match result {
         Err(e) => {
             error!("retrieval for day date: {} failed.", data.DayDate);
-            // insert_data(conn, data);
+            insert_data(conn, data)?;
         }
         Ok(obj) => {
             info!("found data for day: {}", data.DayDate);
@@ -233,5 +231,14 @@ fn insert_or_update(conn: &mut SqliteConnection, data: &DayData) -> Result<(), D
     Ok(())
 }
 
-// fn insert_data(conn: &mut SqliteConnection, data: &DayData) -> Result<DayData, DbError> {}
+fn insert_data(conn: &mut SqliteConnection, data: &DayData) -> Result<DayData, diesel::result::Error> {
+    // insert into the database and return the new data or error
+    use crate::schema::day_data::dsl::*;
+
+    let data_insert=DayDataInsert::from(data);
+
+    diesel::insert_into(crate::schema::day_data::table).values(&data_insert).returning(DayData::as_returning())
+    .get_result(conn)
+}
+
 // fn update_data(conn: &mut SqliteConnection, data: &DayData) -> Result<DayData, DbError> {}
