@@ -6,6 +6,7 @@ use crate::ENVIRONMENT;
 use chrono::NaiveDate;
 use diesel::prelude::*;
 use diesel::SqliteConnection;
+use diesel::result::Error;
 use log::{debug, error, info};
 use serde::Deserialize;
 use std::path::PathBuf;
@@ -215,8 +216,6 @@ fn insert_or_update(conn: &mut SqliteConnection, data: &DayData) -> Result<(), d
     let result = day_data
         .filter(DayDate.eq(data.DayDate))
         .first::<DayData>(conn);
-    // .select(DayData::as_select())
-    // .load(conn)?;
 
     match result {
         Err(e) => {
@@ -231,7 +230,7 @@ fn insert_or_update(conn: &mut SqliteConnection, data: &DayData) -> Result<(), d
     Ok(())
 }
 
-fn insert_data(conn: &mut SqliteConnection, data: &DayData) -> Result<DayData, diesel::result::Error> {
+fn insert_data(conn: &mut SqliteConnection, data: &DayData) -> Result<DayData, Error> {
     // insert into the database and return the new data or error
     use crate::schema::day_data::dsl::*;
 
@@ -241,4 +240,7 @@ fn insert_data(conn: &mut SqliteConnection, data: &DayData) -> Result<DayData, d
     .get_result(conn)
 }
 
-// fn update_data(conn: &mut SqliteConnection, data: &DayData) -> Result<DayData, DbError> {}
+fn update_data(conn: &mut SqliteConnection, data: &DayData) -> Result<DayData, Error> {
+    // update the given record
+    diesel::update(crate::schema::day_data::table).set(data).returning(DayData::as_returning()).get_result(conn)
+}

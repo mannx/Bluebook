@@ -1,5 +1,6 @@
 #![allow(non_snake_case)]
 pub mod daily;
+pub mod control;
 
 use crate::api::DbError;
 use serde::Serialize;

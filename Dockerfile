@@ -3,7 +3,7 @@
 #
 # Rust Build Stage
 #
-FROM rust AS build
+FROM rust:alpine AS build
 WORKDIR /app
 
 COPY backend-rust/ ./
@@ -30,13 +30,14 @@ RUN npm run build
 #
 
 # FROM alpine:3.17
-FROM debian:bookworm-slim
+# FROM debian:bookworm-slim
+FROM alpine:latest
 
 # make sure required packages are installed
 # poppler-utils required for pdf parsing 
-# RUN apk update
-# RUN apk add tzdata poppler-utils sqlite 
-RUN apt update && apt install sqlite3 -y
+RUN apk update
+RUN apk add tzdata poppler-utils sqlite 
+# RUN apt update && apt install sqlite3 -y
 
 # FROM debian:bookworm-slim AS runtime
 #
@@ -49,6 +50,9 @@ COPY --from=react /app/dist /dist
 
 # copy in default config file for top5 api
 COPY ./backend/api/data.json /top5.json
+
+# copy in import mapping files
+COPY ./backend-rust/src/imports/id.ron /id.ron
 
 # copy run and backup scripts
 # COPY ./scripts /scripts

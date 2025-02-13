@@ -3,7 +3,7 @@ use chrono::NaiveDate;
 use diesel::prelude::*;
 use serde::{Deserialize, Serialize};
 
-#[derive(Queryable, Selectable)]
+#[derive(Queryable, Selectable,AsChangeset)]
 #[diesel(table_name=crate::schema::day_data)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 #[derive(Serialize, Deserialize, Clone)]
