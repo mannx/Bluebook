@@ -25,7 +25,6 @@ diesel::table! {
         CreditFood -> Float,
         GiftCardSold -> Float,
         USFunds -> Float,
-        WeeklyAverage -> Float,
         CommentData -> Nullable<Text>,
         HoursWorked -> Float,
         Productivity -> Float,
@@ -83,7 +82,6 @@ diesel::table! {
     weekly_info (id) {
         id -> Integer,
         DayDate -> Date,
-        BreadCount -> Integer,
         FoodCostAmount -> Float,
         FoodCostPercent -> Float,
         LabourCostAmount -> Float,

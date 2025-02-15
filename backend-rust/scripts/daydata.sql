@@ -60,7 +60,6 @@ UPDATE day_data SET CreditSalesRedeemed2=0 WHERE CreditSalesRedeemed2 IS NULL;
 UPDATE day_data SET CreditFood=0 WHERE CreditFood IS NULL;
 UPDATE day_data SET GiftCardSold=0 WHERE GiftCardSold IS NULL;
 UPDATE day_data SET USFunds=0 WHERE USFunds IS NULL;
-UPDATE day_data SET WeeklyAverage=0 WHERE WeeklyAverage IS NULL;
 
 -- update the date field to strip off the useless time component
 UPDATE day_data set Date=substr(Date,0,11);
@@ -72,13 +71,13 @@ ATTACH DATABASE 'db.db' AS db;
 INSERT INTO db.day_data (
   id, DayDate,CashDeposit,DebitCard,MasterCard,Visa,Amex,CreditSales,GiftCardRedeem,SubwayCaters,PayPal,
   SkipTheDishes,DoorDash,UberEats,PettyCash,Tips,Hst,BottleDeposit,NetSales,CreditSalesRedeemed,
-  CreditFood,GiftCardSold,USFunds,WeeklyAverage,CommentData,
+  CreditFood,GiftCardSold,USFunds,CommentData,
   HoursWorked,Productivity,Factor,AdjustedSales,CustomerCount,BreadCredits,BreadOverShort
 )
 SELECT 
   id, Date,CashDeposit,DebitCard,MasterCard,Visa,Amex,CreditSales,GiftCardRedeem,SubwayCaters,PayPal,
   SkipTheDishes,DoorDash,UberEats,PettyCash,Tips,Hst,BottleDeposit,NetSales,CreditSalesRedeemed+
-  CreditSalesRedeemed,CreditFood,GiftCardSold,USFunds,WeeklyAverage,Comment,
+  CreditSalesRedeemed,CreditFood,GiftCardSold,USFunds,Comment,
   HoursWorked,Productivity,Factor,AdjustedSales,CustomerCount,BreadCredits,BreadOverShort
 FROM day_data;
 

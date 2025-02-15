@@ -1,5 +1,6 @@
 #![allow(non_snake_case)]
 use crate::api::error::ApiReturnMessage;
+use crate::imports::control::import_control_sheet;
 use crate::imports::daily::daily_import;
 use crate::imports::ImportResult;
 use crate::ENVIRONMENT;
@@ -55,7 +56,7 @@ pub async fn import_daily(
 ) -> actix_web::Result<impl Responder> {
     let mut messages: ImportResult = web::block(move || {
         let mut conn = pool.get()?;
-        do_import(&mut conn, &data)
+        do_import_daily(&mut conn, &data)
     })
     .await?
     .map_err(error::ErrorInternalServerError)?;
@@ -65,12 +66,43 @@ pub async fn import_daily(
     Ok(HttpResponse::Ok().json(messages))
 }
 
-fn do_import(conn: &mut SqliteConnection, data: &[String]) -> Result<ImportResult, DbError> {
+#[post("/api/import/control")]
+pub async fn import_control(
+    pool: web::Data<DbPool>,
+    data: web::Json<Vec<String>>,
+) -> actix_web::Result<impl Responder> {
+    let mut messages: ImportResult = web::block(move || {
+        let mut conn = pool.get()?;
+        do_import_control(&mut conn, &data)
+    })
+    .await?
+    .map_err(error::ErrorInternalServerError)?;
+
+    messages.add("Import Complete".to_owned());
+
+    Ok(HttpResponse::Ok().json(messages))
+}
+
+fn do_import_daily(conn: &mut SqliteConnection, data: &[String]) -> Result<ImportResult, DbError> {
     let mut msg = ImportResult::new();
 
     for f in data.iter() {
         // try to import the given file
         let mut res = daily_import(conn, f);
+        msg.combine(&mut res);
+    }
+
+    Ok(msg)
+}
+
+fn do_import_control(
+    conn: &mut SqliteConnection,
+    data: &[String],
+) -> Result<ImportResult, DbError> {
+    let mut msg = ImportResult::new();
+
+    for f in data.iter() {
+        let mut res = import_control_sheet(conn, f);
         msg.combine(&mut res);
     }
 

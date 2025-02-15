@@ -59,8 +59,6 @@ async fn main() -> std::io::Result<()> {
         Err(e) => println!("error unable to migrate db.: {:?}", e),
     }
 
-    debug!("import path: {}", ENVIRONMENT.ImportPath);
-
     HttpServer::new(move || {
         // let cors = Cors::default().allow_any_origin().allow_any_method();
         let cors = Cors::permissive();
@@ -77,6 +75,7 @@ async fn main() -> std::io::Result<()> {
             .service(handlers::day_edit::day_edit_update)
             .service(handlers::import::import_list)
             .service(handlers::import::import_daily)
+            .service(handlers::import::import_control)
             // return the index on all other paths so react-router works
             .service(
                 actix_files::Files::new("/", "./dist/")

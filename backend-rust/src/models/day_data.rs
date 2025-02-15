@@ -1,14 +1,17 @@
 #![allow(non_snake_case)]
 use chrono::NaiveDate;
 use diesel::prelude::*;
+use diesel::result::Error;
 use serde::{Deserialize, Serialize};
 
-#[derive(Queryable, Selectable,AsChangeset)]
+#[derive(Queryable, Selectable, AsChangeset)]
 #[diesel(table_name=crate::schema::day_data)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 #[derive(Serialize, Deserialize, Clone)]
 pub struct DayData {
     pub id: i32,
+
+    // Debit Side
     pub DayDate: NaiveDate,
     pub CashDeposit: f32,
     pub DebitCard: f32,
@@ -23,6 +26,8 @@ pub struct DayData {
     pub DoorDash: f32,
     pub UberEats: f32,
     pub PettyCash: f32,
+
+    // Credit Side
     pub Tips: f32,
     pub Hst: f32,
     pub BottleDeposit: f32,
@@ -31,8 +36,9 @@ pub struct DayData {
     pub CreditFood: f32,
     pub GiftCardSold: f32,
     pub USFunds: f32,
-    pub WeeklyAverage: f32,
     pub CommentData: Option<String>,
+
+    // Control Sheet
     pub HoursWorked: f32,
     pub Productivity: f32,
     pub Factor: f32,
@@ -107,7 +113,6 @@ pub struct DayDataInsert {
     pub CreditFood: f32,
     pub GiftCardSold: f32,
     pub USFunds: f32,
-    pub WeeklyAverage: f32,
     pub CommentData: Option<String>,
     pub HoursWorked: f32,
     pub Productivity: f32,
@@ -121,7 +126,7 @@ pub struct DayDataInsert {
 impl DayData {
     pub fn new(date: chrono::NaiveDate) -> Self {
         Self {
-            id: 0,
+            id: -1,
             DayDate: date,
             CashDeposit: 0.,
             DebitCard: 0.,
@@ -144,7 +149,6 @@ impl DayData {
             CreditFood: 0.,
             GiftCardSold: 0.,
             USFunds: 0.,
-            WeeklyAverage: 0.,
             CommentData: None,
             HoursWorked: 0.,
             Productivity: 0.,
@@ -154,6 +158,36 @@ impl DayData {
             BreadCredits: 0.,
             BreadOverShort: 0.,
         }
+    }
+
+    // copy controlsheet data from one object to this one
+    // used before updating after a daily sheet import
+    pub fn copy_control(&mut self, data: &DayData) {
+        self.HoursWorked = data.HoursWorked;
+        self.Productivity = data.Productivity;
+        self.Factor = data.Factor;
+        self.AdjustedSales = data.AdjustedSales;
+        self.CustomerCount = data.CustomerCount;
+        self.BreadCredits = data.BreadCredits;
+        self.BreadOverShort = data.BreadOverShort;
+    }
+
+    pub fn insert_or_update(&self, conn: &mut SqliteConnection) -> Result<(), Error> {
+        // if data.id == -1, we insert, otherwise we update
+        if self.id == -1 {
+            // insert
+            let data_insert = DayDataInsert::from(self);
+
+            diesel::insert_into(crate::schema::day_data::table)
+                .values(&data_insert)
+                .execute(conn)?;
+        } else {
+            // update
+            diesel::update(crate::schema::day_data::table)
+                .set(self)
+                .execute(conn)?;
+        }
+        Ok(())
     }
 }
 
@@ -182,7 +216,6 @@ impl DayDataInsert {
             CreditFood: 0.,
             GiftCardSold: 0.,
             USFunds: 0.,
-            WeeklyAverage: 0.,
             CommentData: None,
             HoursWorked: 0.,
             Productivity: 0.,
@@ -219,7 +252,6 @@ impl DayDataInsert {
             CreditFood: data.CreditFood,
             GiftCardSold: data.GiftCardSold,
             USFunds: data.USFunds,
-            WeeklyAverage: data.WeeklyAverage,
             CommentData: data.CommentData.clone(),
             HoursWorked: data.HoursWorked,
             Productivity: data.Productivity,

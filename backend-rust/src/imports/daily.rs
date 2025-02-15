@@ -1,12 +1,11 @@
 // parse daily spreadsheets into the db
 
 #![allow(non_snake_case)]
-use crate::api::DbError;
 use crate::ENVIRONMENT;
 use chrono::NaiveDate;
 use diesel::prelude::*;
-use diesel::SqliteConnection;
 use diesel::result::Error;
+use diesel::SqliteConnection;
 use log::{debug, error, info};
 use serde::Deserialize;
 use std::path::PathBuf;
@@ -15,7 +14,6 @@ use umya_spreadsheet::*;
 use crate::imports::ImportResult;
 use crate::models::day_data::{DayData, DayDataInsert};
 
-#[allow(dead_code)]
 #[derive(Deserialize)]
 struct Config {
     Dates: Vec<Vec<String>>,
@@ -44,6 +42,7 @@ struct Config {
 
 impl Config {
     fn load() -> Self {
+        // TODO: adjust path if we are dockerized
         let fstr = std::fs::read_to_string("src/imports/id.ron").expect("unable to id.ron");
         ron::from_str::<Config>(fstr.as_str()).unwrap()
     }
@@ -110,7 +109,6 @@ pub fn daily_import(conn: &mut SqliteConnection, file_name: &String) -> ImportRe
             messages.db_error(err);
         }
 
-        debug!("[{}] ${}", day_data.DayDate, day_data.CashDeposit);
         messages.add(format!("successfully parsed {}", day_data.DayDate));
     }
 
@@ -209,7 +207,10 @@ fn get_value(sheet: &Worksheet, cell: &str) -> f32 {
 }
 
 // insert or update the DayData table for the day we just processed
-fn insert_or_update(conn: &mut SqliteConnection, data: &DayData) -> Result<(), diesel::result::Error> {
+fn insert_or_update(
+    conn: &mut SqliteConnection,
+    data: &DayData,
+) -> Result<(), diesel::result::Error> {
     // try to retrieve the object from the db with the same date
     use crate::schema::day_data::dsl::*;
 
@@ -218,29 +219,47 @@ fn insert_or_update(conn: &mut SqliteConnection, data: &DayData) -> Result<(), d
         .first::<DayData>(conn);
 
     match result {
-        Err(e) => {
+        Err(_) => {
             error!("retrieval for day date: {} failed.", data.DayDate);
             insert_data(conn, data)?;
         }
-        Ok(obj) => {
+        Ok(old) => {
             info!("found data for day: {}", data.DayDate);
+            // pass in the current db item since we dont want to update certain fields
+            update_data(conn, data, &old)?;
         }
     }
 
     Ok(())
 }
 
+// insert new entry into the db
 fn insert_data(conn: &mut SqliteConnection, data: &DayData) -> Result<DayData, Error> {
     // insert into the database and return the new data or error
-    use crate::schema::day_data::dsl::*;
+    let data_insert = DayDataInsert::from(data);
 
-    let data_insert=DayDataInsert::from(data);
-
-    diesel::insert_into(crate::schema::day_data::table).values(&data_insert).returning(DayData::as_returning())
-    .get_result(conn)
+    diesel::insert_into(crate::schema::day_data::table)
+        .values(&data_insert)
+        .returning(DayData::as_returning())
+        .get_result(conn)
 }
 
-fn update_data(conn: &mut SqliteConnection, data: &DayData) -> Result<DayData, Error> {
+// update an entry in the db, make sure to copy over any data we don't set from daily sheet
+// ie. copy data from control sheet over before updating
+fn update_data(
+    conn: &mut SqliteConnection,
+    data: &DayData,
+    old: &DayData,
+) -> Result<DayData, Error> {
+    // copy any data we dont want ot change
+    // could also do this in the update() function below?
+    let mut new_data = data.clone();
+    new_data.copy_control(old);
+
     // update the given record
-    diesel::update(crate::schema::day_data::table).set(data).returning(DayData::as_returning()).get_result(conn)
+    diesel::update(crate::schema::day_data::table)
+        // .set(data)
+        .set(new_data)
+        .returning(DayData::as_returning())
+        .get_result(conn)
 }

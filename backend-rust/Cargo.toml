@@ -42,3 +42,6 @@ umya-spreadsheet = "2.2.3"
 # misc
 lazy_static = "1.5.0"
 ron = "0.8"
+
+# regex for pattern matching import files
+regex = "1.11"

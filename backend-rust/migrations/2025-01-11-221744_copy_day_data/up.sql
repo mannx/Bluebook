@@ -28,9 +28,6 @@ CREATE TABLE IF NOT EXISTS day_data (
 
   USFunds REAL NOT NULL,
  
-  
-  WeeklyAverage REAL NOT NULL,
-  
   CommentData TEXT,
   HoursWorked REAL NOT NULL,
   Productivity REAL NOT NULL,
