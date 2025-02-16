@@ -50,7 +50,6 @@ lazy_static! {
 }
 
 // holds the data we are parseing
-#[allow(dead_code)]
 #[derive(Debug)]
 pub struct ControlSheetData {
     week_ending: NaiveDate,

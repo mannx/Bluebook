@@ -2,6 +2,7 @@
 use crate::api::error::ApiReturnMessage;
 use crate::imports::control::import_control_sheet;
 use crate::imports::daily::daily_import;
+use crate::imports::wisr::import_wisr_sheet;
 use crate::imports::ImportResult;
 use crate::ENVIRONMENT;
 use actix_web::{error, HttpResponse};
@@ -83,6 +84,24 @@ pub async fn import_control(
     Ok(HttpResponse::Ok().json(messages))
 }
 
+#[post("/api/import/wisr")]
+pub async fn import_wisr(
+    pool: web::Data<DbPool>,
+    data: web::Json<Vec<String>>,
+) -> actix_web::Result<impl Responder> {
+    let mut messages: ImportResult = web::block(move || {
+        let mut conn = pool.get()?;
+
+        do_wisr_import(&mut conn, &data)
+    })
+    .await?
+    .map_err(error::ErrorInternalServerError)?;
+
+    messages.add("Wisr Import Complete".to_owned());
+
+    Ok(HttpResponse::Ok().json(messages))
+}
+
 fn do_import_daily(conn: &mut SqliteConnection, data: &[String]) -> Result<ImportResult, DbError> {
     let mut msg = ImportResult::new();
 
@@ -103,6 +122,17 @@ fn do_import_control(
 
     for f in data.iter() {
         let mut res = import_control_sheet(conn, f);
+        msg.combine(&mut res);
+    }
+
+    Ok(msg)
+}
+
+fn do_wisr_import(conn: &mut SqliteConnection, data: &[String]) -> Result<ImportResult, DbError> {
+    let mut msg = ImportResult::new();
+
+    for f in data.iter() {
+        let mut res = import_wisr_sheet(conn, f);
         msg.combine(&mut res);
     }
 

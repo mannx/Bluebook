@@ -76,6 +76,7 @@ async fn main() -> std::io::Result<()> {
             .service(handlers::import::import_list)
             .service(handlers::import::import_daily)
             .service(handlers::import::import_control)
+            .service(handlers::import::import_wisr)
             // return the index on all other paths so react-router works
             .service(
                 actix_files::Files::new("/", "./dist/")

@@ -1,6 +1,7 @@
 #![allow(non_snake_case)]
 pub mod control;
 pub mod daily;
+pub mod wisr;
 
 use crate::ENVIRONMENT;
 use chrono::NaiveDate;
