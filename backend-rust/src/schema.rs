@@ -81,7 +81,7 @@ diesel::table! {
 diesel::table! {
     weekly_info (id) {
         id -> Integer,
-        DayDate -> Date,
+        WeekEnding -> Date,
         FoodCostAmount -> Float,
         FoodCostPercent -> Float,
         LabourCostAmount -> Float,

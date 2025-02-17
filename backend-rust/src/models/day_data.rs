@@ -89,7 +89,6 @@ pub struct TagDataInsert {
 #[derive(Insertable)]
 #[diesel(table_name=crate::schema::day_data)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
-#[derive(Serialize, Deserialize, Clone)]
 pub struct DayDataInsert {
     pub DayDate: NaiveDate,
     pub CashDeposit: f32,
@@ -183,7 +182,10 @@ impl DayData {
                 .execute(conn)?;
         } else {
             // update
+            use crate::schema::day_data::dsl::*;
+
             diesel::update(crate::schema::day_data::table)
+                .filter(id.eq(self.id)) // make sure to only update the record we are
                 .set(self)
                 .execute(conn)?;
         }

@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS weekly_info (
   id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
 
-  DayDate DATE NOT NULL,
+  WeekEnding DATE NOT NULL,
 
   FoodCostAmount REAL NOT NULL,
   FoodCostPercent REAL NOT NULL,

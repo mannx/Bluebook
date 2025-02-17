@@ -68,7 +68,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(Logger::new("%a %{User-Agent}i"))
             .wrap(cors)
             .app_data(web::Data::new(pool.clone()))
-            .service(api::weekly::weekly_test)
+            .service(handlers::weekly::weekly_handler)
             .service(handlers::month::get_month_view_handler)
             .service(api::settings::get_bluebook_settings)
             .service(handlers::day_edit::day_edit_get)

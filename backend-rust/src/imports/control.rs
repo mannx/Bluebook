@@ -50,7 +50,7 @@ lazy_static! {
 }
 
 // holds the data we are parseing
-#[derive(Debug)]
+// #[derive(Debug)]
 pub struct ControlSheetData {
     week_ending: NaiveDate,
     productivity: Vec<f32>,
@@ -255,6 +255,8 @@ fn save_control_sheet(
         let date = start_date.checked_add_days(Days::new(i as u64)).unwrap();
 
         // retrieve the data if in the db, or a new entry
+        debug!("loading or creating day data for {date}...");
+
         let mut day_data: DayData = match load_or_new_day(conn, date) {
             Err(err) => {
                 error!("Unable to retrieve or create daydata for control sheet import");

@@ -17,7 +17,7 @@ UPDATE weekly_infos set Date=substr(Date,0,11);
 ATTACH DATABASE 'db.db' AS db;
 
 INSERT INTO db.weekly_info (
-  id, DayDate,
+  id, WeekEnding,
   FoodCostAmount, FoodCostPercent, LabourCostAmount,LabourCostPercent,NetSales,PartySales,
   Productivity
 )

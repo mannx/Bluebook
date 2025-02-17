@@ -103,12 +103,12 @@ fn parse_wisr(file_name: &String) -> Result<WisrData, String> {
 
     wisr.week_ending = NaiveDate::from_ymd_opt(year, month, day).unwrap();
 
-    wisr.catering_sales = catering[1].parse::<f32>().unwrap();
+    wisr.catering_sales = catering[1].trim().parse::<f32>().unwrap();
 
-    wisr.food_cost_dollar = food_cost[1].parse::<f32>().unwrap();
+    wisr.food_cost_dollar = food_cost[1].replace(",", "").parse::<f32>().unwrap();
     wisr.food_cost_percent = food_cost[2].parse::<f32>().unwrap();
 
-    wisr.labour_cost_dollar = labour_cost[1].parse::<f32>().unwrap();
+    wisr.labour_cost_dollar = labour_cost[1].replace(",", "").parse::<f32>().unwrap();
     wisr.labour_cost_percent = labour_cost[2].parse::<f32>().unwrap();
 
     Ok(wisr)
@@ -122,13 +122,15 @@ fn save_wisr(
     // save the remaining weekly information
     let mut weekly: WeeklyInfo = load_or_new_week(conn, wisr.week_ending)?;
 
-    weekly.DayDate = wisr.week_ending;
+    weekly.WeekEnding = wisr.week_ending;
 
     weekly.FoodCostAmount = wisr.food_cost_dollar;
     weekly.FoodCostPercent = wisr.food_cost_percent;
 
     weekly.LabourCostAmount = wisr.labour_cost_dollar;
     weekly.LabourCostPercent = wisr.labour_cost_percent;
+
+    weekly.PartySales = wisr.catering_sales;
 
     // save or update the info
     weekly.insert_or_update(conn)?;

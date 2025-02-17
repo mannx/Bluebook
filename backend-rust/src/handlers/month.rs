@@ -1,13 +1,8 @@
 #![allow(non_snake_case)]
+use crate::api::DbPool;
 use actix_web::error;
 use actix_web::HttpResponse;
 use actix_web::{get, web, Responder};
-// use chrono::{Datelike, Days, NaiveDate};
-// use diesel::prelude::*;
-// use diesel::SqliteConnection;
-// use serde::{Deserialize, Serialize};
-
-use crate::api::DbPool;
 
 use crate::api::month::get_month_data;
 

@@ -10,8 +10,7 @@ use serde::Serialize;
 #[derive(Serialize)]
 pub struct WeeklyInfo {
     pub id: i32,
-    pub DayDate: NaiveDate,
-    // pub BreadCount: i32,
+    pub WeekEnding: NaiveDate,
     pub FoodCostAmount: f32,
     pub FoodCostPercent: f32,
 
@@ -27,10 +26,8 @@ pub struct WeeklyInfo {
 #[derive(Insertable)]
 #[diesel(table_name=crate::schema::weekly_info)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
-#[derive(Serialize)]
 pub struct WeeklyInfoInsert {
-    pub DayDate: NaiveDate,
-    // pub BreadCount: i32,
+    pub WeekEnding: NaiveDate,
     pub FoodCostAmount: f32,
     pub FoodCostPercent: f32,
 
@@ -47,7 +44,7 @@ impl WeeklyInfo {
     pub fn new(date: chrono::NaiveDate) -> Self {
         Self {
             id: -1,
-            DayDate: date,
+            WeekEnding: date,
             // BreadCount: 0,
             FoodCostAmount: 0.,
             FoodCostPercent: 0.,
@@ -70,7 +67,10 @@ impl WeeklyInfo {
                 .execute(conn)?;
         } else {
             // update
+            use crate::schema::weekly_info::dsl::*;
+
             diesel::update(crate::schema::weekly_info::table)
+                .filter(id.eq(self.id))
                 .set(self)
                 .execute(conn)?;
         }
@@ -82,7 +82,7 @@ impl WeeklyInfo {
 impl WeeklyInfoInsert {
     pub fn new(date: chrono::NaiveDate) -> Self {
         Self {
-            DayDate: date,
+            WeekEnding: date,
             FoodCostAmount: 0.,
             FoodCostPercent: 0.,
             LabourCostAmount: 0.,
@@ -95,7 +95,7 @@ impl WeeklyInfoInsert {
 
     pub fn from(data: &WeeklyInfo) -> Self {
         Self {
-            DayDate: data.DayDate,
+            WeekEnding: data.WeekEnding,
             FoodCostAmount: data.FoodCostAmount,
             FoodCostPercent: data.FoodCostPercent,
             LabourCostAmount: data.LabourCostAmount,

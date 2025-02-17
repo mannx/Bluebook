@@ -47,7 +47,6 @@ impl ImportResult {
         self.Messages.append(&mut ir.Messages);
     }
 
-    // #[allow(dead_code)]
     // TODO: remove if we decide against using this
     fn db_error(&mut self, err: Error) {
         self.Error = Some(format!("Database error occurred: {err}"));
@@ -131,7 +130,7 @@ fn load_or_new_week(conn: &mut SqliteConnection, date: NaiveDate) -> Result<Week
 
     // try to retrieve the data
     let result = weekly_info
-        .filter(DayDate.eq(date))
+        .filter(WeekEnding.eq(date))
         .first::<WeeklyInfo>(conn);
     match result {
         Ok(d) => Ok(d),

@@ -1,47 +1,163 @@
-use actix_web::error;
-use actix_web::HttpResponse;
-use actix_web::{get, web, Responder};
-use chrono::NaiveDate;
+#![allow(non_snake_case)]
+use chrono::{Days, NaiveDate};
 use diesel::prelude::*;
-use log::error;
+use diesel::result::Error;
+use log::{debug, info};
 
-use crate::api::*;
-use crate::models::prelude::*;
+use serde::Serialize;
 
-#[get("/api/weekly/view/{month}/{day}/{year}")]
-pub async fn weekly_test(
-    pool: web::Data<DbPool>,
-    name: web::Path<(u32, u32, i32)>,
-) -> actix_web::Result<impl Responder> {
-    let (month, day, year) = name.into_inner();
+use crate::api::DbError;
+use crate::models::day_data::DayData;
+use crate::models::weekly::WeeklyInfo;
 
-    let date = NaiveDate::from_ymd_opt(year, month, day).expect("invalid date provided!");
+#[derive(Serialize)]
+pub struct WeeklyReport {
+    TargetAUV: u32,
+    TargetHours: u32,
 
-    let result = web::block(move || -> diesel::QueryResult<WeeklyInfo> {
+    ProductivityBudget: f32,
+    ProductivityActual: f32,
+
+    FoodCostAmount: f32,
+    LabourCostAmount: f32,
+    PartySales: f32,
+
+    NetSales: f32,
+    NetSalesMismatch: bool, // true if net sales calculated from dailies differs from what was taken from wisr
+    WisrNetSales: f32,      // netsales from the control sheet.  debug for now
+
+    CustomerCount: i32,
+
+    GiftCardSold: f32,
+    GiftCardRedeem: f32,
+
+    BreadOverShort: f32,
+
+    LastYearSales: f32,
+    LastYearCustomerCount: u32,
+    UpcomingSales: f32,
+
+    PrevWeek: NaiveDate,
+}
+
+// used to hold data while WeeklyReport is being generated
+struct WeekData {
+    days: Vec<DayData>,
+    weekly: Option<WeeklyInfo>,
+    //todo: auv information here
+}
+
+impl WeeklyReport {
+    fn new() -> Self {
+        Self {
+            TargetAUV: 0,
+            TargetHours: 0,
+            ProductivityActual: 0.,
+            ProductivityBudget: 0.,
+            FoodCostAmount: 0.,
+            LabourCostAmount: 0.,
+            PartySales: 0.,
+            NetSales: 0.,
+            NetSalesMismatch: false,
+            WisrNetSales: 0.,
+            CustomerCount: 0,
+            GiftCardSold: 0.,
+            GiftCardRedeem: 0.,
+            BreadOverShort: 0.,
+            LastYearSales: 0.,
+            LastYearCustomerCount: 0,
+            UpcomingSales: 0.,
+            PrevWeek: NaiveDate::MIN,
+        }
+    }
+}
+
+impl WeekData {
+    fn new() -> Self {
+        Self {
+            days: Vec::new(),
+            weekly: None,
+        }
+    }
+}
+
+pub fn get_weekly_report(
+    conn: &mut SqliteConnection,
+    week_ending: NaiveDate,
+) -> Result<WeeklyReport, DbError> {
+    let data = get_week_data(conn, week_ending)?;
+
+    Ok(calculate_weekly(&data))
+}
+
+fn get_week_data(conn: &mut SqliteConnection, week_ending: NaiveDate) -> Result<WeekData, DbError> {
+    // get the starting day of the week
+    let start_day = week_ending.checked_sub_days(Days::new(6)).unwrap();
+
+    debug!("Geting week data between [{start_day}] and [{week_ending}]");
+
+    let mut data = WeekData::new();
+
+    // load the day data
+    {
+        use crate::schema::day_data::dsl::*;
+
+        debug!("Getting daily data...");
+        let mut result = day_data
+            .filter(DayDate.ge(start_day).and(DayDate.le(week_ending)))
+            .order(DayDate)
+            .select(DayData::as_select())
+            .load(conn)?;
+
+        data.days.append(&mut result);
+        debug!("Done!");
+    }
+
+    // get the weekly information
+    {
         use crate::schema::weekly_info::dsl::*;
 
-        let mut conn = pool.get().expect("unable to get db connection from pool");
+        debug!("Getting weekly info for {week_ending}...");
+        let result = weekly_info
+            .filter(WeekEnding.eq(week_ending))
+            .first::<WeeklyInfo>(conn);
 
-        let results = weekly_info
-            .filter(DayDate.eq(date))
-            .select(WeeklyInfo::as_select())
-            .first::<WeeklyInfo>(&mut conn);
+        let wi = match result {
+            Err(err) => match err {
+                Error::NotFound => {
+                    info!("Weekly data not found for {week_ending}");
+                    None
+                }
+                err => return Err(Box::new(err)),
+            },
+            Ok(n) => Some(n),
+        };
 
-        match results {
-            Ok(r) => Ok(r),
-            Err(e) => {
-                error!(
-                    "unable to retrieve weekly information for week of {}.  Returning blank data",
-                    date
-                );
-                error!("{}", e);
+        data.weekly = wi;
+        debug!("Done!");
+    }
 
-                Ok(WeeklyInfo::new(date))
-            }
-        }
-    })
-    .await?
-    .map_err(error::ErrorInternalServerError)?;
+    debug!("Returning weekly data");
+    Ok(data)
+}
 
-    Ok(HttpResponse::Ok().json(result))
+fn calculate_weekly(data: &WeekData) -> WeeklyReport {
+    let mut report = WeeklyReport::new();
+
+    // calcuate fields from the daily data
+    for i in &data.days {
+        report.NetSales += i.NetSales;
+        report.CustomerCount += i.CustomerCount;
+        report.GiftCardSold += i.GiftCardSold;
+        report.GiftCardRedeem += i.GiftCardRedeem;
+        report.BreadOverShort += i.BreadOverShort;
+    }
+
+    // calculate information from the weekly if we have it
+    if let Some(wi) = &data.weekly {
+        report.WisrNetSales = wi.NetSales;
+        report.NetSalesMismatch = report.WisrNetSales == report.NetSales;
+    }
+
+    report
 }
