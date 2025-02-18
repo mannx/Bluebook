@@ -1,5 +1,6 @@
 #![allow(non_snake_case)]
-use chrono::{Days, NaiveDate};
+// use chrono::{Days, NaiveDate};
+use chrono::{Datelike, Days, NaiveDate};
 use diesel::prelude::*;
 use diesel::result::Error;
 use log::{debug, info};
@@ -86,6 +87,7 @@ pub fn get_weekly_report(
     week_ending: NaiveDate,
 ) -> Result<WeeklyReport, DbError> {
     let data = get_week_data(conn, week_ending)?;
+    let last_year=get_last_year_sales(conn,week_ending)?;
 
     Ok(calculate_weekly(&data))
 }
@@ -139,6 +141,34 @@ fn get_week_data(conn: &mut SqliteConnection, week_ending: NaiveDate) -> Result<
 
     debug!("Returning weekly data");
     Ok(data)
+}
+
+fn get_last_year_sales(conn:&mut SqliteConnection,this_week_ending:NaiveDate)->Result<WeeklyReport,DbError>{
+    // get last years week ending
+    let mut last_year_end=this_week_ending.checked_sub_months(chrono::Months::new(12)).unwrap();
+    // let last_year_start=last_year_end.checked_sub_days(Days::new(6)).unwrap();
+
+    // adjust the week ending date to fall on a tuesday
+    if last_year_end.weekday()!=chrono::Weekday::Tue{
+        debug!("last year not a tuesday, adjusting...");
+
+        // ajudst backwards until tuesday
+        // TODO: do this better
+        while last_year_end.weekday()==chrono::Weekday::Tue{
+            last_year_end=last_year_end.checked_sub_days(Days::new(1)).unwrap();
+        }
+
+        debug!("new last year {last_year_end}");
+    }
+
+    // debug!("calculating last year sales from [{last_year_start}] - [{last_year_end}]");
+
+    let report=get_week_data(conn,last_year_end)?;
+    let ns = report.days.iter().fold(0.,|acc,obj|acc+obj.NetSales);
+
+    debug!(" net sales: {ns}");
+
+    Ok(WeeklyReport::new())
 }
 
 fn calculate_weekly(data: &WeekData) -> WeeklyReport {
