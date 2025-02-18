@@ -11,6 +11,7 @@ use serde::Serialize;
 pub struct WeeklyInfo {
     pub id: i32,
     pub WeekEnding: NaiveDate,
+
     pub FoodCostAmount: f32,
     pub FoodCostPercent: f32,
 

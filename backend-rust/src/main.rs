@@ -33,7 +33,6 @@ fn run_migrations(
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    // dotenvy::dotenv().expect("unable to read .env");
     println!("loading .env file if present...");
     if dotenvy::dotenv().is_err() {
         println!("[dotenvy] unable to load .env file.  proceeding without");

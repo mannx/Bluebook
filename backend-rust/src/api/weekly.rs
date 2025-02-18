@@ -1,9 +1,10 @@
 #![allow(non_snake_case)]
-// use chrono::{Days, NaiveDate};
-use chrono::{Datelike, Days, NaiveDate};
+use chrono::{Datelike, Days, NaiveDate, Weekday};
 use diesel::prelude::*;
 use diesel::result::Error;
+use lazy_static::lazy_static;
 use log::{debug, info};
+use std::collections::HashMap;
 
 use serde::Serialize;
 
@@ -35,11 +36,15 @@ pub struct WeeklyReport {
     BreadOverShort: f32,
 
     LastYearSales: f32,
-    LastYearCustomerCount: u32,
+    LastYearCustomerCount: i32,
     UpcomingSales: f32,
 
     PrevWeek: NaiveDate,
 }
+
+// sales data for last year
+// (LastYearSales, LastYearCustomerCount, UpcomingSales)
+struct LastYearSales(f32, i32, f32);
 
 // used to hold data while WeeklyReport is being generated
 struct WeekData {
@@ -82,14 +87,28 @@ impl WeekData {
     }
 }
 
+lazy_static! {
+    // Mapping to shift week ending dates to nearest week ending day
+    static ref WEEKENDING_OFFSET: HashMap<Weekday, i64> = HashMap::from([
+        // Weekday, diff to reach
+        (Weekday::Tue, 0),
+        (Weekday::Wed, -1),
+        (Weekday::Thu, -2),
+        (Weekday::Fri, -3),
+        (Weekday::Sat, 3),
+        (Weekday::Sun, 2),
+        (Weekday::Mon, 1),
+    ]);
+}
+
 pub fn get_weekly_report(
     conn: &mut SqliteConnection,
     week_ending: NaiveDate,
 ) -> Result<WeeklyReport, DbError> {
     let data = get_week_data(conn, week_ending)?;
-    let last_year=get_last_year_sales(conn,week_ending)?;
+    let last_year = get_last_year_upcoming_sales(conn, week_ending)?;
 
-    Ok(calculate_weekly(&data))
+    Ok(calculate_weekly(&data, last_year))
 }
 
 fn get_week_data(conn: &mut SqliteConnection, week_ending: NaiveDate) -> Result<WeekData, DbError> {
@@ -143,36 +162,46 @@ fn get_week_data(conn: &mut SqliteConnection, week_ending: NaiveDate) -> Result<
     Ok(data)
 }
 
-fn get_last_year_sales(conn:&mut SqliteConnection,this_week_ending:NaiveDate)->Result<WeeklyReport,DbError>{
-    // get last years week ending
-    let mut last_year_end=this_week_ending.checked_sub_months(chrono::Months::new(12)).unwrap();
-    // let last_year_start=last_year_end.checked_sub_days(Days::new(6)).unwrap();
+fn get_last_year_upcoming_sales(
+    conn: &mut SqliteConnection,
+    week_ending: NaiveDate,
+) -> Result<LastYearSales, DbError> {
+    // get last years sales
+    let last_year_end = get_ly_weekending(week_ending);
+    let last_year = get_week_data(conn, last_year_end)?;
 
-    // adjust the week ending date to fall on a tuesday
-    if last_year_end.weekday()!=chrono::Weekday::Tue{
-        debug!("last year not a tuesday, adjusting...");
+    // get upcoming sales for next week
+    let next = last_year_end.checked_add_days(Days::new(7)).unwrap();
+    let upcoming = get_week_data(conn, next)?;
 
-        // ajudst backwards until tuesday
-        // TODO: do this better
-        while last_year_end.weekday()==chrono::Weekday::Tue{
-            last_year_end=last_year_end.checked_sub_days(Days::new(1)).unwrap();
-        }
+    let net = last_year
+        .days
+        .iter()
+        .fold(0., |acc, obj| acc + obj.NetSales);
+    let up_net = upcoming.days.iter().fold(0., |acc, obj| acc + obj.NetSales);
+    let count = last_year
+        .days
+        .iter()
+        .fold(0, |acc, obj| acc + obj.CustomerCount);
 
-        debug!("new last year {last_year_end}");
-    }
-
-    // debug!("calculating last year sales from [{last_year_start}] - [{last_year_end}]");
-
-    let report=get_week_data(conn,last_year_end)?;
-    let ns = report.days.iter().fold(0.,|acc,obj|acc+obj.NetSales);
-
-    debug!(" net sales: {ns}");
-
-    Ok(WeeklyReport::new())
+    Ok(LastYearSales(net, count, up_net))
 }
 
-fn calculate_weekly(data: &WeekData) -> WeeklyReport {
+// returns the tuesday corresponding to last year of the given date
+fn get_ly_weekending(week_ending: NaiveDate) -> NaiveDate {
+    use chrono::{Months, TimeDelta};
+
+    let last = week_ending.checked_sub_months(Months::new(12)).unwrap(); // get 1 year ago
+    let offset = WEEKENDING_OFFSET.get(&last.weekday()).unwrap(); // get the offset to
+                                                                  // the clostest tuesday
+
+    let days = TimeDelta::days(*offset);
+    last.checked_add_signed(days).unwrap()
+}
+
+fn calculate_weekly(data: &WeekData, last_year: LastYearSales) -> WeeklyReport {
     let mut report = WeeklyReport::new();
+    let LastYearSales(ly_netsales, ly_custcount, ly_upcoming) = last_year;
 
     // calcuate fields from the daily data
     for i in &data.days {
@@ -187,7 +216,17 @@ fn calculate_weekly(data: &WeekData) -> WeeklyReport {
     if let Some(wi) = &data.weekly {
         report.WisrNetSales = wi.NetSales;
         report.NetSalesMismatch = report.WisrNetSales == report.NetSales;
+
+        report.FoodCostAmount = wi.FoodCostAmount;
+        report.LabourCostAmount = wi.LabourCostAmount;
+        report.PartySales = wi.PartySales;
+
+        report.ProductivityActual = wi.Productivity;
     }
+
+    report.LastYearSales = ly_netsales;
+    report.LastYearCustomerCount = ly_custcount;
+    report.UpcomingSales = ly_upcoming;
 
     report
 }
