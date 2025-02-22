@@ -1,6 +1,29 @@
 // @generated automatically by Diesel CLI.
 
 diesel::table! {
+    auv_data (id) {
+        id -> Integer,
+        month -> Integer,
+        year -> Integer,
+        week_1_auv -> Integer,
+        week_1_hours -> Integer,
+        week_1_productivity -> Float,
+        week_2_auv -> Integer,
+        week_2_hours -> Integer,
+        week_2_productivity -> Float,
+        week_3_auv -> Integer,
+        week_3_hours -> Integer,
+        week_3_productivity -> Float,
+        week_4_auv -> Integer,
+        week_4_hours -> Integer,
+        week_4_productivity -> Float,
+        week_5_auv -> Integer,
+        week_5_hours -> Integer,
+        week_5_productivity -> Float,
+    }
+}
+
+diesel::table! {
     day_data (id) {
         id -> Integer,
         DayDate -> Date,
@@ -93,6 +116,7 @@ diesel::table! {
 }
 
 diesel::allow_tables_to_appear_in_same_query!(
+    auv_data,
     day_data,
     hockey_schedule,
     settings,

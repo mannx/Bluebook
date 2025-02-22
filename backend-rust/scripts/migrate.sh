@@ -26,3 +26,4 @@ sqlite3 $DB_ORIG <../scripts/weekly_info.sql
 sqlite3 $DB_ORIG <../scripts/daydata.sql
 sqlite3 $DB_ORIG <../scripts/hockey.sql
 sqlite3 $DB_ORIG <../scripts/settings.sql
+sqlite3 $DB_ORIG <../scripts/auv.sql

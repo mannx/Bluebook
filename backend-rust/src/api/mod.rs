@@ -1,3 +1,4 @@
+pub mod auv;
 pub mod day_edit;
 pub mod error;
 pub mod month;

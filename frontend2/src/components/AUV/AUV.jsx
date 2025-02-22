@@ -45,9 +45,7 @@ export default function AUV() {
 
 export async function loader({ params }) {
   // get the data from the server
-  const month = params.month;
-  const year = params.year;
-  const q = "?month=" + month + "&year=" + year;
+  const q = "/" + params.month + "/" + param.year;
 
   const url = UrlApi2AUVView + q;
   const resp = await fetch(url);
@@ -133,7 +131,7 @@ export function AUVLayout() {
 
 function getAuvData(data) {
   let auv = [];
-  const end = data.Dates.length;
+  const end = data.dates.length;
 
   for (let i = 0; i < end; i++) {
     auv.push(AUVData(data, i));
@@ -145,10 +143,7 @@ function getAuvData(data) {
 }
 
 function AUVData(data, index) {
-  // remove timezone info to prevent showing a previous day
-  //  (date has UTC timezone and dayjs will shift that to local time)
-  const dateStr = data.Dates[index].slice(0, data.Dates[index].length - 10);
-  const date = dayjs(dateStr);
+  const date = dayjs(data.dates[index]);
 
   return (
     <>
@@ -162,7 +157,7 @@ function AUVData(data, index) {
             id={"auv" + index}
             type="number"
             label="AUV"
-            defaultValue={data.AUV[index]}
+            defaultValue={data.auv[index]}
           />
         </TableCell>
         <TableCell>
@@ -171,7 +166,7 @@ function AUVData(data, index) {
             id={"hours" + index}
             type="number"
             label="Hours"
-            defaultValue={data.Hours[index]}
+            defaultValue={data.hours[index]}
           />
         </TableCell>
         <TableCell>
@@ -179,7 +174,7 @@ function AUVData(data, index) {
             name={"prod" + index}
             id={"prod" + index}
             label="Productivity"
-            defaultValue={data.Productivity[index]}
+            defaultValue={data.productivity[index]}
           />
         </TableCell>
       </TableRow>
