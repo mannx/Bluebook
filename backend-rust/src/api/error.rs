@@ -8,6 +8,10 @@ pub struct ApiReturnMessage<T> {
     pub Data: Option<T>,
 }
 
+// used if we need to return an error message and have no data to associate
+#[derive(Serialize)]
+pub struct NoData {}
+
 impl<T> ApiReturnMessage<T> {
     pub fn error(msg: &str) -> Self {
         Self {

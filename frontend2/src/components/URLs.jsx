@@ -17,7 +17,8 @@ export const UrlApi2WeeklyExport = "http://localhost:8080/api2/weekly/export";
 
 // export const UrlApi2AUVView = "http://localhost:8080/api2/auv/view";
 export const UrlApi2AUVView = "http://localhost:8080/api/auv/view";
-export const UrlApi2AUVUpdate = "http://localhost:8080/api2/auv/update";
+// export const UrlApi2AUVUpdate = "http://localhost:8080/api2/auv/update";
+export const UrlApi2AUVUpdate = "http://localhost:8080/api/auv/update";
 
 export const UrlApiWasteView = "http://localhost:8080/api/waste/view";
 export const UrlApiWasteExport = "http://localhost:8080/api/waste/export";

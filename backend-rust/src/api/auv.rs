@@ -1,8 +1,11 @@
-use crate::api::DbError;
-use crate::models::auv::{AUVData, AUVEntry};
 use diesel::prelude::*;
 use diesel::result::Error;
 use log::info;
+
+// use crate::api::error::{ApiReturnMessage, NoData};
+use crate::api::DbError;
+use crate::handlers::auv::AuvFormData;
+use crate::models::auv::{AUVData, AUVEntry};
 
 pub fn get_auv_data(conn: &mut SqliteConnection, mon: u32, yea: i32) -> Result<AUVEntry, DbError> {
     use crate::schema::auv_data::dsl::*;
@@ -26,4 +29,9 @@ pub fn get_auv_data(conn: &mut SqliteConnection, mon: u32, yea: i32) -> Result<A
     };
 
     Ok(AUVEntry::from(&auv))
+}
+
+// update the auv data in the db
+pub fn set_auv_data(conn: &mut SqliteConnection, data: &AuvFormData) -> Result<(), DbError> {
+    Ok(())
 }

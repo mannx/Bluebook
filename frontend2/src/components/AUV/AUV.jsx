@@ -45,7 +45,7 @@ export default function AUV() {
 
 export async function loader({ params }) {
   // get the data from the server
-  const q = "/" + params.month + "/" + param.year;
+  const q = "/" + params.month + "/" + params.year;
 
   const url = UrlApi2AUVView + q;
   const resp = await fetch(url);
