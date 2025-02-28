@@ -1,8 +1,8 @@
 #![allow(non_snake_case)]
-// use crate::api::error::ApiReturnMessage;
 use actix_web::error;
 use actix_web::HttpResponse;
 use actix_web::{get, post, web, Responder};
+use chrono::{NaiveDate, Weekday};
 use log::{debug, info};
 use serde::Deserialize;
 
@@ -12,13 +12,36 @@ use crate::models::auv::AUVEntry;
 
 // form data we get from the frontend to update the db with
 #[derive(Deserialize, Debug)]
-#[allow(dead_code)]
 pub struct AuvFormData {
     pub Month: u32,
     pub Year: i32,
     pub AUV: Vec<i32>,
     pub Hours: Vec<i32>,
     pub Productivity: Vec<f32>,
+}
+
+impl AuvFormData {
+    pub fn convert_to(&mut self) -> AUVEntry {
+        let mut auv = AUVEntry::new();
+
+        for i in 1..=5 {
+            // do we have a valid week ending date?
+            if let Some(date) =
+                NaiveDate::from_weekday_of_month_opt(self.Year, self.Month, Weekday::Tue, i)
+            {
+                auv.dates.push(date);
+            } else {
+                // invalid date, we are done early
+                break;
+            }
+        }
+
+        auv.auv.append(&mut self.AUV);
+        auv.hours.append(&mut self.Hours);
+        auv.productivity.append(&mut self.Productivity);
+
+        auv
+    }
 }
 
 #[get("/api/auv/view/{month}/{year}")]
@@ -38,25 +61,25 @@ pub async fn get_auv_handler(
     .await?
     .map_err(error::ErrorInternalServerError)?;
 
-    // let ret = ApiReturnMessage::ok(auv);
     Ok(HttpResponse::Ok().json(auv))
 }
 
 #[post("/api/auv/update")]
 pub async fn set_auv_handler(
     pool: web::Data<DbPool>,
-    data: web::Json<AuvFormData>,
+    mut data: web::Json<AuvFormData>,
 ) -> actix_web::Result<impl Responder> {
     info!("[set_auv_handler] setting auv...");
     debug!("data: {:?}", data);
 
-    let result = web::block(move || {
+    web::block(move || {
         let mut conn = pool.get()?;
 
-        set_auv_data(&mut conn, &data)
+        let auv_data = data.convert_to();
+        set_auv_data(&mut conn, &auv_data)
     })
     .await?
     .map_err(error::ErrorInternalServerError)?;
 
-    Ok(HttpResponse::Ok().json(result))
+    Ok(HttpResponse::Ok())
 }

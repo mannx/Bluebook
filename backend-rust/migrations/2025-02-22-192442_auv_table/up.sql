@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS auv_data (
   week_4_hours INTEGER NOT NULL,
   week_4_productivity REAL NOT NULL,
   
-  week_5_auv INTEGER NOT NULL,
-  week_5_hours INTEGER NOT NULL,
-  week_5_productivity REAL NOT NULL
+  week_5_auv INTEGER,
+  week_5_hours INTEGER,
+  week_5_productivity REAL
 );

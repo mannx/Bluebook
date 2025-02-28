@@ -7,6 +7,12 @@ FROM rust:alpine AS build
 WORKDIR /app
 
 COPY backend-rust/ ./
+
+# add missing deps
+RUN apk add --no-cache musl-dev sqlite
+
+# temp adjust certain source files for dockerization
+RUN sed -i 's|src/imports||' src/imports/daily.rs
 RUN cargo build --release
 
 #

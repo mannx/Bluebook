@@ -17,9 +17,9 @@ diesel::table! {
         week_4_auv -> Integer,
         week_4_hours -> Integer,
         week_4_productivity -> Float,
-        week_5_auv -> Integer,
-        week_5_hours -> Integer,
-        week_5_productivity -> Float,
+        week_5_auv -> Nullable<Integer>,
+        week_5_hours -> Nullable<Integer>,
+        week_5_productivity -> Nullable<Float>,
     }
 }
 
