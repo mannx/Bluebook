@@ -65,7 +65,7 @@ pub struct AUVDataInsert {
 }
 
 // a more usuable structure than the database
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 pub struct AUVEntry {
     pub dates: Vec<NaiveDate>, // week ending date of each entry
     pub auv: Vec<i32>,

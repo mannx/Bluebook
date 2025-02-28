@@ -3,19 +3,20 @@ use chrono::{Datelike, Days, NaiveDate, Weekday};
 use diesel::prelude::*;
 use diesel::result::Error;
 use lazy_static::lazy_static;
-use log::{debug, info};
+use log::{debug, error, info};
 use std::collections::HashMap;
 
 use serde::Serialize;
 
 use crate::api::DbError;
+use crate::models::auv::{AUVData, AUVEntry};
 use crate::models::day_data::DayData;
 use crate::models::weekly::WeeklyInfo;
 
 #[derive(Serialize)]
 pub struct WeeklyReport {
-    TargetAUV: u32,
-    TargetHours: u32,
+    TargetAUV: i32,
+    TargetHours: i32,
 
     ProductivityBudget: f32,
     ProductivityActual: f32,
@@ -48,9 +49,10 @@ struct LastYearSales(f32, i32, f32);
 
 // used to hold data while WeeklyReport is being generated
 struct WeekData {
+    week_ending: NaiveDate,
     days: Vec<DayData>,
     weekly: Option<WeeklyInfo>,
-    //todo: auv information here
+    auv: Option<AUVEntry>,
 }
 
 impl WeeklyReport {
@@ -79,10 +81,12 @@ impl WeeklyReport {
 }
 
 impl WeekData {
-    fn new() -> Self {
+    fn new(week_ending: NaiveDate) -> Self {
         Self {
+            week_ending,
             days: Vec::new(),
             weekly: None,
+            auv: None,
         }
     }
 }
@@ -105,9 +109,12 @@ pub fn get_weekly_report(
     conn: &mut SqliteConnection,
     week_ending: NaiveDate,
 ) -> Result<WeeklyReport, DbError> {
+    debug!("[get_weekly_report] start...");
+
     let data = get_week_data(conn, week_ending)?;
     let last_year = get_last_year_upcoming_sales(conn, week_ending)?;
 
+    debug!("   calculating weekly data....");
     Ok(calculate_weekly(&data, last_year))
 }
 
@@ -117,7 +124,7 @@ fn get_week_data(conn: &mut SqliteConnection, week_ending: NaiveDate) -> Result<
 
     debug!("Geting week data between [{start_day}] and [{week_ending}]");
 
-    let mut data = WeekData::new();
+    let mut data = WeekData::new(week_ending);
 
     // load the day data
     {
@@ -156,6 +163,37 @@ fn get_week_data(conn: &mut SqliteConnection, week_ending: NaiveDate) -> Result<
 
         data.weekly = wi;
         debug!("Done!");
+    }
+
+    // get the auv data
+    {
+        use crate::schema::auv_data::dsl::*;
+
+        debug!("Getting auv info for {week_ending}...");
+        let mon = week_ending.month() as i32;
+        let yea = week_ending.year();
+
+        debug!("   month: {mon}");
+        debug!("   year: {yea}");
+
+        let result = auv_data
+            .filter(month.eq(mon).and(year.eq(yea)))
+            .first::<AUVData>(conn);
+        let auv = match result {
+            Err(err) => match err {
+                Error::NotFound => {
+                    info!("Auv data not found for {week_ending}");
+                    None
+                }
+                err => return Err(Box::new(err)),
+            },
+            Ok(n) => Some(AUVEntry::from(&n)),
+        };
+
+        data.auv = auv;
+
+        debug!("auv: {:?}", data.auv);
+        debug!("Done");
     }
 
     debug!("Returning weekly data");
@@ -222,6 +260,31 @@ fn calculate_weekly(data: &WeekData, last_year: LastYearSales) -> WeeklyReport {
         report.PartySales = wi.PartySales;
 
         report.ProductivityActual = wi.Productivity;
+    }
+
+    // get auv data for this week ending
+    if let Some(auv) = &data.auv {
+        // find the index for the week ending that we need
+        let mut index = None;
+        for (i, date) in auv.dates.iter().enumerate() {
+            if *date == data.week_ending {
+                debug!("found week ending in auv data!");
+                index = Some(i);
+                break;
+            }
+        }
+
+        if index.is_none() {
+            error!(
+                "[calculate_weekly] Unable to find week ending date {} in auv data!.  Skipping...",
+                data.week_ending
+            );
+        } else {
+            let i = index.unwrap();
+            report.TargetAUV = auv.auv[i];
+            report.TargetHours = auv.hours[i];
+            report.ProductivityBudget = auv.productivity[i];
+        }
     }
 
     report.LastYearSales = ly_netsales;

@@ -3,19 +3,19 @@ UPDATE auv_entry2 SET week1_auv=0 WHERE week1_auv IS NULL;
 UPDATE auv_entry2 SET week2_auv=0 WHERE week2_auv IS NULL;
 UPDATE auv_entry2 SET week3_auv=0 WHERE week3_auv IS NULL;
 UPDATE auv_entry2 SET week4_auv=0 WHERE week4_auv IS NULL;
-UPDATE auv_entry2 SET week5_auv=0 WHERE week5_auv IS NULL;
+-- UPDATE auv_entry2 SET week5_auv=0 WHERE week5_auv IS NULL;
 
 UPDATE auv_entry2 SET week1_hours=0 WHERE week1_hours IS NULL;
 UPDATE auv_entry2 SET week2_hours=0 WHERE week2_hours IS NULL;
 UPDATE auv_entry2 SET week3_hours=0 WHERE week3_hours IS NULL;
 UPDATE auv_entry2 SET week4_hours=0 WHERE week4_hours IS NULL;
-UPDATE auv_entry2 SET week5_hours=0 WHERE week5_hours IS NULL;
+-- UPDATE auv_entry2 SET week5_hours=0 WHERE week5_hours IS NULL;
 
 UPDATE auv_entry2 SET week1_prod=0 WHERE week1_prod IS NULL;
 UPDATE auv_entry2 SET week2_prod=0 WHERE week2_prod IS NULL;
 UPDATE auv_entry2 SET week3_prod=0 WHERE week3_prod IS NULL;
 UPDATE auv_entry2 SET week4_prod=0 WHERE week4_prod IS NULL;
-UPDATE auv_entry2 SET week5_prod=0 WHERE week5_prod IS NULL;
+-- UPDATE auv_entry2 SET week5_prod=0 WHERE week5_prod IS NULL;
 
 -- attach to new db and copy everything over
 ATTACH DATABASE 'db.db' AS db;
