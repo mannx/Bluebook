@@ -41,6 +41,7 @@ pub struct WeeklyReport {
     UpcomingSales: f32,
 
     PrevWeek: NaiveDate,
+    WeekEnding: NaiveDate,
 }
 
 // sales data for last year
@@ -76,6 +77,7 @@ impl WeeklyReport {
             LastYearCustomerCount: 0,
             UpcomingSales: 0.,
             PrevWeek: NaiveDate::MIN,
+            WeekEnding: NaiveDate::MIN,
         }
     }
 }
@@ -253,7 +255,8 @@ fn calculate_weekly(data: &WeekData, last_year: LastYearSales) -> WeeklyReport {
     // calculate information from the weekly if we have it
     if let Some(wi) = &data.weekly {
         report.WisrNetSales = wi.NetSales;
-        report.NetSalesMismatch = report.WisrNetSales == report.NetSales;
+        report.NetSalesMismatch = report.WisrNetSales != report.NetSales; // true if they are
+                                                                          // not equal
 
         report.FoodCostAmount = wi.FoodCostAmount;
         report.LabourCostAmount = wi.LabourCostAmount;
@@ -290,6 +293,9 @@ fn calculate_weekly(data: &WeekData, last_year: LastYearSales) -> WeeklyReport {
     report.LastYearSales = ly_netsales;
     report.LastYearCustomerCount = ly_custcount;
     report.UpcomingSales = ly_upcoming;
+
+    report.WeekEnding = data.week_ending;
+    report.PrevWeek = data.week_ending.checked_sub_days(Days::new(7)).unwrap();
 
     report
 }

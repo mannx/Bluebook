@@ -4,6 +4,8 @@ use std::env;
 pub struct Environment {
     pub ImportPath: String,
     pub TempPath: String,
+    pub OutputPath: String,
+    pub DataPath: String,
 }
 
 impl Environment {
@@ -11,6 +13,8 @@ impl Environment {
         Self {
             ImportPath: "/import".to_owned(),
             TempPath: "/tmp".to_owned(),
+            OutputPath: "/output".to_owned(),
+            DataPath: "/data".to_owned(),
         }
     }
 
@@ -20,6 +24,8 @@ impl Environment {
 
         e.ImportPath = env::var("BLUEBOOK_IMPORT_PATH").unwrap_or(e.ImportPath.clone());
         e.TempPath = env::var("BLUEBOOK_TEMP_PATH").unwrap_or(e.TempPath.clone());
+        e.OutputPath = env::var("BLUEBOOK_OUTPUT_PATH").unwrap_or(e.OutputPath.clone());
+        e.DataPath = env::var("BLUEBOOK_DATA_PATH").unwrap_or(e.DataPath.clone());
 
         e
     }

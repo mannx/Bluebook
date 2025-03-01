@@ -13,7 +13,7 @@ export const UrlApi2DayUpdate = "http://localhost:8080/api2/day/update";
 export const UrlApi2ImportList = "http://localhost:8080/api2/import/list"; // get list of all files we can import
 
 export const UrlApiWeekly = "http://localhost:8080/api/weekly/view";
-export const UrlApi2WeeklyExport = "http://localhost:8080/api2/weekly/export";
+export const UrlApi2WeeklyExport = "http://localhost:8080/api/weekly/export";
 
 // export const UrlApi2AUVView = "http://localhost:8080/api2/auv/view";
 export const UrlApi2AUVView = "http://localhost:8080/api/auv/view";

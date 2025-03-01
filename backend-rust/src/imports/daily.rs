@@ -42,8 +42,9 @@ struct Config {
 
 impl Config {
     fn load() -> Self {
-        // TODO: adjust path if we are dockerized
-        let fstr = std::fs::read_to_string("src/imports/id.ron").expect("unable to id.ron");
+        // TODO: adjust path if we are dockerized. Currently stripped to / in dockerfile
+        let fstr = std::fs::read_to_string("src/imports/daily_import.ron")
+            .expect("unable to daily_import.ron");
         ron::from_str::<Config>(fstr.as_str()).unwrap()
     }
 }

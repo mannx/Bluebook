@@ -20,7 +20,7 @@ pub async fn get_bluebook_settings(pool: web::Data<DbPool>) -> actix_web::Result
     Ok(HttpResponse::Ok().json(results))
 }
 
-fn read_settings(conn: &mut SqliteConnection) -> Result<Settings, DbError> {
+pub fn read_settings(conn: &mut SqliteConnection) -> Result<Settings, DbError> {
     use crate::schema::settings::dsl::*;
 
     let result = settings.first::<Settings>(conn);

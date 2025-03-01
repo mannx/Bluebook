@@ -16,23 +16,13 @@ import utc from "dayjs/plugin/utc";
 
 export async function loader({ params }) {
   const url =
-    UrlApiWeekly +
-    // "?month=" +
-    // params.month +
-    // "&day=" +
-    // params.day +
-    // "&year=" +
-    // params.year;
-    "/" +
-    params.month +
-    "/" +
-    params.day +
-    "/" +
-    params.year;
+    UrlApiWeekly + "/" + params.month + "/" + params.day + "/" + params.year;
   const resp = await fetch(url);
   const data = await resp.json();
 
   console.log(params);
+  console.log(data);
+
   return {
     ...data,
     ...params,
@@ -43,9 +33,16 @@ export async function action({ request, params }) {
   const formData = await request.formData();
   const updates = Object.fromEntries(formData);
 
+  const hours = parseFloat(updates.hours);
+  const manager = parseFloat(updates.manager);
+  const sysco = parseFloat(updates.sysco);
+
   const body = {
-    ...params,
-    ...updates,
+    week_ending: updates.week_ending,
+    hours: isNaN(hours) ? 0.0 : hours,
+    manager: isNaN(manager) ? 0.0 : manager,
+    sysco: isNaN(sysco) ? 0.0 : sysco,
+    netsales: updates.netsales === "true",
   };
 
   const url = UrlApi2WeeklyExport;
@@ -221,6 +218,7 @@ export default function Weekly() {
             name="netsales"
             value={useNetSales}
           />
+          <input type="hidden" name="week_ending" value={data.WeekEnding} />
           <Button variant="contained" type="submit">
             Export
           </Button>
