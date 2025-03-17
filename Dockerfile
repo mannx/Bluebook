@@ -3,13 +3,15 @@
 #
 # Rust Build Stage
 #
-FROM rust:alpine AS build
+# FROM rust:alpine AS build
+FROM rust:latest AS build
 WORKDIR /app
 
 COPY backend-rust/ ./
 
 # add missing deps
-RUN apk add --no-cache musl-dev sqlite
+# RUN apk add --no-cache musl-dev sqlite
+RUN apt update && apt install sqlite3
 
 # temp adjust certain source files for dockerization
 RUN sed -i 's|src/imports||' src/imports/daily.rs
@@ -37,14 +39,14 @@ RUN npm run build
 #
 
 # FROM alpine:3.17
-# FROM debian:bookworm-slim
-FROM alpine:latest
+FROM debian:bookworm-slim
+# FROM alpine:latest
 
 # make sure required packages are installed
 # poppler-utils required for pdf parsing 
-RUN apk update
-RUN apk add tzdata poppler-utils sqlite 
-# RUN apt update && apt install sqlite3 -y
+# RUN apk update
+# RUN apk add tzdata poppler-utils sqlite 
+RUN apt update && apt install sqlite3 poppler-utils -y
 
 # FROM debian:bookworm-slim AS runtime
 #
@@ -59,7 +61,8 @@ COPY --from=react /app/dist /dist
 COPY ./backend/api/data.json /top5.json
 
 # copy in import mapping files
-COPY ./backend-rust/src/imports/id.ron /id.ron
+COPY ./backend-rust/src/imports/daily_import.ron /daily_import.ron
+COPY ./backend-rust/src/api/export.ron /export.ron
 
 # copy run and backup scripts
 # COPY ./scripts /scripts

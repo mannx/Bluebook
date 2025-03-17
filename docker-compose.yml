@@ -1,6 +1,6 @@
 services:
   bluebook:
-    image: bluebook:latest
+    image: bluebook:dev
     container_name: bluebook
     # env_file: ".env"
     ports:
