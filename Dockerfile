@@ -13,6 +13,7 @@ RUN apk add --no-cache musl-dev sqlite
 
 # temp adjust certain source files for dockerization
 RUN sed -i 's|src/imports||' src/imports/daily.rs
+RUN sed -i 's|src/api||' src/api/export.rs
 RUN cargo build --release
 
 #

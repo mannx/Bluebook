@@ -1,5 +1,6 @@
 #![allow(non_snake_case)]
 use std::env;
+use std::path::PathBuf;
 
 pub struct Environment {
     pub ImportPath: String,
@@ -28,5 +29,13 @@ impl Environment {
         e.DataPath = env::var("BLUEBOOK_DATA_PATH").unwrap_or(e.DataPath.clone());
 
         e
+    }
+
+    pub fn with_data_path<S: Into<String>>(&self, file_name: S) -> PathBuf {
+        let mut path = PathBuf::from(&self.DataPath);
+        path.push(file_name.into());
+
+        // path.as_path()
+        path
     }
 }

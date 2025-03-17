@@ -46,8 +46,7 @@ export async function action({ request, params }) {
   };
 
   const url = UrlApi2WeeklyExport;
-  const resp = await fetch(url, GetPostOptions(JSON.stringify(body)));
-  const data = await resp.json();
+  await fetch(url, GetPostOptions(JSON.stringify(body)));
 
   return null;
 }

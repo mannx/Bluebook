@@ -15,33 +15,33 @@ use crate::models::weekly::WeeklyInfo;
 
 #[derive(Serialize)]
 pub struct WeeklyReport {
-    TargetAUV: i32,
-    TargetHours: i32,
+    pub TargetAUV: i32,
+    pub TargetHours: i32,
 
-    ProductivityBudget: f32,
-    ProductivityActual: f32,
+    pub ProductivityBudget: f32,
+    pub ProductivityActual: f32,
 
-    FoodCostAmount: f32,
-    LabourCostAmount: f32,
-    PartySales: f32,
+    pub FoodCostAmount: f32,
+    pub LabourCostAmount: f32,
+    pub PartySales: f32,
 
-    NetSales: f32,
-    NetSalesMismatch: bool, // true if net sales calculated from dailies differs from what was taken from wisr
-    WisrNetSales: f32,      // netsales from the control sheet.  debug for now
+    pub NetSales: f32,
+    pub NetSalesMismatch: bool, // true if net sales calculated from dailies differs from what was taken from wisr
+    pub WisrNetSales: f32,      // netsales from the control sheet.  debug for now
 
-    CustomerCount: i32,
+    pub CustomerCount: i32,
 
-    GiftCardSold: f32,
-    GiftCardRedeem: f32,
+    pub GiftCardSold: f32,
+    pub GiftCardRedeem: f32,
 
-    BreadOverShort: f32,
+    pub BreadOverShort: f32,
 
-    LastYearSales: f32,
-    LastYearCustomerCount: i32,
-    UpcomingSales: f32,
+    pub LastYearSales: f32,
+    pub LastYearCustomerCount: i32,
+    pub UpcomingSales: f32,
 
-    PrevWeek: NaiveDate,
-    WeekEnding: NaiveDate,
+    pub PrevWeek: NaiveDate,
+    pub WeekEnding: NaiveDate,
 }
 
 // sales data for last year
