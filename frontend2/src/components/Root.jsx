@@ -43,20 +43,12 @@ function navHeader2() {
       Url: "/auv",
     },
     {
-      Title: "Wastage",
-      Url: "/wastage",
-    },
-    {
       Title: "Top 5",
       Url: "/top5",
     },
     {
       Title: "Import",
       Url: "/import",
-    },
-    {
-      Title: "Waste Input",
-      Url: "/waste/input",
     },
   ];
 
@@ -74,24 +66,8 @@ function navHeader2() {
       Url: "/backups",
     },
     {
-      Title: "Waste Settings",
-      Url: "/waste/settings",
-    },
-    {
       Title: "Comment Search",
       Url: "/search",
-    },
-    {
-      Title: "Hockey Data",
-      Url: "/hockey/data",
-    },
-    {
-      Title: "Simple Stats",
-      Url: "/stats/simple",
-    },
-    {
-      Title: "Day Data Viewer",
-      Url: "/ddviewer",
     },
   ];
 

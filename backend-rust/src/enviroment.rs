@@ -7,6 +7,7 @@ pub struct Environment {
     pub TempPath: String,
     pub OutputPath: String,
     pub DataPath: String,
+    ConfigPath: String, // path for .ron config files -- can be mapped to DataPath
 }
 
 impl Environment {
@@ -16,6 +17,7 @@ impl Environment {
             TempPath: "/tmp".to_owned(),
             OutputPath: "/output".to_owned(),
             DataPath: "/data".to_owned(),
+            ConfigPath: "/data".to_owned(),
         }
     }
 
@@ -27,6 +29,7 @@ impl Environment {
         e.TempPath = env::var("BLUEBOOK_TEMP_PATH").unwrap_or(e.TempPath.clone());
         e.OutputPath = env::var("BLUEBOOK_OUTPUT_PATH").unwrap_or(e.OutputPath.clone());
         e.DataPath = env::var("BLUEBOOK_DATA_PATH").unwrap_or(e.DataPath.clone());
+        e.ConfigPath = env::var("BLUEBOOK_CONFIG_PATH").unwrap_or(e.ConfigPath.clone());
 
         e
     }
@@ -35,7 +38,13 @@ impl Environment {
         let mut path = PathBuf::from(&self.DataPath);
         path.push(file_name.into());
 
-        // path.as_path()
+        path
+    }
+
+    pub fn with_config_path<S: Into<String>>(&self, file_name: S) -> PathBuf {
+        let mut path = PathBuf::from(&self.ConfigPath);
+        path.push(file_name.into());
+
         path
     }
 }

@@ -64,17 +64,17 @@ export const UrlApiHockeyDataYear =
 export const UrlApiHockeyRaw = "http://localhost:8080/api/hockey/raw"; // get the raw json of the hockey data
 export const UrlApiHockeyImport = "http://localhost:8080/api/hockey/import";
 
-export const UrlApi2AverageStats = "http://localhost:8080/api/stats/average";
+// export const UrlApi2AverageStats = "http://localhost:8080/api/stats/average";
 
-export const UrlApiGetNotifications =
-  "http://localhost:8080/api/notifications/get";
-export const UrlApiClearNotifications =
-  "http://localhost:8080/api/notifications/clear";
+// export const UrlApiGetNotifications =
+//   "http://localhost:8080/api/notifications/get";
+// export const UrlApiClearNotifications =
+//   "http://localhost:8080/api/notifications/clear";
 
 export const UrlApiSettingsGet = "http://localhost:8080/api/settings/get"; // get the global settings
 export const UrlApiSettingsSet = "http://localhost:8080/api/settings/set"; // update the global settings
 
-export const UrlApi2RawDayData = "http://localhost:8080/api/raw/daydata";
+// export const UrlApi2RawDayData = "http://localhost:8080/api/raw/daydata";
 
 export const UrlAbout = "http://localhost:8080/api/about";
 

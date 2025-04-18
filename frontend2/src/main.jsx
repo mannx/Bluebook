@@ -174,36 +174,36 @@ const router = createBrowserRouter([
           },
         ],
       },
-      {
-        path: "/wastage",
-        element: <WasteView />,
-        children: [
-          {
-            path: "/wastage/:day/:month/:year",
-            element: <WasteTable />,
-            loader: wasteLoader,
-            action: wasteAction,
-          },
-        ],
-      },
-      {
-        path: "/waste/input",
-        element: <WasteInput />,
-        loader: wasteInputLoader,
-        action: wasteInputAction,
-      },
-      {
-        path: "/waste/settings",
-        element: <WasteSettings />,
-        loader: wasteSettingsLoader,
-        action: wasteSettingsAction,
-      },
-      {
-        path: "/waste/settings/:id",
-        element: <WasteSettingsEdit />,
-        loader: wasteSettingsEditLoader,
-        action: wasteSettingsEditAction,
-      },
+      // {
+      //   path: "/wastage",
+      //   element: <WasteView />,
+      //   children: [
+      //     {
+      //       path: "/wastage/:day/:month/:year",
+      //       element: <WasteTable />,
+      //       loader: wasteLoader,
+      //       action: wasteAction,
+      //     },
+      //   ],
+      // },
+      // {
+      //   path: "/waste/input",
+      //   element: <WasteInput />,
+      //   loader: wasteInputLoader,
+      //   action: wasteInputAction,
+      // },
+      // {
+      //   path: "/waste/settings",
+      //   element: <WasteSettings />,
+      //   loader: wasteSettingsLoader,
+      //   action: wasteSettingsAction,
+      // },
+      // {
+      //   path: "/waste/settings/:id",
+      //   element: <WasteSettingsEdit />,
+      //   loader: wasteSettingsEditLoader,
+      //   action: wasteSettingsEditAction,
+      // },
       {
         path: "/top5",
         element: <Top5 />,

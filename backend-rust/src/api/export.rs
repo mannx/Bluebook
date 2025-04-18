@@ -53,8 +53,8 @@ struct Config {
 
 impl Config {
     fn load() -> Self {
-        // TODO: adjust path if we are dockerized. Currently stripped to / in dockerfile
-        let fstr = std::fs::read_to_string("src/api/export.ron").expect("unable to export.ron");
+        let path = ENVIRONMENT.with_config_path("export.ron");
+        let fstr = std::fs::read_to_string(path).expect("Unable to open export.ron.");
         ron::from_str::<Config>(fstr.as_str()).unwrap()
     }
 }
@@ -84,8 +84,6 @@ pub fn export_weekly(conn: &mut SqliteConnection, data: &WeeklyParams) -> Result
     set_weekly_data(sheet, data, &weekly, &config, &settings);
 
     // get output path
-    // let mut path = PathBuf::from(&ENVIRONMENT.DataPath);
-    // path.push(format!("{}.xlsx", data.week_ending));
     let path = ENVIRONMENT.with_data_path(format!("{}.xlsx", data.week_ending));
 
     debug!("saving to output file...");

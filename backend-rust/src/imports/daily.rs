@@ -1,7 +1,6 @@
 // parse daily spreadsheets into the db
 
 #![allow(non_snake_case)]
-use crate::ENVIRONMENT;
 use chrono::NaiveDate;
 use diesel::prelude::*;
 use diesel::result::Error;
@@ -13,6 +12,7 @@ use umya_spreadsheet::*;
 
 use crate::imports::ImportResult;
 use crate::models::day_data::{DayData, DayDataInsert};
+use crate::ENVIRONMENT;
 
 #[derive(Deserialize)]
 struct Config {
@@ -42,9 +42,8 @@ struct Config {
 
 impl Config {
     fn load() -> Self {
-        // TODO: adjust path if we are dockerized. Currently stripped to / in dockerfile
-        let fstr = std::fs::read_to_string("src/imports/daily_import.ron")
-            .expect("unable to daily_import.ron");
+        let path = ENVIRONMENT.with_config_path("daily.ron");
+        let fstr = std::fs::read_to_string(path).expect("unable to open daily.ron");
         ron::from_str::<Config>(fstr.as_str()).unwrap()
     }
 }
