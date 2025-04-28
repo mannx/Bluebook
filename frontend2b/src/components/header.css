@@ -1,0 +1,64 @@
+ul.navControl {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: dodgerblue;
+}
+
+li.navControl {
+  float: left;
+}
+
+li.navControl a {
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+a.active {
+  background-color: royalblue;
+}
+
+li.navExtra {
+  float: right;
+}
+
+li.navControl a:hover {
+  background-color: deepskyblue;
+}
+
+li.navDropDown {
+  color: white;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+div.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+div.dropdown-content {
+  display: none;
+  float: left;
+  background-color: #f9f9f9; /* update to something better? */
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  padding: 12px 16px;
+  z-index: 1;
+}
+
+div.dropdown:hover div.dropdown-content {
+  display: block;
+}
+
+@media print {
+  .no-print,
+  .no-print * {
+    display: none !important;
+  }
+}

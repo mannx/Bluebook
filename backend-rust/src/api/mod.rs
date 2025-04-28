@@ -4,6 +4,7 @@ pub mod error;
 pub mod export;
 pub mod month;
 pub mod settings;
+pub mod tags;
 pub mod weekly;
 
 use chrono::NaiveDate;

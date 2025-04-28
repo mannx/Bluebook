@@ -9,7 +9,8 @@ use serde::Serialize;
 
 use crate::api::month::get_tags;
 use crate::api::DbError;
-use crate::models::day_data::{DayData, DayDataInsert, TagDataInsert, TagList, TagListInsert};
+use crate::models::day_data::{DayData, DayDataInsert};
+use crate::models::tags::{TagDataInsert, TagList, TagListInsert};
 
 #[derive(Serialize)]
 pub struct DayEditData {
