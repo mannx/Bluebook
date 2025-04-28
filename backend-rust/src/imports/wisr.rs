@@ -15,7 +15,7 @@ use crate::models::weekly::WeeklyInfo;
 lazy_static! {
 static ref RE_WEEK_ENDING :Regex=Regex::new(r"Week Ending:\s*(\d\d?)/(\d\d?)/(\d{4})").unwrap();
 
-static ref RE_CATERING_SALES :Regex=Regex::new(r"CATERING SALES\s+(\d+,?\d+)").unwrap();          // 1 group -> total catering sales;
+static ref RE_CATERING_SALES :Regex=Regex::new(r"CATERING SALES\s+(\d+,?\d*)").unwrap();          // 1 group -> total catering sales;
 static ref RE_LABOUR_COST    :Regex=Regex::new(r"LABOR\s&\sTAXES\s+(\d+,?\d+)\s+(\d+)").unwrap(); // 2 groups -> [0] dollar value [1] percent
 static ref RE_FOOD_COST      :Regex=Regex::new(r"COST OF GOODS\s+(\d+,?\d+)\s+(\d+)").unwrap();   // 2 groups -> [0] dollar value [1] percent
 }

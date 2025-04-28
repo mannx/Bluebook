@@ -1,0 +1,7 @@
+- rust f64 stored in sqlite3 as REAL results in currency with more than 2 digits of decimal places
+  * switch to postgresql for better types?
+  * multiply all currency by 100 when storing to prevent possible rounding errors
+
+- frontend2b is being used to trim down the frontend and rewriting some sections
+
+- once main features complete, backend and frontend2 can be removed and remainging directories renamed

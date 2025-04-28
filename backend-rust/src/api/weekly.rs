@@ -258,6 +258,12 @@ fn calculate_weekly(data: &WeekData, last_year: LastYearSales) -> WeeklyReport {
         report.NetSalesMismatch = report.WisrNetSales != report.NetSales; // true if they are
                                                                           // not equal
 
+        if report.NetSalesMismatch {
+            debug!(" ** Net Sales Mismatch **");
+            debug!("  WISR Net Sales: {}", report.WisrNetSales);
+            debug!("  Calculated Net Sales: {}", report.NetSales);
+        }
+
         report.FoodCostAmount = wi.FoodCostAmount;
         report.LabourCostAmount = wi.LabourCostAmount;
         report.PartySales = wi.PartySales;
