@@ -1,6 +1,8 @@
 - rust f64 stored in sqlite3 as REAL results in currency with more than 2 digits of decimal places
   * switch to postgresql for better types?
   * multiply all currency by 100 when storing to prevent possible rounding errors
+  *
+  * switched to storeing currency as a int
 
 - frontend2b is being used to trim down the frontend and rewriting some sections
 

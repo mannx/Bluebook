@@ -6,8 +6,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::api::get_days_in_month;
 use crate::api::DbError;
-// use crate::models::day_data::{DayData, TagData, TagList};
-use crate::models::day_data::DayData;
+use crate::models::day_data::{DayData, DayDataRaw};
 use crate::models::hockey::HockeySchedule;
 use crate::models::tags::{TagData, TagList};
 
@@ -88,14 +87,16 @@ pub fn get_month_data(
     let results = day_data
         .filter(DayDate.ge(start_day).and(DayDate.le(end_day)))
         .order(DayDate)
-        .select(DayData::as_select())
+        .select(DayDataRaw::as_select())
         .load(conn)?;
 
     // build the output month data and the extra calculations we need to do
     let mut data = Vec::new();
 
-    for r in &results {
-        let mut md = MonthData::new(r);
+    for r1 in &results {
+        let r = DayData::from(r1);
+        // let mut md = MonthData::new(&DayData::from(&r));
+        let mut md = MonthData::new(&r);
 
         // calculate various fields
         // calculate the week ending information if required
@@ -153,10 +154,13 @@ fn calculate_week_ending(
         .checked_sub_days(Days::new(6))
         .expect("invalid date provided");
 
-    let results: Vec<DayData> = day_data
+    let results1: Vec<DayDataRaw> = day_data
         .filter(DayDate.ge(start_date).and(DayDate.le(data.DayDate)))
-        .select(DayData::as_select())
+        .select(DayDataRaw::as_select())
         .load(conn)?;
+
+    // let results: Vec<DayData> = results1.iter().map(|raw| DayData::from(raw)).collect();
+    let results: Vec<DayData> = results1.iter().map(DayData::from).collect();
 
     let gross = results
         .iter()
@@ -188,13 +192,13 @@ fn calculate_weekly_average(conn: &mut SqliteConnection, date: NaiveDate) -> Res
         .checked_sub_days(Days::new(4 * 7))
         .expect("invalid start date"); // 4 weeks
 
-    let results: Vec<DayData> = day_data
+    let results: Vec<DayDataRaw> = day_data
         .filter(DayDate.ge(start_date).and(DayDate.le(date)))
         .order(DayDate)
-        .select(DayData::as_select())
+        .select(DayDataRaw::as_select())
         .load(conn)?;
 
-    let mut total = 0.;
+    let mut total = 0;
     for r in &results {
         // ignore all but the same day
         if r.DayDate.weekday() == date.weekday() {
@@ -202,7 +206,7 @@ fn calculate_weekly_average(conn: &mut SqliteConnection, date: NaiveDate) -> Res
         }
     }
 
-    Ok(total / 4.)
+    Ok((total as f32 / 100.) / 4.)
 }
 
 // get all tags for a given day based on id

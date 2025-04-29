@@ -68,6 +68,7 @@ UPDATE day_data set Date=substr(Date,0,11);
 ATTACH DATABASE 'db.db' AS db;
 
 -- Copy main data over
+-- convert all floating point values to int by * 100
 INSERT INTO db.day_data (
   id, DayDate,CashDeposit,DebitCard,MasterCard,Visa,Amex,CreditSales,GiftCardRedeem,SubwayCaters,PayPal,
   SkipTheDishes,DoorDash,UberEats,PettyCash,Tips,Hst,BottleDeposit,NetSales,CreditSalesRedeemed,
@@ -75,10 +76,10 @@ INSERT INTO db.day_data (
   HoursWorked,Productivity,Factor,AdjustedSales,CustomerCount,BreadCredits,BreadOverShort
 )
 SELECT 
-  id, Date,CashDeposit,DebitCard,MasterCard,Visa,Amex,CreditSales,GiftCardRedeem,SubwayCaters,PayPal,
-  SkipTheDishes,DoorDash,UberEats,PettyCash,Tips,Hst,BottleDeposit,NetSales,CreditSalesRedeemed+
-  CreditSalesRedeemed,CreditFood,GiftCardSold,USFunds,Comment,
-  HoursWorked,Productivity,Factor,AdjustedSales,CustomerCount,BreadCredits,BreadOverShort
+  id, Date,CashDeposit*100,DebitCard*100,MasterCard*100,Visa*100,Amex*100,CreditSales*100,GiftCardRedeem*100,SubwayCaters*100,PayPal*100,
+  SkipTheDishes*100,DoorDash*100,UberEats*100,PettyCash*100,Tips*100,Hst*100,BottleDeposit*100,NetSales*100,CreditSalesRedeemed+
+  CreditSalesRedeemed*100,CreditFood*100,GiftCardSold*100,USFunds*100,Comment,
+  HoursWorked*100,Productivity*100,Factor*100,AdjustedSales*100,CustomerCount,BreadCredits*100,BreadOverShort
 FROM day_data;
 
 -- copy tag data over

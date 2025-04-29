@@ -10,8 +10,8 @@ use serde::Serialize;
 
 use crate::api::DbError;
 use crate::models::auv::{AUVData, AUVEntry};
-use crate::models::day_data::DayData;
-use crate::models::weekly::WeeklyInfo;
+use crate::models::day_data::{DayData, DayDataRaw};
+use crate::models::weekly::{WeeklyInfo, WeeklyInfoRaw};
 
 #[derive(Serialize)]
 pub struct WeeklyReport {
@@ -133,13 +133,14 @@ fn get_week_data(conn: &mut SqliteConnection, week_ending: NaiveDate) -> Result<
         use crate::schema::day_data::dsl::*;
 
         debug!("Getting daily data...");
-        let mut result = day_data
+        let result = day_data
             .filter(DayDate.ge(start_day).and(DayDate.le(week_ending)))
             .order(DayDate)
-            .select(DayData::as_select())
+            .select(DayDataRaw::as_select())
             .load(conn)?;
 
-        data.days.append(&mut result);
+        let mut res = result.iter().map(DayData::from).collect();
+        data.days.append(&mut res);
         debug!("Done!");
     }
 
@@ -150,7 +151,7 @@ fn get_week_data(conn: &mut SqliteConnection, week_ending: NaiveDate) -> Result<
         debug!("Getting weekly info for {week_ending}...");
         let result = weekly_info
             .filter(WeekEnding.eq(week_ending))
-            .first::<WeeklyInfo>(conn);
+            .first::<WeeklyInfoRaw>(conn);
 
         let wi = match result {
             Err(err) => match err {
@@ -160,7 +161,7 @@ fn get_week_data(conn: &mut SqliteConnection, week_ending: NaiveDate) -> Result<
                 }
                 err => return Err(Box::new(err)),
             },
-            Ok(n) => Some(n),
+            Ok(n) => Some(WeeklyInfo::from(&n)),
         };
 
         data.weekly = wi;

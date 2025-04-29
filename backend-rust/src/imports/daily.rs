@@ -11,7 +11,7 @@ use std::path::PathBuf;
 use umya_spreadsheet::*;
 
 use crate::imports::ImportResult;
-use crate::models::day_data::{DayData, DayDataInsert};
+use crate::models::day_data::{DayData, DayDataInsert, DayDataRaw};
 use crate::ENVIRONMENT;
 
 #[derive(Deserialize)]
@@ -216,7 +216,7 @@ fn insert_or_update(
 
     let result = day_data
         .filter(DayDate.eq(data.DayDate))
-        .first::<DayData>(conn);
+        .first::<DayDataRaw>(conn);
 
     match result {
         Err(_) => {
@@ -226,7 +226,8 @@ fn insert_or_update(
         Ok(old) => {
             info!("found data for day: {}", data.DayDate);
             // pass in the current db item since we dont want to update certain fields
-            update_data(conn, data, &old)?;
+            // update_data(conn, data, &old)?;
+            update_data(conn, data, &DayData::from(&old))?;
         }
     }
 
@@ -234,13 +235,14 @@ fn insert_or_update(
 }
 
 // insert new entry into the db
-fn insert_data(conn: &mut SqliteConnection, data: &DayData) -> Result<DayData, Error> {
+fn insert_data(conn: &mut SqliteConnection, data: &DayData) -> Result<DayDataRaw, Error> {
     // insert into the database and return the new data or error
-    let data_insert = DayDataInsert::from(data);
+    let raw = DayDataRaw::from(data);
+    let data_insert = DayDataInsert::from(&raw);
 
     diesel::insert_into(crate::schema::day_data::table)
         .values(&data_insert)
-        .returning(DayData::as_returning())
+        .returning(DayDataRaw::as_returning())
         .get_result(conn)
 }
 
@@ -250,16 +252,19 @@ fn update_data(
     conn: &mut SqliteConnection,
     data: &DayData,
     old: &DayData,
-) -> Result<DayData, Error> {
+) -> Result<DayDataRaw, Error> {
     // copy any data we dont want ot change
     // could also do this in the update() function below?
     let mut new_data = data.clone();
     new_data.copy_control(old);
 
+    let raw = DayDataRaw::from(&new_data);
+
     // update the given record
     diesel::update(crate::schema::day_data::table)
         // .set(data)
-        .set(new_data)
-        .returning(DayData::as_returning())
+        // .set(new_data)
+        .set(raw)
+        .returning(DayDataRaw::as_returning())
         .get_result(conn)
 }

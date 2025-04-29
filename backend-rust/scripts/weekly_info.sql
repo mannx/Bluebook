@@ -21,5 +21,5 @@ INSERT INTO db.weekly_info (
   FoodCostAmount, FoodCostPercent, LabourCostAmount,LabourCostPercent,NetSales,PartySales,
   Productivity
 )
-SELECT id,Date,FoodCostAmount,FoodCostPercent,LabourCostAmount,LabourCostPercent,NetSales,PartySales,
-Productivity FROM weekly_infos;
+SELECT id,Date,FoodCostAmount*100,FoodCostPercent*100,LabourCostAmount*100,LabourCostPercent*100,NetSales*100,PartySales*100,
+Productivity*100 FROM weekly_infos;

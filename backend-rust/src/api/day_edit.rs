@@ -9,7 +9,7 @@ use serde::Serialize;
 
 use crate::api::month::get_tags;
 use crate::api::DbError;
-use crate::models::day_data::{DayData, DayDataInsert};
+use crate::models::day_data::{DayDataInsert, DayDataRaw};
 use crate::models::tags::{TagDataInsert, TagList, TagListInsert};
 
 #[derive(Serialize)]
@@ -40,9 +40,9 @@ pub fn update_day_edit(
             let mut day = DayDataInsert::new(data.Date.unwrap());
             day.CommentData = Some(data.Comment.clone());
 
-            let result: DayData = diesel::insert_into(crate::schema::day_data::table)
+            let result: DayDataRaw = diesel::insert_into(crate::schema::day_data::table)
                 .values(&day)
-                .returning(DayData::as_returning())
+                .returning(DayDataRaw::as_returning())
                 .get_result(conn)?;
 
             Ok(Some(result.id))
@@ -52,9 +52,9 @@ pub fn update_day_edit(
         }
     } else {
         // update the entry
-        let result: DayData = diesel::update(day_data.find(data.ID))
+        let result: DayDataRaw = diesel::update(day_data.find(data.ID))
             .set(CommentData.eq(Some(data.Comment.clone())))
-            .returning(DayData::as_returning())
+            .returning(DayDataRaw::as_returning())
             .get_result(conn)?;
 
         Ok(Some(result.id))
@@ -167,7 +167,7 @@ pub fn get_day_edit(
         })
     } else {
         // get the data
-        let result: DayData = day_data.find(day_id).first::<DayData>(conn)?;
+        let result: DayDataRaw = day_data.find(day_id).first::<DayDataRaw>(conn)?;
 
         // get the tags
         let tags = get_tags(conn, day_id)?;
