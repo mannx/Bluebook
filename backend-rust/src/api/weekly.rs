@@ -10,43 +10,43 @@ use serde::Serialize;
 
 use crate::api::DbError;
 use crate::models::auv::{AUVData, AUVEntry};
-use crate::models::day_data::{DayData, DayDataRaw};
-use crate::models::weekly::{WeeklyInfo, WeeklyInfoRaw};
+use crate::models::day_data::DayData;
+use crate::models::ftoi;
+use crate::models::weekly::WeeklyInfo;
 
 #[derive(Serialize)]
 pub struct WeeklyReport {
     pub TargetAUV: i32,
     pub TargetHours: i32,
 
-    pub ProductivityBudget: f32,
-    pub ProductivityActual: f32,
+    pub ProductivityBudget: i32,
+    pub ProductivityActual: i32,
 
-    pub FoodCostAmount: f32,
-    pub LabourCostAmount: f32,
-    pub PartySales: f32,
+    pub FoodCostAmount: i32,
+    pub LabourCostAmount: i32,
+    pub PartySales: i32,
 
-    pub NetSales: f32,
+    pub NetSales: i32,
     pub NetSalesMismatch: bool, // true if net sales calculated from dailies differs from what was taken from wisr
-    pub WisrNetSales: f32,      // netsales from the control sheet.  debug for now
+    pub WisrNetSales: i32,      // netsales from the control sheet.  debug for now
 
     pub CustomerCount: i32,
 
-    pub GiftCardSold: f32,
-    pub GiftCardRedeem: f32,
+    pub GiftCardSold: i32,
+    pub GiftCardRedeem: i32,
 
-    pub BreadOverShort: f32,
+    pub BreadOverShort: i32,
 
-    pub LastYearSales: f32,
+    pub LastYearSales: i32,
     pub LastYearCustomerCount: i32,
-    pub UpcomingSales: f32,
+    pub UpcomingSales: i32,
 
     pub PrevWeek: NaiveDate,
     pub WeekEnding: NaiveDate,
 }
 
 // sales data for last year
-// (LastYearSales, LastYearCustomerCount, UpcomingSales)
-struct LastYearSales(f32, i32, f32);
+struct LastYearSales(i32, i32, i32);
 
 // used to hold data while WeeklyReport is being generated
 struct WeekData {
@@ -61,21 +61,21 @@ impl WeeklyReport {
         Self {
             TargetAUV: 0,
             TargetHours: 0,
-            ProductivityActual: 0.,
-            ProductivityBudget: 0.,
-            FoodCostAmount: 0.,
-            LabourCostAmount: 0.,
-            PartySales: 0.,
-            NetSales: 0.,
+            ProductivityActual: 0,
+            ProductivityBudget: 0,
+            FoodCostAmount: 0,
+            LabourCostAmount: 0,
+            PartySales: 0,
+            NetSales: 0,
             NetSalesMismatch: false,
-            WisrNetSales: 0.,
+            WisrNetSales: 0,
             CustomerCount: 0,
-            GiftCardSold: 0.,
-            GiftCardRedeem: 0.,
-            BreadOverShort: 0.,
-            LastYearSales: 0.,
+            GiftCardSold: 0,
+            GiftCardRedeem: 0,
+            BreadOverShort: 0,
+            LastYearSales: 0,
             LastYearCustomerCount: 0,
-            UpcomingSales: 0.,
+            UpcomingSales: 0,
             PrevWeek: NaiveDate::MIN,
             WeekEnding: NaiveDate::MIN,
         }
@@ -133,14 +133,13 @@ fn get_week_data(conn: &mut SqliteConnection, week_ending: NaiveDate) -> Result<
         use crate::schema::day_data::dsl::*;
 
         debug!("Getting daily data...");
-        let result = day_data
+        let mut result = day_data
             .filter(DayDate.ge(start_day).and(DayDate.le(week_ending)))
             .order(DayDate)
-            .select(DayDataRaw::as_select())
+            .select(DayData::as_select())
             .load(conn)?;
 
-        let mut res = result.iter().map(DayData::from).collect();
-        data.days.append(&mut res);
+        data.days.append(&mut result);
         debug!("Done!");
     }
 
@@ -151,7 +150,7 @@ fn get_week_data(conn: &mut SqliteConnection, week_ending: NaiveDate) -> Result<
         debug!("Getting weekly info for {week_ending}...");
         let result = weekly_info
             .filter(WeekEnding.eq(week_ending))
-            .first::<WeeklyInfoRaw>(conn);
+            .first::<WeeklyInfo>(conn);
 
         let wi = match result {
             Err(err) => match err {
@@ -161,7 +160,7 @@ fn get_week_data(conn: &mut SqliteConnection, week_ending: NaiveDate) -> Result<
                 }
                 err => return Err(Box::new(err)),
             },
-            Ok(n) => Some(WeeklyInfo::from(&n)),
+            Ok(n) => Some(n),
         };
 
         data.weekly = wi;
@@ -215,11 +214,8 @@ fn get_last_year_upcoming_sales(
     let next = last_year_end.checked_add_days(Days::new(7)).unwrap();
     let upcoming = get_week_data(conn, next)?;
 
-    let net = last_year
-        .days
-        .iter()
-        .fold(0., |acc, obj| acc + obj.NetSales);
-    let up_net = upcoming.days.iter().fold(0., |acc, obj| acc + obj.NetSales);
+    let net = last_year.days.iter().fold(0, |acc, obj| acc + obj.NetSales);
+    let up_net = upcoming.days.iter().fold(0, |acc, obj| acc + obj.NetSales);
     let count = last_year
         .days
         .iter()
@@ -293,7 +289,7 @@ fn calculate_weekly(data: &WeekData, last_year: LastYearSales) -> WeeklyReport {
             let i = index.unwrap();
             report.TargetAUV = auv.auv[i];
             report.TargetHours = auv.hours[i];
-            report.ProductivityBudget = auv.productivity[i];
+            report.ProductivityBudget = ftoi(auv.productivity[i]);
         }
     }
 

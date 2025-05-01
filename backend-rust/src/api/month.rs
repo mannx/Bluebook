@@ -6,8 +6,9 @@ use serde::{Deserialize, Serialize};
 
 use crate::api::get_days_in_month;
 use crate::api::DbError;
-use crate::models::day_data::{DayData, DayDataRaw};
+use crate::models::day_data::DayData;
 use crate::models::hockey::HockeySchedule;
+use crate::models::itof;
 use crate::models::tags::{TagData, TagList};
 
 #[derive(Serialize, Deserialize)]
@@ -51,14 +52,14 @@ pub struct MonthData {
 
 impl MonthData {
     fn new(data: &DayData) -> Self {
-        let tpd = data.SkipTheDishes + data.DoorDash + data.UberEats;
-        let tpp = (tpd / data.NetSales) * 100.;
+        let tpd = itof(data.SkipTheDishes + data.DoorDash + data.UberEats);
+        let tpp = (tpd / itof(data.NetSales)) * 100.;
 
         Self {
             Data: data.clone(),
             ThirdPartyDollar: tpd,
             ThirdPartyPercent: tpp,
-            GrossSales: data.NetSales + data.Hst + data.BottleDeposit,
+            GrossSales: itof(data.NetSales + data.Hst + data.BottleDeposit),
             DayOfWeek: data.DayDate.weekday().to_string(),
             EndOfWeek: None,
             Tags: Vec::new(),
@@ -87,16 +88,14 @@ pub fn get_month_data(
     let results = day_data
         .filter(DayDate.ge(start_day).and(DayDate.le(end_day)))
         .order(DayDate)
-        .select(DayDataRaw::as_select())
+        .select(DayData::as_select())
         .load(conn)?;
 
     // build the output month data and the extra calculations we need to do
     let mut data = Vec::new();
 
-    for r1 in &results {
-        let r = DayData::from(r1);
-        // let mut md = MonthData::new(&DayData::from(&r));
-        let mut md = MonthData::new(&r);
+    for r in &results {
+        let mut md = MonthData::new(r);
 
         // calculate various fields
         // calculate the week ending information if required
@@ -105,9 +104,11 @@ pub fn get_month_data(
         }
 
         md.WeeklyAverage = calculate_weekly_average(conn, r.DayDate)?;
-        if r.NetSales > md.WeeklyAverage {
+        let net_sales = itof(r.NetSales);
+
+        if net_sales > md.WeeklyAverage {
             md.SalesLastWeek = 1;
-        } else if r.NetSales < md.WeeklyAverage {
+        } else if net_sales < md.WeeklyAverage {
             md.SalesLastWeek = -1;
         } else {
             md.SalesLastWeek = 0;
@@ -154,23 +155,24 @@ fn calculate_week_ending(
         .checked_sub_days(Days::new(6))
         .expect("invalid date provided");
 
-    let results1: Vec<DayDataRaw> = day_data
+    let results: Vec<DayData> = day_data
         .filter(DayDate.ge(start_date).and(DayDate.le(data.DayDate)))
-        .select(DayDataRaw::as_select())
+        .select(DayData::as_select())
         .load(conn)?;
 
-    // let results: Vec<DayData> = results1.iter().map(|raw| DayData::from(raw)).collect();
-    let results: Vec<DayData> = results1.iter().map(DayData::from).collect();
-
-    let gross = results
-        .iter()
-        .map(|x| x.NetSales + x.Hst + x.BottleDeposit)
-        .sum::<f32>();
-    let net = results.iter().map(|x| x.NetSales).sum::<f32>();
-    let tpt = results
-        .iter()
-        .map(|x| x.SkipTheDishes + x.DoorDash + x.UberEats)
-        .sum::<f32>();
+    let gross = itof(
+        results
+            .iter()
+            .map(|x| x.NetSales + x.Hst + x.BottleDeposit)
+            .sum::<i32>(),
+    );
+    let net = itof(results.iter().map(|x| x.NetSales).sum::<i32>());
+    let tpt = itof(
+        results
+            .iter()
+            .map(|x| x.SkipTheDishes + x.DoorDash + x.UberEats)
+            .sum::<i32>(),
+    );
     let customer_count = results.iter().map(|x| x.CustomerCount).sum::<i32>();
 
     let tpp = (tpt / gross) * 100.;
@@ -192,10 +194,10 @@ fn calculate_weekly_average(conn: &mut SqliteConnection, date: NaiveDate) -> Res
         .checked_sub_days(Days::new(4 * 7))
         .expect("invalid start date"); // 4 weeks
 
-    let results: Vec<DayDataRaw> = day_data
+    let results: Vec<DayData> = day_data
         .filter(DayDate.ge(start_date).and(DayDate.le(date)))
         .order(DayDate)
-        .select(DayDataRaw::as_select())
+        .select(DayData::as_select())
         .load(conn)?;
 
     let mut total = 0;

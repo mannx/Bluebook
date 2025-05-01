@@ -1,4 +1,4 @@
-// import the control sheet to the database
+// import the wisr sheet to the database
 #![allow(non_snake_case)]
 use crate::imports::load_or_new_week;
 use chrono::NaiveDate;
@@ -10,6 +10,7 @@ use regex::Regex;
 
 use crate::imports::pdf_to_text;
 use crate::imports::ImportResult;
+use crate::models::ftoi;
 use crate::models::weekly::WeeklyInfo;
 
 lazy_static! {
@@ -124,13 +125,13 @@ fn save_wisr(
 
     weekly.WeekEnding = wisr.week_ending;
 
-    weekly.FoodCostAmount = wisr.food_cost_dollar;
-    weekly.FoodCostPercent = wisr.food_cost_percent;
+    weekly.FoodCostAmount = ftoi(wisr.food_cost_dollar);
+    weekly.FoodCostPercent = ftoi(wisr.food_cost_percent);
 
-    weekly.LabourCostAmount = wisr.labour_cost_dollar;
-    weekly.LabourCostPercent = wisr.labour_cost_percent;
+    weekly.LabourCostAmount = ftoi(wisr.labour_cost_dollar);
+    weekly.LabourCostPercent = ftoi(wisr.labour_cost_percent);
 
-    weekly.PartySales = wisr.catering_sales;
+    weekly.PartySales = ftoi(wisr.catering_sales);
 
     // save or update the info
     weekly.insert_or_update(conn)?;

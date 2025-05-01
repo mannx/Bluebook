@@ -1,6 +1,5 @@
 // import the control sheet to the database
 #![allow(non_snake_case)]
-// use crate::api::DbError;
 use crate::imports::load_or_new_day;
 use crate::imports::load_or_new_week;
 use chrono::{Days, NaiveDate};
@@ -13,6 +12,7 @@ use regex::Regex;
 use crate::imports::pdf_to_text;
 use crate::imports::ImportResult;
 use crate::models::day_data::DayData;
+use crate::models::ftoi;
 use crate::models::weekly::WeeklyInfo;
 
 // compile all the regex's we will use one time
@@ -50,7 +50,6 @@ lazy_static! {
 }
 
 // holds the data we are parseing
-// #[derive(Debug)]
 pub struct ControlSheetData {
     week_ending: NaiveDate,
     productivity: Vec<f32>,
@@ -268,13 +267,13 @@ fn save_control_sheet(
             Ok(dd) => dd,
         };
 
-        day_data.HoursWorked = sheet.hours_worked[i];
-        day_data.Productivity = sheet.productivity[i];
-        day_data.Factor = sheet.factor[i];
-        day_data.AdjustedSales = sheet.units_sold[i];
+        day_data.HoursWorked = ftoi(sheet.hours_worked[i]);
+        day_data.Productivity = ftoi(sheet.productivity[i]);
+        day_data.Factor = ftoi(sheet.factor[i]);
+        day_data.AdjustedSales = ftoi(sheet.units_sold[i]);
         day_data.CustomerCount = sheet.customer_count[i];
-        day_data.BreadCredits = sheet.bread_waste[i];
-        day_data.BreadOverShort = sheet.bread_over_short[i];
+        day_data.BreadCredits = ftoi(sheet.bread_waste[i]);
+        day_data.BreadOverShort = ftoi(sheet.bread_over_short[i]);
 
         // save it
         day_data.insert_or_update(conn)?;
@@ -284,8 +283,8 @@ fn save_control_sheet(
     // save the remaining weekly information
     let mut weekly: WeeklyInfo = load_or_new_week(conn, sheet.week_ending)?;
 
-    weekly.NetSales = sheet.net_sales;
-    weekly.Productivity = sheet.total_prod;
+    weekly.NetSales = ftoi(sheet.net_sales);
+    weekly.Productivity = ftoi(sheet.total_prod);
 
     // save or update the info
     weekly.insert_or_update(conn)?;

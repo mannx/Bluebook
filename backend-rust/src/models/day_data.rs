@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 #[diesel(table_name=crate::schema::day_data)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 #[derive(Serialize, Deserialize, Clone)]
-pub struct DayDataRaw {
+pub struct DayData {
     pub id: i32,
 
     // Debit Side
@@ -48,46 +48,6 @@ pub struct DayDataRaw {
     pub BreadOverShort: i32,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
-pub struct DayData {
-    pub id: i32,
-
-    // Debit Side
-    pub DayDate: NaiveDate,
-    pub CashDeposit: f32,
-    pub DebitCard: f32,
-    pub MasterCard: f32,
-    pub Visa: f32,
-    pub Amex: f32,
-    pub CreditSales: f32,
-    pub GiftCardRedeem: f32,
-    pub SubwayCaters: f32,
-    pub PayPal: f32,
-    pub SkipTheDishes: f32,
-    pub DoorDash: f32,
-    pub UberEats: f32,
-    pub PettyCash: f32,
-
-    // Credit Side
-    pub Tips: f32,
-    pub Hst: f32,
-    pub BottleDeposit: f32,
-    pub NetSales: f32,
-    pub CreditSalesRedeemed: f32,
-    pub CreditFood: f32,
-    pub GiftCardSold: f32,
-    pub USFunds: f32,
-    pub CommentData: Option<String>,
-
-    // Control Sheet
-    pub HoursWorked: f32,
-    pub Productivity: f32,
-    pub Factor: f32,
-    pub AdjustedSales: f32,
-    pub CustomerCount: i32,
-    pub BreadCredits: f32,
-    pub BreadOverShort: f32,
-}
 ///
 /// Have a 2nd copy identical to DayData except for missing id, to allow for
 /// autoincrememintg id.  any other fields that don't need to get inserted
@@ -134,71 +94,35 @@ impl DayData {
         Self {
             id: -1,
             DayDate: date,
-            CashDeposit: 0.,
-            DebitCard: 0.,
-            MasterCard: 0.,
-            Visa: 0.,
-            Amex: 0.,
-            CreditSales: 0.,
-            GiftCardRedeem: 0.,
-            SubwayCaters: 0.,
-            PayPal: 0.,
-            SkipTheDishes: 0.,
-            DoorDash: 0.,
-            UberEats: 0.,
-            PettyCash: 0.,
-            Tips: 0.,
-            Hst: 0.,
-            BottleDeposit: 0.,
-            NetSales: 0.,
-            CreditSalesRedeemed: 0.,
-            CreditFood: 0.,
-            GiftCardSold: 0.,
-            USFunds: 0.,
+            CashDeposit: 0,
+            DebitCard: 0,
+            MasterCard: 0,
+            Visa: 0,
+            Amex: 0,
+            CreditSales: 0,
+            GiftCardRedeem: 0,
+            SubwayCaters: 0,
+            PayPal: 0,
+            SkipTheDishes: 0,
+            DoorDash: 0,
+            UberEats: 0,
+            PettyCash: 0,
+            Tips: 0,
+            Hst: 0,
+            BottleDeposit: 0,
+            NetSales: 0,
+            CreditSalesRedeemed: 0,
+            CreditFood: 0,
+            GiftCardSold: 0,
+            USFunds: 0,
             CommentData: None,
-            HoursWorked: 0.,
-            Productivity: 0.,
-            Factor: 0.,
-            AdjustedSales: 0.,
+            HoursWorked: 0,
+            Productivity: 0,
+            Factor: 0,
+            AdjustedSales: 0,
             CustomerCount: 0,
-            BreadCredits: 0.,
-            BreadOverShort: 0.,
-        }
-    }
-
-    pub fn from(data: &DayDataRaw) -> Self {
-        Self {
-            id: data.id,
-            DayDate: data.DayDate,
-            CashDeposit: (data.CashDeposit as f32) / 100.,
-            DebitCard: (data.DebitCard as f32) / 100.,
-            MasterCard: (data.MasterCard as f32) / 100.,
-            Visa: (data.Visa as f32) / 100.,
-            Amex: (data.Amex as f32) / 100.,
-            CreditSales: (data.CreditSales as f32) / 100.,
-            GiftCardRedeem: (data.GiftCardRedeem as f32) / 100.,
-            SubwayCaters: (data.SubwayCaters as f32) / 100.,
-            PayPal: (data.PayPal as f32) / 100.,
-            SkipTheDishes: (data.SkipTheDishes as f32) / 100.,
-            DoorDash: (data.DoorDash as f32) / 100.,
-            UberEats: (data.UberEats as f32) / 100.,
-            PettyCash: (data.PettyCash as f32) / 100.,
-            Tips: (data.Tips as f32) / 100.,
-            Hst: (data.Hst as f32) / 100.,
-            BottleDeposit: (data.BottleDeposit as f32) / 100.,
-            NetSales: (data.NetSales as f32) / 100.,
-            CreditSalesRedeemed: (data.CreditSalesRedeemed as f32) / 100.,
-            CreditFood: (data.CreditFood as f32) / 100.,
-            GiftCardSold: (data.GiftCardSold as f32) / 100.,
-            USFunds: (data.USFunds as f32) / 100.,
-            CommentData: data.CommentData.clone(),
-            HoursWorked: (data.HoursWorked as f32) / 100.,
-            Productivity: (data.Productivity as f32) / 100.,
-            Factor: (data.Factor as f32) / 100.,
-            AdjustedSales: (data.AdjustedSales as f32) / 100.,
-            CustomerCount: data.CustomerCount,
-            BreadCredits: (data.BreadCredits as f32) / 100.,
-            BreadOverShort: (data.BreadOverShort as f32) / 100.,
+            BreadCredits: 0,
+            BreadOverShort: 0,
         }
     }
 
@@ -214,31 +138,6 @@ impl DayData {
         self.BreadOverShort = data.BreadOverShort;
     }
 
-    pub fn insert_or_update(&self, conn: &mut SqliteConnection) -> Result<(), Error> {
-        // if data.id == -1, we insert, otherwise we update
-        // if self.id == -1 {
-        //     // insert
-        //     let data_insert = DayDataInsert::from(self);
-        //
-        //     diesel::insert_into(crate::schema::day_data::table)
-        //         .values(&data_insert)
-        //         .execute(conn)?;
-        // } else {
-        //     // update
-        //     use crate::schema::day_data::dsl::*;
-        //
-        //     diesel::update(crate::schema::day_data::table)
-        //         .filter(id.eq(self.id)) // make sure to only update the record we are
-        //         .set(self)
-        //         .execute(conn)?;
-        // }
-        // Ok(())
-        let raw = DayDataRaw::from(self);
-        raw.insert_or_update(conn)
-    }
-}
-
-impl DayDataRaw {
     pub fn insert_or_update(&self, conn: &mut SqliteConnection) -> Result<(), Error> {
         // if data.id == -1, we insert, otherwise we update
         if self.id == -1 {
@@ -258,42 +157,6 @@ impl DayDataRaw {
                 .execute(conn)?;
         }
         Ok(())
-    }
-
-    pub fn from(data: &DayData) -> Self {
-        Self {
-            id: data.id,
-            DayDate: data.DayDate,
-            CashDeposit: (data.CashDeposit * 100.) as i32,
-            DebitCard: (data.DebitCard * 100.) as i32,
-            MasterCard: (data.MasterCard * 100.) as i32,
-            Visa: (data.Visa * 100.) as i32,
-            Amex: (data.Amex * 100.) as i32,
-            CreditSales: (data.CreditSales * 100.) as i32,
-            GiftCardRedeem: (data.GiftCardRedeem * 100.) as i32,
-            SubwayCaters: (data.SubwayCaters * 100.) as i32,
-            PayPal: (data.PayPal * 100.) as i32,
-            SkipTheDishes: (data.SkipTheDishes * 100.) as i32,
-            DoorDash: (data.DoorDash * 100.) as i32,
-            UberEats: (data.UberEats * 100.) as i32,
-            PettyCash: (data.PettyCash * 100.) as i32,
-            Tips: (data.Tips * 100.) as i32,
-            Hst: (data.Hst * 100.) as i32,
-            BottleDeposit: (data.BottleDeposit * 100.) as i32,
-            NetSales: (data.NetSales * 100.) as i32,
-            CreditSalesRedeemed: (data.CreditSalesRedeemed * 100.) as i32,
-            CreditFood: (data.CreditFood * 100.) as i32,
-            GiftCardSold: (data.GiftCardSold * 100.) as i32,
-            USFunds: (data.USFunds * 100.) as i32,
-            CommentData: data.CommentData.clone(),
-            HoursWorked: (data.HoursWorked * 100.) as i32,
-            Productivity: (data.Productivity * 100.) as i32,
-            Factor: (data.Factor * 100.) as i32,
-            AdjustedSales: (data.AdjustedSales * 100.) as i32,
-            CustomerCount: data.CustomerCount,
-            BreadCredits: (data.BreadCredits * 100.) as i32,
-            BreadOverShort: (data.BreadOverShort * 100.) as i32,
-        }
     }
 }
 
@@ -334,7 +197,7 @@ impl DayDataInsert {
     }
 
     // create an insertable entry from the main entry
-    pub fn from(data: &DayDataRaw) -> Self {
+    pub fn from(data: &DayData) -> Self {
         Self {
             DayDate: data.DayDate,
             CashDeposit: data.CashDeposit,

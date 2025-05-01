@@ -15,8 +15,8 @@ use umya_spreadsheet::XlsxError;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
-use crate::models::day_data::{DayData, DayDataRaw};
-use crate::models::weekly::{WeeklyInfo, WeeklyInfoRaw};
+use crate::models::day_data::DayData;
+use crate::models::weekly::WeeklyInfo;
 
 // List of all messages for the user generated during importing.  errors or status messages
 // TODO: indicate error vs status message for clearer messaging
@@ -108,9 +108,9 @@ fn load_or_new_day(conn: &mut SqliteConnection, date: NaiveDate) -> Result<DayDa
     use crate::schema::day_data::dsl::*;
 
     // try to retrieve the data
-    let result = day_data.filter(DayDate.eq(date)).first::<DayDataRaw>(conn);
+    let result = day_data.filter(DayDate.eq(date)).first::<DayData>(conn);
     match result {
-        Ok(d) => Ok(DayData::from(&d)),
+        Ok(d) => Ok(d),
         Err(err) => {
             match err {
                 Error::NotFound => {
@@ -131,10 +131,9 @@ fn load_or_new_week(conn: &mut SqliteConnection, date: NaiveDate) -> Result<Week
     // try to retrieve the data
     let result = weekly_info
         .filter(WeekEnding.eq(date))
-        .first::<WeeklyInfoRaw>(conn);
+        .first::<WeeklyInfo>(conn);
     match result {
-        // Ok(d) => Ok(d),
-        Ok(d) => Ok(WeeklyInfo::from(&d)),
+        Ok(d) => Ok(d),
         Err(err) => {
             match err {
                 Error::NotFound => {

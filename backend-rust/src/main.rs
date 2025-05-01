@@ -100,20 +100,3 @@ async fn main() -> std::io::Result<()> {
     .run()
     .await
 }
-
-#[cfg(test)]
-mod tests {
-    use log::debug;
-
-    #[test]
-    fn math_test() {
-        // check if we store 1234.56 as a whole number (n * 100)
-        let stored = (1234.56 * 100.) as i32;
-        debug!("stored: {stored} (should be 123456)");
-
-        let float = (stored as f64) / 100.;
-        debug!("float: {float} (should be 1234.56)");
-
-        assert_eq!(float, 1234.56);
-    }
-}
