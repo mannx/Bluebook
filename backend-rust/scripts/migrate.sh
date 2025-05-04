@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# This script is only used during development to migrate
+# and old database to the new model
+
 # run this script from the /scripts/ directory
 
 # move the original db, to $DB_ORIG
@@ -27,3 +30,6 @@ sqlite3 $DB_ORIG <../scripts/daydata.sql
 sqlite3 $DB_ORIG <../scripts/hockey.sql
 sqlite3 $DB_ORIG <../scripts/settings.sql
 sqlite3 $DB_ORIG <../scripts/auv.sql
+
+# add the migration data to the new database
+sqlite3 $DB <../scripts/migrate.sql

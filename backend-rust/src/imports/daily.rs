@@ -97,12 +97,25 @@ pub fn daily_import(conn: &mut SqliteConnection, file_name: &String) -> ImportRe
     for i in 0..4 {
         let res = parse_day(&config, version, sheet, sheet2, i);
 
-        if res.is_none() {
-            // error, or not full sheet, we break early
-            break;
-        }
+        // if res.is_none() {
+        //     // error, or not full sheet, we break early
+        //     break;
+        // }
+        let day_data = match res {
+            Err(e) => {
+                messages.add(e);
+                break;
+            }
+            Ok(n) => match n {
+                Some(n) => n,
+                None => {
+                    messages.add(format!("Unable to parse day index {i}"));
+                    break;
+                }
+            },
+        };
 
-        let day_data = res.unwrap();
+        // let day_data = res.unwrap();
 
         // insert or update this entry in the db
         if let Err(err) = insert_or_update(conn, &day_data) {
@@ -124,7 +137,7 @@ fn parse_day(
     sheet: &Worksheet,
     sheet2: &Worksheet, // 2nd sheet containing data
     day_index: usize,
-) -> Option<DayData> {
+) -> Result<Option<DayData>, String> {
     // retrieve the date we are working on
     // if cell is empty, we stop processing early
     let date_cell = &config.Dates[version][day_index];
@@ -133,7 +146,10 @@ fn parse_day(
     if date_val.is_empty() {
         // no date, return
         debug!("[parse_day] date_val is empty for index {day_index}, returning");
-        return None;
+        // return None;
+        return Err(format!(
+            "[parse_day] date_val is empty for index {day_index}, returning"
+        ));
     }
 
     // convert date into a useable format.
@@ -142,7 +158,8 @@ fn parse_day(
         Err(e) => {
             error!("Unable to parse date value [{date_val}] for index {day_index}");
             error!("error: {e}");
-            return None;
+            // return None;
+            return Err(format!("Unable to parse date [{date_val}]: {e}"));
         }
         // convert to a NaiveDateTime.  ignore the time zone
         Ok(n) => NaiveDate::from(umya_spreadsheet::helper::date::excel_to_date_time_object(
@@ -191,7 +208,7 @@ fn parse_day(
         data.USFunds = us_cash;
     }
 
-    Some(data)
+    Ok(Some(data))
 }
 
 // checks the sheet and determines which version we are parsing
@@ -204,9 +221,17 @@ fn get_daily_version(_sheet: &Worksheet) -> usize {
 // gets the value from the cell, returns 0 if cell is empty
 fn get_value(sheet: &Worksheet, cell: &str) -> i32 {
     let val = sheet.get_value(cell);
-    let f = val.parse::<f32>().unwrap_or(0.);
+    // let f = val.parse::<f32>().unwrap_or(0.);
 
-    ftoi(f)
+    // ftoi(f)
+
+    match val.parse::<f32>() {
+        Ok(n) => ftoi(n),
+        Err(e) => {
+            error!("Unable to convert field with value: {}.  [{e}]", val);
+            0
+        }
+    }
 }
 
 // insert or update the DayData table for the day we just processed

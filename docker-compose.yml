@@ -15,6 +15,7 @@ services:
       - ./data:/data:z
       - ./import_data:/import
       - /etc/localtime:/etc/localtime:ro
+      - ./:/src
     deploy:
       restart_policy:
         condition: on-failure

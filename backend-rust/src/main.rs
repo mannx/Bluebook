@@ -7,7 +7,7 @@ use diesel::SqliteConnection;
 use env_logger::Env;
 use enviroment::Environment;
 use lazy_static::lazy_static;
-use log::debug;
+use log::{debug, info};
 use std::{env, error::Error};
 
 mod api;
@@ -55,7 +55,15 @@ async fn main() -> std::io::Result<()> {
 
     match run_migrations(&mut conn) {
         Ok(_) => println!("migrations run successfully!"),
-        Err(e) => println!("error unable to migrate db.: {:?}", e),
+        Err(e) => panic!("error unable to migrate db. Stopping.: {:?}", e),
+    }
+
+    // if we have an argument given to us, we exit after running migrations
+    // startup script will use this to do the db migration, then
+    // exit, so data copy scripts can be ran, then we can run full
+    if std::env::args().len() > 1 {
+        info!("Argument provided. Exiting after database migrations.");
+        return Ok(());
     }
 
     HttpServer::new(move || {

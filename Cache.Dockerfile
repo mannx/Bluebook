@@ -1,17 +1,20 @@
 #syntax:docker/dockerfile:1
 
 #
-# Rust Build Stage
+# Caching Stage
 #
-FROM rust:latest AS build
+
+FROM lukemathwalker/cargo-chef:latest-rust-1 AS chef
 WORKDIR /app
 
-COPY backend-rust/ ./
+FROM chef AS planner
+COPY backend-rust/ .
+RUN cargo chef prepare --recipe-path recipe.json
 
-# add missing deps
-RUN apt update && apt install sqlite3
-
-# temp adjust certain source files for dockerization
+FROM chef AS builder
+COPY --from=planner /app/recipe.json recipe.json
+RUN cargo chef cook --release --recipe-path recipe.json
+COPY backend-rust/ .
 RUN cargo build --release
 
 #
@@ -39,15 +42,16 @@ FROM debian:bookworm
 
 # make sure required packages are installed
 # poppler-utils required for pdf parsing 
-RUN apt update && apt install sqlite3 poppler-utils -y
+# vim added for dev purpose only
+RUN apt update && apt install sqlite3 poppler-utils vim -y
 
 WORKDIR /
 
-COPY --from=build /app/target/release/backend-rust /bluebook
+COPY --from=builder /app/target/release/backend-rust /bluebook
 COPY --from=react /app/dist /dist
 
 # copy in default config file for top5 api
-COPY ./backend/api/data.json /top5.json
+# COPY ./backend/api/data.json /top5.json
 
 # copy in import mapping files
 COPY ./backend-rust/src/config/*.ron /config/
@@ -59,8 +63,8 @@ COPY ./backend-rust/scripts/*.sql /migrate/
 COPY ./scripts /scripts
 
 # copy and extract the initialization files
-COPY ./init/init.bin /init/init.tar.gz
-RUN tar -zxf /init/init.tar.gz -C /init && rm /init/init.tar.gz
+# COPY ./init/init.bin /init/init.tar.gz
+# RUN tar -zxf /init/init.tar.gz -C /init && rm /init/init.tar.gz
 
 EXPOSE 8080
 # ENTRYPOINT ["/bluebook"]
