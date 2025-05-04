@@ -14,7 +14,6 @@ use crate::models::settings::Settings;
 use crate::ENVIRONMENT;
 
 #[derive(Deserialize, Debug)]
-#[allow(dead_code)]
 pub struct WeeklyParams {
     week_ending: NaiveDate,
     hours: f32,
@@ -25,7 +24,6 @@ pub struct WeeklyParams {
 
 // Holds data on which cells data is outputed to on the spreadsheet
 #[derive(Deserialize)]
-#[allow(dead_code)]
 struct Config {
     managerName: String,
     storeNumber: String,

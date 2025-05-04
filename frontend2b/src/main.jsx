@@ -256,12 +256,12 @@ const router = createBrowserRouter([
       //   element: <DayDataViewer />,
       //   loader: ddViewerLoader,
       // },
-      // {
-      //   path: "/settings",
-      //   element: <Settings />,
-      //   loader: settingsLoader,
-      //   action: settingsAction,
-      // },
+      {
+        path: "/settings",
+        element: <Settings />,
+        loader: settingsLoader,
+        action: settingsAction,
+      },
       // {
       //   path: "/about",
       //   element: <AboutPage />,
