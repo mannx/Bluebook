@@ -61,6 +61,12 @@ function NF(obj) {
   );
 }
 
+// Wrapper around NF that converts {obj} back into a floating point
+// used for currency
+function F(obj) {
+  return NF(obj / 100.0);
+}
+
 export default function Weekly() {
   const [useNetSales, setUseNetSales] = React.useState(false);
   const data = useLoaderData();
@@ -111,16 +117,16 @@ export default function Weekly() {
             </tr>
             <tr className="Month">
               <td className="Month">Sales Last Year</td>
-              <td className="Month">{NF(data.LastYearSales)}</td>
+              <td className="Month">{F(data.LastYearSales)}</td>
             </tr>
             <tr className="Month">
               <td className="Month">Sales This Week</td>
-              <td className="Month">{NF(data.NetSales)}</td>
+              <td className="Month">{F(data.NetSales)}</td>
               {data.NetSalesMismatch === true ? mismatchOutput : <></>}
             </tr>
             <tr className="Month">
               <td className="Month">Upcoming Sales</td>
-              <td className="Month">{NF(data.UpcomingSales)}</td>
+              <td className="Month">{F(data.UpcomingSales)}</td>
             </tr>
             <tr className="Month">
               <td className="Month">&nbsp;</td>
@@ -132,11 +138,11 @@ export default function Weekly() {
             </tr>
             <tr className="Month">
               <td className="Month">Food Cost $</td>
-              <td className="Month">{NF(data.FoodCostAmount)}</td>
+              <td className="Month">{F(data.FoodCostAmount)}</td>
             </tr>
             <tr className="Month">
               <td className="Month">Labour Cost $</td>
-              <td className="Month">{NF(data.LabourCostAmount)}</td>
+              <td className="Month">{F(data.LabourCostAmount)}</td>
             </tr>
             <tr className="Month">
               <td className="Month">&nbsp;</td>
@@ -144,11 +150,11 @@ export default function Weekly() {
             </tr>
             <tr className="Month">
               <td className="Month">Productivity Budget</td>
-              <td className="Month">{NF(data.ProductivityBudget)}</td>
+              <td className="Month">{F(data.ProductivityBudget)}</td>
             </tr>
             <tr className="Month">
               <td className="Month">Productivity Actual</td>
-              <td className="Month">{NF(data.ProductivityActual)}</td>
+              <td className="Month">{F(data.ProductivityActual)}</td>
             </tr>
             <tr className="Month">
               <td className="Month">Customer Count</td>
@@ -160,7 +166,7 @@ export default function Weekly() {
             </tr>
             <tr className="Month">
               <td className="Month">Party Sales</td>
-              <td className="Month">{NF(data.PartySales)}</td>
+              <td className="Month">{F(data.PartySales)}</td>
             </tr>
             <tr className="Month">
               <td className="Month">&nbsp;</td>
@@ -176,11 +182,11 @@ export default function Weekly() {
             </tr>
             <tr className="Month">
               <td className="Month">Gift Card Sold</td>
-              <td className="Month">{NF(data.GiftCardSold)}</td>
+              <td className="Month">{F(data.GiftCardSold)}</td>
             </tr>
             <tr className="Month">
               <td className="Month">Gift Card Redeem</td>
-              <td className="Month">{NF(data.GiftCardRedeem)}</td>
+              <td className="Month">{F(data.GiftCardRedeem)}</td>
             </tr>
             <tr className="Month">
               <td className="Month">&nbsp;</td>

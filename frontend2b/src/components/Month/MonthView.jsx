@@ -104,6 +104,7 @@ export default function MonthView() {
 }
 
 // define several helper functions for displaying commonly formatted numbers
+// div -> if true, divide obj by 100 to convert back to a float
 function NF(obj, prefix = "", suffix = "") {
   return (
     <NumericFormat
@@ -117,13 +118,15 @@ function NF(obj, prefix = "", suffix = "") {
   );
 }
 
-export function NumberFormat(obj, prefix = "", suffix = "") {
-  return NF(obj, prefix, suffix);
-}
-
 // output a general number
 function O(obj) {
   return NF(obj);
+}
+
+// output a number that needs to get converted back to a float
+// ie. anything that is supposed to be currency
+function F(obj) {
+  return NF(obj / 100.0, "", "");
 }
 
 function P(obj) {
@@ -210,28 +213,28 @@ function Row(data, settings) {
       <td className="Month">{Zero(data.Day)}</td>
       <td className="Month">{dj.format("dddd")}</td>
       <td className="Month">{O(data.GrossSales)}</td>
-      <td className="Month">{O(data.Data.Hst)}</td>
-      <td className="Month">{O(data.Data.BottleDeposit)}</td>
+      <td className="Month">{F(data.Data.Hst)}</td>
+      <td className="Month">{F(data.Data.BottleDeposit)}</td>
       <td className={`${cls} ${"Month"}`}>
         <div className="tooltip-month">
-          {O(data.Data.NetSales)}
+          {F(data.Data.NetSales)}
           <span className="tooltiptext-month">{O(data.WeeklyAverage)}</span>
         </div>
       </td>
       <td className="blank"></td>
-      <td className="Month">{O(data.Data.DebitCard)}</td>
-      <td className="Month">{O(data.Data.Visa)}</td>
-      <td className="Month">{O(data.Data.MasterCard)}</td>
-      <td className="Month">{O(data.Data.Amex)}</td>
-      <td className="Month">{O(data.Data.CreditSales)}</td>
+      <td className="Month">{F(data.Data.DebitCard)}</td>
+      <td className="Month">{F(data.Data.Visa)}</td>
+      <td className="Month">{F(data.Data.MasterCard)}</td>
+      <td className="Month">{F(data.Data.Amex)}</td>
+      <td className="Month">{F(data.Data.CreditSales)}</td>
       <td className="blank"></td>
-      <td className="Month">{O(data.Data.GiftCardRedeem)}</td>
-      <td className="Month">{O(data.Data.GiftCardSold)}</td>
+      <td className="Month">{F(data.Data.GiftCardRedeem)}</td>
+      <td className="Month">{F(data.Data.GiftCardSold)}</td>
       <td className="blank"></td>
-      <td className="Month">{O(data.Data.HoursWorked)}</td>
-      <td className="Month">{O(data.Data.Productivity)}</td>
-      <td className="Month">{O(data.Data.Factor)}</td>
-      <td className="Month">{O(data.Data.AdjustedSales)}</td>
+      <td className="Month">{F(data.Data.HoursWorked)}</td>
+      <td className="Month">{F(data.Data.Productivity)}</td>
+      <td className="Month">{F(data.Data.Factor)}</td>
+      <td className="Month">{F(data.Data.AdjustedSales)}</td>
       <td className="Month">{O(data.Data.CustomerCount)}</td>
       <td className="Month no-print">{Dol(data.ThirdPartyDollar)}</td>
       <td className="Month no-print">{P(data.ThirdPartyPercent)}</td>
