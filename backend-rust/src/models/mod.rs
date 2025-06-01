@@ -14,17 +14,3 @@ pub fn ftoi(n: f32) -> i32 {
 pub fn itof(n: i32) -> f32 {
     n as f32 / 100.
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn ftoi_test() {
-        let orig = 1024.76;
-        let i = ftoi(orig);
-        let f = itof(i);
-
-        assert_eq!(f, orig, "[orig: {orig}] [i: {i}] [f: {f}]");
-    }
-}

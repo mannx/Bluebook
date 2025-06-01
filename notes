@@ -5,6 +5,8 @@
 Known TODO List
   * Weekly export
   * Frontend error reporting worked on
+  * Productivity from control sheet being read in as a f32, stored as i32
+  *   conversion not always prec
 
 
 Migration Steps
