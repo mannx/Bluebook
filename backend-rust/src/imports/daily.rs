@@ -221,9 +221,6 @@ fn get_daily_version(_sheet: &Worksheet) -> usize {
 // gets the value from the cell, returns 0 if cell is empty
 fn get_value(sheet: &Worksheet, cell: &str) -> i32 {
     let val = sheet.get_value(cell);
-    // let f = val.parse::<f32>().unwrap_or(0.);
-
-    // ftoi(f)
 
     match val.parse::<f32>() {
         Ok(n) => ftoi(n),
@@ -283,9 +280,16 @@ fn update_data(
     // could also do this in the update() function below?
     let mut new_data = data.clone();
     new_data.copy_control(old);
+    new_data.id = old.id;
+
+    // debug!("[daily.rs] *** UPDATE ***");
+    // debug!("[daily.rs] ID: {}", new_data.id);
+
+    use crate::schema::day_data::dsl::*;
 
     // update the given record
     diesel::update(crate::schema::day_data::table)
+        .filter(id.eq(old.id))
         .set(new_data)
         .returning(DayData::as_returning())
         .get_result(conn)

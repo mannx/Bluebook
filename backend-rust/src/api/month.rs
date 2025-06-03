@@ -2,6 +2,7 @@
 use chrono::{Datelike, Days, NaiveDate};
 use diesel::prelude::*;
 use diesel::SqliteConnection;
+use log::debug;
 use serde::{Deserialize, Serialize};
 
 use crate::api::get_days_in_month;
@@ -124,6 +125,10 @@ pub fn get_month_data(
     }
 
     // do we have missing days to pad out?
+    let ud = days as usize;
+    debug!("[month.rs] days: {ud}");
+    debug!("[month.rs] data.len() = {}", data.len());
+
     if data.len() != days as usize {
         let missing = days as usize - data.len();
         let date = match data.last() {

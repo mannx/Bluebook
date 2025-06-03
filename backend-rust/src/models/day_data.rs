@@ -53,7 +53,7 @@ pub struct DayData {
 /// autoincrememintg id.  any other fields that don't need to get inserted
 /// can also be removed from this struct
 ///
-#[derive(Insertable)]
+#[derive(Insertable, Debug)]
 #[diesel(table_name=crate::schema::day_data)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 pub struct DayDataInsert {
