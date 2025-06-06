@@ -1,4 +1,3 @@
-#![allow(non_snake_case)]
 use crate::api::DbPool;
 use actix_web::error;
 use actix_web::HttpResponse;

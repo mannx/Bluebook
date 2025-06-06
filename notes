@@ -5,8 +5,12 @@
 Known TODO List
   * Weekly export
   * Frontend error reporting worked on
-  * Productivity from control sheet being read in as a f32, stored as i32
-  *   conversion not always prec
+  
+  * When importing daily sheets, a new row is created and an Update flag set
+    on the pre-existing row if we are updating data.
+    This only happens on the daily, the control sheet doesn't need to do this.
+    Can use this flag to revert data in case a wrong date was used in the daily sheet
+    This does break tags, and those needed to be reworked anyway
 
 
 Migration Steps

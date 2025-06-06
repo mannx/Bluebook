@@ -42,60 +42,12 @@ import AUV, {
   action as auvAction,
 } from "./components/AUV/AUV";
 
-// import WasteView, {
-//   WasteTable,
-//   loader as wasteLoader,
-//   action as wasteAction,
-// } from "./components/Waste/Wastage";
-
-// import WasteInput, {
-//   loader as wasteInputLoader,
-//   action as wasteInputAction,
-// } from "./components/Waste/Input";
-
-// import WasteSettings, {
-//   WasteSettingsEdit,
-//   loader as wasteSettingsLoader,
-//   action as wasteSettingsAction,
-//   EditLoader as wasteSettingsEditLoader,
-//   EditAction as wasteSettingsEditAction,
-// } from "./components/Waste/Settings";
-
-// import Top5, {
-//   Top5Data,
-//   loader as top5Loader,
-//   dataLoader as top5DataLoader,
-// } from "./components/Top5/Top5";
-
-// import Backups, {
-//   loader as backupsLoader,
-//   action as backupsAction,
-// } from "./components/Backups/Backups.jsx";
-
-// import CommentSearch, {
-//   loader as commentSearchLoader,
-// } from "./components/Search/CommentSearch";
-
-// import HockeyData, {
-//   loader as hockeyDataLoader,
-//   HockeyDataView,
-//   viewLoader as hockeyDataViewLoader,
-// } from "./components/Hockey/HockeyData";
-
-// import SimpleStats, {
-//   loader as statsAverageLoader,
-//   dataLoader as simpleStatsYearLoader,
-//   SimpleStatsYear,
-// } from "./components/Stats/Stats";
+import Backup, { loader as backupLoader } from "./components/Backup/Backup";
 
 import Settings, {
   loader as settingsLoader,
   action as settingsAction,
 } from "./components/Settings/Settings";
-
-// import DayDataViewer, {
-//   loader as ddViewerLoader,
-// } from "./components/Stats/DayDataViewer.jsx";
 
 // import AboutPage, { loader as aboutLoader } from "./components/About/About.tsx";
 
@@ -174,88 +126,6 @@ const router = createBrowserRouter([
           },
         ],
       },
-      // {
-      //   path: "/wastage",
-      //   element: <WasteView />,
-      //   children: [
-      //     {
-      //       path: "/wastage/:day/:month/:year",
-      //       element: <WasteTable />,
-      //       loader: wasteLoader,
-      //       action: wasteAction,
-      //     },
-      //   ],
-      // },
-      // {
-      //   path: "/waste/input",
-      //   element: <WasteInput />,
-      //   loader: wasteInputLoader,
-      //   action: wasteInputAction,
-      // },
-      // {
-      //   path: "/waste/settings",
-      //   element: <WasteSettings />,
-      //   loader: wasteSettingsLoader,
-      //   action: wasteSettingsAction,
-      // },
-      // {
-      //   path: "/waste/settings/:id",
-      //   element: <WasteSettingsEdit />,
-      //   loader: wasteSettingsEditLoader,
-      //   action: wasteSettingsEditAction,
-      // },
-      // {
-      //   path: "/top5",
-      //   element: <Top5 />,
-      //   loader: top5Loader,
-      //   children: [
-      //     {
-      //       path: "/top5/:month/:year",
-      //       element: <Top5Data />,
-      //       loader: top5DataLoader,
-      //     },
-      //   ],
-      // },
-      // {
-      //   path: "/backups",
-      //   element: <Backups />,
-      //   loader: backupsLoader,
-      //   action: backupsAction,
-      // },
-      // {
-      //   path: "/search",
-      //   element: <CommentSearch />,
-      //   loader: commentSearchLoader,
-      // },
-      // {
-      //   path: "/hockey/data/",
-      //   element: <HockeyData />,
-      //   loader: hockeyDataLoader,
-      //   children: [
-      //     {
-      //       path: "/hockey/data/:year",
-      //       element: <HockeyDataView />,
-      //       loader: hockeyDataViewLoader,
-      //     },
-      //   ],
-      // },
-      // {
-      //   path: "/stats/simple",
-      //   element: <SimpleStats />,
-      //   loader: statsAverageLoader,
-      //   children: [
-      //     {
-      //       path: "/stats/simple/:year",
-      //       element: <SimpleStatsYear />,
-      //       loader: simpleStatsYearLoader,
-      //     },
-      //   ],
-      // },
-      // {
-      //   path: "/ddviewer/:minYear?/:maxYear?/:limit?",
-      //   element: <DayDataViewer />,
-      //   loader: ddViewerLoader,
-      // },
       {
         path: "/settings",
         element: <Settings />,
@@ -272,6 +142,11 @@ const router = createBrowserRouter([
       //   element: <TestApi />,
       //   loader: testLoader,
       // },
+      {
+        path: "/backup",
+        element: <Backup />,
+        loader: backupLoader,
+      },
     ],
   },
 ]);

@@ -1,4 +1,5 @@
 pub mod auv;
+pub mod backup;
 pub mod day_edit;
 pub mod export;
 pub mod import;

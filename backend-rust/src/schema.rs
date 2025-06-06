@@ -56,6 +56,7 @@ diesel::table! {
         CustomerCount -> Integer,
         BreadCredits -> Integer,
         BreadOverShort -> Integer,
+        Updated -> Bool,
     }
 }
 

@@ -88,6 +88,7 @@ pub fn get_month_data(
     // retrieve the data from the db
     let results = day_data
         .filter(DayDate.ge(start_day).and(DayDate.le(end_day)))
+        .filter(Updated.eq(false))
         .order(DayDate)
         .select(DayData::as_select())
         .load(conn)?;

@@ -35,7 +35,10 @@ CREATE TABLE IF NOT EXISTS day_data (
   AdjustedSales INTEGER NOT NULL,
   CustomerCount INTEGER NOT NULL,
   BreadCredits INTEGER NOT NULL,
-  BreadOverShort INTEGER NOT NULL
+  BreadOverShort INTEGER NOT NULL,
+
+  Updated BOOLEAN NOT NULL    -- if true, ignore this row unless we are reverting import data
+                      -- when updating from daily sheets, create a new row, and update 'Updated' to true
 );
 
 CREATE TABLE IF NOT EXISTS tag_list (

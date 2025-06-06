@@ -24,6 +24,8 @@ export const UrlApiGetTagId = "http://localhost:8080/api/tags/data";
 export const UrlApiTop5 = "http://localhost:8080/api/top5";
 export const UrlApiTop5Data = "http://localhost:8080/api/top5/data";
 
+export const UrlApiBackupGet = "http://localhost:8080/api/backup/get";
+
 // TODO:
 export const UrlApiManualArchive = "http://localhost:8080/api/backup/archive";
 

@@ -2,6 +2,7 @@
 use chrono::NaiveDate;
 use diesel::prelude::*;
 use diesel::result::Error;
+use log::debug;
 use serde::{Deserialize, Serialize};
 
 #[derive(Queryable, Selectable, AsChangeset)]
@@ -46,6 +47,8 @@ pub struct DayData {
     pub CustomerCount: i32,
     pub BreadCredits: i32,
     pub BreadOverShort: i32,
+
+    pub Updated: bool,
 }
 
 ///
@@ -87,6 +90,7 @@ pub struct DayDataInsert {
     pub CustomerCount: i32,
     pub BreadCredits: i32,
     pub BreadOverShort: i32,
+    pub Updated: bool,
 }
 
 impl DayData {
@@ -123,6 +127,7 @@ impl DayData {
             CustomerCount: 0,
             BreadCredits: 0,
             BreadOverShort: 0,
+            Updated: false,
         }
     }
 
@@ -142,7 +147,7 @@ impl DayData {
         // if data.id == -1, we insert, otherwise we update
         if self.id == -1 {
             // insert
-            let data_insert = DayDataInsert::from(self);
+            let data_insert = DayDataInsert::from(self, false);
 
             diesel::insert_into(crate::schema::day_data::table)
                 .values(&data_insert)
@@ -151,9 +156,24 @@ impl DayData {
             // update
             use crate::schema::day_data::dsl::*;
 
+            // diesel::update(crate::schema::day_data::table)
+            //     .filter(id.eq(self.id)) // make sure to only update the record we are
+            //     .set(self)
+            //     .execute(conn)?;
+
+            // 1) update ourselves, and make sure Update is set to true
+
+            debug!("[DayData] Updating Update Field for day: {}", self.DayDate);
             diesel::update(crate::schema::day_data::table)
-                .filter(id.eq(self.id)) // make sure to only update the record we are
-                .set(self)
+                .filter(id.eq(self.id))
+                .set(Updated.eq(true))
+                .execute(conn)?;
+
+            // 2) insert ourselves as a new row
+            debug!("[DayData] Inserting new row for day: {}", self.DayDate);
+            let data_insert = DayDataInsert::from(self, false);
+            diesel::insert_into(crate::schema::day_data::table)
+                .values(&data_insert)
                 .execute(conn)?;
         }
         Ok(())
@@ -193,11 +213,12 @@ impl DayDataInsert {
             CustomerCount: 0,
             BreadCredits: 0,
             BreadOverShort: 0,
+            Updated: false,
         }
     }
 
     // create an insertable entry from the main entry
-    pub fn from(data: &DayData) -> Self {
+    pub fn from(data: &DayData, Updated: bool) -> Self {
         Self {
             DayDate: data.DayDate,
             CashDeposit: data.CashDeposit,
@@ -229,6 +250,7 @@ impl DayDataInsert {
             CustomerCount: data.CustomerCount,
             BreadCredits: data.BreadCredits,
             BreadOverShort: data.BreadOverShort,
+            Updated,
         }
     }
 }

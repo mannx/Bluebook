@@ -1,4 +1,3 @@
-#![allow(non_snake_case)]
 use actix_web::error;
 use actix_web::HttpResponse;
 use actix_web::{get, post, web, Responder};

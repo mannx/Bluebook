@@ -25,11 +25,21 @@ diesel migration run
 cd data
 
 # run sql migration scripts to copy data
+echo "** Migrating Weekly Data **"
 sqlite3 $DB_ORIG <../scripts/weekly_info.sql
+
+echo "** Migrating Daily Data **"
 sqlite3 $DB_ORIG <../scripts/daydata.sql
+
+echo "** Migration Hockey Data **"
 sqlite3 $DB_ORIG <../scripts/hockey.sql
+
+echo "** Migrating Settings **"
 sqlite3 $DB_ORIG <../scripts/settings.sql
+
+echo "** Migrating AUV **"
 sqlite3 $DB_ORIG <../scripts/auv.sql
 
 # add the migration data to the new database
+echo "** Running final migration script **"
 sqlite3 $DB <../scripts/migrate.sql
