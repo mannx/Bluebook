@@ -2,22 +2,21 @@
 use chrono::{Datelike, Days, NaiveDate};
 use diesel::prelude::*;
 use diesel::SqliteConnection;
-// use log::debug;
 use serde::{Deserialize, Serialize};
+use std::cmp::Ordering;
 
 use crate::api::get_days_in_month;
 use crate::api::DbError;
 use crate::models::day_data::DayData;
 use crate::models::hockey::HockeySchedule;
-use crate::models::itof;
 use crate::models::tags::TagList;
 
 #[derive(Serialize, Deserialize)]
 struct EndOfWeek {
-    NetSales: f32,
+    NetSales: i32,
     CustomerCount: i32,
-    ThirdPartyPercent: f32,
-    ThirdPartyTotal: f32,
+    ThirdPartyTotal: i32,
+    GrossSales: i32,
 }
 
 // Tags is reused else where.  move to another mod with get_tags?
@@ -30,9 +29,8 @@ pub struct Tags {
 #[derive(Serialize, Deserialize)]
 pub struct MonthData {
     Data: DayData,
-    ThirdPartyDollar: f32,
-    ThirdPartyPercent: f32,
-    GrossSales: f32,
+    ThirdPartyDollar: i32,
+    GrossSales: i32,
     DayOfWeek: String, // text form of the day of the week (Mon,Tue,etc)
     EndOfWeek: Option<EndOfWeek>,
     Tags: Vec<Tags>,
@@ -42,7 +40,7 @@ pub struct MonthData {
     // 0 -> same sales
     // -1 -> Sales less than last week
     SalesLastWeek: i32,
-    WeeklyAverage: f32, // 4 week average of this day
+    WeeklyAverage: i32, // 4 week average of this day
 
     // split out as DayData.DayDate gets serialized as [year, day_in_year] with no month
     Day: u8,
@@ -53,19 +51,17 @@ pub struct MonthData {
 
 impl MonthData {
     fn new(data: &DayData) -> Self {
-        let tpd = itof(data.SkipTheDishes + data.DoorDash + data.UberEats);
-        let tpp = (tpd / itof(data.NetSales)) * 100.;
+        let tpd = data.SkipTheDishes + data.DoorDash + data.UberEats;
 
         Self {
             Data: data.clone(),
             ThirdPartyDollar: tpd,
-            ThirdPartyPercent: tpp,
-            GrossSales: itof(data.NetSales + data.Hst + data.BottleDeposit),
+            GrossSales: data.NetSales + data.Hst + data.BottleDeposit,
             DayOfWeek: data.DayDate.weekday().to_string(),
             EndOfWeek: None,
             Tags: Vec::new(),
             SalesLastWeek: 0,
-            WeeklyAverage: 0.,
+            WeeklyAverage: 0,
             Day: data.DayDate.day() as u8,
             Month: data.DayDate.month() as u8,
             Year: data.DayDate.year(),
@@ -106,18 +102,15 @@ pub fn get_month_data(
         }
 
         md.WeeklyAverage = calculate_weekly_average(conn, r.DayDate)?;
-        let net_sales = itof(r.NetSales);
+        let net_sales = r.NetSales;
 
-        if net_sales > md.WeeklyAverage {
-            md.SalesLastWeek = 1;
-        } else if net_sales < md.WeeklyAverage {
-            md.SalesLastWeek = -1;
-        } else {
-            md.SalesLastWeek = 0;
-        }
+        md.SalesLastWeek = match net_sales.cmp(&md.WeeklyAverage) {
+            Ordering::Greater => 1,
+            Ordering::Equal => 0,
+            Ordering::Less => -1,
+        };
 
         // get any tags
-        // md.Tags = get_tags(conn, r.id)?;
         md.Tags = get_tags(conn, r)?;
 
         // get hockey schedule information if any
@@ -127,10 +120,6 @@ pub fn get_month_data(
     }
 
     // do we have missing days to pad out?
-    // let ud = days as usize;
-    // debug!("[month.rs] days: {ud}");
-    // debug!("[month.rs] data.len() = {}", data.len());
-
     if data.len() != days as usize {
         let missing = days as usize - data.len();
         let date = match data.last() {
@@ -167,34 +156,28 @@ fn calculate_week_ending(
         .select(DayData::as_select())
         .load(conn)?;
 
-    let gross = itof(
-        results
-            .iter()
-            .map(|x| x.NetSales + x.Hst + x.BottleDeposit)
-            .sum::<i32>(),
-    );
-    let net = itof(results.iter().map(|x| x.NetSales).sum::<i32>());
-    let tpt = itof(
-        results
-            .iter()
-            .map(|x| x.SkipTheDishes + x.DoorDash + x.UberEats)
-            .sum::<i32>(),
-    );
+    let gross = results
+        .iter()
+        .map(|x| x.NetSales + x.Hst + x.BottleDeposit)
+        .sum::<i32>();
+    let net = results.iter().map(|x| x.NetSales).sum::<i32>();
+    let tpt = results
+        .iter()
+        .map(|x| x.SkipTheDishes + x.DoorDash + x.UberEats)
+        .sum::<i32>();
     let customer_count = results.iter().map(|x| x.CustomerCount).sum::<i32>();
-
-    let tpp = (tpt / gross) * 100.;
 
     Ok(EndOfWeek {
         NetSales: net,
         ThirdPartyTotal: tpt,
-        ThirdPartyPercent: tpp,
         CustomerCount: customer_count,
+        GrossSales: gross,
     })
 }
 
 /// Calculates the weekly average of the past 4 weeks to compare to this one
 /// TODO: have number of weeks a changable setting?
-fn calculate_weekly_average(conn: &mut SqliteConnection, date: NaiveDate) -> Result<f32, DbError> {
+fn calculate_weekly_average(conn: &mut SqliteConnection, date: NaiveDate) -> Result<i32, DbError> {
     use crate::schema::day_data::dsl::*;
 
     let start_date = date
@@ -202,7 +185,7 @@ fn calculate_weekly_average(conn: &mut SqliteConnection, date: NaiveDate) -> Res
         .expect("invalid start date"); // 4 weeks
 
     let results: Vec<DayData> = day_data
-        .filter(DayDate.ge(start_date).and(DayDate.le(date)))
+        .filter(DayDate.ge(start_date).and(DayDate.lt(date)))
         .order(DayDate)
         .select(DayData::as_select())
         .load(conn)?;
@@ -215,7 +198,7 @@ fn calculate_weekly_average(conn: &mut SqliteConnection, date: NaiveDate) -> Res
         }
     }
 
-    Ok((total as f32 / 100.) / 4.)
+    Ok(total / 4)
 }
 
 // get all tags for a given day based on id

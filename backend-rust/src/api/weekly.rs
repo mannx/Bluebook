@@ -11,7 +11,6 @@ use serde::Serialize;
 use crate::api::DbError;
 use crate::models::auv::{AUVData, AUVEntry};
 use crate::models::day_data::DayData;
-use crate::models::ftoi;
 use crate::models::weekly::WeeklyInfo;
 
 #[derive(Serialize)]
@@ -289,7 +288,7 @@ fn calculate_weekly(data: &WeekData, last_year: LastYearSales) -> WeeklyReport {
             let i = index.unwrap();
             report.TargetAUV = auv.auv[i];
             report.TargetHours = auv.hours[i];
-            report.ProductivityBudget = ftoi(auv.productivity[i]);
+            report.ProductivityBudget = auv.productivity[i];
         }
     }
 

@@ -10,7 +10,6 @@ use regex::Regex;
 
 use crate::imports::pdf_to_text;
 use crate::imports::ImportResult;
-use crate::models::ftoi;
 use crate::models::weekly::WeeklyInfo;
 
 lazy_static! {
@@ -21,26 +20,27 @@ static ref RE_LABOUR_COST    :Regex=Regex::new(r"LABOR\s&\sTAXES\s+(\d+,?\d+)\s+
 static ref RE_FOOD_COST      :Regex=Regex::new(r"COST OF GOODS\s+(\d+,?\d+)\s+(\d+)").unwrap();   // 2 groups -> [0] dollar value [1] percent
 }
 
+#[derive(Debug)]
 pub struct WisrData {
     week_ending: NaiveDate,
 
-    catering_sales: f32,
-    labour_cost_dollar: f32,
-    labour_cost_percent: f32,
+    catering_sales: i32,
+    labour_cost_dollar: i32,
+    labour_cost_percent: i32,
 
-    food_cost_dollar: f32,
-    food_cost_percent: f32,
+    food_cost_dollar: i32,
+    food_cost_percent: i32,
 }
 
 impl WisrData {
     fn new() -> Self {
         Self {
             week_ending: NaiveDate::MIN,
-            catering_sales: 0.,
-            labour_cost_dollar: 0.,
-            labour_cost_percent: 0.,
-            food_cost_dollar: 0.,
-            food_cost_percent: 0.,
+            catering_sales: 0,
+            labour_cost_dollar: 0,
+            labour_cost_percent: 0,
+            food_cost_dollar: 0,
+            food_cost_percent: 0,
         }
     }
 }
@@ -63,6 +63,15 @@ pub fn import_wisr_sheet(conn: &mut SqliteConnection, file_name: &String) -> Imp
     }
 
     messages
+}
+
+// converts from a string input to a i32 for db storage
+fn ftoi(input: &str) -> i32 {
+    input
+        .replace(",", "")
+        .replace(".", "")
+        .parse::<i32>()
+        .unwrap()
 }
 
 fn parse_wisr(file_name: &String) -> Result<WisrData, String> {
@@ -104,13 +113,14 @@ fn parse_wisr(file_name: &String) -> Result<WisrData, String> {
 
     wisr.week_ending = NaiveDate::from_ymd_opt(year, month, day).unwrap();
 
-    wisr.catering_sales = catering[1].replace(",", "").parse::<f32>().unwrap();
+    // remove both any , and the . for easy conversions
+    wisr.catering_sales = ftoi(&catering[1]);
 
-    wisr.food_cost_dollar = food_cost[1].replace(",", "").parse::<f32>().unwrap();
-    wisr.food_cost_percent = food_cost[2].parse::<f32>().unwrap();
+    wisr.food_cost_dollar = ftoi(&food_cost[1]);
+    wisr.food_cost_percent = ftoi(&food_cost[2]);
 
-    wisr.labour_cost_dollar = labour_cost[1].replace(",", "").parse::<f32>().unwrap();
-    wisr.labour_cost_percent = labour_cost[2].parse::<f32>().unwrap();
+    wisr.labour_cost_dollar = ftoi(&labour_cost[1]);
+    wisr.labour_cost_percent = ftoi(&labour_cost[2]);
 
     Ok(wisr)
 }
@@ -125,13 +135,13 @@ fn save_wisr(
 
     weekly.WeekEnding = wisr.week_ending;
 
-    weekly.FoodCostAmount = ftoi(wisr.food_cost_dollar);
-    weekly.FoodCostPercent = ftoi(wisr.food_cost_percent);
+    weekly.FoodCostAmount = wisr.food_cost_dollar;
+    weekly.FoodCostPercent = wisr.food_cost_percent;
 
-    weekly.LabourCostAmount = ftoi(wisr.labour_cost_dollar);
-    weekly.LabourCostPercent = ftoi(wisr.labour_cost_percent);
+    weekly.LabourCostAmount = wisr.labour_cost_dollar;
+    weekly.LabourCostPercent = wisr.labour_cost_percent;
 
-    weekly.PartySales = ftoi(wisr.catering_sales);
+    weekly.PartySales = wisr.catering_sales;
 
     // save or update the info
     weekly.insert_or_update(conn)?;

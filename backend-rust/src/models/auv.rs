@@ -17,23 +17,23 @@ pub struct AUVData {
 
     pub week_1_auv: i32,
     pub week_1_hours: i32,
-    pub week_1_productivity: f32,
+    pub week_1_productivity: i32,
 
     pub week_2_auv: i32,
     pub week_2_hours: i32,
-    pub week_2_productivity: f32,
+    pub week_2_productivity: i32,
 
     pub week_3_auv: i32,
     pub week_3_hours: i32,
-    pub week_3_productivity: f32,
+    pub week_3_productivity: i32,
 
     pub week_4_auv: i32,
     pub week_4_hours: i32,
-    pub week_4_productivity: f32,
+    pub week_4_productivity: i32,
 
     pub week_5_auv: Option<i32>,
     pub week_5_hours: Option<i32>,
-    pub week_5_productivity: Option<f32>,
+    pub week_5_productivity: Option<i32>,
 }
 
 #[derive(Insertable)]
@@ -45,23 +45,23 @@ pub struct AUVDataInsert {
 
     pub week_1_auv: i32,
     pub week_1_hours: i32,
-    pub week_1_productivity: f32,
+    pub week_1_productivity: i32,
 
     pub week_2_auv: i32,
     pub week_2_hours: i32,
-    pub week_2_productivity: f32,
+    pub week_2_productivity: i32,
 
     pub week_3_auv: i32,
     pub week_3_hours: i32,
-    pub week_3_productivity: f32,
+    pub week_3_productivity: i32,
 
     pub week_4_auv: i32,
     pub week_4_hours: i32,
-    pub week_4_productivity: f32,
+    pub week_4_productivity: i32,
 
     pub week_5_auv: Option<i32>,
     pub week_5_hours: Option<i32>,
-    pub week_5_productivity: Option<f32>,
+    pub week_5_productivity: Option<i32>,
 }
 
 // a more usuable structure than the database
@@ -70,7 +70,7 @@ pub struct AUVEntry {
     pub dates: Vec<NaiveDate>, // week ending date of each entry
     pub auv: Vec<i32>,
     pub hours: Vec<i32>,
-    pub productivity: Vec<f32>,
+    pub productivity: Vec<i32>,
 }
 
 #[derive(Debug)]

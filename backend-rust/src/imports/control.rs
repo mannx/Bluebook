@@ -7,23 +7,13 @@ use chrono::{Days, NaiveDate};
 use diesel::result::Error;
 use diesel::SqliteConnection;
 use log::{debug, error, info};
+use regex::Captures;
 use regex::Regex;
 
 use crate::imports::pdf_to_text;
 use crate::imports::ImportResult;
 use crate::models::day_data::DayData;
 use crate::models::weekly::WeeklyInfo;
-
-// TODO: RE_BREAD_OVERSHORT will match cash over/short first before bread over/short
-// lazy_static! {
-//     static ref RE_BREAD_OVERSHORT :Regex=Regex::new(r"= OVER\/SHORT\s+(-?\d+[.]\d+)\s+(-?\d+[.]\d+)\s+(-?\d+[.]\d+)\s+(-?\d+[.]\d+)\s+(-?\d+[.]\d+)\s+(-?\d+[.]\d+)\s+(-?\d+[.]\d+)\s+(-?\d+[.]\d+)")
-//         .expect("Unable to compile regex: RE_BREAD_OVERSHORT ");
-//
-//     // this allows us to parse values in the thousands, should only be required rarely, and doesnt seem to work well as the main regex
-//     // find way to fix instead?
-//     static ref RE_BREAD_OVERSHORT2 :Regex=Regex::new(r"/= OVER\/SHORT\s+(-?\d*,?\d+[.]\d+)\s+(-?\d*,?\d+[.]\d+)\s+(-?\d*,?\d+[.]\d+)\s+(-?\d*,?\d+[.]\d+)\s+(-?\d*,?\d+[.]\d+)\s+(-?\d*,?\d+[.]\d+)\s+(-?\d*,?\d+[.]\d+)\s+")
-//         .expect("Unable to compile regex: RE_BREAD_OVERSHORT2 ");
-// }
 
 static DIGIT: &str = r"(\d+)";
 static WHOLE: &str = r"(\d+\.\d+)";
@@ -67,6 +57,15 @@ fn ReCustomerCount() -> Regex {
     Regex::new(reg.as_str()).unwrap()
 }
 
+// recent changes need this one, ReCustomerCount is for older sheets
+fn ReCustomerCount2() -> Regex {
+    let mut reg = format!("CUSTOMER COUNT{WS}");
+    for _ in 0..7 {
+        reg.push_str(&format!("{WHOLE}{WS}"));
+    }
+    Regex::new(reg.as_str()).unwrap()
+}
+
 fn ReHoursWorked() -> Regex {
     let mut reg = format!("HOURS WORKED{WS}");
     for _ in 0..8 {
@@ -92,6 +91,15 @@ fn ReWeekEnding() -> Regex {
     Regex::new(r"WEEK ENDING\s*(\d\d?)/(\d\d?)/(\d{4})").unwrap()
 }
 
+fn ReBreadOverShort() -> Regex {
+    let mut reg = format!(r"= OVER/SHORT{WS}");
+
+    // 7 days + total
+    for _ in 0..8 {
+        reg.push_str(&format!(r"(-?\d+\.\d+){WS}"));
+    }
+    Regex::new(reg.as_str()).unwrap()
+}
 // holds the data we are parseing
 pub struct ControlSheetData {
     week_ending: NaiveDate,
@@ -151,6 +159,41 @@ pub fn import_control_sheet(conn: &mut SqliteConnection, file_name: &String) -> 
     messages
 }
 
+fn get_cust_count(control: &str) -> Option<Captures> {
+    // 2 possible regex's are needed, try oldest to newest
+    match ReCustomerCount().captures(control) {
+        Some(c) => Some(c), // success
+        None => ReCustomerCount2().captures(control),
+    }
+}
+
+// parses the customer count.  this can either be a i32, or a
+// floating point, but we can safely ignore anything after the .
+// logs an error if we encounter one, and returns 0
+fn parse_cust_count(input: &str) -> i32 {
+    match input.parse::<i32>() {
+        Ok(i) => i,
+        Err(_) => {
+            // strip away everything past the .
+            match input.to_owned().split_once(".") {
+                None => {
+                    error!("Unable to parse customer count.  Input: [{input}]");
+                    0
+                }
+                Some((val, _)) => val
+                    .parse::<i32>()
+                    .expect("Unable to parse customer count (2).  Input: {input}"),
+            }
+        }
+    }
+}
+
+// get the bread over/short amounts.
+// the regex first captures the money, so ignore, and return the 2nd if matched
+fn get_bread_overshort(control: &str) -> Option<Captures> {
+    ReBreadOverShort().captures_iter(control).nth(1)
+}
+
 fn parse_control_sheet(file_name: &String) -> Result<ControlSheetData, String> {
     let mut control_sheet = ControlSheetData::new();
 
@@ -190,7 +233,7 @@ fn parse_control_sheet(file_name: &String) -> Result<ControlSheetData, String> {
         return Err("Unable to parse units sold".to_owned());
     };
 
-    let Some(customer_count) = ReCustomerCount().captures(control_data.as_str()) else {
+    let Some(customer_count) = get_cust_count(&control_data) else {
         return Err("Unable to parse customer count".to_owned());
     };
 
@@ -206,20 +249,9 @@ fn parse_control_sheet(file_name: &String) -> Result<ControlSheetData, String> {
         return Err("Unable to parse net sales".to_owned());
     };
 
-    // check for bread over short.
-    // if first capture fails, try the 2nd.
-    // find a way not to have to use 2 regex for this?
-    // let bos = RE_BREAD_OVERSHORT.captures(control_data.as_str());
-    // let bread_over_short = match bos {
-    //     Some(bos) => bos, // first match was success
-    //     None => match RE_BREAD_OVERSHORT2.captures(control_data.as_str()) {
-    //         None => return Err("Unable to parse bread over/short".to_owned()),
-    //         Some(bos2) => {
-    //             debug!("control sheet: bread over/short v2 used.");
-    //             bos2
-    //         }
-    //     },
-    // };
+    let Some(bread_over_short) = get_bread_overshort(control_data.as_str()) else {
+        return Err("Unable to parse bread over/short".to_owned());
+    };
 
     // convert and build the output data
     // loop through each day and convert and store
@@ -243,11 +275,9 @@ fn parse_control_sheet(file_name: &String) -> Result<ControlSheetData, String> {
                 .parse::<i32>()
                 .expect("unable to convert units_sold"),
         );
-        control_sheet.customer_count.push(
-            customer_count[i]
-                .parse::<i32>()
-                .expect("unable to convert customer count"),
-        );
+        control_sheet
+            .customer_count
+            .push(parse_cust_count(&customer_count[i]));
         control_sheet.hours_worked.push(
             hours_workd[i]
                 .replace(".", "")
@@ -261,12 +291,12 @@ fn parse_control_sheet(file_name: &String) -> Result<ControlSheetData, String> {
                 .expect("unable to convert bread waste"),
         );
 
-        // control_sheet.bread_over_short.push(
-        //     bread_over_short[i]
-        //         .replace(".", "")
-        //         .parse::<i32>()
-        //         .expect("unable to convert bread/overshort"),
-        // );
+        control_sheet.bread_over_short.push(
+            bread_over_short[i]
+                .replace(".", "")
+                .parse::<i32>()
+                .expect("unable to convert bread/overshort"),
+        );
     }
 
     // update the single items

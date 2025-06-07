@@ -9,9 +9,9 @@ use serde::Deserialize;
 use std::path::PathBuf;
 use umya_spreadsheet::*;
 
+use crate::imports::ftoi;
 use crate::imports::ImportResult;
 use crate::models::day_data::DayData;
-use crate::models::ftoi;
 use crate::ENVIRONMENT;
 
 #[derive(Deserialize)]
@@ -213,13 +213,7 @@ fn get_value(sheet: &Worksheet, cell: &str) -> i32 {
         return 0;
     }
 
-    match val.parse::<f32>() {
-        Ok(n) => ftoi(n),
-        Err(e) => {
-            error!("Unable to convert field with value: {}.  [{e}]", val);
-            0
-        }
-    }
+    ftoi(val.as_str())
 }
 
 /// Insert ourselves into the db, or if we already have an entry then:
@@ -237,18 +231,6 @@ fn insert_or_update(
     let result = day_data
         .filter(DayDate.eq(data.DayDate))
         .first::<DayData>(conn);
-
-    // match result {
-    //     Err(_) => {
-    //         error!("retrieval for day date: {} failed.", data.DayDate);
-    //         insert_data(conn, data)?;
-    //     }
-    //     Ok(old) => {
-    //         info!("found data for day: {}", data.DayDate);
-    //         // pass in the current db item since we dont want to update certain fields
-    //         update_data(conn, data, &old)?;
-    //     }
-    // }
 
     // if result is Err, the current date is not yet in the db and just insert
     // otherwise, copy over the control data from the result, then perform an update
@@ -272,40 +254,3 @@ fn insert_or_update(
 
     data.insert_or_update(conn)
 }
-
-// insert new entry into the db
-// fn insert_data(conn: &mut SqliteConnection, data: &DayData) -> Result<DayData, Error> {
-//     // insert into the database and return the new data or error
-//     let data_insert = DayDataInsert::from(data);
-//
-//     diesel::insert_into(crate::schema::day_data::table)
-//         .values(&data_insert)
-//         .returning(DayData::as_returning())
-//         .get_result(conn)
-// }
-//
-// // update an entry in the db, make sure to copy over any data we don't set from daily sheet
-// // ie. copy data from control sheet over before updating
-// fn update_data(
-//     conn: &mut SqliteConnection,
-//     data: &DayData,
-//     old: &DayData,
-// ) -> Result<DayData, Error> {
-//     // copy any data we dont want ot change
-//     // could also do this in the update() function below?
-//     let mut new_data = data.clone();
-//     new_data.copy_control(old);
-//     new_data.id = old.id;
-//
-//     // debug!("[daily.rs] *** UPDATE ***");
-//     // debug!("[daily.rs] ID: {}", new_data.id);
-//
-//     use crate::schema::day_data::dsl::*;
-//
-//     // update the given record
-//     diesel::update(crate::schema::day_data::table)
-//         .filter(id.eq(old.id))
-//         .set(new_data)
-//         .returning(DayData::as_returning())
-//         .get_result(conn)
-// }

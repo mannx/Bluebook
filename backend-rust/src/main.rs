@@ -121,6 +121,7 @@ async fn main() -> std::io::Result<()> {
             )
     })
     .bind(("0.0.0.0", 8080))?
+    .workers(1) // change to slightly bigger instead of default of 16?
     .run()
     .await
 }

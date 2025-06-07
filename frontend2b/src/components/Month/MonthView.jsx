@@ -208,17 +208,18 @@ function Row(data, settings) {
 
   const dj = dayjs(new Date(data.Year, data.Month - 1, data.Day));
 
+  const third_perc = (data.ThirdPartyDollar / data.Data.NetSales) * 100.0;
   return (
     <tr key={data.ID}>
       <td className="Month">{Zero(data.Day)}</td>
       <td className="Month">{dj.format("dddd")}</td>
-      <td className="Month">{O(data.GrossSales)}</td>
+      <td className="Month">{F(data.GrossSales)}</td>
       <td className="Month">{F(data.Data.Hst)}</td>
       <td className="Month">{F(data.Data.BottleDeposit)}</td>
       <td className={`${cls} ${"Month"}`}>
         <div className="tooltip-month">
           {F(data.Data.NetSales)}
-          <span className="tooltiptext-month">{O(data.WeeklyAverage)}</span>
+          <span className="tooltiptext-month">{F(data.WeeklyAverage)}</span>
         </div>
       </td>
       <td className="blank"></td>
@@ -234,10 +235,10 @@ function Row(data, settings) {
       <td className="Month">{F(data.Data.HoursWorked)}</td>
       <td className="Month">{F(data.Data.Productivity)}</td>
       <td className="Month">{F(data.Data.Factor)}</td>
-      <td className="Month">{F(data.Data.AdjustedSales)}</td>
+      <td className="Month">{O(data.Data.AdjustedSales)}</td>
       <td className="Month">{O(data.Data.CustomerCount)}</td>
       <td className="Month no-print">{Dol(data.ThirdPartyDollar)}</td>
-      <td className="Month no-print">{P(data.ThirdPartyPercent)}</td>
+      <td className="Month no-print">{P(third_perc)}</td>
 
       <td className="blank no-print"></td>
       <td className={`${hcls} ${"Month"} ${"no-print"}`}>
@@ -280,6 +281,9 @@ function hashDate(data) {
   return "" + data.Year + "-" + data.Month + "-" + data.Day;
 }
 function EndOfWeek(data) {
+  const tpp =
+    (data.EndOfWeek.ThirdPartyTotal / data.EndOfWeek.GrossSales) * 100.0;
+
   return (
     <tr key={"eow-" + data.ID} className="blank">
       <td className="spacer"></td>
@@ -287,7 +291,7 @@ function EndOfWeek(data) {
       <td className="spacer"></td>
       <td className="spacer"></td>
       <td className="spacer"></td>
-      <td className="Net">{O(data.EndOfWeek.NetSales)}</td>
+      <td className="Net">{F(data.EndOfWeek.NetSales)}</td>
 
       <td className="spacer"></td>
       <td className="spacer"></td>
@@ -304,10 +308,8 @@ function EndOfWeek(data) {
       <td className="spacer"></td>
       <td className="spacer"></td>
       <td className="CustomerCount">{O(data.EndOfWeek.CustomerCount)}</td>
-      <td className="no-print">{O(data.EndOfWeek.ThirdPartyTotal)}</td>
-      <td className="ThirdPartyPerc no-print">
-        {O(data.EndOfWeek.ThirdPartyPercent)}%
-      </td>
+      <td className="no-print">{F(data.EndOfWeek.ThirdPartyTotal)}</td>
+      <td className="ThirdPartyPerc no-print">{O(tpp)}%</td>
     </tr>
   );
 }

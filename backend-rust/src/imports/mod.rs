@@ -145,3 +145,17 @@ fn load_or_new_week(conn: &mut SqliteConnection, date: NaiveDate) -> Result<Week
         }
     }
 }
+
+// converts from a string input to a i32 for db storage
+// logs and error if we can't parse, and returns 0
+// this should only be used for quick conversion where we don't need
+// to pass the error back to the front end
+pub fn ftoi(input: &str) -> i32 {
+    match input.replace(",", "").replace(".", "").parse::<i32>() {
+        Ok(i) => i,
+        Err(err) => {
+            error!("[ftoi] Unable to convert [{input}] into an i32. Error: {err}");
+            0
+        }
+    }
+}

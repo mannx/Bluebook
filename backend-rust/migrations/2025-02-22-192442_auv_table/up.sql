@@ -8,22 +8,22 @@ CREATE TABLE IF NOT EXISTS auv_data (
 
   week_1_auv INTEGER NOT NULL,
   week_1_hours INTEGER NOT NULL,
-  week_1_productivity REAL NOT NULL,
+  week_1_productivity INTEGER NOT NULL,
 
   week_2_auv INTEGER NOT NULL,
   week_2_hours INTEGER NOT NULL,
-  week_2_productivity REAL NOT NULL,
+  week_2_productivity INTEGER NOT NULL,
 
 
   week_3_auv INTEGER NOT NULL,
   week_3_hours INTEGER NOT NULL,
-  week_3_productivity REAL NOT NULL,
+  week_3_productivity INTEGER NOT NULL,
 
   week_4_auv INTEGER NOT NULL,
   week_4_hours INTEGER NOT NULL,
-  week_4_productivity REAL NOT NULL,
+  week_4_productivity INTEGER NOT NULL,
   
   week_5_auv INTEGER,
   week_5_hours INTEGER,
-  week_5_productivity REAL
+  week_5_productivity INTEGER
 );

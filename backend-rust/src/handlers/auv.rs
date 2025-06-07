@@ -17,7 +17,7 @@ pub struct AuvFormData {
     pub Year: i32,
     pub AUV: Vec<i32>,
     pub Hours: Vec<i32>,
-    pub Productivity: Vec<f32>,
+    pub Productivity: Vec<i32>,
 }
 
 impl AuvFormData {

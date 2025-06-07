@@ -40,10 +40,6 @@ pub async fn day_edit_update(
         let day = update_day_edit(&mut conn, &data)?;
 
         // process tags
-        // match tag_id {
-        //     Some(id) => update_tags(&mut conn, id, &data),
-        //     None => Ok(true),
-        // }
         match day {
             Some(mut day) => update_tags(&mut conn, &mut day, &data),
             None => Ok(true),
