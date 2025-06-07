@@ -11,6 +11,12 @@ Known TODO List
     This only happens on the daily, the control sheet doesn't need to do this.
     Can use this flag to revert data in case a wrong date was used in the daily sheet
     This does break tags, and those needed to be reworked anyway
+  * Tags been reworked
+    Tags are now stored as a space seperated list of id's from the tag_list table
+     in day_data.Tags
+    If no tags are found for the day, this field is null
+    day_edit tag setting needs to be finsihed
+
 
 
 Migration Steps

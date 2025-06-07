@@ -57,6 +57,7 @@ diesel::table! {
         BreadCredits -> Integer,
         BreadOverShort -> Integer,
         Updated -> Bool,
+        Tags -> Nullable<Text>,
     }
 }
 

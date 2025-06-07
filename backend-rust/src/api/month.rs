@@ -2,7 +2,7 @@
 use chrono::{Datelike, Days, NaiveDate};
 use diesel::prelude::*;
 use diesel::SqliteConnection;
-use log::debug;
+// use log::debug;
 use serde::{Deserialize, Serialize};
 
 use crate::api::get_days_in_month;
@@ -10,7 +10,7 @@ use crate::api::DbError;
 use crate::models::day_data::DayData;
 use crate::models::hockey::HockeySchedule;
 use crate::models::itof;
-use crate::models::tags::{TagData, TagList};
+use crate::models::tags::TagList;
 
 #[derive(Serialize, Deserialize)]
 struct EndOfWeek {
@@ -117,7 +117,8 @@ pub fn get_month_data(
         }
 
         // get any tags
-        md.Tags = get_tags(conn, r.id)?;
+        // md.Tags = get_tags(conn, r.id)?;
+        md.Tags = get_tags(conn, r)?;
 
         // get hockey schedule information if any
         md.Hockey = get_hockey_data(conn, r.DayDate).ok();
@@ -126,9 +127,9 @@ pub fn get_month_data(
     }
 
     // do we have missing days to pad out?
-    let ud = days as usize;
-    debug!("[month.rs] days: {ud}");
-    debug!("[month.rs] data.len() = {}", data.len());
+    // let ud = days as usize;
+    // debug!("[month.rs] days: {ud}");
+    // debug!("[month.rs] data.len() = {}", data.len());
 
     if data.len() != days as usize {
         let missing = days as usize - data.len();
@@ -219,33 +220,28 @@ fn calculate_weekly_average(conn: &mut SqliteConnection, date: NaiveDate) -> Res
 
 // get all tags for a given day based on id
 // pub as this can get reused elsewhere.  move to another mod?
-pub fn get_tags(conn: &mut SqliteConnection, day_id: i32) -> Result<Vec<Tags>, DbError> {
-    use crate::schema::tag_data::dsl::*;
-
+pub fn get_tags(conn: &mut SqliteConnection, day: &DayData) -> Result<Vec<Tags>, DbError> {
     // retrieve all tags for this day
     let mut tags = Vec::new();
 
     // retrieve the list of all the tags for this day
-    let data: Vec<TagData> = tag_data
-        .filter(DayID.eq(day_id))
-        .select(TagData::as_select())
-        .load(conn)?;
+    let tids = match &day.Tags {
+        None => return Ok(tags),
+        Some(tags) => tags
+            .split(' ')
+            .map(|x| x.parse::<i32>().unwrap())
+            .collect::<Vec<i32>>(),
+    };
 
-    // look up the tag
-    for d in &data {
-        // find better way to do this
+    for tag_id in tids {
+        // get the tag text
         use crate::schema::tag_list::dsl::*;
 
-        let taglist: Vec<TagList> = tag_list
-            .filter(id.eq(d.TagID))
-            .select(TagList::as_select())
-            .load(conn)?;
-        for t in taglist {
-            tags.push(Tags {
-                id: t.id,
-                tag: t.Tag.unwrap_or_else(|| "".to_owned()),
-            });
-        }
+        let tdata: TagList = tag_list.filter(id.eq(tag_id)).first::<TagList>(conn)?;
+        tags.push(Tags {
+            id: tdata.id,
+            tag: tdata.Tag.unwrap_or_else(|| "".to_owned()),
+        });
     }
 
     Ok(tags)

@@ -37,8 +37,9 @@ CREATE TABLE IF NOT EXISTS day_data (
   BreadCredits INTEGER NOT NULL,
   BreadOverShort INTEGER NOT NULL,
 
-  Updated BOOLEAN NOT NULL    -- if true, ignore this row unless we are reverting import data
+  Updated BOOLEAN NOT NULL,    -- if true, ignore this row unless we are reverting import data
                       -- when updating from daily sheets, create a new row, and update 'Updated' to true
+  Tags TEXT                   -- space seperated list of tags for the given day
 );
 
 CREATE TABLE IF NOT EXISTS tag_list (

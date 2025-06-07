@@ -49,6 +49,7 @@ pub struct DayData {
     pub BreadOverShort: i32,
 
     pub Updated: bool,
+    pub Tags: Option<String>,
 }
 
 ///
@@ -91,6 +92,7 @@ pub struct DayDataInsert {
     pub BreadCredits: i32,
     pub BreadOverShort: i32,
     pub Updated: bool,
+    pub Tags: Option<String>,
 }
 
 impl DayData {
@@ -128,6 +130,7 @@ impl DayData {
             BreadCredits: 0,
             BreadOverShort: 0,
             Updated: false,
+            Tags: None,
         }
     }
 
@@ -214,6 +217,7 @@ impl DayDataInsert {
             BreadCredits: 0,
             BreadOverShort: 0,
             Updated: false,
+            Tags: None,
         }
     }
 
@@ -251,6 +255,7 @@ impl DayDataInsert {
             BreadCredits: data.BreadCredits,
             BreadOverShort: data.BreadOverShort,
             Updated,
+            Tags: data.Tags.clone(),
         }
     }
 }

@@ -7,8 +7,10 @@ use diesel::SqliteConnection;
 use env_logger::Env;
 use enviroment::Environment;
 use lazy_static::lazy_static;
-use log::{debug, info};
+use log::{debug, error, info};
 use std::{env, error::Error};
+
+use crate::api::DbError;
 
 mod api;
 mod enviroment;
@@ -58,6 +60,18 @@ async fn main() -> std::io::Result<()> {
         Err(e) => panic!("error unable to migrate db. Stopping.: {:?}", e),
     }
 
+    // run tag migration only if we need to
+    match env::var("BLUEBOOK_MIG_TAG") {
+        Ok(_) => {
+            info!("Migrating tags...");
+            match migrate_tags(&mut conn) {
+                Ok(_) => info!("Success."),
+                Err(err) => error!("Tag Migration Failed: {err}"),
+            }
+        }
+        Err(_) => info!("Skipping tag migration..."),
+    }
+
     // if we have an argument given to us, we exit after running migrations
     // startup script will use this to do the db migration, then
     // exit, so data copy scripts can be ran, then we can run full
@@ -77,7 +91,6 @@ async fn main() -> std::io::Result<()> {
             .app_data(web::Data::new(pool.clone()))
             .service(handlers::weekly::weekly_handler)
             .service(handlers::month::get_month_view_handler)
-            // .service(api::settings::get_bluebook_settings)
             .service(handlers::settings::get_bluebook_settings)
             .service(handlers::settings::set_bluebook_settings)
             .service(handlers::day_edit::day_edit_get)
@@ -110,4 +123,64 @@ async fn main() -> std::io::Result<()> {
     .bind(("0.0.0.0", 8080))?
     .run()
     .await
+}
+
+// migrate tags from the tag_data table into the DayData table
+// once we are fully running and no longer need to migrate an old db
+// this can be removed along with migrate_tags_do()
+fn migrate_tags(conn: &mut SqliteConnection) -> Result<(), DbError> {
+    use crate::models::day_data::DayData;
+    use crate::schema::day_data::dsl::*;
+    use diesel::prelude::*;
+
+    info!("Performing tag migration...");
+    let results: Vec<DayData> = day_data.select(DayData::as_select()).load(conn)?;
+    for r in results {
+        info!("Migrating Tags for Date: {}", r.DayDate);
+        match migrate_tags_do(conn, &r) {
+            Ok(_) => {}
+            Err(err) => {
+                error!("Unable to update tags for day: {}", r.DayDate);
+                error!("\t** {err}");
+            }
+        }
+    }
+
+    Ok(())
+}
+
+// migrate the tags for a given day
+fn migrate_tags_do(
+    conn: &mut SqliteConnection,
+    data: &models::day_data::DayData,
+) -> Result<(), DbError> {
+    use crate::models::tags::TagData;
+    use diesel::prelude::*;
+
+    // retrieve any tags from tag_data associated with this id
+    use crate::schema::tag_data::dsl::*;
+
+    let tags: Vec<TagData> = tag_data
+        .filter(DayID.eq(data.id))
+        .select(TagData::as_select())
+        .load(conn)?;
+
+    let tlist: String = tags
+        .iter()
+        .map(|t| t.TagID.to_string())
+        .collect::<Vec<String>>()
+        .join(" ");
+
+    if !tlist.is_empty() {
+        // update the tags
+        use crate::schema::day_data::dsl::*;
+
+        info!("  Updating tag list...");
+        diesel::update(day_data)
+            .filter(id.eq(data.id))
+            .set(Tags.eq(Some(tlist)))
+            .execute(conn)?;
+    }
+
+    Ok(())
 }
