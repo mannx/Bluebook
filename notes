@@ -16,9 +16,6 @@ Known TODO List
      in day_data.Tags
     If no tags are found for the day, this field is null
 
-  * AUV has started to get converted to i32 from f32, partially done backend
-     frontend has not yet been touched
-
 
 
 Migration Steps

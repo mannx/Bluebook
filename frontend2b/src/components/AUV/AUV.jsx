@@ -75,7 +75,8 @@ export async function action({ request, params }) {
 
     const p = formData.get("prod" + i);
     if (p !== null) {
-      prod.push(parseFloat(p));
+      const f = parseFloat(p);
+      prod.push(parseInt(f * 100.0));
     }
   }
 
@@ -174,7 +175,7 @@ function AUVData(data, index) {
             name={"prod" + index}
             id={"prod" + index}
             label="Productivity"
-            defaultValue={data.productivity[index]}
+            defaultValue={data.productivity[index] / 100.0}
           />
         </TableCell>
       </TableRow>

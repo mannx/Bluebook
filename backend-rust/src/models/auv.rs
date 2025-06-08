@@ -6,7 +6,7 @@ use serde::Serialize;
 
 use std::fmt;
 
-#[derive(Queryable, Selectable, AsChangeset)]
+#[derive(Queryable, Selectable, AsChangeset, Debug)]
 #[diesel(table_name=crate::schema::auv_data)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 pub struct AUVData {
@@ -89,24 +89,51 @@ impl std::error::Error for AUVConversionError {
 }
 
 impl AUVData {
-    pub fn insert_or_update(&self, conn: &mut SqliteConnection) -> Result<(), Error> {
-        // if data.id == -1, we insert, otherwise we update
+    pub fn insert_or_update(&mut self, conn: &mut SqliteConnection) -> Result<(), Error> {
+        // if id==-1, check if date is in db, if so, do update, otherwise insert
         if self.id == -1 {
-            // insert
-            let data_insert = AUVDataInsert::from(self);
-
-            diesel::insert_into(crate::schema::auv_data::table)
-                .values(&data_insert)
-                .execute(conn)?;
-        } else {
-            // update
+            // alrady in db?
             use crate::schema::auv_data::dsl::*;
 
-            diesel::update(crate::schema::auv_data::table)
-                .filter(id.eq(self.id)) // make sure to only update the record we are
-                .set(self)
-                .execute(conn)?;
+            match auv_data
+                .filter(month.eq(self.month).and(year.eq(self.year)))
+                .first::<AUVData>(conn)
+            {
+                Err(_) => {
+                    // not found, perform insert
+                    self.insert(conn)
+                }
+                Ok(auv) => {
+                    // perform update with its id
+                    self.id = auv.id;
+                    self.update(conn)
+                }
+            }
+        } else {
+            self.update(conn)
         }
+
+        // Ok(())
+    }
+
+    fn insert(&self, conn: &mut SqliteConnection) -> Result<(), Error> {
+        let data_insert = AUVDataInsert::from(self);
+
+        diesel::insert_into(crate::schema::auv_data::table)
+            .values(&data_insert)
+            .execute(conn)?;
+
+        Ok(())
+    }
+
+    fn update(&self, conn: &mut SqliteConnection) -> Result<(), Error> {
+        use crate::schema::auv_data::dsl::*;
+
+        diesel::update(crate::schema::auv_data::table)
+            .filter(id.eq(self.id)) // make sure to only update the record we are
+            .set(self)
+            .execute(conn)?;
+
         Ok(())
     }
 

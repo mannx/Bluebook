@@ -47,21 +47,21 @@ INSERT INTO db.auv_data (
 SELECT id, month, year, 
   week1_auv,
   week1_hours,
-  week1_prod,
+  week1_prod * 100,
 
   week2_auv,
   week2_hours,
-  week2_prod,
+  week2_prod * 100,
 
   week3_auv,
   week3_hours,
-  week3_prod,
+  week3_prod * 100,
 
   week4_auv,
   week4_hours,
-  week4_prod,
+  week4_prod * 100,
 
   week5_auv,
   week5_hours,
-  week5_prod
+  week5_prod * 100
 FROM auv_entry2;

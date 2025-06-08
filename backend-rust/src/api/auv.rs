@@ -31,7 +31,7 @@ pub fn get_auv_data(conn: &mut SqliteConnection, mon: u32, yea: i32) -> Result<A
 
 // update the auv data in the db
 pub fn set_auv_data(conn: &mut SqliteConnection, data: &AUVEntry) -> Result<(), DbError> {
-    let auv_data = AUVData::from(data)?;
+    let mut auv_data = AUVData::from(data)?;
 
     debug!("[set_auv_data] successfully converted auv data...");
 
