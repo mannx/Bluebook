@@ -21,7 +21,7 @@ var (
 	reProductivity  = regexp.MustCompile(`PRODUCTIVITY\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)`)
 	reFactor        = regexp.MustCompile(`FACTOR\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)`)
 	reUnitsSold     = regexp.MustCompile(`ALL UNITS SOLD\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+`)
-	reCustomerCount = regexp.MustCompile(`CUSTOMER COUNT\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+`)
+	reCustomerCount = regexp.MustCompile(`CUSTOMER COUNT\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)`)
 	reHoursWorked   = regexp.MustCompile(`HOURS WORKED\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)`)
 
 	reTotalProd = regexp.MustCompile(`PRODUCTIVITY\s+(\d+\.\d+)`)
@@ -152,7 +152,7 @@ func ImportControl(fileName string, db *gorm.DB) ImportReport {
 		dd.Productivity, _ = strconv.ParseFloat(prod[i+1], 64) // +1 since entry 0 is the full capture
 		dd.Factor, _ = strconv.ParseFloat(factor[i+1], 64)
 		dd.AdjustedSales, _ = strconv.ParseFloat(unitSold[i+1], 64)
-		dd.CustomerCount, _ = strconv.Atoi(custCount[i+1])
+		dd.CustomerCount = parseFloat(custCount[i+1])
 		dd.HoursWorked, _ = strconv.ParseFloat(hoursWorkd[i+1], 64)
 		dd.BreadCredits, _ = strconv.ParseFloat(breadCredits[i+1], 64)
 		dd.BreadOverShort, _ = strconv.ParseFloat(breadOverShort[i+1], 64)
@@ -203,4 +203,16 @@ func ImportControl(fileName string, db *gorm.DB) ImportReport {
 
 	report.Add(fmt.Sprintf("Successfully imported control sheet week ending %v/%v/%v", month, day, year))
 	return report
+}
+
+func parseFloat(input string) int {
+	// a:=strings.Split(input,".")
+	a, _, found := strings.Cut(input, ".")
+	if !found {
+		log.Debug().Msgf("[parseFloat] not found...")
+		return 0
+	}
+
+	r, _ := strconv.Atoi(a)
+	return r
 }
