@@ -88,7 +88,7 @@ export default function Weekly() {
       <td className="Month">
         <Switch checked={useNetSales} onChange={handleNetSalesChange} />
       </td>
-      <td className="Month">{data.WisrNetSales}</td>
+      <td className="Month">{F(data.WisrNetSales)}</td>
     </>
   );
 
