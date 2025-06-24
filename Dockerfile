@@ -4,7 +4,8 @@
 # Go Build Stage
 #
 
-FROM golang:1.21-alpine3.17 AS build
+# FROM golang:1.21-alpine3.17 AS build
+FROM golang:alpine AS build
 
 ENV GOPATH=/go/src
 WORKDIR /go/src/github.com/mannx/Bluebook
@@ -41,7 +42,8 @@ RUN npm run build
 # Deploy Stage
 #
 
-FROM alpine:3.17
+FROM alpine:3.21
+# FROM alpine:latest
 
 # make sure required packages are installed
 # poppler-utils required for pdf parsing 
