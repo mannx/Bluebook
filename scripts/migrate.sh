@@ -23,12 +23,15 @@ check_for_migration() {
   echo "select name from sqlite_master where type='table' and name='migration_check'" >/tmp/cmd
   MIG_TABLE="$(sqlite3 $DB_ORIG </tmp/cmd)"
 
+  echo "migration check result: "
+  echo $MIG_TABLE
+
   if [[ -z $MIG_TABLE ]]; then
     # we need to migrate
-    return 1
+    MIG=1
   fi
 
-  return 0
+  MIG=0
 }
 
 # performs the migration
@@ -53,8 +56,9 @@ migrate() {
 }
 
 echo Checking for migration...
-if [[ check_for_migration ]]; then
-  echo Starting migration...
+check_for_migration
+
+if [[ -z $MIG ]]; then
   migrate
 else
   echo Migration already done...skipping

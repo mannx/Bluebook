@@ -141,27 +141,26 @@ fn set_weekly_data(
 
     sheet
         .get_cell_mut(config.lastYearSales.as_str())
-        .set_value(weekly.LastYearSales.to_string());
+        .set_value((weekly.LastYearSales as f32 / 100.).to_string());
     sheet
         .get_cell_mut(config.netSales.as_str())
-        // .set_value(weekly.NetSales.to_string());
-        .set_value(net_sales.to_string());
+        .set_value((net_sales as f32 / 100.).to_string());
 
     sheet
         .get_cell_mut(config.upcomingSales.as_str())
-        .set_value(weekly.UpcomingSales.to_string());
+        .set_value((weekly.UpcomingSales as f32 / 100.).to_string());
     sheet
         .get_cell_mut(config.breadCount.as_str())
         .set_value(weekly.BreadOverShort.to_string());
     sheet
         .get_cell_mut(config.foodCost.as_str())
-        .set_value(weekly.FoodCostAmount.to_string());
+        .set_value((weekly.FoodCostAmount as f32 / 100.).to_string());
     sheet
         .get_cell_mut(config.syscoCost.as_str())
         .set_value(data.sysco.to_string());
     sheet
         .get_cell_mut(config.labourCost.as_str())
-        .set_value(weekly.LabourCostAmount.to_string());
+        .set_value((weekly.LabourCostAmount as f32 / 100.).to_string());
     sheet
         .get_cell_mut(config.customerCount.as_str())
         .set_value(weekly.CustomerCount.to_string());

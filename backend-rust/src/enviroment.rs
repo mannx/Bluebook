@@ -2,6 +2,7 @@
 use std::env;
 use std::path::PathBuf;
 
+#[derive(Debug)]
 pub struct Environment {
     pub ImportPath: String,
     pub TempPath: String,
@@ -17,7 +18,7 @@ impl Environment {
             TempPath: "/tmp".to_owned(),
             OutputPath: "/output".to_owned(),
             DataPath: "/data".to_owned(),
-            ConfigPath: "/data".to_owned(),
+            ConfigPath: "/config".to_owned(),
         }
     }
 

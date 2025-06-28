@@ -2,12 +2,10 @@ services:
   bluebook:
     image: bluebook:dev
     container_name: bluebook
-    # env_file: ".env"
     ports:
       - 8080:8080
     environment:
       - TZ=Canada/Atlantic
-      - DATABASE_URL=/data/db.db
       - PUID=1000
       - PGID=1000
       - RUST_LOG=debug

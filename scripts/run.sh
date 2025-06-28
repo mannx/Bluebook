@@ -4,7 +4,7 @@
 # cp /init/* /data/
 
 # create a backup before we start
-# /scripts/ar.sh
+/scripts/ar.sh
 
 # make sure db has had migrations applied
 /bluebook migrate

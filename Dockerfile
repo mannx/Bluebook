@@ -59,8 +59,10 @@ COPY ./backend-rust/scripts/*.sql /migrate/
 COPY ./scripts /scripts
 
 # copy and extract the initialization files
-COPY ./init/init.bin /init/init.tar.gz
-RUN tar -zxf /init/init.tar.gz -C /init && rm /init/init.tar.gz
+# COPY ./init/init.bin /init/init.tar.gz
+# RUN tar -zxf /init/init.tar.gz -C /init && rm /init/init.tar.gz
+
+ENV DATABASE_URL=/data/db.db
 
 EXPOSE 8080
 # ENTRYPOINT ["/bluebook"]

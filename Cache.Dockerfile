@@ -66,6 +66,8 @@ COPY ./scripts /scripts
 # COPY ./init/init.bin /init/init.tar.gz
 # RUN tar -zxf /init/init.tar.gz -C /init && rm /init/init.tar.gz
 
+ENV DATABASE_URL=/data/db.db
+
 EXPOSE 8080
 # ENTRYPOINT ["/bluebook"]
 ENTRYPOINT ["/scripts/run.sh"]
