@@ -1,6 +1,7 @@
 services:
   bluebook:
-    image: bluebook:dev
+    # image: bluebook:dev
+    image: mannx/bluebook:rust
     container_name: bluebook
     ports:
       - 8080:8080

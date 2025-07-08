@@ -11,7 +11,7 @@
 
 # if we have a previously used database, migrate the data over if found
 if [[ -f /data/db.mig ]]; then
-  cp /data/db.mig /data/db.orig.db
+  mv /data/db.mig /data/db.orig.db
 
   # migrate data
   /scripts/migrate.sh
