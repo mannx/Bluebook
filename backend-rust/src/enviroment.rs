@@ -48,4 +48,11 @@ impl Environment {
 
         path
     }
+
+    pub fn with_output_path<S:Into<String>>(&self,file_name:S)->PathBuf{
+        let mut path=PathBuf::from(&self.OutputPath);
+        path.push(file_name.into());
+
+        path
+    }
 }

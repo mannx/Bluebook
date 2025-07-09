@@ -245,6 +245,8 @@ fn calculate_weekly(data: &WeekData, last_year: LastYearSales) -> WeeklyReport {
         report.CustomerCount += i.CustomerCount;
         report.GiftCardSold += i.GiftCardSold;
         report.GiftCardRedeem += i.GiftCardRedeem;
+        
+        debug!("[calculate_weekly] bread +/-: [{}] [{}]",i.DayDate,i.BreadOverShort);
         report.BreadOverShort += i.BreadOverShort;
     }
 

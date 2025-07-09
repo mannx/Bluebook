@@ -82,7 +82,8 @@ pub fn export_weekly(conn: &mut SqliteConnection, data: &WeeklyParams) -> Result
     set_weekly_data(sheet, data, &weekly, &config, &settings);
 
     // get output path
-    let path = ENVIRONMENT.with_data_path(format!("{}.xlsx", data.week_ending));
+    // let path = ENVIRONMENT.with_data_path(format!("{}.xlsx", data.week_ending));
+    let path = ENVIRONMENT.with_output_path(format!("{}.xlsx", data.week_ending));
 
     debug!("saving to output file...");
     writer::xlsx::write(&book, path.as_path())?;
@@ -182,14 +183,14 @@ fn set_weekly_data(
         .set_value(weekly.TargetHours.to_string());
     sheet
         .get_cell_mut(config.gcSold.as_str())
-        .set_value(weekly.GiftCardSold.to_string());
+        .set_value((weekly.GiftCardSold as f32/100.).to_string());
     sheet
         .get_cell_mut(config.gcRedeem.as_str())
-        .set_value(weekly.GiftCardRedeem.to_string());
+        .set_value((weekly.GiftCardRedeem as f32/100.).to_string());
     sheet
         .get_cell_mut(config.prodBudget.as_str())
         .set_value(weekly.ProductivityBudget.to_string());
     sheet
         .get_cell_mut(config.prodActual.as_str())
-        .set_value(weekly.ProductivityActual.to_string());
+        .set_value((weekly.ProductivityActual as f32/100.).to_string());
 }
