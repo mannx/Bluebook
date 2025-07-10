@@ -66,14 +66,12 @@ fn pdf_to_text(file_name: &String) -> Option<PathBuf> {
         }
     };
 
-    let mut input_path = PathBuf::from(&ENVIRONMENT.ImportPath);
-    input_path.push(fname);
+    let input_path = ENVIRONMENT.with_import_path(fname);
 
     debug!("[pdf_to_text] starting to process {file_name}");
 
     // generate output name
-    let mut path = PathBuf::from(&ENVIRONMENT.TempPath);
-    path.push(format!("{}.txt", fname));
+    let path = ENVIRONMENT.with_temp_path(format!("{}.txt", fname));
 
     let output_fname = path.to_str().unwrap();
 

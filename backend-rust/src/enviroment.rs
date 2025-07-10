@@ -4,10 +4,10 @@ use std::path::PathBuf;
 
 #[derive(Debug)]
 pub struct Environment {
-    pub ImportPath: String,
-    pub TempPath: String,
-    pub OutputPath: String,
-    pub DataPath: String,
+    ImportPath: String,
+    TempPath: String,
+    OutputPath: String,
+    DataPath: String,
     ConfigPath: String, // path for .ron config files -- can be mapped to DataPath
 }
 
@@ -49,8 +49,22 @@ impl Environment {
         path
     }
 
-    pub fn with_output_path<S:Into<String>>(&self,file_name:S)->PathBuf{
-        let mut path=PathBuf::from(&self.OutputPath);
+    pub fn with_import_path<S: Into<String>>(&self, file_name: S) -> PathBuf {
+        let mut path = PathBuf::from(&self.ImportPath);
+        path.push(file_name.into());
+
+        path
+    }
+
+    pub fn with_output_path<S: Into<String>>(&self, file_name: S) -> PathBuf {
+        let mut path = PathBuf::from(&self.OutputPath);
+        path.push(file_name.into());
+
+        path
+    }
+
+    pub fn with_temp_path<S: Into<String>>(&self, file_name: S) -> PathBuf {
+        let mut path = PathBuf::from(&self.TempPath);
         path.push(file_name.into());
 
         path

@@ -12,7 +12,6 @@ use log::error;
 
 use glob::glob;
 use serde::Serialize;
-use std::path::PathBuf;
 
 use crate::api::{DbError, DbPool};
 
@@ -150,8 +149,7 @@ fn get_file_list() -> std::io::Result<ImportFileList> {
 
 // get all files from the BLUEBOOK_IMPORT_DIR using the given file mask
 fn get_files(mask: &str) -> std::io::Result<Vec<String>> {
-    let mut base_dir = PathBuf::from(&ENVIRONMENT.ImportPath);
-    base_dir.push(mask);
+    let base_dir = ENVIRONMENT.with_import_path(mask);
 
     let glob_path = match base_dir.to_str() {
         None => {

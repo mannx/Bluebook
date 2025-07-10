@@ -6,7 +6,6 @@ use diesel::prelude::*;
 use diesel::SqliteConnection;
 use log::{debug, error, info};
 use serde::Deserialize;
-use std::path::PathBuf;
 use umya_spreadsheet::*;
 
 use crate::imports::ftoi;
@@ -57,8 +56,7 @@ pub fn daily_import(conn: &mut SqliteConnection, file_name: &String) -> ImportRe
     let config = Config::load();
 
     // get the path to the file
-    let mut path = PathBuf::from(&ENVIRONMENT.ImportPath);
-    path.push(file_name);
+    let path = ENVIRONMENT.with_import_path(file_name);
     debug!("loading daily sheet: {}", path.to_str().unwrap());
 
     // load the sheet

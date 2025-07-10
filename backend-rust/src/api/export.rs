@@ -1,10 +1,8 @@
 #![allow(non_snake_case)]
 use chrono::NaiveDate;
-// use diesel::prelude::*;
 use diesel::SqliteConnection;
 use log::debug;
 use serde::Deserialize;
-use std::path::PathBuf;
 use umya_spreadsheet::*;
 
 use crate::api::settings::read_settings;
@@ -71,8 +69,7 @@ pub fn export_weekly(conn: &mut SqliteConnection, data: &WeeklyParams) -> Result
     let settings = read_settings(conn)?;
 
     // open weekly sheet
-    let mut path = PathBuf::from(&ENVIRONMENT.DataPath);
-    path.push("weekly.xlsx");
+    let path = ENVIRONMENT.with_data_path("weekly.xlsx");
 
     debug!("Reading template weeekly...");
     let mut book = reader::xlsx::read(path.as_path())?;
@@ -82,7 +79,6 @@ pub fn export_weekly(conn: &mut SqliteConnection, data: &WeeklyParams) -> Result
     set_weekly_data(sheet, data, &weekly, &config, &settings);
 
     // get output path
-    // let path = ENVIRONMENT.with_data_path(format!("{}.xlsx", data.week_ending));
     let path = ENVIRONMENT.with_output_path(format!("{}.xlsx", data.week_ending));
 
     debug!("saving to output file...");
@@ -183,14 +179,14 @@ fn set_weekly_data(
         .set_value(weekly.TargetHours.to_string());
     sheet
         .get_cell_mut(config.gcSold.as_str())
-        .set_value((weekly.GiftCardSold as f32/100.).to_string());
+        .set_value((weekly.GiftCardSold as f32 / 100.).to_string());
     sheet
         .get_cell_mut(config.gcRedeem.as_str())
-        .set_value((weekly.GiftCardRedeem as f32/100.).to_string());
+        .set_value((weekly.GiftCardRedeem as f32 / 100.).to_string());
     sheet
         .get_cell_mut(config.prodBudget.as_str())
         .set_value(weekly.ProductivityBudget.to_string());
     sheet
         .get_cell_mut(config.prodActual.as_str())
-        .set_value((weekly.ProductivityActual as f32/100.).to_string());
+        .set_value((weekly.ProductivityActual as f32 / 100.).to_string());
 }
