@@ -148,7 +148,7 @@ fn set_weekly_data(
         .set_value((weekly.UpcomingSales as f32 / 100.).to_string());
     sheet
         .get_cell_mut(config.breadCount.as_str())
-        .set_value(weekly.BreadOverShort.to_string());
+        .set_value((weekly.BreadOverShort as f32/100.).to_string());
     sheet
         .get_cell_mut(config.foodCost.as_str())
         .set_value((weekly.FoodCostAmount as f32 / 100.).to_string());

@@ -134,7 +134,7 @@ export default function Weekly() {
             </tr>
             <tr className="Month">
               <td className="Month">Bread Plate Count</td>
-              <td className="Month">{NF(data.BreadOverShort)}</td>
+              <td className="Month">{F(data.BreadOverShort)}</td>
             </tr>
             <tr className="Month">
               <td className="Month">Food Cost $</td>
