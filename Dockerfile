@@ -47,7 +47,7 @@ COPY --from=build /app/target/release/backend-rust /bluebook
 COPY --from=react /app/dist /dist
 
 # copy in default config file for top5 api
-COPY ./backend/api/data.json /top5.json
+#COPY ./backend/api/data.json /top5.json
 
 # copy in import mapping files
 COPY ./backend-rust/src/config/*.ron /config/
@@ -65,5 +65,4 @@ COPY ./scripts /scripts
 ENV DATABASE_URL=/data/db.db
 
 EXPOSE 8080
-# ENTRYPOINT ["/bluebook"]
 ENTRYPOINT ["/scripts/run.sh"]

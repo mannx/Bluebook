@@ -34,7 +34,7 @@ export const UrlApiManualArchive = "http://localhost:8080/api/backup/archive";
 export const UrlApiSettingsGet = "http://localhost:8080/api/settings/get"; // get the global settings
 export const UrlApiSettingsSet = "http://localhost:8080/api/settings/set"; // update the global settings
 
-// export const UrlAbout = "http://localhost:8080/api/about";
+export const UrlAbout = "http://localhost:8080/api/about";
 
 // headers sent when doing a POST operation
 const headers = {

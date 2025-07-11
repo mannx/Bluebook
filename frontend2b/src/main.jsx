@@ -49,7 +49,7 @@ import Settings, {
   action as settingsAction,
 } from "./components/Settings/Settings";
 
-// import AboutPage, { loader as aboutLoader } from "./components/About/About.tsx";
+import AboutPage, { loader as aboutLoader } from "./components/About/About.tsx";
 
 // import TestApi, { loader as testLoader } from "./components/Test/Test.tsx";
 
@@ -132,11 +132,11 @@ const router = createBrowserRouter([
         loader: settingsLoader,
         action: settingsAction,
       },
-      // {
-      //   path: "/about",
-      //   element: <AboutPage />,
-      //   loader: aboutLoader,
-      // },
+      {
+        path: "/about",
+        element: <AboutPage />,
+        loader: aboutLoader,
+      },
       // {
       //   path: "/test",
       //   element: <TestApi />,

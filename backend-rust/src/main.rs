@@ -7,7 +7,7 @@ use diesel::SqliteConnection;
 use env_logger::Env;
 use enviroment::Environment;
 use lazy_static::lazy_static;
-use log::{debug, error, info};
+use log::{debug, error, info, warn};
 use std::{env, error::Error};
 
 use crate::api::DbError;
@@ -35,13 +35,18 @@ fn run_migrations(
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    println!("loading .env file if present...");
+    info!("Loading .env file if present...");
     if dotenvy::dotenv().is_err() {
-        println!("[dotenvy] unable to load .env file.  proceeding without");
+        warn!("[dotenvy] unable to load .env file.  proceeding without");
     }
 
     env_logger::init_from_env(Env::default().default_filter_or("info"));
     debug!("Logger initialized");
+
+    info!(
+        "Build Commit: {}",
+        env::var("VERGEN_GIT_SHA").expect("[VERGEN_GIT_SHA NOT SET]")
+    );
 
     let url = env::var("DATABASE_URL").expect("DATABASE_URL required");
     let manager = r2d2::ConnectionManager::<SqliteConnection>::new(url);
@@ -104,6 +109,7 @@ async fn main() -> std::io::Result<()> {
             .service(handlers::export::export_weekly_handler)
             .service(handlers::tags::get_tag_list_handler)
             .service(handlers::backup::get_backup_list)
+            .service(handlers::about::get_about_info)
             // return the index on all other paths so react-router works
             .service(
                 actix_files::Files::new("/", "./dist/")

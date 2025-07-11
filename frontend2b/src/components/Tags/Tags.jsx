@@ -33,8 +33,8 @@ export default function Tags() {
           {data !== null &&
             data.map((obj) => {
               return (
-                <Grid xs={2} key={obj.ID}>
-                  <Link to={"/tags/" + obj.ID}>
+                <Grid xs={2} key={obj.id}>
+                  <Link to={"/tags/" + obj.id}>
                     <Button size="small" variant="outlined">
                       {obj.Tag} ({obj.Count})
                     </Button>

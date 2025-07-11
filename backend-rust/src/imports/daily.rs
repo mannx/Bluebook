@@ -252,3 +252,23 @@ fn insert_or_update(
 
     data.insert_or_update(conn)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn daily() {
+        use std::path::PathBuf;
+
+        let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+        path.push("src/config/daily.ron");
+
+        println!("Path: {}", path.as_path().to_str().unwrap());
+
+        let fstr = std::fs::read_to_string(path).expect("unable to open daily.ron");
+        let config = ron::from_str::<Config>(fstr.as_str()).unwrap();
+
+        assert!(config.DebitCard[0][0] == "B3");
+    }
+}

@@ -1,3 +1,4 @@
+pub mod about;
 pub mod auv;
 pub mod backup;
 pub mod day_edit;
