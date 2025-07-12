@@ -13,6 +13,16 @@ import Paper from "@mui/material/Paper";
 
 import { UrlApiGetTags, UrlApiGetTagId } from "../URLs";
 
+interface Tag {
+  tag: string;
+  id: number;
+}
+
+interface TagData {
+  Day: any;
+  Tags: Tag[];
+}
+
 export async function loader() {
   // retrieve all the tags
   const url = UrlApiGetTags;
@@ -51,7 +61,7 @@ export default function Tags() {
 
 // load information for a given tag with 'id'
 export async function idLoader({ params }) {
-  const url = UrlApiGetTagId + "?id=" + params.id;
+  const url = UrlApiGetTagId + "/" + params.id;
   const resp = await fetch(url);
   const data = await resp.json();
 
@@ -59,7 +69,7 @@ export async function idLoader({ params }) {
 }
 
 export function TagID() {
-  const { data } = useLoaderData();
+  const { data }: TagData = useLoaderData();
 
   return (
     <>
@@ -80,10 +90,10 @@ export function TagID() {
               data.map((obj, i) => {
                 return (
                   <TableRow key={i}>
-                    <TableCell>{obj.Day.ID}</TableCell>
-                    <TableCell>{dayLink(obj.Date)}</TableCell>
+                    <TableCell>{obj.Day.id}</TableCell>
+                    <TableCell>{dayLink(obj.Day.DayDate)}</TableCell>
                     <TableCell>{obj.Day.NetSales}</TableCell>
-                    <TableCell>{obj.Day.Comment}</TableCell>
+                    <TableCell>{obj.Day.CommentData}</TableCell>
                     <TableCell>{tagList(obj)}</TableCell>
                   </TableRow>
                 );
@@ -100,7 +110,7 @@ function tagList(obj) {
   if (!obj.Tags) return null;
 
   const out = obj.Tags.map((o, i) => {
-    return <Link to={"/tags/" + obj.TagIDs[i]}>#{o}</Link>;
+    return <Link to={"/tags/" + obj.id}>#{o.tag}</Link>;
   });
   return out;
 }

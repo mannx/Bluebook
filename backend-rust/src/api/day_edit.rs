@@ -3,11 +3,10 @@ use chrono::NaiveDate;
 use diesel::prelude::*;
 use diesel::result::Error::NotFound;
 use diesel::SqliteConnection;
-// use log::error;
 use serde::Deserialize;
 use serde::Serialize;
 
-use crate::api::month::get_tags;
+use crate::api::tags::get_tags;
 use crate::api::DbError;
 use crate::models::day_data::{DayData, DayDataInsert};
 use crate::models::tags::{TagList, TagListInsert};
@@ -66,47 +65,19 @@ pub fn update_day_edit(
 // splits tags and saves to the correct tables.  returns true on success, false if an error occured
 pub fn update_tags(
     conn: &mut SqliteConnection,
-    // tag_id: i32,
     day: &mut DayData,
     data: &DayEditUpdate,
 ) -> Result<bool, DbError> {
-    // 0) remove all tag_data entries where DayId==tag_id
     // 1) split tags into singular entities
     // 2) remove the '#'
     // 3) add to the tag_list table if not found
     // 4) create a tag_data entry with the tag_list id and tag_id
-
-    // remove all tag_data entries linked to this day
-    // clear_tag_data(conn, tag_id)?;
 
     // split and process the tag data into a vector
     let tag_rep = data.Tags.replace("#", " ");
     let tags = tag_rep.split_ascii_whitespace();
 
     let mut tag_list = Vec::new(); // list of tag ids for this day
-
-    // for tag in tags.into_iter() {
-    //     // if this tag isnt in the db, added it and get the id
-    //     let tag_id = get_tag_id(conn, tag)?;
-    //
-    //     // create an entry for this day and tag
-    //     // let data = TagDataInsert {
-    //     //     TagID: tag_id,
-    //     //     DayID: data.ID,
-    //     // };
-    //     //
-    //     // use crate::schema::tag_data;
-    //     //
-    //     // let result = diesel::insert_into(tag_data::table)
-    //     //     .values(&data)
-    //     //     .execute(conn);
-    //     //
-    //     // if let Err(e) = result {
-    //     //     // log the error, but conintue on with the remaining tags
-    //     //     error!("Error inserting tag: [{tag}]...contining");
-    //     //     error!("{:?}", e);
-    //     // }
-    // }
 
     for tag in tags.into_iter() {
         let tag_id = get_tag_id(conn, tag)?;
@@ -164,15 +135,6 @@ fn add_new_tag(conn: &mut SqliteConnection, tag: &str) -> Result<TagList, DbErro
     Ok(result)
 }
 
-// remove all tags that might be associated with the given day id
-// fn clear_tag_data(conn: &mut SqliteConnection, tag_id: i32) -> Result<(), DbError> {
-//     use crate::schema::tag_data::dsl::*;
-//
-//     diesel::delete(tag_data.filter(DayID.eq(tag_id))).execute(conn)?;
-//
-//     Ok(())
-// }
-
 pub fn get_day_edit(
     conn: &mut SqliteConnection,
     day_id: i32,
@@ -194,7 +156,6 @@ pub fn get_day_edit(
         let result: DayData = day_data.find(day_id).first::<DayData>(conn)?;
 
         // get the tags
-        // let tags = get_tags(conn, day_id)?;
         let tags = get_tags(conn, &result)?;
         let mut tag_string = Vec::new();
 

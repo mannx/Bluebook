@@ -16,6 +16,10 @@ pub struct TagListInsert {
     pub Tag: Option<String>,
 }
 
+//
+// TagData is only used for tag migration.
+// once fully complete, this can be removed once no longer needed
+//
 #[derive(Queryable, Selectable)]
 #[diesel(table_name=crate::schema::tag_data)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
