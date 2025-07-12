@@ -1,6 +1,7 @@
 #![allow(non_snake_case)]
 use diesel::prelude::*;
 use diesel::SqliteConnection;
+use log::debug;
 use serde::{Deserialize, Serialize};
 
 use crate::api::DbError;
@@ -102,10 +103,18 @@ pub fn get_tags(conn: &mut SqliteConnection, day: &DayData) -> Result<Vec<Tags>,
     // retrieve the list of all the tags for this day
     let tids = match &day.Tags {
         None => return Ok(tags),
-        Some(tags) => tags
-            .split(' ')
-            .map(|x| x.parse::<i32>().unwrap())
-            .collect::<Vec<i32>>(),
+        Some(tags) => {
+            debug!("[get_tags] processing tags for [{}]", tags);
+
+            if tags.is_empty() {
+                debug!("tag is empty [day: {}]. returning...", day.id);
+                return Ok(Vec::new());
+            }
+
+            tags.split(' ')
+                .map(|x| x.parse::<i32>().unwrap())
+                .collect::<Vec<i32>>()
+        }
     };
 
     for tag_id in tids {

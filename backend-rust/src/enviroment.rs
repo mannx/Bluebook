@@ -1,4 +1,5 @@
 #![allow(non_snake_case)]
+use log::warn;
 use std::env;
 use std::path::PathBuf;
 
@@ -12,6 +13,17 @@ pub struct Environment {
 }
 
 impl Environment {
+    // returns a environment variable or a default alternative incase its not set
+    pub fn var(var: &str, default: &str) -> String {
+        match env::var(var) {
+            Ok(v) => v,
+            Err(_) => {
+                warn!("Environment variable {var} not set, using default option: {default}");
+                default.to_owned()
+            }
+        }
+    }
+
     pub fn default() -> Self {
         Self {
             ImportPath: "/import".to_owned(),

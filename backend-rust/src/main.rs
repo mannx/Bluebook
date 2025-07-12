@@ -45,7 +45,13 @@ async fn main() -> std::io::Result<()> {
 
     info!(
         "Build Commit: {}",
-        env::var("VERGEN_GIT_SHA").expect("[VERGEN_GIT_SHA NOT SET]")
+        // env::var("VERGEN_GIT_SHA").expect("[VERGEN_GIT_SHA NOT SET]")
+        Environment::var("VERGEN_GIT_SHA", "VERGEN_GIT_SHA NOT SET")
+    );
+    info!(
+        "Build branch: {}",
+        // env::var("VERGEN_GIT_BRANCH").expect("[VERGEN_GIT_BRANCH NOT SET]")
+        Environment::var("VERGEN_GIT_BRANCH", "VERGEN_GIT_BRANCH NOT SET")
     );
 
     let url = env::var("DATABASE_URL").expect("DATABASE_URL required");
@@ -110,6 +116,7 @@ async fn main() -> std::io::Result<()> {
             .service(handlers::tags::get_tag_list_handler)
             .service(handlers::tags::get_tag_data_handler)
             .service(handlers::backup::get_backup_list)
+            .service(handlers::backup::undo_backup_handler)
             .service(handlers::about::get_about_info)
             // return the index on all other paths so react-router works
             .service(

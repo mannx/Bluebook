@@ -63,11 +63,7 @@ function navHeader2() {
     },
     {
       Title: "Backups",
-      Url: "/backups",
-    },
-    {
-      Title: "Comment Search",
-      Url: "/search",
+      Url: "/backup",
     },
   ];
 

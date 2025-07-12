@@ -42,7 +42,10 @@ import AUV, {
   action as auvAction,
 } from "./components/AUV/AUV";
 
-import Backup, { loader as backupLoader } from "./components/Backup/Backup";
+import Backup, {
+  loader as backupLoader,
+  action as backupAction,
+} from "./components/Backup/Backup";
 
 import Settings, {
   loader as settingsLoader,
@@ -146,6 +149,7 @@ const router = createBrowserRouter([
         path: "/backup",
         element: <Backup />,
         loader: backupLoader,
+        action: backupAction,
       },
     ],
   },

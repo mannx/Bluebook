@@ -25,11 +25,10 @@ export const UrlApiTop5 = "http://localhost:8080/api/top5";
 export const UrlApiTop5Data = "http://localhost:8080/api/top5/data";
 
 export const UrlApiBackupGet = "http://localhost:8080/api/backup/get";
+export const UrlApiBackupUndo = "http://localhost:8080/api/backup/undo";
 
 // TODO:
 export const UrlApiManualArchive = "http://localhost:8080/api/backup/archive";
-
-// export const UrlApiCommentSearch = "http://localhost:8080/api/comment/search"; // search for all comments containing the search term
 
 export const UrlApiSettingsGet = "http://localhost:8080/api/settings/get"; // get the global settings
 export const UrlApiSettingsSet = "http://localhost:8080/api/settings/set"; // update the global settings

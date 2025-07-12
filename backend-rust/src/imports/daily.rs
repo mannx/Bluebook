@@ -228,6 +228,7 @@ fn insert_or_update(
 
     let result = day_data
         .filter(DayDate.eq(data.DayDate))
+        .filter(Updated.eq(false)) // get the currently active row
         .first::<DayData>(conn);
 
     // if result is Err, the current date is not yet in the db and just insert

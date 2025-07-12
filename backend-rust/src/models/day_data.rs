@@ -144,6 +144,9 @@ impl DayData {
         self.CustomerCount = data.CustomerCount;
         self.BreadCredits = data.BreadCredits;
         self.BreadOverShort = data.BreadOverShort;
+
+        self.CommentData = data.CommentData.clone();
+        self.Tags = data.Tags.clone();
     }
 
     pub fn insert_or_update(&self, conn: &mut SqliteConnection) -> Result<(), Error> {
@@ -156,13 +159,7 @@ impl DayData {
                 .values(&data_insert)
                 .execute(conn)?;
         } else {
-            // update
             use crate::schema::day_data::dsl::*;
-
-            // diesel::update(crate::schema::day_data::table)
-            //     .filter(id.eq(self.id)) // make sure to only update the record we are
-            //     .set(self)
-            //     .execute(conn)?;
 
             // 1) update ourselves, and make sure Update is set to true
 

@@ -1,9 +1,10 @@
 use actix_web::error;
 use actix_web::HttpResponse;
-use actix_web::{get, web, Responder};
+use actix_web::{get, post, web, Responder};
 use diesel::prelude::*;
 use diesel::SqliteConnection;
 
+use crate::api::backup::perform_backup_undo;
 use crate::api::DbError;
 use crate::api::DbPool;
 use crate::models::day_data::DayData;
@@ -30,4 +31,19 @@ fn read_backup(conn: &mut SqliteConnection) -> Result<Vec<DayData>, DbError> {
         .load(conn)?;
 
     Ok(res)
+}
+
+#[post("/api/backup/undo")]
+pub async fn undo_backup_handler(
+    pool: web::Data<DbPool>,
+    data: web::Json<Vec<i32>>,
+) -> actix_web::Result<impl Responder> {
+    let results = web::block(move || {
+        let mut conn = pool.get()?;
+        perform_backup_undo(&mut conn, &data)
+    })
+    .await?
+    .map_err(error::ErrorInternalServerError)?;
+
+    Ok(HttpResponse::Ok().json(results))
 }
