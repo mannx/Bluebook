@@ -43,16 +43,8 @@ async fn main() -> std::io::Result<()> {
     env_logger::init_from_env(Env::default().default_filter_or("info"));
     debug!("Logger initialized");
 
-    info!(
-        "Build Commit: {}",
-        // env::var("VERGEN_GIT_SHA").expect("[VERGEN_GIT_SHA NOT SET]")
-        Environment::var("VERGEN_GIT_SHA", "VERGEN_GIT_SHA NOT SET")
-    );
-    info!(
-        "Build branch: {}",
-        // env::var("VERGEN_GIT_BRANCH").expect("[VERGEN_GIT_BRANCH NOT SET]")
-        Environment::var("VERGEN_GIT_BRANCH", "VERGEN_GIT_BRANCH NOT SET")
-    );
+    info!("Build Commit: {}", env!("VERGEN_GIT_SHA"));
+    info!("Build branch: {}", env!("VERGEN_GIT_BRANCH"));
 
     let url = env::var("DATABASE_URL").expect("DATABASE_URL required");
     let manager = r2d2::ConnectionManager::<SqliteConnection>::new(url);

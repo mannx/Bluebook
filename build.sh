@@ -31,4 +31,4 @@ fi
 
 echo "Building container with tag: $TAG..."
 
-docker buildx build -t bluebook:$TAG -f Cache.Dockerfile .
+docker buildx build -t bluebook:$TAG .
