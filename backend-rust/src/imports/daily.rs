@@ -143,7 +143,6 @@ fn parse_day(
         Err(e) => {
             error!("Unable to parse date value [{date_val}] for index {day_index}");
             error!("error: {e}");
-            // return None;
             return Err(format!("Unable to parse date [{date_val}]: {e}"));
         }
         // convert to a NaiveDateTime.  ignore the time zone

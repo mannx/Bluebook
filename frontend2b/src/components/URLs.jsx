@@ -20,6 +20,7 @@ export const UrlApi2AUVUpdate = "http://localhost:8080/api/auv/update";
 
 export const UrlApiGetTags = "http://localhost:8080/api/tags/view";
 export const UrlApiGetTagId = "http://localhost:8080/api/tags/data";
+export const UrlApiMigrateTags = "http://localhost:8080/api/tags/migrate";
 
 export const UrlApiTop5 = "http://localhost:8080/api/top5";
 export const UrlApiTop5Data = "http://localhost:8080/api/top5/data";

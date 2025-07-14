@@ -1,7 +1,7 @@
 #![allow(non_snake_case)]
 use diesel::prelude::*;
 use diesel::SqliteConnection;
-use log::debug;
+use log::{debug, error, info};
 use serde::{Deserialize, Serialize};
 
 use crate::api::DbError;
@@ -129,4 +129,97 @@ pub fn get_tags(conn: &mut SqliteConnection, day: &DayData) -> Result<Vec<Tags>,
     }
 
     Ok(tags)
+}
+
+// migrate tags from the tag_data table into the DayData table
+// once we are fully running and no longer need to migrate an old db
+// this can be removed along with migrate_tags_do()
+pub fn migrate_tags(conn: &mut SqliteConnection) -> Result<Vec<String>, DbError> {
+    use crate::models::day_data::DayData;
+    use crate::schema::day_data::dsl::*;
+    use diesel::prelude::*;
+
+    info!("Performing tag migration...");
+    let mut messages = Vec::new();
+    let results: Vec<DayData> = day_data.select(DayData::as_select()).load(conn)?;
+
+    for r in results {
+        info!("Migrating Tags for Date: {}", r.DayDate);
+        match migrate_tags_do(conn, &r) {
+            Ok(_) => {}
+            Err(err) => {
+                error!("Unable to update tags for day: {}", r.DayDate);
+                error!("\t** {err}");
+
+                messages.push(format!("Unable to update tags for day: {}", r.DayDate));
+                messages.push(format!("\t**{err}"));
+            }
+        }
+    }
+
+    messages.push("Pruning unused tags...".to_owned());
+    let mut pmsg = prune_tags(conn)?;
+    messages.append(&mut pmsg);
+
+    messages.push("Migration Success".to_owned());
+    Ok(messages)
+}
+
+// migrate the tags for a given day
+fn migrate_tags_do(conn: &mut SqliteConnection, data: &DayData) -> Result<(), DbError> {
+    use crate::models::tags::TagData;
+    use diesel::prelude::*;
+
+    // retrieve any tags from tag_data associated with this id
+    use crate::schema::tag_data::dsl::*;
+
+    let tags: Vec<TagData> = tag_data
+        .filter(DayID.eq(data.id))
+        .select(TagData::as_select())
+        .load(conn)?;
+
+    let tlist: String = tags
+        .iter()
+        .map(|t| t.TagID.to_string())
+        .collect::<Vec<String>>()
+        .join(" ");
+
+    if !tlist.is_empty() {
+        // update the tags
+        use crate::schema::day_data::dsl::*;
+
+        info!("  Updating tag list...");
+        diesel::update(day_data)
+            .filter(id.eq(data.id))
+            .set(Tags.eq(Some(tlist)))
+            .execute(conn)?;
+    }
+
+    Ok(())
+}
+
+// prune off any tags that are not in use
+// currently only done on tag migration, but should be linked to an
+// api endpoint
+fn prune_tags(conn: &mut SqliteConnection) -> Result<Vec<String>, DbError> {
+    let tags = get_tag_list(conn)?;
+    let mut msg = Vec::new();
+
+    conn.transaction(|conn| {
+        for t in tags {
+            if t.Count == 0 {
+                msg.push(format!(
+                    "Pruning tag: {}",
+                    t.Tag.unwrap_or("--NO TAG NAME--".to_owned())
+                ));
+
+                use crate::schema::tag_list::dsl::*;
+
+                diesel::delete(tag_list.filter(id.eq(t.id))).execute(conn)?;
+            }
+        }
+        diesel::result::QueryResult::Ok(())
+    })?;
+
+    Ok(msg)
 }

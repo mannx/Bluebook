@@ -29,7 +29,5 @@ To Migrate to the backend-rust version follow
   1) Shutdown previous container
   2) Backup database
   3) Rename database to db.mig
-  4) Set BLUEBOOK_MIG_TAG environment variable to anything to migrate tags
   4) Run new container
   5) Make sure migration worked
-  6) Clear BLUEBOOK_MIG_TAG from compose, as only need to migrate tags once

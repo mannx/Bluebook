@@ -6,10 +6,12 @@
 FROM rust:latest AS build
 WORKDIR /app
 
-COPY backend-rust/ ./
 
 # add missing deps
 RUN apt update && apt install sqlite3
+
+COPY backend-rust/ ./
+COPY .git/ .git
 
 # temp adjust certain source files for dockerization
 RUN cargo build --release

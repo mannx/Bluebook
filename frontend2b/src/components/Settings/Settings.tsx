@@ -5,6 +5,7 @@ import {
   UrlApiSettingsGet,
   UrlApiSettingsSet,
   UrlApiManualArchive,
+  UrlApiMigrateTags,
 } from "../URLs.jsx";
 
 // import HockeyParse from "../Hockey/HockeyParse.tsx";
@@ -18,6 +19,13 @@ import Switch from "@mui/material/Switch";
 import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
 import { Typography } from "@mui/material";
+
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
+
+import { ApiReturnMessage } from "../api.tsx";
 
 export async function loader() {
   const resp = await fetch(UrlApiSettingsGet);
@@ -60,6 +68,10 @@ export default function Settings() {
   const [manualURL, setManualURL] = React.useState("");
   const [errorMsg, setErrorMsg] = React.useState(null);
 
+  const [migrateOpen, setMigrateOpen] = React.useState(false);
+  const [migrateMsg, setMigrateMsg] = React.useState([]);
+  const [migrateShow, setMigrateShow] = React.useState(false);
+
   const handleChange = (e) => {
     setState({
       ...state,
@@ -87,6 +99,34 @@ export default function Settings() {
       // misformed return data?
       setErrorMsg("Unknown return information");
     }
+  };
+
+  const migrateOnOpen = () => {
+    setMigrateOpen(true);
+  };
+
+  const migrateOnClose = () => {
+    setMigrateOpen(false);
+  };
+
+  const migrateTags = async () => {
+    // close the dialog
+
+    // post the request and save the result
+    const opts = GetPostOptions(null);
+    const resp = await fetch(UrlApiMigrateTags, opts);
+    const json: ApiReturnMessage<string[]> = await resp.json();
+
+    console.log(json);
+    if (json.Error === true) {
+      setErrorMsg(json.Message);
+    } else {
+      setMigrateMsg(json.Data);
+      setMigrateShow(true);
+    }
+
+    // close the dialog
+    setMigrateOpen(false);
   };
 
   return (
@@ -194,6 +234,47 @@ export default function Settings() {
           <Button onClick={manualArchive}>Create backup archive</Button>
         </Stack>
       </Form>
+      <Divider />
+
+      <Box>
+        <Typography>Migrate Tags</Typography>
+        <Button onClick={setMigrateOpen}>Migrate</Button>
+        <Dialog open={migrateOpen} onClose={migrateOnClose}>
+          <DialogTitle>Migrate Tags?</DialogTitle>
+          <DialogContent>
+            <Typography>Migrate tags from old system to new?</Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={migrateOnClose}>Cancel</Button>
+            <Button onClick={migrateTags} autoFocus>
+              Migrate
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        <Dialog
+          open={migrateShow}
+          onClose={() => {
+            setMigrateShow(false);
+          }}
+        >
+          <DialogTitle>Migration Results</DialogTitle>
+          <DialogContent>
+            <ul>
+              {migrateMsg.map((n) => {
+                return <li>{n}</li>;
+              })}
+            </ul>
+            <Button
+              onClick={() => {
+                setMigrateShow(false);
+              }}
+            >
+              Ok
+            </Button>
+          </DialogContent>
+        </Dialog>
+      </Box>
     </>
   );
 }
