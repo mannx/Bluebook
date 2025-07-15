@@ -1,6 +1,6 @@
 import { Link, Outlet, useLoaderData } from "react-router-dom";
 
-import Grid from "@mui/material/Unstable_Grid2";
+import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
 
 import Table from "@mui/material/Table";
