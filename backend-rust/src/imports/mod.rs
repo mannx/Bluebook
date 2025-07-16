@@ -106,7 +106,9 @@ fn load_or_new_day(conn: &mut SqliteConnection, date: NaiveDate) -> Result<DayDa
     use crate::schema::day_data::dsl::*;
 
     // try to retrieve the data
-    let result = day_data.filter(DayDate.eq(date)).first::<DayData>(conn);
+    let result = day_data
+        .filter(DayDate.eq(date).and(Updated.eq(false)))
+        .first::<DayData>(conn);
     match result {
         Ok(d) => Ok(d),
         Err(err) => {
@@ -148,7 +150,7 @@ fn load_or_new_week(conn: &mut SqliteConnection, date: NaiveDate) -> Result<Week
 // logs and error if we can't parse, and returns 0
 // this should only be used for quick conversion where we don't need
 // to pass the error back to the front end
-pub fn ftoi(input: &str) -> i32 {
+fn ftoi(input: &str) -> i32 {
     match input.replace(",", "").replace(".", "").parse::<i32>() {
         Ok(i) => i,
         Err(err) => {

@@ -27,6 +27,7 @@ export const UrlApiTop5Data = "http://localhost:8080/api/top5/data";
 
 export const UrlApiBackupGet = "http://localhost:8080/api/backup/get";
 export const UrlApiBackupUndo = "http://localhost:8080/api/backup/undo";
+export const UrlApiBackupClear = "http://localhost:8080/api/backup/clear";
 
 // TODO:
 export const UrlApiManualArchive = "http://localhost:8080/api/backup/archive";

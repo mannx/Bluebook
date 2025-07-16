@@ -4,7 +4,8 @@ use actix_web::{get, post, web, Responder};
 use diesel::prelude::*;
 use diesel::SqliteConnection;
 
-use crate::api::backup::perform_backup_undo;
+use crate::api::backup::{clear_backup_list, perform_backup_undo};
+use crate::api::error::ApiReturnMessage;
 use crate::api::DbError;
 use crate::api::DbPool;
 use crate::models::day_data::DayData;
@@ -46,4 +47,18 @@ pub async fn undo_backup_handler(
     .map_err(error::ErrorInternalServerError)?;
 
     Ok(HttpResponse::Ok().json(results))
+}
+
+#[post("/api/backup/clear")]
+pub async fn clear_backup_handler(pool: web::Data<DbPool>) -> actix_web::Result<impl Responder> {
+    let rows = web::block(move || {
+        let mut conn = pool.get()?;
+        clear_backup_list(&mut conn)
+    })
+    .await?
+    .map_err(error::ErrorInternalServerError)?;
+
+    let api = ApiReturnMessage::<String>::ok(format!("Cleared {} rows.", rows));
+
+    Ok(HttpResponse::Ok().json(api))
 }

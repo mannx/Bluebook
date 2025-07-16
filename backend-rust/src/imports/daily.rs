@@ -242,6 +242,7 @@ fn insert_or_update(
                 "Found data for [{}]...Copy control data and updating...",
                 data.DayDate
             );
+
             data.copy_control(&old);
 
             // set the id so we know to run an update

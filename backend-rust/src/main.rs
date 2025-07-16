@@ -96,6 +96,7 @@ async fn main() -> std::io::Result<()> {
             .service(handlers::tags::migrate_tag_handler)
             .service(handlers::backup::get_backup_list)
             .service(handlers::backup::undo_backup_handler)
+            .service(handlers::backup::clear_backup_handler)
             .service(handlers::about::get_about_info)
             // return the index on all other paths so react-router works
             .service(

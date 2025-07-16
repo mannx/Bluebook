@@ -31,6 +31,18 @@ pub fn perform_backup_undo(
     Ok(msgs)
 }
 
+// removes all DayData rows that have Updated set to true
+// returns number of rows removed
+pub fn clear_backup_list(conn: &mut SqliteConnection) -> Result<usize, DbError> {
+    use crate::schema::day_data::dsl::*;
+
+    let rows = diesel::delete(day_data)
+        .filter(Updated.eq(true))
+        .execute(conn)?;
+
+    Ok(rows)
+}
+
 fn do_undo(conn: &mut SqliteConnection, undo_id: &i32) -> Result<(), DbError> {
     use crate::schema::day_data::dsl::*;
 
