@@ -145,8 +145,7 @@ fn calculate_week_ending(
         .expect("invalid date provided");
 
     let results: Vec<DayData> = day_data
-        .filter(DayDate.ge(start_date).and(DayDate.le(data.DayDate)))
-        .filter(Updated.eq(false))
+        .filter(DayDate.ge(start_date).and(DayDate.le(data.DayDate)).and(Updated.eq(false)))
         .select(DayData::as_select())
         .load(conn)?;
 
