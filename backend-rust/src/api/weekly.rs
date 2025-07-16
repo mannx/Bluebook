@@ -133,7 +133,7 @@ fn get_week_data(conn: &mut SqliteConnection, week_ending: NaiveDate) -> Result<
 
         debug!("Getting daily data...");
         let mut result = day_data
-            .filter(DayDate.ge(start_day).and(DayDate.le(week_ending)))
+            .filter(DayDate.ge(start_day).and(DayDate.le(week_ending)).and(Update.eq(false)))
             .order(DayDate)
             .select(DayData::as_select())
             .load(conn)?;

@@ -127,9 +127,11 @@ fn set_weekly_data(
 ) {
     // TODO: confirm returning correct value for true
     let net_sales = if data.netsales {
-        weekly.NetSales
-    } else {
+        // weekly.NetSales
         weekly.WisrNetSales
+    } else {
+        // weekly.WisrNetSales
+        weekly.NetSales
     };
 
     sheet
@@ -151,13 +153,15 @@ fn set_weekly_data(
         .set_value((weekly.BreadOverShort as f32 / 100.).to_string());
     sheet
         .get_cell_mut(config.foodCost.as_str())
-        .set_value((weekly.FoodCostAmount as f32 / 100.).to_string());
+        // .set_value((weekly.FoodCostAmount as f32 / 100.).to_string());
+        .set_value((weekly.FoodCostAmount  ).to_string());
     sheet
         .get_cell_mut(config.syscoCost.as_str())
         .set_value(data.sysco.to_string());
     sheet
         .get_cell_mut(config.labourCost.as_str())
-        .set_value((weekly.LabourCostAmount as f32 / 100.).to_string());
+        // .set_value((weekly.LabourCostAmount as f32 / 100.).to_string());
+        .set_value((weekly.LabourCostAmount  ).to_string());
     sheet
         .get_cell_mut(config.customerCount.as_str())
         .set_value(weekly.CustomerCount.to_string());
