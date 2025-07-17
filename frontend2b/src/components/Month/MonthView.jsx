@@ -212,8 +212,7 @@ function Row(data, settings) {
   const third_perc = (data.ThirdPartyDollar / data.Data.NetSales) * 100.0;
   return (
     <tr key={data.ID}>
-      {/* <td className="Month">{Zero(data.Day)}</td> */}
-      <td className="Month">U: {data.Data.Updated.toString()}</td>
+      <td className="Month">{Zero(data.Day)}</td>
       <td className="Month">{dj.format("dddd")}</td>
       <td className="Month">{F(data.GrossSales)}</td>
       <td className="Month">{F(data.Data.Hst)}</td>
