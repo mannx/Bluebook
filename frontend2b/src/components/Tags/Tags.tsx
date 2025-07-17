@@ -70,6 +70,7 @@ export async function idLoader({ params }) {
 
 export function TagID() {
   const { data }: TagData = useLoaderData();
+console.log(data);
 
   return (
     <>

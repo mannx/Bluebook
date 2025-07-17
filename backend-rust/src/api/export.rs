@@ -125,12 +125,9 @@ fn set_weekly_data(
     config: &Config,
     _settings: &Settings,
 ) {
-    // TODO: confirm returning correct value for true
     let net_sales = if data.netsales {
-        // weekly.NetSales
         weekly.WisrNetSales
     } else {
-        // weekly.WisrNetSales
         weekly.NetSales
     };
 
@@ -153,14 +150,12 @@ fn set_weekly_data(
         .set_value((weekly.BreadOverShort as f32 / 100.).to_string());
     sheet
         .get_cell_mut(config.foodCost.as_str())
-        // .set_value((weekly.FoodCostAmount as f32 / 100.).to_string());
         .set_value((weekly.FoodCostAmount  ).to_string());
     sheet
         .get_cell_mut(config.syscoCost.as_str())
         .set_value(data.sysco.to_string());
     sheet
         .get_cell_mut(config.labourCost.as_str())
-        // .set_value((weekly.LabourCostAmount as f32 / 100.).to_string());
         .set_value((weekly.LabourCostAmount  ).to_string());
     sheet
         .get_cell_mut(config.customerCount.as_str())
@@ -189,7 +184,7 @@ fn set_weekly_data(
         .set_value((weekly.GiftCardRedeem as f32 / 100.).to_string());
     sheet
         .get_cell_mut(config.prodBudget.as_str())
-        .set_value(weekly.ProductivityBudget.to_string());
+        .set_value((weekly.ProductivityBudget as f32/100.).to_string());
     sheet
         .get_cell_mut(config.prodActual.as_str())
         .set_value((weekly.ProductivityActual as f32 / 100.).to_string());

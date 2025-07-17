@@ -18,8 +18,8 @@ struct AboutInfo {
 #[get("/api/about")]
 pub async fn get_about_info() -> actix_web::Result<impl Responder> {
     let info = AboutInfo {
-        Branch: env::var("VERGEN_GIT_BRANCH").unwrap_or_else(|_| "NO BRANCH".to_owned()),
-        Commit: env::var("VERGEN_GIT_SHA").unwrap_or_else(|_| "NO COMMIT".to_owned()),
+        Branch: env!("VERGEN_GIT_BRANCH").to_owned(),
+        Commit: env!("VERGEN_GIT_SHA").to_owned(),
     };
 
     let result = ApiReturnMessage::<AboutInfo>::ok(info);
