@@ -43,10 +43,6 @@ function navHeader2() {
       Url: "/auv",
     },
     {
-      Title: "Top 5",
-      Url: "/top5",
-    },
-    {
       Title: "Import",
       Url: "/import",
     },

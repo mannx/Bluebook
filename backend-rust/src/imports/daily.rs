@@ -6,13 +6,12 @@ use diesel::prelude::*;
 use diesel::SqliteConnection;
 use log::{debug, error, info};
 use serde::Deserialize;
-use umya_spreadsheet::*;
 use std::collections::HashMap;
+use umya_spreadsheet::*;
 
 use crate::imports::ftoi;
 use crate::imports::ImportResult;
 use crate::models::day_data::DayData;
-use crate::api::DbError;
 use crate::ENVIRONMENT;
 
 #[derive(Deserialize)]
@@ -41,11 +40,16 @@ struct Config {
     PayPal: Vec<Vec<String>>,
 }
 
+#[derive(Deserialize)]
+struct VersionConfig {
+    data: Vec<VersionPair>,
+}
+
 /// VersionConfig holds data used to determine which Config index to use
-#[derive(Deserialize,Debug)]
-struct VersionConfig{
-    index: i32,
-    pairs: HashMap<String,String>,
+#[derive(Deserialize)]
+struct VersionPair {
+    index: usize,
+    pairs: HashMap<String, String>,
 }
 
 impl Config {
@@ -56,17 +60,17 @@ impl Config {
     }
 }
 
-impl VersionConfig{
-    fn new()->Self{
-        Self{
-            index:0,
-            pairs: HashMap::new(),
-        }
-    }
+impl VersionConfig {
+    // fn new()->Self{
+    //     Self{
+    //         index:0,
+    //         pairs: HashMap::new(),
+    //     }
+    // }
 
-    fn load()->Self{
-        let path=ENVIRONMENT.with_config_path("version.ron");
-        let fstr=std::fs::read_to_string(path).expect("unable to open version.ron");
+    fn load() -> Self {
+        let path = ENVIRONMENT.with_config_path("version.ron");
+        let fstr = std::fs::read_to_string(path).expect("unable to open version.ron");
         ron::from_str::<VersionConfig>(fstr.as_str()).unwrap()
     }
 }
@@ -112,13 +116,13 @@ pub fn daily_import(conn: &mut SqliteConnection, file_name: &String) -> ImportRe
     };
 
     // for each day, parse it and return an DayData object.
-    let version =match  get_daily_version(sheet){
-        Err(_)=>{
+    let version = match get_daily_version(sheet) {
+        Err(_) => {
             error!("Invalid daily version -- no match version");
             messages.error_str(format!("[ERROR] Daily sheet [{file_name}].  Unable to determine which version entry to use."));
             return messages;
-        },
-        Ok(n)=>n,
+        }
+        Ok(n) => n,
     };
 
     // up to 4 days per sheet
@@ -228,12 +232,37 @@ fn parse_day(
 
 // checks the sheet and determines which version we are parsing
 // used to index itno the config to get proper cell addresses
-fn get_daily_version(_sheet: &Worksheet) -> Result<usize,DbError> {
+fn get_daily_version(sheet: &Worksheet) -> Result<usize, ()> {
     // only 1 version right now
-    let version=VersionConfig::load();
-    debug!("version: {:?}",version);
+    let version = VersionConfig::load();
 
-    Ok(0)
+    for check in version.data {
+        if check_daily_version(sheet, &check) {
+            // found the correct index
+            return Ok(check.index);
+        }
+    }
+
+    Err(())
+}
+
+/// Checks all the pairs. returns true if we match all pairs
+fn check_daily_version(sheet: &Worksheet, pairs: &VersionPair) -> bool {
+    debug!("Checking daily sheet version for index: {}", pairs.index);
+
+    for (key, val) in &pairs.pairs {
+        let s_val = sheet.get_value(key.as_str());
+
+        debug!("  {} = {}?", key, val);
+        if s_val != *val {
+            debug!("   [FAILED] Returning");
+            return false;
+        }
+
+        debug!("   [PASS]");
+    }
+
+    true
 }
 
 // gets the value from the cell, returns 0 if cell is empty

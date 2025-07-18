@@ -1,6 +1,11 @@
 VersionConfig(
-    index: 0,
-    pairs: [
-        "A3","CashDeposit",
-    ],
+  data: [
+    VersionPair(
+      index: 0,
+      pairs: {
+        "A4":"Cash deposit",
+        "A14": "Tips",
+      }
+    )
+  ]
 )
