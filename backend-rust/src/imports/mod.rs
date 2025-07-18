@@ -43,6 +43,10 @@ impl ImportResult {
         self.Messages.push(msg);
     }
 
+    fn error_str<S:Into<String>>(&mut self,err:S){
+        self.Messages.push(err.into());
+    }
+
     pub fn combine(&mut self, ir: &mut ImportResult) {
         self.Messages.append(&mut ir.Messages);
     }

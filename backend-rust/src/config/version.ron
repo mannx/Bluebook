@@ -1,0 +1,6 @@
+VersionConfig(
+    index: 0,
+    pairs: [
+        "A3","CashDeposit",
+    ],
+)

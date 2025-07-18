@@ -7,10 +7,12 @@ use diesel::SqliteConnection;
 use log::{debug, error, info};
 use serde::Deserialize;
 use umya_spreadsheet::*;
+use std::collections::HashMap;
 
 use crate::imports::ftoi;
 use crate::imports::ImportResult;
 use crate::models::day_data::DayData;
+use crate::api::DbError;
 use crate::ENVIRONMENT;
 
 #[derive(Deserialize)]
@@ -39,11 +41,33 @@ struct Config {
     PayPal: Vec<Vec<String>>,
 }
 
+/// VersionConfig holds data used to determine which Config index to use
+#[derive(Deserialize,Debug)]
+struct VersionConfig{
+    index: i32,
+    pairs: HashMap<String,String>,
+}
+
 impl Config {
     fn load() -> Self {
         let path = ENVIRONMENT.with_config_path("daily.ron");
         let fstr = std::fs::read_to_string(path).expect("unable to open daily.ron");
         ron::from_str::<Config>(fstr.as_str()).unwrap()
+    }
+}
+
+impl VersionConfig{
+    fn new()->Self{
+        Self{
+            index:0,
+            pairs: HashMap::new(),
+        }
+    }
+
+    fn load()->Self{
+        let path=ENVIRONMENT.with_config_path("version.ron");
+        let fstr=std::fs::read_to_string(path).expect("unable to open version.ron");
+        ron::from_str::<VersionConfig>(fstr.as_str()).unwrap()
     }
 }
 
@@ -88,7 +112,14 @@ pub fn daily_import(conn: &mut SqliteConnection, file_name: &String) -> ImportRe
     };
 
     // for each day, parse it and return an DayData object.
-    let version = get_daily_version(sheet);
+    let version =match  get_daily_version(sheet){
+        Err(_)=>{
+            error!("Invalid daily version -- no match version");
+            messages.error_str(format!("[ERROR] Daily sheet [{file_name}].  Unable to determine which version entry to use."));
+            return messages;
+        },
+        Ok(n)=>n,
+    };
 
     // up to 4 days per sheet
     for i in 0..4 {
@@ -197,9 +228,12 @@ fn parse_day(
 
 // checks the sheet and determines which version we are parsing
 // used to index itno the config to get proper cell addresses
-fn get_daily_version(_sheet: &Worksheet) -> usize {
+fn get_daily_version(_sheet: &Worksheet) -> Result<usize,DbError> {
     // only 1 version right now
-    0
+    let version=VersionConfig::load();
+    debug!("version: {:?}",version);
+
+    Ok(0)
 }
 
 // gets the value from the cell, returns 0 if cell is empty
