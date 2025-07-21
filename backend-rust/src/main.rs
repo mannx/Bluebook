@@ -41,6 +41,11 @@ async fn main() -> std::io::Result<()> {
     env_logger::init_from_env(Env::default().default_filter_or("info"));
     debug!("Logger initialized");
 
+    println!(
+        "Logger level: {}",
+        env::var("RUST_LOG").unwrap_or_else(|_| "RUST_LOG NOT SET".to_owned())
+    );
+
     info!("Build Commit: {}", env!("VERGEN_GIT_SHA"));
     info!("Build branch: {}", env!("VERGEN_GIT_BRANCH"));
 
@@ -58,7 +63,7 @@ async fn main() -> std::io::Result<()> {
 
     match run_migrations(&mut conn) {
         Ok(_) => println!("migrations run successfully!"),
-        Err(e) => panic!("error unable to migrate db. Stopping.: {:?}", e),
+        Err(e) => panic!("error unable to migrate db. Stopping.: {e}"),
     }
 
     // if we have an argument given to us, we exit after running migrations

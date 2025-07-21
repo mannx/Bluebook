@@ -4,7 +4,7 @@
 use chrono::NaiveDate;
 use diesel::prelude::*;
 use diesel::SqliteConnection;
-use log::{debug, error, info};
+use log::{debug, error, info, trace};
 use serde::Deserialize;
 use std::collections::HashMap;
 use umya_spreadsheet::*;
@@ -61,13 +61,6 @@ impl Config {
 }
 
 impl VersionConfig {
-    // fn new()->Self{
-    //     Self{
-    //         index:0,
-    //         pairs: HashMap::new(),
-    //     }
-    // }
-
     fn load() -> Self {
         let path = ENVIRONMENT.with_config_path("version.ron");
         let fstr = std::fs::read_to_string(path).expect("unable to open version.ron");
@@ -267,9 +260,13 @@ fn check_daily_version(sheet: &Worksheet, pairs: &VersionPair) -> bool {
 
 // gets the value from the cell, returns 0 if cell is empty
 fn get_value(sheet: &Worksheet, cell: &str) -> i32 {
+    trace!("[get_value] cell: {cell}");
+
     let val = sheet.get_value(cell);
+    trace!("[get_value] value: {val}");
 
     if val.is_empty() {
+        trace!("       empty string, returngin 0");
         return 0;
     }
 

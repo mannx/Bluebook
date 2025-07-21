@@ -49,7 +49,7 @@ impl MonthData {
         Self {
             Data: data.clone(),
             ThirdPartyDollar: tpd,
-            GrossSales: data.NetSales + data.Hst + data.BottleDeposit,
+            GrossSales: data.NetSales + data.Hst + data.BottleDeposit + data.Tips,
             DayOfWeek: data.DayDate.weekday().to_string(),
             EndOfWeek: None,
             Tags: Vec::new(),
@@ -145,7 +145,12 @@ fn calculate_week_ending(
         .expect("invalid date provided");
 
     let results: Vec<DayData> = day_data
-        .filter(DayDate.ge(start_date).and(DayDate.le(data.DayDate)).and(Updated.eq(false)))
+        .filter(
+            DayDate
+                .ge(start_date)
+                .and(DayDate.le(data.DayDate))
+                .and(Updated.eq(false)),
+        )
         .select(DayData::as_select())
         .load(conn)?;
 
