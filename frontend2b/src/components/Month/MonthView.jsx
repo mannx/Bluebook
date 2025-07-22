@@ -134,7 +134,7 @@ function P(obj) {
 } // output a percent
 
 function Dol(obj) {
-  return F(obj, "$", "");
+  return NF(obj/100.0, "$", "");
 }
 
 // zero pad a number to 2 places
