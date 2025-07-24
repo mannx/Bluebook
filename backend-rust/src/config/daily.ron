@@ -1,27 +1,33 @@
 Config(
   Dates: [
     ["A3","E3","A26","E26"],
+    ["A3","E3","A29","E29"],
   ],
 
-	CashDeposit: [["B4", "F4", "B27", "F27"]],
-	AmexCard: [["B6", "F6", "B29", "F29"]],
-	CreditSales: [["B7", "F7", "B30", "F30"]],
-	GiftCardRedeem: [["B8", "F8", "B31", "F31"]],
-	SubwayCaters: [["B9", "F9", "B32", "F32"]],
-	SkipTheDishes: [["B10", "F10", "B33", "F33"]],
-	DoorDash: [["B11", "F11", "B34", "F34"]],
-	USCash: [["B12", "F12", "B35", "F35"]],
-	PettyCash: [["B13", "F13", "B36", "F36"]],
+	CashDeposit: [["B4", "F4", "B27", "F27"],["B4", "F4", "B30", "F30"]],
+	AmexCard: [["B6", "F6", "B29", "F29"],["B7", "F7", "B33", "F33"]],
+	CreditSales: [["B7", "F7", "B30", "F30"],["B9", "F9", "B35", "F35"]],
+	GiftCardRedeem: [["B8", "F8", "B31", "F31"],["B10", "F10", "B36", "F36"]],
+	SubwayCaters: [["B9", "F9", "B32", "F32"],["B11", "F11", "B37", "F37"]],
+	SkipTheDishes: [["B10", "F10", "B33", "F33"],["B12", "F12", "B38", "F38"]],
+	DoorDash: [["B11", "F11", "B34", "F34"],["B13", "F13", "B39", "F39"]],
+	USCash: [["B12", "F12", "B35", "F35"],["B15", "F15", "B41", "F41"]],
+	PettyCash: [["B13", "F13", "B36", "F36"],["B16", "F16", "B42", "F42"]],
+  // TODO: implement in db
+  RemoteOrder: [[],["B8","F8","B34","F35"]],
 
-  UberEats: [["C12", "G12", "C35", "G35"]],
+  // TODO: index 0: if "uber", then uscash is uber, else uscash
+  // index 1: uber total
+  UberEats: [["C12", "G12","C35","G35"],["B14", "F14", "C40", "G40"]],
 
-	Tips: [["C14", "G14", "C37", "G37"]],
-	HST: [["C15", "G15", "C38", "G38"]],
-	BottleDeposit: [["C16", "G16", "C39", "G39"]],
-	NetSales: [["C17", "G17", "C40", "G40"]],
-	CreditSalesRcv: [["C18", "G18", "C41", "G41"]],
-	CreditFood: [["C20", "G20", "C43", "G43"]],
-	GiftCardSold: [["C21", "G21", "C44", "G44"]],
+	Tips: [["C14", "G14", "C37", "G37"],["C17", "G17", "C43", "G43"]],
+	HST: [["C15", "G15", "C38", "G38"],["C18", "G18", "C44", "G44"]],
+	BottleDeposit: [["C16", "G16", "C39", "G39"],["C19", "G19", "C45", "G45"]],
+	NetSales: [["C17", "G17", "C40", "G40"],["C20", "G20", "C46", "G46"]],
+	CreditSalesRcv: [["C18", "G18", "C41", "G41"],["C22", "G22", "C48", "G48"]],
+	CreditFood: [["C20", "G20", "C43", "G43"],["C23", "G23", "C49", "G49"]],
+	GiftCardSold: [["C21", "G21", "C44", "G44"],["C24", "G24", "C50", "G50"]],
+  MoneyReceived: [[],["C21","G21","C47","G47"]],
 
 	DebitCard: [["B3", "C3", "D3", "E3"]],
 	MasterCard: [["B4", "C4", "D4", "E4"]],

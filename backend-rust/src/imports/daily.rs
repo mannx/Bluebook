@@ -47,9 +47,11 @@ struct VersionConfig {
 
 /// VersionConfig holds data used to determine which Config index to use
 #[derive(Deserialize)]
+#[allow(dead_code)]
 struct VersionPair {
     index: usize,
     pairs: HashMap<String, String>,
+    uber_check: bool,
 }
 
 impl Config {
@@ -80,7 +82,7 @@ pub fn daily_import(conn: &mut SqliteConnection, file_name: &String) -> ImportRe
     let path = ENVIRONMENT.with_import_path(file_name);
     debug!("loading daily sheet: {}", path.to_str().unwrap());
 
-    // load the sheet
+    // load the sheet17
     let book_res = reader::xlsx::read(path.as_path());
     let book = match book_res {
         Ok(b) => b,
@@ -212,6 +214,7 @@ fn parse_day(
 
     // if uber contains 'uber', USFunds is uber amount
     let us_cash = get_value(sheet, &config.USCash[version][day_index]);
+
     let is_uber = sheet.get_value(config.UberEats[version][day_index].as_str());
 
     if is_uber.contains("uber") {
@@ -254,7 +257,6 @@ fn check_daily_version(sheet: &Worksheet, pairs: &VersionPair) -> bool {
 
         debug!("   [PASS]");
     }
-
     true
 }
 
@@ -305,7 +307,7 @@ fn insert_or_update(
 
             data.copy_control(&old);
 
-            // set the id so we know to run an update
+            // set the id so we know to run an ureturn;pdate
             data.id = old.id;
             debug!("id: {}", data.id);
         }
@@ -331,5 +333,41 @@ mod tests {
         let config = ron::from_str::<Config>(fstr.as_str()).unwrap();
 
         assert!(config.DebitCard[0][0] == "B3");
+    }
+
+    #[test]
+    fn version() {
+        use std::env;
+        use std::path::PathBuf;
+
+        let mani = env!("CARGO_MANIFEST_DIR");
+        let conf = format!("{mani}/src/config/");
+        env::set_var("BLUEBOOK_CONFIG_PATH", conf);
+
+        let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+        path.push("tests/version2.xlsx");
+
+        // load the sheet
+        let book_res = reader::xlsx::read(path.as_path());
+        let book = match book_res {
+            Ok(b) => b,
+            Err(e) => {
+                panic!("Unable to load test sheet for version check. Error: [{e}]");
+            }
+        };
+
+        // sheet contains most of the data, sheet2 contains the few fields on the 2nd sheet
+        let sheet = match book.get_sheet(&0) {
+            None => {
+                panic!("Unable to get sheet 0 for version check");
+            }
+            Some(s) => s,
+        };
+
+        // make sure we match version 2
+        match get_daily_version(sheet) {
+            Err(_) => panic!("Sheet does NOT match version 2 check"),
+            Ok(n) => assert!(n == 1),
+        }
     }
 }

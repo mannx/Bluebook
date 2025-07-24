@@ -21,3 +21,15 @@ pub async fn get_month_view_handler(
 
     Ok(HttpResponse::Ok().json(results))
 }
+
+#[get("/api/test")]
+pub async fn month_test_handler(pool: web::Data<DbPool>) -> actix_web::Result<impl Responder> {
+    let results = web::block(move || {
+        let mut conn = pool.get()?;
+        get_month_data(&mut conn, 1, 2024)
+    })
+    .await?
+    .map_err(error::ErrorInternalServerError)?;
+
+    Ok(HttpResponse::Ok().json(&results[0]))
+}

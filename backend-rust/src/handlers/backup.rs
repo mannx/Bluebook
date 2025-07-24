@@ -58,7 +58,7 @@ pub async fn clear_backup_handler(pool: web::Data<DbPool>) -> actix_web::Result<
     .await?
     .map_err(error::ErrorInternalServerError)?;
 
-    let api = ApiReturnMessage::<String>::ok(format!("Cleared {} rows.", rows));
+    let api = ApiReturnMessage::<String>::ok(format!("Cleared {rows} rows."));
 
     Ok(HttpResponse::Ok().json(api))
 }

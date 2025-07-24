@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Queryable, Selectable, AsChangeset)]
 #[diesel(table_name=crate::schema::day_data)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct DayData {
     pub id: i32,
 

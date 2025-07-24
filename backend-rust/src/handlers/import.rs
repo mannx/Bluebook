@@ -153,10 +153,7 @@ fn get_files(mask: &str) -> std::io::Result<Vec<String>> {
 
     let glob_path = match base_dir.to_str() {
         None => {
-            return Err(std::io::Error::new(
-                std::io::ErrorKind::Other,
-                "Invalid path",
-            ))
+            return Err(std::io::Error::other("Invalid path"));
         }
         Some(p) => p,
     };

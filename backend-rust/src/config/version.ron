@@ -3,9 +3,16 @@ VersionConfig(
     VersionPair(
       index: 0,
       pairs: {
-        "A4":"Cash deposit",
-        "A14": "Tips",
-      }
+        "A6":"Amex",
+      },
+      uber_check: true,   // is uber value shared with something else?
+    ),
+    (
+      index: 1,
+      pairs: {
+        "A5": "Interac, Visa",
+      },
+      uber_check:false,
     )
   ]
 )
