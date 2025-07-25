@@ -47,7 +47,7 @@ struct VersionConfig {
 
 /// VersionConfig holds data used to determine which Config index to use
 #[derive(Deserialize)]
-#[allow(dead_code)]
+// #[allow(dead_code)]
 struct VersionPair {
     index: usize,
     pairs: HashMap<String, String>,
@@ -122,7 +122,7 @@ pub fn daily_import(conn: &mut SqliteConnection, file_name: &String) -> ImportRe
 
     // up to 4 days per sheet
     for i in 0..4 {
-        let res = parse_day(&config, version, sheet, sheet2, i);
+        let res = parse_day(&config, &version, sheet, sheet2, i);
 
         let mut day_data = match res {
             Err(e) => {
@@ -148,13 +148,14 @@ pub fn daily_import(conn: &mut SqliteConnection, file_name: &String) -> ImportRe
 // all errors are recorded in the messages object to return to the user
 fn parse_day(
     config: &Config,
-    version: usize, // which version of the daily sheet are we working with
+    version_conf: &VersionPair, // which version of the daily sheet are we working with
     sheet: &Worksheet,
     sheet2: &Worksheet, // 2nd sheet containing data
     day_index: usize,
 ) -> Result<DayData, String> {
     // retrieve the date we are working on
     // if cell is empty, we stop processing early
+    let version=version_conf.index;
     let date_cell = &config.Dates[version][day_index];
     let date_val = sheet.get_value(date_cell.as_str());
 
@@ -215,27 +216,34 @@ fn parse_day(
     // if uber contains 'uber', USFunds is uber amount
     let us_cash = get_value(sheet, &config.USCash[version][day_index]);
 
-    let is_uber = sheet.get_value(config.UberEats[version][day_index].as_str());
+    if version_conf.uber_check{
+        // uber and us-cash share same field
+            let is_uber = sheet.get_value(config.UberEats[version][day_index].as_str());
 
     if is_uber.contains("uber") {
         data.UberEats = us_cash;
     } else {
         data.USFunds = us_cash;
     }
+}else{
+    data.UberEats=get_value(sheet,&config.UberEats[version][day_index]);
+}
 
     Ok(data)
 }
 
 // checks the sheet and determines which version we are parsing
 // used to index itno the config to get proper cell addresses
-fn get_daily_version(sheet: &Worksheet) -> Result<usize, ()> {
+// fn get_daily_version(sheet: &Worksheet) -> Result<usize, ()> {
+fn get_daily_version(sheet: &Worksheet) -> Result<VersionPair, ()> {
     // only 1 version right now
     let version = VersionConfig::load();
 
     for check in version.data {
         if check_daily_version(sheet, &check) {
             // found the correct index
-            return Ok(check.index);
+            // return Ok(check.index);
+            return Ok(check);
         }
     }
 
@@ -367,7 +375,7 @@ mod tests {
         // make sure we match version 2
         match get_daily_version(sheet) {
             Err(_) => panic!("Sheet does NOT match version 2 check"),
-            Ok(n) => assert!(n == 1),
+            Ok(n) => assert!(n.index == 1),
         }
     }
 }

@@ -29,8 +29,8 @@ Config(
 	GiftCardSold: [["C21", "G21", "C44", "G44"],["C24", "G24", "C50", "G50"]],
   MoneyReceived: [[],["C21","G21","C47","G47"]],
 
-	DebitCard: [["B3", "C3", "D3", "E3"]],
-	MasterCard: [["B4", "C4", "D4", "E4"]],
-	VisaCard: [["B5", "C5", "D5", "E5"]],
-	PayPal: [["B6", "C6", "D6", "E6"]],
+	DebitCard: [["B3", "C3", "D3", "E3"],["B3", "C3", "D3", "E3"]],
+	MasterCard: [["B4", "C4", "D4", "E4"],["B4", "C4", "D4", "E4"]],
+	VisaCard: [["B5", "C5", "D5", "E5"],["B5", "C5", "D5", "E5"]],
+	PayPal: [["B6", "C6", "D6", "E6"],["B6", "C6", "D6", "E6"]],
 )
