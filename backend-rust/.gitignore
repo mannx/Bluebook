@@ -4,4 +4,3 @@ dist/
 dist
 db.db
 import_data/
-tests/

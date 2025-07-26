@@ -20,7 +20,8 @@ Known TODO List
      should return something more user friendly to the user to indicate an
      error occurred
 
-  * imports/daily.rs needs cleanup
+  * Test data stored in archive in src/tests.  use run.sh to unpack and run tests
+    build.sh is used to pack all test data into 1 archive
 
 
 
