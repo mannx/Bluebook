@@ -10,7 +10,7 @@ WORKDIR /app
 # add missing deps
 RUN apt update && apt install sqlite3
 
-COPY backend-rust/ ./
+COPY backend/ ./
 COPY .git/ .git
 
 # temp adjust certain source files for dockerization
@@ -24,7 +24,7 @@ FROM node:alpine AS react
 
 WORKDIR /app
 
-COPY ./frontend2b .
+COPY ./frontend .
 
 # fix urls
 RUN sed -i 's|http://localhost:8080||' src/components/URLs.jsx
@@ -36,7 +36,6 @@ RUN npm run build
 # Deploy Stage
 #
 
-# FROM debian:bookworm-slim
 FROM debian:bookworm-slim
 
 # make sure required packages are installed
@@ -48,14 +47,11 @@ WORKDIR /
 COPY --from=build /app/target/release/backend-rust /bluebook
 COPY --from=react /app/dist /dist
 
-# copy in default config file for top5 api
-#COPY ./backend/api/data.json /top5.json
-
 # copy in import mapping files
-COPY ./backend-rust/src/config/*.ron /config/
+COPY ./backend/src/config/*.ron /config/
 
 # copy in initial migration scripts (TODO: remove once we are sure we no longer need)
-COPY ./backend-rust/scripts/*.sql /migrate/
+COPY ./backend/scripts/*.sql /migrate/
 
 # copy run and backup scripts
 COPY ./scripts /scripts
