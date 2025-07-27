@@ -1,0 +1,36 @@
+- frontend2b is being used to trim down the frontend and rewriting some sections
+
+- once main features complete, backend and frontend2 can be removed and remainging directories renamed
+
+Known TODO List
+  * Frontend error reporting worked on
+  
+  * When importing daily sheets, a new row is created and an Update flag set
+    on the pre-existing row if we are updating data.
+    This only happens on the daily, the control sheet doesn't need to do this.
+    Can use this flag to revert data in case a wrong date was used in the daily sheet
+    This does break tags, and those needed to be reworked anyway
+  
+  * Tags been reworked
+    Tags are now stored as a space seperated list of id's from the tag_list table
+     in day_data.Tags
+    If no tags are found for the day, this field is null
+  
+  * Error parsing control and/or wisr simply returns an Error and panics
+     should return something more user friendly to the user to indicate an
+     error occurred
+
+  * Test data stored in archive in src/tests.  use run.sh to unpack and run tests
+    build.sh is used to pack all test data into 1 archive
+
+
+
+Migration Steps
+---------------
+
+To Migrate to the backend-rust version follow
+  1) Shutdown previous container
+  2) Backup database
+  3) Rename database to db.mig
+  4) Run new container
+  5) Make sure migration worked

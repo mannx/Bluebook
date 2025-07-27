@@ -1,20 +1,23 @@
-version: "3.8"
-
 services:
   bluebook:
-    # image: mannx/bluebook:main
-    image: mannx/bluebook:pr-30
+    # image: bluebook:dev
+    image: mannx/bluebook:rust
     container_name: bluebook
     ports:
       - 8080:8080
     environment:
-      - TZ=Canada/Atlantic      
+      - TZ=Canada/Atlantic
       - PUID=1000
       - PGID=1000
+      - RUST_LOG=debug
     volumes:
       - ./data:/data:z
       - ./import_data:/import
+      - ./data:/export
+      - ./data/backup:/backup
       - /etc/localtime:/etc/localtime:ro
+      - ./:/src
     deploy:
       restart_policy:
         condition: on-failure
+    # network_mode: host

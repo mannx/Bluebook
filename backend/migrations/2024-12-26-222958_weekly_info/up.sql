@@ -1,0 +1,15 @@
+CREATE TABLE IF NOT EXISTS weekly_info (
+  id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+
+  WeekEnding DATE NOT NULL,
+
+  FoodCostAmount INTEGER NOT NULL,
+  FoodCostPercent INTEGER NOT NULL,
+
+  LabourCostAmount INTEGER NOT NULL,
+  LabourCostPercent INTEGER NOT NULL,
+
+  NetSales INTEGER NOT NULL,
+  PartySales INTEGER NOT NULL,
+  Productivity INTEGER NOT NULL
+)

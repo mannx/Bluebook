@@ -1,0 +1,51 @@
+[package]
+name = "backend-rust"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# actix server bits
+actix-web = "4.9.0"
+actix-files = "0.6.6"
+actix-cors = "0.7"
+
+# loggings
+env_logger = "0.11.6"
+log = "0.4"
+
+# .env file reading
+dotenvy = "0.15"
+
+# serialization
+serde = { version = "1.0", features = ["derive"] }
+
+# db
+diesel = { version = "2.2", features = [
+  "sqlite",
+  "returning_clauses_for_sqlite_3_35",
+  "r2d2",
+  "chrono",
+  "64-column-tables",
+] }
+
+diesel_migrations = "2.2.0"
+
+# time library
+chrono = { version = "0.4", features = ["serde"] }
+
+# file utils
+#  - allows pattern matching on file names
+glob = "0.3.2"
+
+#  - spreadsheet reading/writing
+umya-spreadsheet = "2.2.3"
+
+# misc
+lazy_static = "1.5.0"
+ron = "0.10"
+
+# regex for pattern matching import files
+regex = "1.11"
+
+[build-dependencies]
+vergen-git2 = { version = "1.0", features = ["build", "cargo"] }
