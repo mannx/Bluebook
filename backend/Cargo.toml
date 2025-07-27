@@ -5,7 +5,7 @@ edition = "2021"
 
 [dependencies]
 # actix server bits
-actix-web = "4.9.0"
+actix-web = "4.11.0"
 actix-files = "0.6.6"
 actix-cors = "0.7"
 
@@ -38,7 +38,7 @@ chrono = { version = "0.4", features = ["serde"] }
 glob = "0.3.2"
 
 #  - spreadsheet reading/writing
-umya-spreadsheet = "2.2.3"
+umya-spreadsheet = "2.3.1"
 
 # misc
 lazy_static = "1.5.0"
