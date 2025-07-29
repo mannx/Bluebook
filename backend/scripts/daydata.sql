@@ -37,13 +37,14 @@ INSERT INTO db.day_data (
   id, DayDate,CashDeposit,DebitCard,MasterCard,Visa,Amex,CreditSales,GiftCardRedeem,SubwayCaters,PayPal,
   SkipTheDishes,DoorDash,UberEats,PettyCash,Tips,Hst,BottleDeposit,NetSales,CreditSalesRedeemed,
   CreditFood,GiftCardSold,USFunds,CommentData,
-  HoursWorked,Productivity,Factor,AdjustedSales,CustomerCount,BreadCredits,BreadOverShort, Updated
+  HoursWorked,Productivity,Factor,AdjustedSales,CustomerCount,BreadCredits,BreadOverShort, Updated,RemoteOrder,BevCredit
 )
 SELECT 
   id, Date,CashDeposit*100,DebitCard*100,MasterCard*100,Visa*100,Amex*100,CreditSales*100,GiftCardRedeem*100,SubwayCaters*100,PayPal*100,
   SkipTheDishes*100,DoorDash*100,UberEats*100,PettyCash*100,Tips*100,Hst*100,BottleDeposit*100,NetSales*100,CreditSalesRedeemed+
   CreditSalesRedeemed*100,CreditFood*100,GiftCardSold*100,USFunds*100,Comment,
-  HoursWorked*100,Productivity*100,Factor*100,AdjustedSales,CustomerCount,BreadCredits*100,BreadOverShort*100, FALSE
+  HoursWorked*100,Productivity*100,Factor*100,AdjustedSales,CustomerCount,BreadCredits*100,BreadOverShort*100, FALSE,
+  0,0
 FROM day_data;
 
 -- copy tag data over

@@ -1,5 +1,8 @@
 #!/bin/sh
 
+USER=mannx
+NAME=bluebook
+
 Help() {
   echo "Build docker image"
   echo "build.sh [-r|d]"
@@ -29,6 +32,6 @@ if [ "$TAG" = "invalid" ]; then
   exit
 fi
 
-echo "Building container with tag: $TAG..."
+echo "Building ${USER}/${NAME}:${TAG}..."
 
-docker buildx build -t bluebook:$TAG .
+docker buildx build -t ${USER}/${NAME}:${TAG} .

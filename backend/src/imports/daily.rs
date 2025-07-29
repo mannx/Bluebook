@@ -32,6 +32,7 @@ struct Config {
     NetSales: Vec<Vec<String>>,
     CreditSalesRcv: Vec<Vec<String>>,
     CreditFood: Vec<Vec<String>>,
+    BevCredit: Vec<Vec<String>>,
     GiftCardSold: Vec<Vec<String>>,
     DebitCard: Vec<Vec<String>>,
     MasterCard: Vec<Vec<String>>,
@@ -208,6 +209,7 @@ fn parse_day(
     data.NetSales = get_value(sheet, &config.NetSales[version][day_index]);
     data.CreditSalesRedeemed = get_value(sheet, &config.CreditSalesRcv[version][day_index]);
     data.CreditFood = get_value(sheet, &config.CreditFood[version][day_index]);
+    data.BevCredit = get_value(sheet, &config.BevCredit[version][day_index]);
     data.GiftCardSold = get_value(sheet, &config.GiftCardSold[version][day_index]);
 
     // if uber contains 'uber', USFunds is uber amount

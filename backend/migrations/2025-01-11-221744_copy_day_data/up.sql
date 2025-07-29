@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS day_data (
   Visa INTEGER NOT NULL,
   Amex INTEGER NOT NULL,
 
+  RemoteOrder INTEGER NOT NULL,
   CreditSales INTEGER NOT NULL,
   GiftCardRedeem INTEGER NOT NULL,
   SubwayCaters INTEGER NOT NULL,
@@ -24,6 +25,7 @@ CREATE TABLE IF NOT EXISTS day_data (
   NetSales INTEGER NOT NULL,
   CreditSalesRedeemed INTEGER NOT NULL,
   CreditFood INTEGER NOT NULL,
+  BevCredit INTEGER NOT NULL,
   GiftCardSold INTEGER NOT NULL,
 
   USFunds INTEGER NOT NULL,
