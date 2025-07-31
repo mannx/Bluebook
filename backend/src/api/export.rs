@@ -1,7 +1,7 @@
 #![allow(non_snake_case)]
 use chrono::NaiveDate;
 use diesel::SqliteConnection;
-use log::debug;
+use log::{debug, error, info};
 use serde::Deserialize;
 use umya_spreadsheet::*;
 
@@ -71,7 +71,7 @@ pub fn export_weekly(conn: &mut SqliteConnection, data: &WeeklyParams) -> Result
     // open weekly sheet
     let path = ENVIRONMENT.with_data_path("weekly.xlsx");
 
-    debug!("Reading template weeekly...");
+    info!("Reading template weeekly...");
     let mut book = reader::xlsx::read(path.as_path())?;
     let sheet = book.get_sheet_mut(&0).unwrap();
 
@@ -81,10 +81,14 @@ pub fn export_weekly(conn: &mut SqliteConnection, data: &WeeklyParams) -> Result
     // get output path
     let path = ENVIRONMENT.with_output_path(format!("{}.xlsx", data.week_ending));
 
-    debug!("saving to output file...");
-    writer::xlsx::write(&book, path.as_path())?;
-
-    Ok(())
+    info!("Saving weekly export to output file...");
+    match writer::xlsx::write(&book, path.as_path()) {
+        Ok(n) => Ok(n),
+        Err(err) => {
+            error!("Unable to save weekly export.  Error: {err}");
+            Err(Box::new(err))
+        }
+    }
 }
 
 // set store number, manager name, date and any other relevent info
@@ -150,13 +154,13 @@ fn set_weekly_data(
         .set_value((weekly.BreadOverShort as f32 / 100.).to_string());
     sheet
         .get_cell_mut(config.foodCost.as_str())
-        .set_value((weekly.FoodCostAmount  ).to_string());
+        .set_value((weekly.FoodCostAmount).to_string());
     sheet
         .get_cell_mut(config.syscoCost.as_str())
         .set_value(data.sysco.to_string());
     sheet
         .get_cell_mut(config.labourCost.as_str())
-        .set_value((weekly.LabourCostAmount  ).to_string());
+        .set_value((weekly.LabourCostAmount).to_string());
     sheet
         .get_cell_mut(config.customerCount.as_str())
         .set_value(weekly.CustomerCount.to_string());
@@ -184,7 +188,7 @@ fn set_weekly_data(
         .set_value((weekly.GiftCardRedeem as f32 / 100.).to_string());
     sheet
         .get_cell_mut(config.prodBudget.as_str())
-        .set_value((weekly.ProductivityBudget as f32/100.).to_string());
+        .set_value((weekly.ProductivityBudget as f32 / 100.).to_string());
     sheet
         .get_cell_mut(config.prodActual.as_str())
         .set_value((weekly.ProductivityActual as f32 / 100.).to_string());

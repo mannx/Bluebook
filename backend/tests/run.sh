@@ -2,7 +2,7 @@
 
 # unpackage test data
 # run tests
-mkdir tmp
-tar -zxvf tests.tar.gz --directory tmp
-cd ../..
+mkdir data
+tar -zxvf tests.tar.gz --directory data
+cd ../
 cargo test

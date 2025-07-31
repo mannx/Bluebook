@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Form, useLoaderData } from "react-router-dom";
+import { Form, useActionData, useLoaderData } from "react-router-dom";
 import { NumericFormat } from "react-number-format";
 
 import TextField from "@mui/material/TextField";
@@ -8,13 +8,14 @@ import Stack from "@mui/material/Stack";
 import Container from "@mui/material/Container";
 import Switch from "@mui/material/Switch";
 
-import { UrlApiWeekly, UrlApi2WeeklyExport, GetPostOptions } from "../URLs";
 import { Typography } from "@mui/material";
 
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
-
 dayjs.extend(utc);
+
+import { UrlApiWeekly, UrlApi2WeeklyExport, GetPostOptions } from "../URLs";
+import { ShowOnError } from "../Error";
 
 export async function loader({ params }) {
   const url =
@@ -45,9 +46,10 @@ export async function action({ request, params }) {
   };
 
   const url = UrlApi2WeeklyExport;
-  await fetch(url, GetPostOptions(JSON.stringify(body)));
+  const res = await fetch(url, GetPostOptions(JSON.stringify(body)));
+  const json = res.json();
 
-  return null;
+  return json;
 }
 
 function NF(obj) {
@@ -70,6 +72,7 @@ function F(obj) {
 export default function Weekly() {
   const [useNetSales, setUseNetSales] = React.useState(false);
   const data = useLoaderData();
+  const error = useActionData();
 
   const handleNetSalesChange = (e) => {
     setUseNetSales(e.target.checked);
@@ -98,6 +101,7 @@ export default function Weekly() {
     <>
       <Container sx={{ margin: 2 }}>
         {mismatch}
+        {ShowOnError(error)}
         <table>
           <caption>Weekly Report</caption>
           <thead>

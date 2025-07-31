@@ -349,7 +349,7 @@ mod tests {
         env::set_var("BLUEBOOK_CONFIG_PATH", conf);
 
         let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-        path.push("tests/version2.xlsx");
+        path.push("tests/data/version2.xlsx");
 
         // load the sheet
         let book_res = reader::xlsx::read(path.as_path());
