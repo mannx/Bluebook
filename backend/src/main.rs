@@ -69,10 +69,11 @@ async fn main() -> std::io::Result<()> {
     // if we have an argument given to us, we exit after running migrations
     // startup script will use this to do the db migration, then
     // exit, so data copy scripts can be ran, then we can run full
-    if std::env::args().len() > 1 {
-        info!("Argument provided. Exiting after database migrations.");
-        return Ok(());
-    }
+    // TODO: this should no longer be needed, update if required?
+    // if std::env::args().len() > 1 {
+    //     info!("Argument provided. Exiting after database migrations.");
+    //     return Ok(());
+    // }
 
     HttpServer::new(move || {
         // let cors = Cors::default().allow_any_origin().allow_any_method();
@@ -104,7 +105,7 @@ async fn main() -> std::io::Result<()> {
             .service(handlers::backup::clear_backup_handler)
             .service(handlers::about::get_about_info)
             // remove once test is done
-            .service(handlers::month::month_test_handler)
+            // .service(handlers::month::month_test_handler)
             // return the index on all other paths so react-router works
             .service(
                 actix_files::Files::new("/", "./dist/")

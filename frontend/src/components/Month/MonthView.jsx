@@ -105,7 +105,7 @@ export default function MonthView() {
 
 // define several helper functions for displaying commonly formatted numbers
 // div -> if true, divide obj by 100 to convert back to a float
-function NF(obj, prefix = "", suffix = "") {
+export function NF(obj, prefix = "", suffix = "") {
   return (
     <NumericFormat
       value={obj}
@@ -134,7 +134,7 @@ function P(obj) {
 } // output a percent
 
 function Dol(obj) {
-  return NF(obj/100.0, "$", "");
+  return NF(obj / 100.0, "$", "");
 }
 
 // zero pad a number to 2 places
