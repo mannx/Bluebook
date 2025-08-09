@@ -1,27 +1,21 @@
 Config(
   Dates: [
-    ["A3","E3","A26","E26"],
-    ["A3","E3","A32","E32"],
+    ["A3","E3","A33","E33"],
   ],
 
-	CashDeposit: [["B4", "F4", "B27", "F27"],["B4", "F4", "B30", "F30"]],
-	AmexCard: [["B6", "F6", "B29", "F29"],["B7", "F7", "B33", "F33"]],
-	CreditSales: [["B7", "F7", "B30", "F30"],["B12", "F12", "B41", "F41"]],
-	GiftCardRedeem: [["B8", "F8", "B31", "F31"],["B13", "F13", "B42", "F42"]],
-	SubwayCaters: [["B9", "F9", "B32", "F32"],["B14", "F14", "B43", "F43"]],
-	SkipTheDishes: [["B10", "F10", "B33", "F33"],["B15", "F15", "B44", "F44"]],
-	DoorDash: [["B11", "F11", "B34", "F34"],["B16", "F16", "B45", "F45"]],
-	USCash: [["B12", "F12", "B35", "F35"],["B18", "F18", "B47", "F47"]],
-	PettyCash: [["B13", "F13", "B36", "F36"],["B19", "F19", "B48", "F48"]],
-  // TODO: implement in db
-  RemoteOrder: [[],["B8","F8","B37","F37"]],
+	CashDeposit: [["B5","F5","B35","F35"]],
+	AmexCard: [["B9","F9","B39","F39"]],
+	CreditSales: [["B14","F14","B44","F44"]],
+  GiftCardRedeem: [["B15","F15","B45","F45"]], 
+  SubwayCaters: [["B16","F16","B46","F46"]],
+	SkipTheDishes: [["B17","F17","B47","F47"]],
+	DoorDash: [["B18","F18","B48","F48"]],
+	UberEats: [["B19","F19","B49","F49"]],
+  USCash:[["B20","F20","B50","F50"]],
+	PettyCash: [["B21","F21","B51","F51"]],
 
-  // TODO: index 0: if "uber", then uscash is uber, else uscash
-  // index 1: uber total
-  UberEats: [["C12", "G12","C35","G35"],["B17", "F17", "B46", "F46"]],
-
-	Tips: [["C14", "G14", "C37", "G37"],["C20", "G20", "C49", "G49"]],
-	HST: [["C15", "G15", "C38", "G38"],["C21", "G21", "C50", "G50"]],
+	Tips: [["C22","G22","C52","G52"]],
+  HST: [["C23","G23","C52","G53"]],
 	BottleDeposit: [["C16", "G16", "C39", "G39"],["C22", "G22", "C51", "G51"]],
 	NetSales: [["C17", "G17", "C40", "G40"],["C23", "G23", "C52", "G52"]],
 	CreditSalesRcv: [["C18", "G18", "C41", "G41"],["C24", "G24", "C53", "G53"]],
