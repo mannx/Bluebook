@@ -3,7 +3,7 @@ VersionConfig(
     VersionPair(
       index: 0,
       pairs: {
-        "A6":"Amex",
+        "A4":"Net Sales",
       },
     ),
     VersionPair(
