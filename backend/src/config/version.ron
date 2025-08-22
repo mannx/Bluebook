@@ -6,5 +6,11 @@ VersionConfig(
         "A4":"Net Sales",
       },
     ),
+    VersionPair(
+      index: 1,
+      pairs: {
+        "A46":"ApplePay RO",
+      }
+    )
   ]
 )
