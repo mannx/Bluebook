@@ -50,7 +50,7 @@ struct VersionConfig {
 struct VersionPair {
     index: usize,
     pairs: HashMap<String, String>,
-    uber_check: bool,
+    // uber_check: bool,
 }
 
 impl Config {
