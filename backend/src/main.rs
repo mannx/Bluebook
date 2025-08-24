@@ -33,6 +33,10 @@ fn run_migrations(
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    // let args: Vec<String> = env::args().collect();
+    // println!("runtime path: {}", args[0]);
+    // println!("number args: {}", args.len());
+
     info!("Loading .env file if present...");
     if dotenvy::dotenv().is_err() {
         warn!("[dotenvy] unable to load .env file.  proceeding without");
@@ -41,10 +45,13 @@ async fn main() -> std::io::Result<()> {
     env_logger::init_from_env(Env::default().default_filter_or("info"));
     debug!("Logger initialized");
 
-    println!(
+    info!(
         "Logger level: {}",
         env::var("RUST_LOG").unwrap_or_else(|_| "RUST_LOG NOT SET".to_owned())
     );
+
+    let args: Vec<String> = env::args().collect();
+    info!("Run Path: {}", args[0]);
 
     info!("Build Commit: {}", env!("VERGEN_GIT_SHA"));
     info!("Build branch: {}", env!("VERGEN_GIT_BRANCH"));
