@@ -78,6 +78,8 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         // let cors = Cors::default().allow_any_origin().allow_any_method();
         let cors = Cors::permissive();
+        let env = Environment::load();
+        debug!("html root: {}", env.HtmlRoot);
 
         App::new()
             .wrap(Logger::default())
@@ -108,15 +110,19 @@ async fn main() -> std::io::Result<()> {
             // .service(handlers::month::month_test_handler)
             // return the index on all other paths so react-router works
             .service(
-                actix_files::Files::new("/", "./dist/")
+                actix_files::Files::new("/", env.HtmlRoot)
                     .prefer_utf8(true)
                     .index_file("index.html")
                     .default_handler(|req: actix_web::dev::ServiceRequest| {
                         let (http_req, _) = req.into_parts();
 
                         async {
-                            let resp = actix_files::NamedFile::open("./dist/index.html")?
-                                .into_response(&http_req);
+                            let env = Environment::load();
+                            let resp = actix_files::NamedFile::open(format!(
+                                "{}/index.html",
+                                env.HtmlRoot
+                            ))?
+                            .into_response(&http_req);
                             Ok(ServiceResponse::new(http_req, resp))
                         }
                     }),

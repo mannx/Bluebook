@@ -9,6 +9,7 @@ pub struct Environment {
     OutputPath: String,
     DataPath: String,
     ConfigPath: String, // path for .ron config files -- can be mapped to DataPath
+    pub HtmlRoot: String, // path to html/js files.  defaults to /dist
 }
 
 impl Environment {
@@ -19,6 +20,7 @@ impl Environment {
             OutputPath: "/output".to_owned(),
             DataPath: "/data".to_owned(),
             ConfigPath: "/config".to_owned(),
+            HtmlRoot: "/dist".to_owned(),
         }
     }
 
@@ -31,6 +33,7 @@ impl Environment {
         e.OutputPath = env::var("BLUEBOOK_OUTPUT_PATH").unwrap_or(e.OutputPath.clone());
         e.DataPath = env::var("BLUEBOOK_DATA_PATH").unwrap_or(e.DataPath.clone());
         e.ConfigPath = env::var("BLUEBOOK_CONFIG_PATH").unwrap_or(e.ConfigPath.clone());
+        e.HtmlRoot = env::var("BLUEBOOK_HTML_ROOT").unwrap_or(e.HtmlRoot.clone());
 
         e
     }
