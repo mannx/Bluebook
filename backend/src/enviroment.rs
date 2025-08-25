@@ -15,7 +15,7 @@ pub struct Environment {
 }
 
 impl Environment {
-    pub fn default() -> Self {
+    fn default() -> Self {
         Self {
             ImportPath: "/import".to_owned(),
             TempPath: "/tmp".to_owned(),
@@ -27,7 +27,7 @@ impl Environment {
     }
 
     // reads input as an env var, then parses its value to expand
-    fn var(input: &str) -> Result<String, VarError> {
+    pub fn var(input: &str) -> Result<String, VarError> {
         let expr = env::var(input)?;
         let val = full(&expr).unwrap();
 
