@@ -7,7 +7,8 @@ use diesel::SqliteConnection;
 use env_logger::Env;
 use enviroment::Environment;
 use lazy_static::lazy_static;
-use log::{debug, info};
+use log::{debug, error, info};
+use std::process::Command;
 use std::{env, error::Error};
 
 mod api;
@@ -57,6 +58,34 @@ async fn main() -> std::io::Result<()> {
 
     let url = Environment::var("DATABASE_URL").expect("DATABASE_URL required.");
     debug!("Database URL: {url}");
+
+    // if path doesn't exist, create it first otherwise
+    match std::fs::exists(&url) {
+        Err(err) => {
+            error!("Unable to check for existence of DATABASE_URL: {}", url);
+            error!("  Error: {err}");
+        }
+        Ok(e) => {
+            if !e {
+                // database doesn't exist, create one
+                let output = Command::new("touch").arg("~/.bluebook/data/db.db").status();
+                match output {
+                    Err(err) => {
+                        error!("Unable to generate initial database! Error: {err}");
+                        return Ok(());
+                    }
+                    Ok(n) => {
+                        if !n.success() {
+                            error!("Unable to generate initial database: {}", url);
+                        }
+                    }
+                }
+            } else {
+                info!("Database located...");
+            }
+        }
+    }
+
     let manager = r2d2::ConnectionManager::<SqliteConnection>::new(url);
     let pool = r2d2::Pool::builder()
         .build(manager)
