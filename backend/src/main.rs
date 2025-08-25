@@ -41,6 +41,7 @@ async fn main() -> std::io::Result<()> {
     println!("Loading .env file if present...");
     if dotenvy::from_path(env_file).is_err() {
         println!("[dotenvy] unable to load .env file.  proceeding without");
+        println!("[dotenvy] filename: {env_file}");
     }
 
     env_logger::init_from_env(Env::default().default_filter_or("info"));
