@@ -3,6 +3,7 @@ use shellexpand::full;
 use std::env;
 use std::env::VarError;
 use std::path::PathBuf;
+use log::debug;
 
 #[derive(Debug)]
 pub struct Environment {
@@ -28,8 +29,11 @@ impl Environment {
 
     // reads input as an env var, then parses its value to expand
     pub fn var(input: &str) -> Result<String, VarError> {
+        debug!("[var] env: {input}");
         let expr = env::var(input)?;
+        debug!("[var]   init val: {expr}");
         let val = full(&expr).unwrap();
+        debug!("[var]   return value: {val}");
 
         Ok(val.to_string())
     }
@@ -44,6 +48,8 @@ impl Environment {
         e.DataPath = Environment::var("BLUEBOOK_DATA_PATH").unwrap_or(e.DataPath.clone());
         e.ConfigPath = Environment::var("BLUEBOOK_CONFIG_PATH").unwrap_or(e.ConfigPath.clone());
         e.HtmlRoot = Environment::var("BLUEBOOK_HTML_ROOT").unwrap_or(e.HtmlRoot.clone());
+
+        debug!("config path: {}",e.ConfigPath);
 
         e
     }

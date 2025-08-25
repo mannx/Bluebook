@@ -17,7 +17,6 @@ use crate::ENVIRONMENT;
 struct Config {
     Dates: Vec<Vec<String>>,
     CashDeposit: Vec<Vec<String>>,
-    AmexCard: Vec<Vec<String>>,
     CreditSales: Vec<Vec<String>>,
     GiftCardRedeem: Vec<Vec<String>>,
     SubwayCaters: Vec<Vec<String>>,
@@ -38,6 +37,7 @@ struct Config {
     MasterCard: Vec<Vec<String>>,
     VisaCard: Vec<Vec<String>>,
     Discover: Vec<Vec<String>>,
+    AmexCard: Vec<Vec<String>>,
 }
 
 #[derive(Deserialize)]
@@ -187,7 +187,6 @@ fn parse_day(
     data.CashDeposit = get_value(sheet, &config.CashDeposit[version][day_index]);
 
     // debit side
-    data.Amex = get_value(sheet, &config.AmexCard[version][day_index]);
     data.CreditSales = get_value(sheet, &config.CreditSales[version][day_index]);
     data.GiftCardRedeem = get_value(sheet, &config.GiftCardRedeem[version][day_index]);
     data.SubwayCaters = get_value(sheet, &config.SubwayCaters[version][day_index]);
@@ -199,6 +198,7 @@ fn parse_day(
     data.DebitCard = get_value(sheet2, &config.DebitCard[version][day_index]);
     data.Visa = get_value(sheet2, &config.VisaCard[version][day_index]);
     data.MasterCard = get_value(sheet2, &config.MasterCard[version][day_index]);
+    data.Amex = get_value(sheet2, &config.AmexCard[version][day_index]);
     // TODO: update DayData & db to change PayPal to Discover
     data.PayPal = get_value(sheet2, &config.Discover[version][day_index]);
 

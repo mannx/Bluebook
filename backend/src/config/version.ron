@@ -1,16 +1,16 @@
 VersionConfig(
   data: [
     VersionPair(
+      index: 1,
+      pairs: {
+        "A46":"ApplePay RO",
+      }
+    ),
+    VersionPair(
       index: 0,
       pairs: {
         "A4":"Net Sales",
       },
     ),
-    VersionPair(
-      index: 1,
-      pairs: {
-        "A46":"ApplePay RO",
-      }
-    )
   ]
 )
