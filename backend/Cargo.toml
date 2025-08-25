@@ -49,3 +49,4 @@ regex = "1.11"
 
 [build-dependencies]
 vergen-git2 = { version = "1.0", features = ["build", "cargo"] }
+copy_to_output = "2.2.0"

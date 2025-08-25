@@ -7,7 +7,8 @@ use diesel::SqliteConnection;
 use env_logger::Env;
 use enviroment::Environment;
 use lazy_static::lazy_static;
-use log::{debug, info, warn};
+use log::{debug, info};
+use std::path::{Path, PathBuf};
 use std::{env, error::Error};
 
 mod api;
@@ -33,13 +34,15 @@ fn run_migrations(
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    // let args: Vec<String> = env::args().collect();
-    // println!("runtime path: {}", args[0]);
-    // println!("number args: {}", args.len());
+    let args: Vec<String> = env::args().collect();
+    let base_path = Path::new(&args[0]).parent().unwrap();
+    let mut env_file = PathBuf::new();
+    env_file.push(base_path);
+    env_file.push(".env");
 
-    info!("Loading .env file if present...");
-    if dotenvy::dotenv().is_err() {
-        warn!("[dotenvy] unable to load .env file.  proceeding without");
+    println!("Loading .env file if present...");
+    if dotenvy::from_path(&env_file).is_err() {
+        println!("[dotenvy] unable to load .env file.  proceeding without");
     }
 
     env_logger::init_from_env(Env::default().default_filter_or("info"));
@@ -49,9 +52,6 @@ async fn main() -> std::io::Result<()> {
         "Logger level: {}",
         env::var("RUST_LOG").unwrap_or_else(|_| "RUST_LOG NOT SET".to_owned())
     );
-
-    let args: Vec<String> = env::args().collect();
-    info!("Run Path: {}", args[0]);
 
     info!("Build Commit: {}", env!("VERGEN_GIT_SHA"));
     info!("Build branch: {}", env!("VERGEN_GIT_BRANCH"));
@@ -72,15 +72,6 @@ async fn main() -> std::io::Result<()> {
         Ok(_) => println!("migrations run successfully!"),
         Err(e) => panic!("error unable to migrate db. Stopping.: {e}"),
     }
-
-    // if we have an argument given to us, we exit after running migrations
-    // startup script will use this to do the db migration, then
-    // exit, so data copy scripts can be ran, then we can run full
-    // TODO: this should no longer be needed, update if required?
-    // if std::env::args().len() > 1 {
-    //     info!("Argument provided. Exiting after database migrations.");
-    //     return Ok(());
-    // }
 
     HttpServer::new(move || {
         // let cors = Cors::default().allow_any_origin().allow_any_method();
