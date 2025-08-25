@@ -57,6 +57,7 @@ async fn main() -> std::io::Result<()> {
     info!("Build branch: {}", env!("VERGEN_GIT_BRANCH"));
 
     let url = env::var("DATABASE_URL").expect("DATABASE_URL required");
+    debug!("Database URL: {url}");
     let manager = r2d2::ConnectionManager::<SqliteConnection>::new(url);
     let pool = r2d2::Pool::builder()
         .build(manager)
