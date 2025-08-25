@@ -8,7 +8,6 @@ use env_logger::Env;
 use enviroment::Environment;
 use lazy_static::lazy_static;
 use log::{debug, info};
-use std::path::{Path, PathBuf};
 use std::{env, error::Error};
 
 mod api;
@@ -34,14 +33,13 @@ fn run_migrations(
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    let args: Vec<String> = env::args().collect();
-    let base_path = Path::new(&args[0]).parent().unwrap();
-    let mut env_file = PathBuf::new();
-    env_file.push(base_path);
-    env_file.push(".env");
+    // .env is found at either current directory
+    // or in /usr/share/bluebook/.env
+    // change when packaging
+    let env_file = ".env";
 
     println!("Loading .env file if present...");
-    if dotenvy::from_path(&env_file).is_err() {
+    if dotenvy::from_path(env_file).is_err() {
         println!("[dotenvy] unable to load .env file.  proceeding without");
     }
 
@@ -56,7 +54,6 @@ async fn main() -> std::io::Result<()> {
     info!("Build Commit: {}", env!("VERGEN_GIT_SHA"));
     info!("Build branch: {}", env!("VERGEN_GIT_BRANCH"));
 
-    // let url = env::var("DATABASE_URL").expect("DATABASE_URL required");
     let url = Environment::var("DATABASE_URL").expect("DATABASE_URL required.");
     debug!("Database URL: {url}");
     let manager = r2d2::ConnectionManager::<SqliteConnection>::new(url);
@@ -78,8 +75,6 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         let cors = Cors::default().allow_any_origin().allow_any_method();
         // let cors = Cors::permissive();
-        let env = Environment::load();
-        debug!("html root: {}", env.HtmlRoot);
 
         App::new()
             .wrap(Logger::default())
@@ -110,7 +105,7 @@ async fn main() -> std::io::Result<()> {
             // .service(handlers::month::month_test_handler)
             // return the index on all other paths so react-router works
             .service(
-                actix_files::Files::new("/", env.HtmlRoot)
+                actix_files::Files::new("/", &ENVIRONMENT.HtmlRoot)
                     .prefer_utf8(true)
                     .index_file("index.html")
                     .default_handler(|req: actix_web::dev::ServiceRequest| {
