@@ -141,5 +141,26 @@ fn create_db() -> Result<(), std::io::Error> {
     let data_dir = ENVIRONMENT.data_path();
     std::fs::create_dir_all(data_dir)?;
 
+    // use std::process::Command;
+    // let output = Command::new("echo")
+    //     .arg("$USER")
+    //     .output()
+    //     .expect("unable to run echo command!");
+    //
+    // debug!("result of echo $USER");
+    // debug!("{}", vec_to_str(&output.stdout));
+    let user = env::var("USER").unwrap_or_else(|_| "--USER NOT SET--".to_owned());
+    debug!("running as user: {user}");
+
     Ok(())
 }
+
+// fn vec_to_str(input: &Vec<u8>) -> String {
+//     let mut out = String::new();
+//
+//     for i in input {
+//         out.push(*i as char);
+//     }
+//
+//     out
+// }
