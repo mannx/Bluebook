@@ -7,8 +7,7 @@ use diesel::SqliteConnection;
 use env_logger::Env;
 use enviroment::Environment;
 use lazy_static::lazy_static;
-use log::{debug, error, info};
-use std::process::Command;
+use log::{debug, info};
 use std::{env, error::Error};
 
 mod api;
@@ -60,31 +59,8 @@ async fn main() -> std::io::Result<()> {
     debug!("Database URL: {url}");
 
     // if path doesn't exist, create it first otherwise
-    match std::fs::exists(&url) {
-        Err(err) => {
-            error!("Unable to check for existence of DATABASE_URL: {}", url);
-            error!("  Error: {err}");
-        }
-        Ok(e) => {
-            if !e {
-                // database doesn't exist, create one
-                let output = Command::new("touch").arg("~/.bluebook/data/db.db").status();
-                match output {
-                    Err(err) => {
-                        error!("Unable to generate initial database! Error: {err}");
-                        return Ok(());
-                    }
-                    Ok(n) => {
-                        if !n.success() {
-                            error!("Unable to generate initial database: {}", url);
-                        }
-                    }
-                }
-            } else {
-                info!("Database located...");
-            }
-        }
-    }
+    debug!("Initializing data directory if needed...");
+    create_db()?;
 
     let manager = r2d2::ConnectionManager::<SqliteConnection>::new(url);
     let pool = r2d2::Pool::builder()
@@ -157,4 +133,13 @@ async fn main() -> std::io::Result<()> {
     .workers(1) // change to slightly bigger instead of default of 16?
     .run()
     .await
+}
+
+// make sure user data directories are setup and a initial db file is created
+fn create_db() -> Result<(), std::io::Error> {
+    info!("Creating data directory if not already present");
+    let data_dir = ENVIRONMENT.data_path();
+    std::fs::create_dir_all(data_dir)?;
+
+    Ok(())
 }
