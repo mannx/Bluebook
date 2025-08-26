@@ -94,7 +94,10 @@ fn pdf_to_text(file_name: &String) -> Option<PathBuf> {
         Ok(status) => {
             if !status.status.success() {
                 error!("error whne processing pdftotext conversion...");
-                error!("{:?}", status.stderr);
+                error!(
+                    "{:?}",
+                    str::from_utf8(&status.stderr).expect("unable to convert u8 ->str")
+                );
                 return None;
             }
 
