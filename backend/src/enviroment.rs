@@ -85,8 +85,4 @@ impl Environment {
 
         path
     }
-
-    pub fn data_path(&self) -> String {
-        self.DataPath.clone()
-    }
 }

@@ -58,10 +58,6 @@ async fn main() -> std::io::Result<()> {
     let url = Environment::var("DATABASE_URL").expect("DATABASE_URL required.");
     debug!("Database URL: {url}");
 
-    // if path doesn't exist, create it first otherwise
-    debug!("Initializing data directory if needed...");
-    create_db()?;
-
     let manager = r2d2::ConnectionManager::<SqliteConnection>::new(url);
     let pool = r2d2::Pool::builder()
         .build(manager)
@@ -134,33 +130,3 @@ async fn main() -> std::io::Result<()> {
     .run()
     .await
 }
-
-// make sure user data directories are setup and a initial db file is created
-fn create_db() -> Result<(), std::io::Error> {
-    info!("Creating data directory if not already present");
-    let data_dir = ENVIRONMENT.data_path();
-    std::fs::create_dir_all(data_dir)?;
-
-    // use std::process::Command;
-    // let output = Command::new("echo")
-    //     .arg("$USER")
-    //     .output()
-    //     .expect("unable to run echo command!");
-    //
-    // debug!("result of echo $USER");
-    // debug!("{}", vec_to_str(&output.stdout));
-    let user = env::var("USER").unwrap_or_else(|_| "--USER NOT SET--".to_owned());
-    debug!("running as user: {user}");
-
-    Ok(())
-}
-
-// fn vec_to_str(input: &Vec<u8>) -> String {
-//     let mut out = String::new();
-//
-//     for i in input {
-//         out.push(*i as char);
-//     }
-//
-//     out
-// }
