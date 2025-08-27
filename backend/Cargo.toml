@@ -47,5 +47,13 @@ ron = "0.10"
 # regex for pattern matching import files
 regex = "1.11"
 
+# allows shell expansion for any set environment variables
+shellexpand = "3.1.1"
+
 [build-dependencies]
+# set build version information
 vergen-git2 = { version = "1.0", features = ["build", "cargo"] }
+
+# copy some config files to the build directory
+# todo: might not need to do this?
+copy_to_output = "2.2.0"

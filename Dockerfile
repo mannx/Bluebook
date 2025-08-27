@@ -36,7 +36,7 @@ RUN npm run build
 # Deploy Stage
 #
 
-FROM debian:bookworm-slim
+FROM debian:trixie-slim
 
 # make sure required packages are installed
 # poppler-utils required for pdf parsing 

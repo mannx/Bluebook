@@ -1,18 +1,16 @@
 VersionConfig(
   data: [
     VersionPair(
-      index: 0,
-      pairs: {
-        "A6":"Amex",
-      },
-      uber_check: true,   // is uber value shared with something else?
-    ),
-    (
       index: 1,
       pairs: {
-        "A5": "Interac, Visa",
+        "A46":"ApplePay RO",
+      }
+    ),
+    VersionPair(
+      index: 0,
+      pairs: {
+        "A4":"Net Sales",
       },
-      uber_check:false,
-    )
+    ),
   ]
 )

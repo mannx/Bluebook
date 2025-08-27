@@ -12,6 +12,7 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 
 import { UrlApiGetTags, UrlApiGetTagId } from "../URLs";
+import { NF } from "../Month/MonthView";
 
 interface Tag {
   tag: string;
@@ -70,7 +71,7 @@ export async function idLoader({ params }) {
 
 export function TagID() {
   const { data }: TagData = useLoaderData();
-console.log(data);
+  console.log(data);
 
   return (
     <>
@@ -78,7 +79,6 @@ console.log(data);
         <Table size="small" sx={{ width: 1 / 2 }}>
           <TableHead>
             <TableRow>
-              <TableCell>ID</TableCell>
               <TableCell>Date</TableCell>
               <TableCell>Net Sales</TableCell>
               <TableCell>Comments</TableCell>
@@ -91,9 +91,8 @@ console.log(data);
               data.map((obj, i) => {
                 return (
                   <TableRow key={i}>
-                    <TableCell>{obj.Day.id}</TableCell>
                     <TableCell>{dayLink(obj.Day.DayDate)}</TableCell>
-                    <TableCell>{obj.Day.NetSales}</TableCell>
+                    <TableCell>{NF(obj.Day.NetSales / 100.0)}</TableCell>
                     <TableCell>{obj.Day.CommentData}</TableCell>
                     <TableCell>{tagList(obj)}</TableCell>
                   </TableRow>

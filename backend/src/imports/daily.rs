@@ -17,7 +17,6 @@ use crate::ENVIRONMENT;
 struct Config {
     Dates: Vec<Vec<String>>,
     CashDeposit: Vec<Vec<String>>,
-    AmexCard: Vec<Vec<String>>,
     CreditSales: Vec<Vec<String>>,
     GiftCardRedeem: Vec<Vec<String>>,
     SubwayCaters: Vec<Vec<String>>,
@@ -32,11 +31,13 @@ struct Config {
     NetSales: Vec<Vec<String>>,
     CreditSalesRcv: Vec<Vec<String>>,
     CreditFood: Vec<Vec<String>>,
+    BevCredit: Vec<Vec<String>>,
     GiftCardSold: Vec<Vec<String>>,
     DebitCard: Vec<Vec<String>>,
     MasterCard: Vec<Vec<String>>,
     VisaCard: Vec<Vec<String>>,
-    PayPal: Vec<Vec<String>>,
+    Discover: Vec<Vec<String>>,
+    AmexCard: Vec<Vec<String>>,
 }
 
 #[derive(Deserialize)]
@@ -49,7 +50,6 @@ struct VersionConfig {
 struct VersionPair {
     index: usize,
     pairs: HashMap<String, String>,
-    uber_check: bool,
 }
 
 impl Config {
@@ -187,7 +187,6 @@ fn parse_day(
     data.CashDeposit = get_value(sheet, &config.CashDeposit[version][day_index]);
 
     // debit side
-    data.Amex = get_value(sheet, &config.AmexCard[version][day_index]);
     data.CreditSales = get_value(sheet, &config.CreditSales[version][day_index]);
     data.GiftCardRedeem = get_value(sheet, &config.GiftCardRedeem[version][day_index]);
     data.SubwayCaters = get_value(sheet, &config.SubwayCaters[version][day_index]);
@@ -199,7 +198,9 @@ fn parse_day(
     data.DebitCard = get_value(sheet2, &config.DebitCard[version][day_index]);
     data.Visa = get_value(sheet2, &config.VisaCard[version][day_index]);
     data.MasterCard = get_value(sheet2, &config.MasterCard[version][day_index]);
-    data.PayPal = get_value(sheet2, &config.PayPal[version][day_index]);
+    data.Amex = get_value(sheet2, &config.AmexCard[version][day_index]);
+    // TODO: update DayData & db to change PayPal to Discover
+    data.PayPal = get_value(sheet2, &config.Discover[version][day_index]);
 
     // credit side
     data.Tips = get_value(sheet, &config.Tips[version][day_index]);
@@ -208,23 +209,11 @@ fn parse_day(
     data.NetSales = get_value(sheet, &config.NetSales[version][day_index]);
     data.CreditSalesRedeemed = get_value(sheet, &config.CreditSalesRcv[version][day_index]);
     data.CreditFood = get_value(sheet, &config.CreditFood[version][day_index]);
+    data.BevCredit = get_value(sheet, &config.BevCredit[version][day_index]);
     data.GiftCardSold = get_value(sheet, &config.GiftCardSold[version][day_index]);
 
-    // if uber contains 'uber', USFunds is uber amount
-    let us_cash = get_value(sheet, &config.USCash[version][day_index]);
-
-    if version_conf.uber_check {
-        // uber and us-cash share same field
-        let is_uber = sheet.get_value(config.UberEats[version][day_index].as_str());
-
-        if is_uber.contains("uber") {
-            data.UberEats = us_cash;
-        } else {
-            data.USFunds = us_cash;
-        }
-    } else {
-        data.UberEats = get_value(sheet, &config.UberEats[version][day_index]);
-    }
+    data.USFunds = get_value(sheet, &config.USCash[version][day_index]);
+    data.UberEats = get_value(sheet, &config.UberEats[version][day_index]);
 
     Ok(data)
 }
@@ -294,7 +283,7 @@ fn insert_or_update(
         .filter(Updated.eq(false)) // get the currently active row
         .first::<DayData>(conn);
 
-    // if result is Err, the current date is not yet in the db and just insert
+    // if result is Err, the curr"A6":"Amex",ent date is not yet in the db and just insert
     // otherwise, copy over the control data from the result, then perform an update
     match result {
         Err(_) => {
@@ -347,7 +336,7 @@ mod tests {
         env::set_var("BLUEBOOK_CONFIG_PATH", conf);
 
         let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-        path.push("tests/version2.xlsx");
+        path.push("tests/data/version1.xlsx");
 
         // load the sheet
         let book_res = reader::xlsx::read(path.as_path());
@@ -368,8 +357,8 @@ mod tests {
 
         // make sure we match version 2
         match get_daily_version(sheet) {
-            Err(_) => panic!("Sheet does NOT match version 2 check"),
-            Ok(n) => assert!(n.index == 1),
+            Err(_) => panic!("Sheet does NOT match version 1 check"),
+            Ok(n) => assert!(n.index == 0),
         }
     }
 }
