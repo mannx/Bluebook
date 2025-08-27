@@ -185,7 +185,6 @@ function Row(data, settings) {
           <span>
             {data.Hockey.Away}
             <br />
-            ^18.3.1
           </span>
           <span>
             Home: {data.Hockey.GFHome} Away: {data.Hockey.GFAway}
