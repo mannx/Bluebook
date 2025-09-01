@@ -4,3 +4,4 @@ dist/
 dist
 db.db
 import_data/
+secret.json

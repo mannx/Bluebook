@@ -8,6 +8,7 @@ use env_logger::Env;
 use enviroment::Environment;
 use lazy_static::lazy_static;
 use log::{debug, info};
+use schema::day_data::CreditFood;
 use std::{env, error::Error};
 
 mod api;
@@ -57,6 +58,11 @@ async fn main() -> std::io::Result<()> {
 
     let url = Environment::var("DATABASE_URL").expect("DATABASE_URL required.");
     debug!("Database URL: {url}");
+
+    // debug!("Running drive test...");
+    // drive_test()?;
+    // debug!("Success!");
+    // return Ok(());
 
     let manager = r2d2::ConnectionManager::<SqliteConnection>::new(url);
     let pool = r2d2::Pool::builder()
@@ -130,3 +136,18 @@ async fn main() -> std::io::Result<()> {
     .run()
     .await
 }
+
+// fn drive_test() -> Result<(), String> {
+//     use drive_v3::Credentials;
+//     debug!("[drive_test] Getting Credentials");
+//
+//     let path = "secret.json";
+//     let scopes: [&'static str; 2] = [
+//         "https://www.googleapis.com/auth/drive.metadata.readonly",
+//         "https://www.googleapis.com/auth/drive.file",
+//     ];
+//
+//     let creds = Credentials::from_client_secrets_file(&path, &scopes)?;
+//
+//     Ok(())
+// }
