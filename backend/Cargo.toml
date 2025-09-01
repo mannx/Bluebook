@@ -52,7 +52,7 @@ shellexpand = "3.1.1"
 
 # use to connect to gdrive
 #reqwest = "0.12.23"
-#drive-v3 = "0.6.1"
+drive-v3 = "0.6.1"
 
 [build-dependencies]
 # set build version information
