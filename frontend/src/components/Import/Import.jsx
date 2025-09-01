@@ -14,6 +14,7 @@ import Container from "@mui/material/Container";
 import {
   GetPostOptions,
   UrlApi2ImportList,
+  UrlApi2ImportList2,
   UrlApiImportDaily,
   UrlApiImportControl,
   UrlApiImportWISR,
@@ -57,7 +58,8 @@ function a11yProps(index) {
 }
 
 export async function loader() {
-  const url = UrlApi2ImportList;
+  // const url = UrlApi2ImportList;
+  const url = UrlApi2ImportList2;
   const resp = await fetch(url);
   const data = await resp.json();
 
@@ -132,6 +134,7 @@ export default function Import() {
   const outputData = (data) => {
     return (
       <>
+        <Container>{displayResults()}</Container>
         <Box sx={{ width: "100%" }}>
           <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
             <Tabs value={value} onChange={handleChange}>
@@ -150,7 +153,6 @@ export default function Import() {
             {createForm("wisr", data.Wisr)}
           </TabPanel>
         </Box>
-        <Container>{displayResults()}</Container>
       </>
     );
   };
@@ -171,10 +173,22 @@ function createForm(id, entries) {
       {entries !== undefined &&
         entries !== null &&
         entries.map((e, i) => {
+          // get the id if we have a google drive file listing
+          let val = "";
+          if (e[0] !== undefined && e[0] !== null) {
+            if (e[0].Drive !== undefined && e[0].Drive !== null) {
+              val = e[0].Drive;
+            } else {
+              val = e[1];
+            }
+          } else {
+            val = e[1];
+          }
+
           return (
             <>
-              <input type="checkbox" id={e} name={i} value={e} />
-              <label for={e}>{e}</label>
+              <input type="checkbox" id={val} name={i} value={val} />
+              <label for={e}>{e[1]}</label>
               <br />
             </>
           );

@@ -8,6 +8,7 @@ export const UrlApi2DayEdit = "http://localhost:8080/api2/day/edit";
 export const UrlApi2DayUpdate = "http://localhost:8080/api2/day/update";
 
 export const UrlApi2ImportList = "http://localhost:8080/api2/import/list"; // get list of all files we can import
+export const UrlApi2ImportList2 = "http://localhost:8080/api2/import/list2"; // get list of all files we can import
 export const UrlApiImportDaily = "http://localhost:8080/api/import/daily";
 export const UrlApiImportControl = "http://localhost:8080/api/import/control";
 export const UrlApiImportWISR = "http://localhost:8080/api/import/wisr";

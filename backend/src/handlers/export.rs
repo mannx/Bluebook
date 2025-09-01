@@ -11,7 +11,7 @@ pub async fn export_weekly_handler(
     pool: web::Data<DbPool>,
     data: web::Json<WeeklyParams>,
 ) -> actix_web::Result<impl Responder> {
-    debug!("[weekly export] data: {:?}", data);
+    debug!("[weekly export] data: {data:?}");
 
     let result = web::block(move || {
         let mut conn = match pool.get() {

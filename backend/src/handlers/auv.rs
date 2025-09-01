@@ -70,7 +70,6 @@ pub async fn set_auv_handler(
     mut data: web::Json<AuvFormData>,
 ) -> actix_web::Result<impl Responder> {
     info!("[set_auv_handler] setting auv...");
-    debug!("data: {:?}", data);
 
     web::block(move || {
         let mut conn = pool.get()?;

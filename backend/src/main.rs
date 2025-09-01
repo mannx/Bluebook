@@ -7,7 +7,7 @@ use diesel::SqliteConnection;
 use env_logger::Env;
 use enviroment::Environment;
 use lazy_static::lazy_static;
-use log::{debug, error, info};
+use log::{debug, info};
 use std::{env, error::Error};
 
 mod api;
@@ -58,16 +58,6 @@ async fn main() -> std::io::Result<()> {
     let url = Environment::var("DATABASE_URL").expect("DATABASE_URL required.");
     debug!("Database URL: {url}");
 
-    debug!("Running drive test...");
-    match drive_test() {
-        Ok(_) => {
-            debug!("Success!")
-        }
-        Err(err) => error!("Failed.  Err: [{}]", err.message),
-    }
-
-    return Ok(());
-
     let manager = r2d2::ConnectionManager::<SqliteConnection>::new(url);
     let pool = r2d2::Pool::builder()
         .build(manager)
@@ -85,8 +75,8 @@ async fn main() -> std::io::Result<()> {
     }
 
     HttpServer::new(move || {
-        let cors = Cors::default().allow_any_origin().allow_any_method();
-        // let cors = Cors::permissive();
+        // let cors = Cors::default().allow_any_origin().allow_any_method();
+        let cors = Cors::permissive();
 
         App::new()
             .wrap(Logger::default())
@@ -139,39 +129,4 @@ async fn main() -> std::io::Result<()> {
     .workers(1) // change to slightly bigger instead of default of 16?
     .run()
     .await
-}
-
-fn drive_test() -> Result<(), drive_v3::Error> {
-    use drive_v3::Credentials;
-    use drive_v3::Drive;
-
-    debug!("[drive_test] Getting Credentials");
-
-    let path = "secret.json";
-    let scopes: [&'static str; 2] = [
-        "https://www.googleapis.com/auth/drive.metadata.readonly",
-        "https://www.googleapis.com/auth/drive.file",
-    ];
-
-    let creds = Credentials::from_client_secrets_file(&path, &scopes)?;
-
-    // store in a safe place
-    // let storage_path = ENVIRONMENT.with_data_path("cred.json");
-    debug!("Auth OK.  Retrieving file listing...");
-    let drive = Drive::new(&creds);
-    let files = drive
-        .files
-        .list()
-        .fields("files(name,id,mimeType)")
-        .q("trashed=false")
-        .execute()?;
-    debug!("Retrieval success!");
-
-    if let Some(file) = files.files {
-        for f in &file {
-            debug!("{f}");
-        }
-    }
-
-    Ok(())
 }

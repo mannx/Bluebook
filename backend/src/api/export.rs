@@ -56,7 +56,7 @@ impl Config {
 }
 
 pub fn export_weekly(conn: &mut SqliteConnection, data: &WeeklyParams) -> Result<(), DbError> {
-    debug!("[export_weekly] params: {:?}", data);
+    debug!("[export_weekly] params: {data:?}");
 
     // read in the config for output locations
     let config = Config::load();
