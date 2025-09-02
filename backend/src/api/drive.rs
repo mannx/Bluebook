@@ -1,7 +1,9 @@
-use drive_v3::objects::File;
+use drive_v3::objects::{File, UploadType};
 use drive_v3::Error;
 use drive_v3::{Credentials, Drive};
-use log::{debug, error};
+use log::{debug, error, info};
+use regex::Regex;
+use std::path::Path;
 
 use crate::ENVIRONMENT;
 
@@ -54,10 +56,20 @@ pub fn get_recent_sheets(creds: &Credentials, max: usize) -> Result<Vec<File>, E
         .order_by("recency")
         .execute()?;
 
-    let mut files = match files.files {
+    let files = match files.files {
         None => return Ok(Vec::new()), // no files returned
         Some(f) => f,
     };
+
+    // create a regex to filter out only daily sheets
+    // MM-DD-YY - MM-DD-YY
+    let regex = Regex::new(r"\d\d\s*-\d\d\s*-\d\d\s*-\s*\d\d\s*-\d\d\s*-\d\d\s*.xlsx")
+        .expect("Unable to build regex for [get_recent_sheets]!");
+
+    let mut files: Vec<File> = files
+        .into_iter()
+        .filter(|f| regex.is_match(f.name.clone().unwrap().as_str()))
+        .collect();
 
     files.truncate(max);
     Ok(files)
@@ -120,4 +132,47 @@ pub fn fetch_file_for_import(file_id: &str) -> Result<String, drive_v3::Error> {
     drive.files.get_media(file_id).save_to(&path).execute()?;
 
     Ok(path.to_str().unwrap().to_owned())
+}
+
+// update the given file to google drive
+pub fn upload_to_drive(path: &Path) -> Result<(), drive_v3::Error> {
+    info!("Uploading file {path:?} to google drive...");
+
+    debug!("  Getting Credentials...");
+    let creds = get_credentials()?;
+    let drive = Drive::new(&creds);
+
+    // get the filename from the path to set correctly
+    let file_name = match path.file_name() {
+        Some(f) => f.to_str().unwrap().to_owned(),
+        None => {
+            error!("Unable to get filename from given path: {path:?}...Skipping upload");
+            return Err(drive_v3::Error {
+                kind: drive_v3::ErrorKind::IO,
+                message: format!("Unable to get filename from given path: {path:?}"),
+            });
+        }
+    };
+
+    info!("Uploading to drive as {file_name:?}...");
+
+    // create the metadata of the file
+    let metadata = File {
+        name: Some(file_name),
+        ..Default::default()
+    };
+
+    let resp = drive
+        .files
+        .create()
+        .upload_type(UploadType::Multipart)
+        .metadata(&metadata)
+        .content_source(path)
+        .execute()?;
+
+    info!("Upload success.");
+    debug!("   File name: {}", resp.name.unwrap());
+    debug!("   MIME Type: {}", resp.mime_type.unwrap());
+
+    Ok(())
 }

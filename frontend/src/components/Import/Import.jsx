@@ -14,7 +14,6 @@ import Container from "@mui/material/Container";
 import {
   GetPostOptions,
   UrlApi2ImportList,
-  UrlApi2ImportList2,
   UrlApiImportDaily,
   UrlApiImportControl,
   UrlApiImportWISR,
@@ -58,8 +57,7 @@ function a11yProps(index) {
 }
 
 export async function loader() {
-  // const url = UrlApi2ImportList;
-  const url = UrlApi2ImportList2;
+  const url = UrlApi2ImportList;
   const resp = await fetch(url);
   const data = await resp.json();
 

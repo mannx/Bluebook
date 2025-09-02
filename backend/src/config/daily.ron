@@ -26,6 +26,6 @@ Config(
 	DebitCard: [["B3", "C3", "D3", "E3"],["B3", "C3", "D3", "E3"]],
 	VisaCard: [["B4", "C4", "D4", "E4"],["B4", "C4", "D4", "E4"]],
 	MasterCard: [["B5", "C5", "D5", "E5"],["B5", "C5", "D5", "E5"]],
-  	Discover: [[],["B6","C6","D6","E6"]],
+  Discover: [[],["B6","C6","D6","E6"]],
 	AmexCard: [["B9","F9","B39","F39"],["B7","C7","D7","E7"]],
 )

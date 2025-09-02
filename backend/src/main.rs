@@ -103,8 +103,6 @@ async fn main() -> std::io::Result<()> {
             .service(handlers::backup::undo_backup_handler)
             .service(handlers::backup::clear_backup_handler)
             .service(handlers::about::get_about_info)
-            // remove once test is done
-            // .service(handlers::month::month_test_handler)
             // return the index on all other paths so react-router works
             .service(
                 actix_files::Files::new("/", &ENVIRONMENT.HtmlRoot)

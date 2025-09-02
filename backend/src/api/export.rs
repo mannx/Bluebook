@@ -3,6 +3,7 @@ use chrono::NaiveDate;
 use diesel::SqliteConnection;
 use log::{debug, error, info};
 use serde::Deserialize;
+use std::path::PathBuf;
 use umya_spreadsheet::*;
 
 use crate::api::settings::read_settings;
@@ -55,7 +56,7 @@ impl Config {
     }
 }
 
-pub fn export_weekly(conn: &mut SqliteConnection, data: &WeeklyParams) -> Result<(), DbError> {
+pub fn export_weekly(conn: &mut SqliteConnection, data: &WeeklyParams) -> Result<PathBuf, DbError> {
     debug!("[export_weekly] params: {data:?}");
 
     // read in the config for output locations
@@ -83,7 +84,7 @@ pub fn export_weekly(conn: &mut SqliteConnection, data: &WeeklyParams) -> Result
 
     info!("Saving weekly export to output file...");
     match writer::xlsx::write(&book, path.as_path()) {
-        Ok(n) => Ok(n),
+        Ok(_) => Ok(path),
         Err(err) => {
             error!("Unable to save weekly export.  Error: {err}");
             Err(Box::new(err))

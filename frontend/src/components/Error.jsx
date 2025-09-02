@@ -36,6 +36,22 @@ export function ShowOnError(resp) {
       </>
     );
   } else {
+    if (
+      resp.Error !== undefined &&
+      resp.Error === false &&
+      resp.Message !== undefined
+    ) {
+      // have a non error status message to show
+      return (
+        <>
+          <div>
+            <Typography sx={{ color: "green" }} varian="h5">
+              {resp.Message}
+            </Typography>
+          </div>
+        </>
+      );
+    }
     return <></>;
   }
 }

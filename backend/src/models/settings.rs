@@ -15,6 +15,7 @@ pub struct Settings {
     pub HockeyHomeTeam: Option<String>,
     pub ManagerName: Option<String>,
     pub StoreNumber: Option<String>,
+    pub use_drive: bool,
 }
 
 impl Settings {
@@ -27,6 +28,7 @@ impl Settings {
             HockeyHomeTeam: None,
             ManagerName: None,
             StoreNumber: None,
+            use_drive: false,
         }
     }
 }
