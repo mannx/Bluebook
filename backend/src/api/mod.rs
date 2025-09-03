@@ -1,6 +1,7 @@
 pub mod auv;
 pub mod backup;
 pub mod day_edit;
+pub mod drive;
 pub mod error;
 pub mod export;
 pub mod month;

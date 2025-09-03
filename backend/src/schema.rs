@@ -79,6 +79,13 @@ diesel::table! {
 }
 
 diesel::table! {
+    migration_check (rowid) {
+        rowid -> Integer,
+        mig_date -> Text,
+    }
+}
+
+diesel::table! {
     settings (id) {
         id -> Integer,
         HockeyURL -> Nullable<Text>,
@@ -87,6 +94,7 @@ diesel::table! {
         HockeyHomeTeam -> Nullable<Text>,
         ManagerName -> Nullable<Text>,
         StoreNumber -> Nullable<Text>,
+        use_drive -> Bool,
     }
 }
 
@@ -123,6 +131,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     auv_data,
     day_data,
     hockey_schedule,
+    migration_check,
     settings,
     tag_data,
     tag_list,

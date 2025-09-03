@@ -104,7 +104,7 @@ pub fn get_tags(conn: &mut SqliteConnection, day: &DayData) -> Result<Vec<Tags>,
     let tids = match &day.Tags {
         None => return Ok(tags),
         Some(tags) => {
-            debug!("[get_tags] processing tags for [{}]", tags);
+            debug!("[get_tags] processing tags for [{tags}]");
 
             if tags.is_empty() {
                 debug!("tag is empty [day: {}]. returning...", day.id);

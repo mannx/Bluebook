@@ -89,6 +89,9 @@ export async function action({ request, params }) {
     Productivity: prod,
   };
 
+  console.log("[AUV] POST body");
+  console.log(body);
+
   // send to the server
   const opts = GetPostOptions(JSON.stringify(body));
   await fetch(UrlApi2AUVUpdate, opts);

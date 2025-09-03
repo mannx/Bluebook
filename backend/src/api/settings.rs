@@ -15,6 +15,7 @@ pub struct SettingsUpdate {
     pub HockeyHomeTeam: String,
     pub ManagerName: String,
     pub StoreNumber: String,
+    pub use_drive: bool,
 }
 
 impl SettingsUpdate {
@@ -36,6 +37,7 @@ impl SettingsUpdate {
         } else {
             None
         };
+
         let StoreNumber = if !self.StoreNumber.is_empty() {
             Some(self.StoreNumber.clone())
         } else {
@@ -50,6 +52,7 @@ impl SettingsUpdate {
             HockeyURL,
             ManagerName,
             StoreNumber,
+            use_drive: self.use_drive,
         }
     }
 }
@@ -60,7 +63,7 @@ pub fn read_settings(conn: &mut SqliteConnection) -> Result<Settings, DbError> {
     let result = settings.first::<Settings>(conn);
     match result {
         Err(e) => {
-            error!("Error retrieving settings.  Using default values. [{}]", e);
+            error!("Error retrieving settings.  Using default values. [{e}]");
             Ok(Settings::default())
         }
         Ok(set) => Ok(set),

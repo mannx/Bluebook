@@ -4,6 +4,7 @@ pub mod daily;
 pub mod wisr;
 
 use crate::ENVIRONMENT;
+
 use chrono::NaiveDate;
 use diesel::prelude::*;
 use diesel::result::Error;
@@ -70,8 +71,6 @@ fn pdf_to_text(file_name: &String) -> Option<PathBuf> {
         }
     };
 
-    let input_path = ENVIRONMENT.with_import_path(fname);
-
     debug!("[pdf_to_text] starting to process {file_name}");
 
     // generate output name
@@ -79,10 +78,13 @@ fn pdf_to_text(file_name: &String) -> Option<PathBuf> {
 
     let output_fname = path.to_str().unwrap();
 
+    debug!("[pdt_to_text] Input file: {file_name}");
+    debug!("[pdf_to_text] Output File: {output_fname}");
+
     // execute the command
     let output = Command::new("pdftotext")
         .arg("-layout")
-        .arg(input_path)
+        .arg(file_name)
         .arg(output_fname)
         .output();
     match output {

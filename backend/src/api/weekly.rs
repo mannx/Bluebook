@@ -3,7 +3,7 @@ use chrono::{Datelike, Days, NaiveDate, Weekday};
 use diesel::prelude::*;
 use diesel::result::Error;
 use lazy_static::lazy_static;
-use log::{debug, error, info};
+use log::{debug, error, info, trace};
 use std::collections::HashMap;
 
 use serde::Serialize;
@@ -123,7 +123,7 @@ fn get_week_data(conn: &mut SqliteConnection, week_ending: NaiveDate) -> Result<
     // get the starting day of the week
     let start_day = week_ending.checked_sub_days(Days::new(6)).unwrap();
 
-    debug!("Geting week data between [{start_day}] and [{week_ending}]");
+    trace!("Geting week data between [{start_day}] and [{week_ending}]");
 
     let mut data = WeekData::new(week_ending);
 
@@ -131,22 +131,27 @@ fn get_week_data(conn: &mut SqliteConnection, week_ending: NaiveDate) -> Result<
     {
         use crate::schema::day_data::dsl::*;
 
-        debug!("Getting daily data...");
+        trace!("Getting daily data...");
         let mut result = day_data
-            .filter(DayDate.ge(start_day).and(DayDate.le(week_ending)).and(Updated.eq(false)))
+            .filter(
+                DayDate
+                    .ge(start_day)
+                    .and(DayDate.le(week_ending))
+                    .and(Updated.eq(false)),
+            )
             .order(DayDate)
             .select(DayData::as_select())
             .load(conn)?;
 
         data.days.append(&mut result);
-        debug!("Done!");
+        trace!("Done!");
     }
 
     // get the weekly information
     {
         use crate::schema::weekly_info::dsl::*;
 
-        debug!("Getting weekly info for {week_ending}...");
+        trace!("Getting weekly info for {week_ending}...");
         let result = weekly_info
             .filter(WeekEnding.eq(week_ending))
             .first::<WeeklyInfo>(conn);
@@ -170,12 +175,12 @@ fn get_week_data(conn: &mut SqliteConnection, week_ending: NaiveDate) -> Result<
     {
         use crate::schema::auv_data::dsl::*;
 
-        debug!("Getting auv info for {week_ending}...");
+        trace!("Getting auv info for {week_ending}...");
         let mon = week_ending.month() as i32;
         let yea = week_ending.year();
 
-        debug!("   month: {mon}");
-        debug!("   year: {yea}");
+        trace!("   month: {mon}");
+        trace!("   year: {yea}");
 
         let result = auv_data
             .filter(month.eq(mon).and(year.eq(yea)))
@@ -193,8 +198,8 @@ fn get_week_data(conn: &mut SqliteConnection, week_ending: NaiveDate) -> Result<
 
         data.auv = auv;
 
-        debug!("auv: {:?}", data.auv);
-        debug!("Done");
+        trace!("auv: {:?}", data.auv);
+        trace!("Done");
     }
 
     debug!("Returning weekly data");
@@ -245,8 +250,12 @@ fn calculate_weekly(data: &WeekData, last_year: LastYearSales) -> WeeklyReport {
         report.CustomerCount += i.CustomerCount;
         report.GiftCardSold += i.GiftCardSold;
         report.GiftCardRedeem += i.GiftCardRedeem;
-        
-        debug!("[calculate_weekly] bread +/-: [{}] [{}]",i.DayDate,i.BreadOverShort);
+
+        trace!(
+            "[calculate_weekly] bread +/-: [{}] [{}]",
+            i.DayDate,
+            i.BreadOverShort
+        );
         report.BreadOverShort += i.BreadOverShort;
     }
 

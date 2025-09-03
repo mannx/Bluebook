@@ -44,7 +44,6 @@ pub fn update_day_edit(
                 .returning(DayData::as_returning())
                 .get_result(conn)?;
 
-            // Ok(Some(result.id))
             Ok(Some(result))
         } else {
             // no date provided, return an error
@@ -57,7 +56,6 @@ pub fn update_day_edit(
             .returning(DayData::as_returning())
             .get_result(conn)?;
 
-        // Ok(Some(result.id))
         Ok(Some(result))
     }
 }

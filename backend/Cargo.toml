@@ -33,16 +33,12 @@ diesel_migrations = "2.2.0"
 # time library
 chrono = { version = "0.4", features = ["serde"] }
 
-# file utils
-#  - allows pattern matching on file names
-glob = "0.3.2"
-
 #  - spreadsheet reading/writing
 umya-spreadsheet = "2.3.1"
 
 # misc
 lazy_static = "1.5.0"
-ron = "0.10"
+ron = "0.11"
 
 # regex for pattern matching import files
 regex = "1.11"
@@ -50,10 +46,9 @@ regex = "1.11"
 # allows shell expansion for any set environment variables
 shellexpand = "3.1.1"
 
+# use to connect to gdrive
+drive-v3 = "0.6.1"
+
 [build-dependencies]
 # set build version information
 vergen-git2 = { version = "1.0", features = ["build", "cargo"] }
-
-# copy some config files to the build directory
-# todo: might not need to do this?
-copy_to_output = "2.2.0"

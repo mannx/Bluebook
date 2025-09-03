@@ -240,7 +240,6 @@ fn check_daily_version(sheet: &Worksheet, pairs: &VersionPair) -> bool {
     for (key, val) in &pairs.pairs {
         let s_val = sheet.get_value(key.as_str());
 
-        debug!("  {} = {}?", key, val);
         if s_val != *val {
             debug!("   [FAILED] Returning");
             return false;
