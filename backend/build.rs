@@ -1,4 +1,3 @@
-use copy_to_output::copy_to_output;
 use std::env;
 use vergen_git2::*;
 
@@ -18,7 +17,4 @@ fn main() {
         .unwrap()
         .emit()
         .unwrap();
-
-    // copy the .env file to the build output
-    copy_to_output(".env", &env::var("PROFILE").unwrap()).expect("unable to copy");
 }
