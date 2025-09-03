@@ -197,20 +197,7 @@ fn calculate_weekly_average(conn: &mut SqliteConnection, date: NaiveDate) -> Res
     }
 
     Ok(total / 4)
-    // Ok(do_calc_weekly_average(&results, date))
 }
-
-// fn do_calc_weekly_average(data: &Vec<DayData>, ignore_date: NaiveDate) -> i32 {
-//     let mut total = 0;
-//     for r in data {
-//         // ignore all but the same day
-//         if r.DayDate.weekday() == ignore_date.weekday() {
-//             total += r.NetSales;
-//         }
-//     }
-//
-//     total / 4
-// }
 
 fn get_hockey_data(
     conn: &mut SqliteConnection,
