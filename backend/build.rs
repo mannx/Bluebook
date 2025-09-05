@@ -1,4 +1,3 @@
-use std::env;
 use vergen_git2::*;
 
 fn main() {

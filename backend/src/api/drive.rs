@@ -13,7 +13,7 @@ pub fn get_credentials() -> Result<Credentials, Error> {
         "https://www.googleapis.com/auth/drive.file",
     ];
 
-    let cred_path = ENVIRONMENT.with_data_path("creds.json");
+    let cred_path = ENVIRONMENT.with_config_path("creds.json");
     let creds = match std::fs::exists(&cred_path) {
         Ok(exist) => {
             if exist {
@@ -26,7 +26,7 @@ pub fn get_credentials() -> Result<Credentials, Error> {
                 c.store(&cred_path)?;
                 c
             } else {
-                let secrets = ENVIRONMENT.with_data_path("secret.json");
+                let secrets = ENVIRONMENT.with_config_path("secret.json");
                 let c = Credentials::from_client_secrets_file(secrets, &scopes)?;
                 // save them
                 c.store(&cred_path)?;
