@@ -45,6 +45,7 @@ export async function action({ request, params }) {
     HockeyHomeTeam: updates.home_team,
     ManagerName: updates.managerName,
     StoreNumber: updates.storeNumber,
+    use_drive: updates.use_drive === "on",
   };
 
   const opt = GetPostOptions(JSON.stringify(body));
@@ -63,6 +64,7 @@ export default function Settings() {
     home_team: data.HockeyHomeTeam,
     managerName: data.ManagerName,
     storeNumber: data.StoreNumber,
+    use_drive: data.use_drive,
   });
 
   const [manualURL, setManualURL] = React.useState("");
@@ -193,6 +195,19 @@ export default function Settings() {
               }}
             />
           </Stack>
+
+          <FormControlLabel
+            control={
+              <Switch
+                checked={state.use_drive}
+                onChange={(e) => {
+                  setState({ ...state, use_drive: e.target.value });
+                }}
+                name="use_drive"
+              />
+            }
+            label="Use Google Drive?"
+          />
 
           <TextField
             label="Home Hockey Team"
