@@ -1,6 +1,12 @@
 VersionConfig(
   data: [
     VersionPair(
+      index: 2,
+      pairs: {
+        "A6": "Interac/Visa/MC/Discover",
+      }
+    ),
+    VersionPair(
       index: 1,
       pairs: {
         "A46":"ApplePay RO",
