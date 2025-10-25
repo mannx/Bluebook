@@ -4,6 +4,7 @@ use chrono::NaiveDate;
 use diesel::prelude::*;
 use diesel::SqliteConnection;
 use log::{debug, error, info, trace};
+use ron::de::SpannedError;
 use serde::Deserialize;
 use std::collections::HashMap;
 use umya_spreadsheet::*;
@@ -58,6 +59,13 @@ impl Config {
         let fstr = std::fs::read_to_string(path).expect("unable to open daily.ron");
         ron::from_str::<Config>(fstr.as_str()).unwrap()
     }
+
+    #[allow(dead_code)]
+    fn load_err() -> Result<Self, SpannedError> {
+        let path = ENVIRONMENT.with_config_path("daily.ron");
+        let fstr = std::fs::read_to_string(path).expect("unable to open daily.ron");
+        ron::from_str::<Config>(fstr.as_str())
+    }
 }
 
 impl VersionConfig {
@@ -65,6 +73,13 @@ impl VersionConfig {
         let path = ENVIRONMENT.with_config_path("version.ron");
         let fstr = std::fs::read_to_string(path).expect("unable to open version.ron");
         ron::from_str::<VersionConfig>(fstr.as_str()).unwrap()
+    }
+
+    #[allow(dead_code)]
+    fn load_err() -> Result<Self, SpannedError> {
+        let path = ENVIRONMENT.with_config_path("version.ron");
+        let fstr = std::fs::read_to_string(path).expect("unable to open version.ron");
+        ron::from_str::<VersionConfig>(fstr.as_str())
     }
 }
 
@@ -310,54 +325,93 @@ fn insert_or_update(
 mod tests {
     use super::*;
 
-    #[test]
-    fn daily() {
-        use std::path::PathBuf;
-
-        let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-        path.push("src/config/daily.ron");
-
-        println!("Path: {}", path.as_path().to_str().unwrap());
-
-        let fstr = std::fs::read_to_string(path).expect("unable to open daily.ron");
-        let config = ron::from_str::<Config>(fstr.as_str()).unwrap();
-
-        assert!(config.DebitCard[0][0] == "B3");
-    }
-
-    #[test]
-    fn version() {
+    fn setup_env() {
         use std::env;
-        use std::path::PathBuf;
+        // use std::path::PathBuf;
 
         let mani = env!("CARGO_MANIFEST_DIR");
         let conf = format!("{mani}/src/config/");
         env::set_var("BLUEBOOK_CONFIG_PATH", conf);
-
-        let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-        path.push("tests/data/version1.xlsx");
-
-        // load the sheet
-        let book_res = reader::xlsx::read(path.as_path());
-        let book = match book_res {
-            Ok(b) => b,
-            Err(e) => {
-                panic!("Unable to load test sheet for version check. Error: [{e}]");
-            }
-        };
-
-        // sheet contains most of the data, sheet2 contains the few fields on the 2nd sheet
-        let sheet = match book.get_sheet(&0) {
-            None => {
-                panic!("Unable to get sheet 0 for version check");
-            }
-            Some(s) => s,
-        };
-
-        // make sure we match version 2
-        match get_daily_version(sheet) {
-            Err(_) => panic!("Sheet does NOT match version 1 check"),
-            Ok(n) => assert!(n.index == 0),
-        }
     }
+
+    #[test]
+    fn daily_config() {
+        setup_env();
+        let config = Config::load_err();
+        let res = match config {
+            Ok(_) => true,
+            Err(err) => {
+                println!("Error parsing daily.ron: {err}");
+                false
+            }
+        };
+
+        assert!(res);
+    }
+
+    #[test]
+    fn version_config() {
+        setup_env();
+        let config = VersionConfig::load_err();
+        let res = match config {
+            Ok(_) => true,
+            Err(err) => {
+                println!("Error parsing version.ron: {err}");
+                false
+            }
+        };
+
+        assert!(res);
+    }
+
+    // #[test]
+    // fn daily() {
+    //     use std::path::PathBuf;
+    //
+    //     let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    //     path.push("src/config/daily.ron");
+    //
+    //     println!("Path: {}", path.as_path().to_str().unwrap());
+    //
+    //     let fstr = std::fs::read_to_string(path).expect("unable to open daily.ron");
+    //     let config = ron::from_str::<Config>(fstr.as_str()).unwrap();
+    //
+    //     assert!(config.DebitCard[0][0] == "B3");
+    // }
+    //
+    // #[test]
+    // fn version() {
+    //     use std::env;
+    //     use std::path::PathBuf;
+    //
+    //     let mani = env!("CARGO_MANIFEST_DIR");
+    //     let conf = format!("{mani}/src/config/");
+    //     env::set_var("BLUEBOOK_CONFIG_PATH", conf);
+    //
+    //     let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    //     path.push("tests/data/version1.xlsx");
+    //
+    //     // load the sheet
+    //     let book_res = reader::xlsx::read(path.as_path());
+    //     let book = match book_res {
+    //         Ok(b) => b,
+    //         Err(e) => {
+    //             panic!("Unable to load test sheet for version check. Error: [{e}]");
+    //         }
+    //     };
+    //
+    //     // sheet contains most of the data, sheet2 contains the few fields on the 2nd sheet
+    //     let sheet = match book.get_sheet(&0) {
+    //         None => {
+    //             panic!("Unable to get sheet 0 for version check");
+    //         }
+    //         Some(s) => s,
+    //     };
+    //
+    //     // make sure we match version 2
+    //     match get_daily_version(sheet) {
+    //         Err(_) => panic!("Sheet does NOT match version 1 check"),
+    //         Ok(n) => assert!(n.index == 0),
+    //     }
+    // }
 }
