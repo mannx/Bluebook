@@ -183,7 +183,7 @@ fn calculate_weekly_average(conn: &mut SqliteConnection, date: NaiveDate) -> Res
         .expect("invalid start date"); // 4 weeks
 
     let results: Vec<DayData> = day_data
-        .filter(DayDate.ge(start_date).and(DayDate.lt(date)))
+        .filter(DayDate.ge(start_date).and(DayDate.lt(date)).and(Updated.eq(false)))
         .order(DayDate)
         .select(DayData::as_select())
         .load(conn)?;
