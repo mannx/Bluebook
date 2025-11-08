@@ -3,7 +3,7 @@ use drive_v3::Error;
 use drive_v3::{Credentials, Drive};
 use log::{debug, error, info};
 use regex::Regex;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use crate::ENVIRONMENT;
 
@@ -14,6 +14,8 @@ pub fn get_credentials() -> Result<Credentials, Error> {
     ];
 
     let cred_path = ENVIRONMENT.with_config_path("creds.json");
+    debug!("[get_credentials] cred_path: {cred_path:?}");
+
     let creds = match std::fs::exists(&cred_path) {
         Ok(exist) => {
             if exist {
@@ -26,23 +28,44 @@ pub fn get_credentials() -> Result<Credentials, Error> {
                 c.store(&cred_path)?;
                 c
             } else {
-                let secrets = ENVIRONMENT.with_config_path("secret.json");
-                let c = Credentials::from_client_secrets_file(secrets, &scopes)?;
-                // save them
-                c.store(&cred_path)?;
-                c
+                // let secrets = ENVIRONMENT.with_config_path("secret.json");
+                // let c = Credentials::from_client_secrets_file(secrets, &scopes)?;
+                // // save them
+                // c.store(&cred_path)?;
+                // c
+                return gen_creds(&cred_path, scopes);
             }
         }
-        Err(err) => {
-            error!("Unable to check for stored Credentials.");
-            return Err(drive_v3::Error::new(
-                drive_v3::ErrorKind::IO,
-                format!("Failure to check path for creds.json.  Error: {err}"),
-            ));
+        Err(_err) => {
+            // unable to find creds file, get here if it doesn't exist
+            match gen_creds(&cred_path, scopes) {
+                Ok(c) => c,
+                Err(err) => {
+                    error!("Unable to get drive Credentials");
+                    error!("Error: {err}");
+                    return Err(err);
+                }
+            }
+            // error!("Unable to check for stored Credentials.");
+            // return Err(drive_v3::Error::new(
+            //     drive_v3::ErrorKind::IO,
+            //     format!("Failure to check path for creds.json.  Error: {err}"),
+            // ));
         }
     };
 
     Ok(creds)
+}
+
+fn gen_creds(cred_path: &PathBuf, scopes: [&'static str; 2]) -> Result<Credentials, Error> {
+    debug!("[gen_creds]");
+    let secrets = ENVIRONMENT.with_config_path("secret.json");
+    debug!(" secrets: {secrets:?}");
+
+    let c = Credentials::from_client_secrets_file(secrets, &scopes)?;
+    // save them
+    c.store(cred_path)?;
+    Ok(c)
 }
 
 // get all recent spreadsheets and return the filename

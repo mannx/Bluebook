@@ -12,7 +12,8 @@ use actix_web::{error, HttpResponse};
 use actix_web::{get, post, web, Responder};
 use diesel::SqliteConnection;
 use drive_v3::objects::File;
-use log::{debug, error};
+use log::{debug, error, info};
+use regex::{Captures, Regex};
 
 use serde::Serialize;
 
@@ -31,7 +32,8 @@ enum ImportFileLocation {
 #[derive(Serialize)]
 struct ImportFileList {
     pub Daily: Vec<(ImportFileLocation, String)>,
-    pub Control: Vec<(ImportFileLocation, String)>,
+    // Control: (Location, OrigFileName, UserFacingFileName)
+    pub Control: Vec<(ImportFileLocation, String, String)>,
     pub Wisr: Vec<(ImportFileLocation, String)>,
 }
 
@@ -53,6 +55,7 @@ impl ImportFileList {
                 (
                     ImportFileLocation::Drive(file.id.clone().unwrap()),
                     file.name.clone().unwrap(),
+                    ImportFileList::control_filename(file.name.clone().unwrap()),
                 )
             })
             .collect();
@@ -71,6 +74,39 @@ impl ImportFileList {
             Daily: daily,
             Control: control,
             Wisr: wisr,
+        }
+    }
+
+    fn control_filename(file_name: String) -> String {
+        // file_name should be in the form of:
+        //  ControlSheetReport_NNNNN_YYYYMMDD_HHMM.pdf
+        //  where   N -> Store number
+        //          Y -> Year
+        //          M -> Month
+        //          D -> Day
+        //          H -> Hour
+        //          M -> Minute
+
+        // adjust this value if we need to accomodate store number len != 5
+        let store_len = 5;
+        let reg_str = format!(
+            r"ControlSheetReport_{}_(\d\d\d\d)(\d\d)(\d\d)_(\d\d)(\d\d)",
+            "\\d".repeat(store_len)
+        );
+        let data = Regex::new(&reg_str).unwrap().captures(file_name.as_str());
+
+        match data {
+            None => {
+                info!("Unable to extract control sheet information from file name");
+                info!("  File name: {file_name}");
+                info!("  Returning input file name instead.");
+                file_name
+            }
+            Some(n) => {
+                info!("extracting week ending date from control sheet file name...");
+                info!("year: {}", n[1].to_owned());
+                file_name
+            }
         }
     }
 }
