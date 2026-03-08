@@ -1,10 +1,7 @@
 #![allow(non_snake_case)]
 use std::ffi::OsString;
 
-use crate::api::drive::fetch_file_for_import;
-use crate::api::drive::{get_control_wisr, get_credentials, get_recent_sheets};
 use crate::api::error::ApiReturnMessage;
-use crate::api::settings::read_settings;
 use crate::api::{DbError, DbPool};
 use crate::imports::control::import_control_sheet;
 use crate::imports::daily::daily_import;
@@ -15,16 +12,10 @@ use crate::ENVIRONMENT;
 use actix_web::{error, HttpResponse};
 use actix_web::{get, post, web, Responder};
 use diesel::SqliteConnection;
-use drive_v3::objects::File;
 use log::{debug, error, info};
-use regex::{Captures, Regex};
+use regex::Regex;
 
 use serde::Serialize;
-
-// max number of items we will show for each daily,control,or wisr
-// TODO: put this in either app settings, environment variable
-// or control on import page
-const MAX_IMPORT_ITEMS: usize = 5;
 
 #[derive(Serialize)]
 #[allow(dead_code)]
@@ -36,51 +27,11 @@ enum ImportFileLocation {
 #[derive(Serialize)]
 struct ImportFileList {
     pub Daily: Vec<(ImportFileLocation, String)>,
-    // Control: (Location, OrigFileName, UserFacingFileName)
     pub Control: Vec<(ImportFileLocation, String, String)>,
     pub Wisr: Vec<(ImportFileLocation, String)>,
 }
 
 impl ImportFileList {
-    // fn from_drive(daily: Vec<File>, control: Vec<File>, wisr: Vec<File>) -> Self {
-    //     let daily = daily
-    //         .iter()
-    //         .map(|file| {
-    //             (
-    //                 ImportFileLocation::Drive(file.id.clone().unwrap()),
-    //                 file.name.clone().unwrap(),
-    //             )
-    //         })
-    //         .collect();
-    //
-    //     let control = control
-    //         .iter()
-    //         .map(|file| {
-    //             (
-    //                 ImportFileLocation::Drive(file.id.clone().unwrap()),
-    //                 file.name.clone().unwrap(),
-    //                 ImportFileList::control_filename(file.name.clone().unwrap()),
-    //             )
-    //         })
-    //         .collect();
-    //
-    //     let wisr = wisr
-    //         .iter()
-    //         .map(|file| {
-    //             (
-    //                 ImportFileLocation::Drive(file.id.clone().unwrap()),
-    //                 file.name.clone().unwrap(),
-    //             )
-    //         })
-    //         .collect();
-    //
-    //     Self {
-    //         Daily: daily,
-    //         Control: control,
-    //         Wisr: wisr,
-    //     }
-    // }
-
     pub fn new() -> Self {
         Self {
             Daily: Vec::new(),
@@ -161,23 +112,7 @@ impl ImportFileList {
 
 #[get("/api2/import/list")]
 // test import list function for returning from google drive
-pub async fn import_list(pool: web::Data<DbPool>) -> actix_web::Result<impl Responder> {
-    // get settings to determine if we are using drive or local paths for files
-    debug!("[import_list] Retrieving settings...");
-    let settings: crate::models::settings::Settings = web::block(move || {
-        let mut conn = pool.get()?;
-        read_settings(&mut conn)
-    })
-    .await?
-    .map_err(error::ErrorInternalServerError)?;
-
-    // if settings.use_drive {
-    //     debug!("use_drive: true, skipping");
-    //     let msg = ApiReturnMessage::<ImportFileList>::error("Drive Not currently supported");
-    //     return Ok(HttpResponse::Ok().json(msg));
-    // }
-
-    // if !settings.use_drive {
+pub async fn import_list() -> actix_web::Result<impl Responder> {
     debug!("Retrieving files from local paths");
 
     // iterate through the import directory for each file type we need
@@ -206,47 +141,6 @@ pub async fn import_list(pool: web::Data<DbPool>) -> actix_web::Result<impl Resp
 
     let ret = ApiReturnMessage::<ImportFileList>::ok(lst);
     Ok(HttpResponse::Ok().json(ret))
-    // }
-
-    // debug!("Getting list from drive...");
-    //
-    // // get our creds than retrieve initial lists
-    // debug!("[/api2/import/list] retrieving credentials");
-    //
-    // let creds = match get_credentials() {
-    //     Ok(n) => n,
-    //     Err(err) => {
-    //         error!("Unable to retrieve google drive crediantials.  Error: {err}");
-    //         let msg =
-    //             ApiReturnMessage::<ImportFileList>::error("Unable to retrieve drive crediantials");
-    //         return Ok(HttpResponse::Ok().json(msg));
-    //     }
-    // };
-    //
-    // let files = match get_recent_sheets(&creds, MAX_IMPORT_ITEMS) {
-    //     Ok(n) => n,
-    //     Err(err) => {
-    //         error!("Unable to retrieve recent sheets.  Error: {err}");
-    //         let msg = ApiReturnMessage::<ImportFileList>::error("Unable to retriev files.");
-    //         return Ok(HttpResponse::Ok().json(msg));
-    //     }
-    // };
-    //
-    // let (control, wisr) = match get_control_wisr(&creds, MAX_IMPORT_ITEMS) {
-    //     Ok(n) => n,
-    //     Err(err) => {
-    //         error!("Unable to retrieve control and wisr sheets.  Error: {err}");
-    //         let msg = ApiReturnMessage::<ImportFileList>::error(
-    //             "Unable to retriev wisr & control files.",
-    //         );
-    //         return Ok(HttpResponse::Ok().json(msg));
-    //     }
-    // };
-    //
-    // let lst = ImportFileList::from_drive(files, control, wisr);
-    // let ret = ApiReturnMessage::<ImportFileList>::ok(lst);
-    // let ret = ApiReturnMessage::<ImportFileList>::error("Not yet implemented");
-    // Ok(HttpResponse::Ok().json(ret))
 }
 
 #[post("/api/import/daily")]
@@ -304,41 +198,6 @@ pub async fn import_wisr(
     Ok(HttpResponse::Ok().json(messages))
 }
 
-// fn get_file(file: &str) -> Result<String, drive_v3::Error> {
-//     let fname = match std::fs::exists(file) {
-//         Ok(b) => {
-//             if b {
-//                 // we found the file locally
-//                 file.to_owned()
-//             } else {
-//                 // fetch the file
-//                 match fetch_file_for_import(file) {
-//                     Ok(file) => file,
-//                     Err(err) => {
-//                         error!("Unable to retrieve file from drive.  Error: {err}");
-//                         // skip this file
-//                         return Err(err);
-//                     }
-//                 }
-//             }
-//         }
-//         Err(e) => {
-//             debug!("File not found locally. File: [{file}]. Error: {e}");
-//             debug!(" Attempting to fetch from drive...");
-//             // fetch the file
-//             match fetch_file_for_import(file) {
-//                 Ok(file) => file,
-//                 Err(err) => {
-//                     error!("Unable to retrieve file from drive(2).  Error: {err}");
-//                     // skip this file
-//                     return Err(err);
-//                 }
-//             }
-//         }
-//     };
-//     Ok(fname)
-// }
-
 fn do_import_daily(conn: &mut SqliteConnection, data: &[String]) -> Result<ImportResult, DbError> {
     let mut msg = ImportResult::new();
 
@@ -359,16 +218,6 @@ fn do_import_control(
     let mut msg = ImportResult::new();
 
     for f in data.iter() {
-        // debug!("Checking if file is remote...");
-        //
-        // let file_name = match get_file(f) {
-        //     Err(err) => {
-        //         error!("Skipping file {f}...Error: {err}");
-        //         continue;
-        //     }
-        //     Ok(n) => n,
-        // };
-
         let fname = ENVIRONMENT.with_import_path(f);
         let mut res = import_control_sheet(conn, fname);
         msg.combine(&mut res);
@@ -381,16 +230,6 @@ fn do_wisr_import(conn: &mut SqliteConnection, data: &[String]) -> Result<Import
     let mut msg = ImportResult::new();
 
     for f in data.iter() {
-        // debug!("Checking if file is remote...");
-        //
-        // let file_name = match get_file(f) {
-        //     Err(err) => {
-        //         error!("Skipping file {f}...Error: {err}");
-        //         continue;
-        //     }
-        //     Ok(n) => n,
-        // };
-
         let fname = ENVIRONMENT.with_import_path(f);
         let mut res = import_wisr_sheet(conn, fname);
         msg.combine(&mut res);

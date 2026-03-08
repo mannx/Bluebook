@@ -13,7 +13,7 @@ use log::{debug, error, trace};
 use serde::Serialize;
 use umya_spreadsheet::XlsxError;
 
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::process::Command;
 
 use crate::models::day_data::DayData;
