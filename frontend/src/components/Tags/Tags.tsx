@@ -1,4 +1,4 @@
-import { Link, Outlet, useLoaderData } from "react-router-dom";
+import { Link, Outlet, useLoaderData } from "react-router";
 
 import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
