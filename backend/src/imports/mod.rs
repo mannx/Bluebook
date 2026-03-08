@@ -61,24 +61,26 @@ impl ImportResult {
 // Convert file_name.pdf to a text file using pdftotext
 // returns the path to the output file which should be a temp file
 // returns None on error
-fn pdf_to_text(file_name: &String) -> Option<PathBuf> {
+// fn pdf_to_text(file_name: &String) -> Option<PathBuf> {
+fn pdf_to_text(file_name: PathBuf) -> Option<PathBuf> {
     // get the filename from the provided path
-    let fname = match Path::new(file_name).file_name() {
+    // let fname = match Path::new(file_name).file_name() {
+    let fname = match file_name.file_name() {
         Some(p) => p.to_str().unwrap(),
         None => {
-            error!("[pdf_to_text] filename was invalid [{file_name}]");
+            error!("[pdf_to_text] filename was invalid");
             return None;
         }
     };
 
-    debug!("[pdf_to_text] starting to process {file_name}");
+    debug!("[pdf_to_text] starting to process ");
 
     // generate output name
     let path = ENVIRONMENT.with_temp_path(format!("{fname}.txt"));
 
     let output_fname = path.to_str().unwrap();
 
-    debug!("[pdt_to_text] Input file: {file_name}");
+    debug!("[pdt_to_text] Input file: {fname}");
     debug!("[pdf_to_text] Output File: {output_fname}");
 
     // execute the command

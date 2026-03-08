@@ -200,6 +200,7 @@ export default function Settings() {
             control={
               <Switch
                 checked={state.use_drive}
+                // onChange={handleChange}
                 onChange={(e) => {
                   setState({ ...state, use_drive: e.target.value });
                 }}

@@ -7,6 +7,7 @@ use diesel::SqliteConnection;
 use lazy_static::lazy_static;
 use log::{debug, error, info};
 use regex::Regex;
+use std::path::PathBuf;
 
 use crate::imports::pdf_to_text;
 use crate::imports::ImportResult;
@@ -45,7 +46,7 @@ impl WisrData {
     }
 }
 
-pub fn import_wisr_sheet(conn: &mut SqliteConnection, file_name: &String) -> ImportResult {
+pub fn import_wisr_sheet(conn: &mut SqliteConnection, file_name: PathBuf) -> ImportResult {
     let mut messages = ImportResult::new();
 
     info!("starting parse of wisr sheet");
@@ -74,7 +75,7 @@ fn ftoi(input: &str) -> i32 {
         .unwrap()
 }
 
-fn parse_wisr(file_name: &String) -> Result<WisrData, String> {
+fn parse_wisr(file_name: PathBuf) -> Result<WisrData, String> {
     let mut wisr = WisrData::new();
 
     debug!("importing wisr sheet...");

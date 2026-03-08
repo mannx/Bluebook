@@ -13,18 +13,26 @@ pub fn get_credentials() -> Result<Credentials, Error> {
         "https://www.googleapis.com/auth/drive.file",
     ];
 
+    // let cred_path = ENVIRONMENT.with_data_path("creds.json");
     let cred_path = ENVIRONMENT.with_config_path("creds.json");
     debug!("[get_credentials] cred_path: {cred_path:?}");
 
     let creds = match std::fs::exists(&cred_path) {
         Ok(exist) => {
+            debug!("[get_credentials] creds.json exists: {exist}");
+
             if exist {
+                debug!("   loading Credentials");
                 let mut c = Credentials::from_file(&cred_path, &scopes)?;
+
+                debug!("  Checking if still valid...");
                 if !c.are_valid() {
+                    debug!("  refreshing Credentials");
                     c.refresh()?;
                 }
 
                 // save again
+                debug!("  saving Credentials");
                 c.store(&cred_path)?;
                 c
             } else {
@@ -33,11 +41,15 @@ pub fn get_credentials() -> Result<Credentials, Error> {
                 // // save them
                 // c.store(&cred_path)?;
                 // c
+                debug!("   generating Credentials");
                 return gen_creds(&cred_path, scopes);
             }
         }
         Err(_err) => {
             // unable to find creds file, get here if it doesn't exist
+            debug!("  creds.json check failed: ");
+            debug!("  error: {_err}");
+            debug!(" generating Credentials...");
             match gen_creds(&cred_path, scopes) {
                 Ok(c) => c,
                 Err(err) => {

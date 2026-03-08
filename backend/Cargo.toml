@@ -38,7 +38,7 @@ umya-spreadsheet = "2.3.1"
 
 # misc
 lazy_static = "1.5.0"
-ron = "0.11"
+ron = "0.12"
 
 # regex for pattern matching import files
 regex = "1.11"
@@ -51,4 +51,5 @@ drive-v3 = "0.6.1"
 
 [build-dependencies]
 # set build version information
-vergen-git2 = { version = "1.0", features = ["build", "cargo"] }
+# vergen-git2 = { version = "1.0", features = ["build", "cargo"] }
+vergen-git2 = { version = "9.1.0", features = ["build", "cargo"] }
