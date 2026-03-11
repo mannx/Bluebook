@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Form, useActionData, useLoaderData } from "react-router-dom";
+import { Form, useActionData, useLoaderData } from "react-router";
 import { NumericFormat } from "react-number-format";
 
 import TextField from "@mui/material/TextField";
@@ -170,7 +170,7 @@ export default function Weekly() {
             </tr>
             <tr className="Month">
               <td className="Month">Party Sales</td>
-              <td className="Month">{F(data.PartySales)}</td>
+              <td className="Month">{NF(data.PartySales)}</td>
             </tr>
             <tr className="Month">
               <td className="Month">&nbsp;</td>

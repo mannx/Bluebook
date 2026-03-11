@@ -1,7 +1,7 @@
 // this page provides a date picker to validate a week ending date
 import * as React from "react";
 
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet } from "react-router";
 
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import Button from "@mui/material/Button";

@@ -9,6 +9,7 @@ use diesel::SqliteConnection;
 use log::{debug, error, info};
 use regex::Captures;
 use regex::Regex;
+use std::path::PathBuf;
 
 use crate::imports::pdf_to_text;
 use crate::imports::ImportResult;
@@ -133,7 +134,8 @@ impl ControlSheetData {
     }
 }
 
-pub fn import_control_sheet(conn: &mut SqliteConnection, file_name: &String) -> ImportResult {
+// pub fn import_control_sheet(conn: &mut SqliteConnection, file_name: &String) -> ImportResult {
+pub fn import_control_sheet(conn: &mut SqliteConnection, file_name: PathBuf) -> ImportResult {
     let mut messages = ImportResult::new();
 
     info!("begining control sheet parse...");
@@ -194,7 +196,8 @@ fn get_bread_overshort(control: &str) -> Option<Captures> {
     ReBreadOverShort().captures_iter(control).nth(1)
 }
 
-fn parse_control_sheet(file_name: &String) -> Result<ControlSheetData, String> {
+// fn parse_control_sheet(file_name: &String) -> Result<ControlSheetData, String> {
+fn parse_control_sheet(file_name: PathBuf) -> Result<ControlSheetData, String> {
     let mut control_sheet = ControlSheetData::new();
 
     debug!("importing control sheet...");

@@ -4,7 +4,7 @@ import ReactDOM from "react-dom/client";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router";
 
 import ErrorPage from "./components/ErrorPage";
 import Root from "./components/Root";
@@ -162,6 +162,10 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         router={router}
         future={{
           v7_startTransition: true,
+          v7_fetcherPersist: true,
+          v7_normalizeFormMethod: true,
+          v7_partialHydration: true,
+          v7_skipActionErrorRevalidation: true,
         }}
       />
     </LocalizationProvider>

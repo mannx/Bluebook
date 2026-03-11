@@ -7,7 +7,7 @@ use std::path::PathBuf;
 
 #[derive(Debug)]
 pub struct Environment {
-    ImportPath: String,
+    pub ImportPath: String,
     TempPath: String,
     OutputPath: String,
     DataPath: String,
