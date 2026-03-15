@@ -5,12 +5,12 @@ edition = "2021"
 
 [dependencies]
 # actix server bits
-actix-web = "4.11.0"
-actix-files = "0.6.6"
+actix-web = "4.13.0"
+actix-files = "0.6.10"
 actix-cors = "0.7"
 
 # loggings
-env_logger = "0.11.6"
+env_logger = "0.11.9"
 log = "0.4"
 
 # .env file reading
@@ -41,7 +41,7 @@ lazy_static = "1.5.0"
 ron = "0.12"
 
 # regex for pattern matching import files
-regex = "1.11"
+regex = "1.12"
 
 # allows shell expansion for any set environment variables
 shellexpand = "3.1.1"
