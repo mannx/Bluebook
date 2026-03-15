@@ -8,7 +8,7 @@ WORKDIR /app
 
 
 # add missing deps
-RUN apt update && apt install sqlite3
+RUN apt update && apt install sqlite3 -y
 
 COPY backend/ ./
 COPY .git/ .git
