@@ -13,6 +13,7 @@ use crate::api::error::ApiReturnMessage;
 struct AboutInfo {
     pub Branch: String,
     pub Commit: String,
+    pub Timestamp: String,
 }
 
 #[get("/api/about")]
@@ -20,6 +21,7 @@ pub async fn get_about_info() -> actix_web::Result<impl Responder> {
     let info = AboutInfo {
         Branch: env!("VERGEN_GIT_BRANCH").to_owned(),
         Commit: env!("VERGEN_GIT_SHA").to_owned(),
+        Timestamp: env!("VERGEN_BUILD_TIMESTAMP").to_owned(),
     };
 
     let result = ApiReturnMessage::<AboutInfo>::ok(info);

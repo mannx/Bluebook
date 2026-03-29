@@ -21,7 +21,11 @@ export default function AboutPage() {
   return (
     <Box>
       <Typography variant="h3">About</Typography>
-      Version: {data.Data.Branch}-{data.Data.Commit}
+      <Typography variant="body">
+        Version: {data.Data.Branch}-{data.Data.Commit}
+        <br />
+        Build Timestamp: {data.Data.Timestamp}
+      </Typography>
     </Box>
   );
 }
