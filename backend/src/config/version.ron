@@ -1,7 +1,7 @@
 VersionConfig(
   data: [
     VersionPair(
-      index: 2,
+      index: 0,
       pairs: {
         "A6": "Interac/Visa/MC/Discover",
       }
@@ -9,14 +9,8 @@ VersionConfig(
     VersionPair(
       index: 1,
       pairs: {
-        "A46":"ApplePay RO",
+        "A6": "Cash/Other",
       }
-    ),
-    VersionPair(
-      index: 0,
-      pairs: {
-        "A4":"Net Sales",
-      },
     ),
   ]
 )
