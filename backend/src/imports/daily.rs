@@ -257,6 +257,7 @@ fn check_daily_version(sheet: &Worksheet, pairs: &VersionPair) -> bool {
 
         if s_val != *val {
             debug!("   [FAILED] Returning");
+            debug!("  expected: [{}].  found: [{}]", *val, s_val);
             return false;
         }
 

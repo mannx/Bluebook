@@ -9,7 +9,7 @@ VersionConfig(
     VersionPair(
       index: 1,
       pairs: {
-        "A6": "Cash/Other",
+        "A6": "Cards/Other",
       }
     ),
   ]
